@@ -13,6 +13,7 @@ import {
 
 export const initialState: ConfigState = {
 	sideBarOpen: true,
+	agentEditorOpen: false,
 };
 
 const ConfigContext = createContext<ConfigState>(initialState);

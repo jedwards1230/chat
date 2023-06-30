@@ -10,10 +10,19 @@ type Message = {
 		| undefined;
 };
 
+type Model = "gpt-3.5-turbo" | "gpt-3.5-turbo-16k" | "gpt-4";
+
+interface AgentConfig {
+	id: string;
+	name: string;
+	model: Model;
+}
+
 interface ChatEntry {
 	id: string;
 	title: string;
 	messages: Message[];
+	agentConfig: AgentConfig;
 }
 
 interface ChatState {
@@ -29,19 +38,5 @@ interface ChatState {
 
 interface ConfigState {
 	sideBarOpen: boolean;
+	agentEditorOpen: boolean;
 }
-
-type ConfigAction =
-	| { type: "TOGGLE_SIDEBAR"; payload?: boolean }
-	| { type: "CREATE_THREAD"; payload: ChatEntry }
-	| {
-			type: "REMOVE_THREAD";
-			payload: string;
-	  }
-	| {
-			type: "UPSERT_MESSAGE";
-			payload: {
-				threadId: string;
-				message: Message;
-			};
-	  };

@@ -1,19 +1,4 @@
-type Action =
-	| { type: "INITIALIZE"; payload: ChatEntry[] }
-	| { type: "CREATE_THREAD"; payload: ChatEntry }
-	| {
-			type: "REMOVE_THREAD";
-			payload: string;
-	  }
-	| {
-			type: "UPSERT_MESSAGE";
-			payload: {
-				threadId: string;
-				message: Message;
-			};
-	  };
-
-export function chatReducer(state: ChatState, action: Action) {
+export function chatReducer(state: ChatState, action: ChatAction) {
 	switch (action.type) {
 		case "INITIALIZE":
 			return {
@@ -58,6 +43,35 @@ export function chatReducer(state: ChatState, action: Action) {
 						  }
 						: thread;
 				}),
+			};
+
+		case "UPSERT_TITLE":
+			return {
+				...state,
+				threadList: state.threadList.map((thread) =>
+					thread.id === action.payload.threadId
+						? {
+								...thread,
+								title: action.payload.title,
+						  }
+						: thread
+				),
+			};
+
+		case "CHANGE_MODEL":
+			return {
+				...state,
+				threadList: state.threadList.map((thread) =>
+					thread.id === action.payload.threadId
+						? {
+								...thread,
+								agentConfig: {
+									...thread.agentConfig,
+									model: action.payload.model,
+								},
+						  }
+						: thread
+				),
 			};
 
 		default:

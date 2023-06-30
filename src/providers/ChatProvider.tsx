@@ -1,6 +1,7 @@
 "use client";
 
 import {
+	Dispatch,
 	createContext,
 	useContext,
 	useEffect,
@@ -19,6 +20,11 @@ export const initialState: ChatState = {
 		id: "",
 		title: "",
 		messages: [],
+		agentConfig: {
+			id: "",
+			name: "",
+			model: "gpt-3.5-turbo-16k",
+		},
 	},
 	handleSubmit: () => {},
 	handleInputChange: () => {},
@@ -28,8 +34,10 @@ export const initialState: ChatState = {
 };
 
 const ChatContext = createContext<ChatState>(initialState);
+const ChatDispatchContext = createContext<Dispatch<ChatAction>>(() => {});
 
 export const useChatCtx = () => useContext(ChatContext);
+export const useChatDispatch = () => useContext(ChatDispatchContext);
 
 export function ChatProvider({ children }: { children: React.ReactNode }) {
 	const [activeThreadId, setActiveThreadId] = useState(uuidv4());
@@ -40,6 +48,11 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 		id: activeThreadId,
 		title: "New Chat",
 		messages: [],
+		agentConfig: {
+			id: "",
+			name: "",
+			model: "gpt-3.5-turbo-16k",
+		},
 	};
 
 	const [state, dispatch] = useReducer(chatReducer, {
@@ -69,11 +82,10 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
 	const createNewThread = () => {
 		const newId = uuidv4();
-		setActiveThreadId(newId); // todo: needed?
+		setActiveThreadId(newId);
 		const newEntry: ChatEntry = {
+			...baseEntry,
 			id: newId,
-			title: "New Chat",
-			messages: [] as Message[],
 		};
 		dispatch({ type: "CREATE_THREAD", payload: newEntry });
 		setInput("");
@@ -115,35 +127,68 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
 			setInput("");
 
-			const res = await fetch("/api/chat", {
+			fetch("/api/chat", {
 				method: "POST",
 				body: JSON.stringify({
 					input,
 					msgHistory: activeThread.messages,
+					modelName: activeThread.agentConfig.model,
 				}),
-			});
+			})
+				.then(async (res) => {
+					if (!res.body) {
+						throw new Error("No response body from /api/chat");
+					}
 
-			if (!res.body) {
-				throw new Error("No response body");
-			}
+					const assistantId = uuidv4();
 
-			const assistantId = uuidv4();
+					await readStream(res.body, (chunk: string) => {
+						const assistantMsg: Message = {
+							id: assistantId,
+							content: chunk,
+							role: "assistant",
+						};
 
-			await readStream(res.body, (chunk: string) => {
-				const assistantMsg: Message = {
-					id: assistantId,
-					content: chunk,
-					role: "assistant",
-				};
-
-				dispatch({
-					type: "UPSERT_MESSAGE",
-					payload: {
-						threadId: activeThread.id,
-						message: assistantMsg,
-					},
+						dispatch({
+							type: "UPSERT_MESSAGE",
+							payload: {
+								threadId: activeThread.id,
+								message: assistantMsg,
+							},
+						});
+					});
+				})
+				.catch((err) => {
+					console.error(err);
 				});
-			});
+
+			const l = activeThread.messages.length;
+			if (l < 2 || l > 10) return;
+			fetch("/api/get_title", {
+				method: "POST",
+				body: JSON.stringify({
+					msgHistory: activeThread.messages,
+					input,
+				}),
+			})
+				.then(async (res) => {
+					if (!res.body) {
+						throw new Error("No response body from /api/chat");
+					}
+
+					await readStream(res.body, (chunk: string) => {
+						dispatch({
+							type: "UPSERT_TITLE",
+							payload: {
+								threadId: activeThread.id,
+								title: chunk,
+							},
+						});
+					});
+				})
+				.catch((err) => {
+					console.error(err);
+				});
 		}
 	};
 
@@ -181,7 +226,9 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 				removeThread,
 			}}
 		>
-			{children}
+			<ChatDispatchContext.Provider value={dispatch}>
+				{children}
+			</ChatDispatchContext.Provider>
 		</ChatContext.Provider>
 	);
 }

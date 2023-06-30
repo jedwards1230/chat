@@ -1,4 +1,8 @@
-import { AIChatMessage, HumanChatMessage } from "langchain/schema";
+import {
+	AIChatMessage,
+	HumanChatMessage,
+	SystemChatMessage,
+} from "langchain/schema";
 import { Calculator } from "langchain/tools/calculator";
 import { initializeAgentExecutorWithOptions } from "langchain/agents";
 import { ChatOpenAI } from "langchain/chat_models/openai";
@@ -12,11 +16,9 @@ export async function POST(request: Request) {
 	const {
 		input,
 		msgHistory,
-		modelName,
 	}: {
 		input: string;
 		msgHistory: Message[];
-		modelName: Model;
 	} = res;
 
 	if (!input) {
@@ -31,17 +33,6 @@ export async function POST(request: Request) {
 		});
 	}
 
-	const messages = msgHistory.map((msg) => {
-		if (msg.role === "user") {
-			return new HumanChatMessage(msg.content);
-		} else if (msg.role === "function") {
-			console.log("Function call", msg.function_call);
-			return new AIChatMessage(msg.function_call);
-		} else {
-			return new AIChatMessage(msg.content);
-		}
-	});
-
 	const stream = new ReadableStream({
 		async start(controller) {
 			const encoder = new TextEncoder();
@@ -54,11 +45,6 @@ export async function POST(request: Request) {
 					},
 				},
 				{
-					handleAgentAction(action, runId) {
-						console.log("Action", action);
-					},
-				},
-				{
 					handleLLMError(error) {
 						console.error(error);
 					},
@@ -68,40 +54,26 @@ export async function POST(request: Request) {
 						console.error(error);
 					},
 				},
-				{
-					handleToolError(error) {
-						console.error(error);
-					},
-				},
 			];
 
-			const memory = new BufferMemory({
-				chatHistory: new ChatMessageHistory(messages),
-				returnMessages: true,
-				memoryKey: "chat_history",
-			});
-
-			const tools = [new Calculator()];
-
 			const llm = new ChatOpenAI({
-				modelName: modelName,
+				modelName: "gpt-3.5-turbo-16k",
 				temperature: 0,
 				streaming: true,
 				callbacks,
 			});
+			const messages = msgHistory.map((msg) => JSON.stringify(msg));
+			messages.push(input);
 
-			const executor = await initializeAgentExecutorWithOptions(
-				tools,
-				llm,
-				{
-					agentType: "openai-functions",
-					// returnIntermediateSteps: true,
-					memory,
-					callbacks,
-				}
-			);
-
-			await executor.call({ input });
+			await llm.call([
+				new SystemChatMessage(
+					"You are a helpful assistant that generates a brief chat title based on provided chat messages. " +
+						"Provide only the string for the title. No quotes or labels are necessary."
+				),
+				new HumanChatMessage(
+					"Messages Start:\n" + messages.join("\n") + "\nMessages End"
+				),
+			]);
 
 			controller.close();
 		},
