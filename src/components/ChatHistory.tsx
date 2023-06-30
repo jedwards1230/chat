@@ -3,7 +3,7 @@
 import { useChatCtx } from "@/providers/ChatProvider";
 import ChatHistoryEntry from "./ChatHistoryEntry";
 import { useConfig, useConfigDispatch } from "@/providers/ConfigProvider";
-import { XMark } from "./Icons";
+import { Settings, XMark } from "./Icons";
 import { useEffect, useRef } from "react";
 import { isMobile } from "@/app/utils";
 
@@ -41,12 +41,20 @@ export default function ChatHistory() {
 			className="fixed h-full max-w-xs py-2 border-r sm:max-w-sm sm:static dark:border-neutral-500 w-96 text-neutral-100 bg-neutral-800 dark:bg-neutral-700"
 		>
 			<div className="relative flex flex-col items-center justify-start w-full h-full gap-2">
-				<button
-					className="w-[95%] py-2 transition-colors bg-neutral-600 hover:bg-neutral-500 rounded-md font-semibold"
-					onClick={createNewThread}
-				>
-					Create New Thread
-				</button>
+				<div className="flex justify-between w-full px-2 gap-x-2">
+					<button
+						className="flex-1 py-2 font-semibold transition-colors rounded-md bg-neutral-600 hover:bg-neutral-500"
+						onClick={createNewThread}
+					>
+						New Chat
+					</button>
+					<button
+						className="p-2 font-semibold transition-colors rounded-md bg-neutral-600 hover:bg-neutral-500"
+						onClick={createNewThread}
+					>
+						<Settings />
+					</button>
+				</div>
 				<div className="flex flex-col-reverse w-full px-1">
 					{threadList &&
 						threadList.map((m, i) => (
