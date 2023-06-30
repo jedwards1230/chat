@@ -5,16 +5,20 @@ import ChatHistoryEntry from "./ChatHistoryEntry";
 import { useConfig, useConfigDispatch } from "@/providers/ConfigProvider";
 import { Settings, XMark } from "./Icons";
 import { useEffect, useRef } from "react";
-import { isMobile } from "@/app/utils";
+import { isMobile } from "@/utils";
 
 export default function ChatHistory() {
 	const { threadList, createNewThread } = useChatCtx();
-	const config = useConfig();
+	const { sideBarOpen } = useConfig();
 	const dispatch = useConfigDispatch();
 	const sidebarRef = useRef<HTMLDivElement>(null);
 
 	const closeSidebar = () => {
 		dispatch({ type: "TOGGLE_SIDEBAR", payload: false });
+	};
+
+	const openConfig = () => {
+		dispatch({ type: "TOGGLE_CONFIG_EDITOR", payload: true });
 	};
 
 	useEffect(() => {
@@ -34,7 +38,7 @@ export default function ChatHistory() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
-	if (!config.sideBarOpen) return null;
+	if (!sideBarOpen) return null;
 	return (
 		<div
 			ref={sidebarRef}
@@ -50,7 +54,7 @@ export default function ChatHistory() {
 					</button>
 					<button
 						className="p-2 font-semibold transition-colors rounded-md bg-neutral-600 hover:bg-neutral-500"
-						onClick={createNewThread}
+						onClick={openConfig}
 					>
 						<Settings />
 					</button>

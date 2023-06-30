@@ -10,6 +10,11 @@ export function configReducer(state: ConfigState, action: ConfigAction) {
 				...state,
 				agentEditorOpen: action.payload ?? !state.agentEditorOpen,
 			};
+		case "TOGGLE_CONFIG_EDITOR":
+			return {
+				...state,
+				configEditorOpen: action.payload ?? !state.configEditorOpen,
+			};
 		default:
 			return state;
 	}

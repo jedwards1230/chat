@@ -1,6 +1,6 @@
 "use client";
 
-import { isMobile } from "@/app/utils";
+import { isMobile } from "@/utils";
 import { configReducer } from "@/reducers/configReducer";
 import {
 	Dispatch,
@@ -14,6 +14,7 @@ import {
 export const initialState: ConfigState = {
 	sideBarOpen: true,
 	agentEditorOpen: false,
+	configEditorOpen: false,
 };
 
 const ConfigContext = createContext<ConfigState>(initialState);

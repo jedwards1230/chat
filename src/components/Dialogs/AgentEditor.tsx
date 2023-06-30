@@ -1,13 +1,25 @@
 "use client";
 
 import { useChatCtx, useChatDispatch } from "@/providers/ChatProvider";
+import { useConfig, useConfigDispatch } from "@/providers/ConfigProvider";
+import Dialog from "./Dialog";
 
 export default function AgentEditor() {
+	const { agentEditorOpen } = useConfig();
+	const configDispatch = useConfigDispatch();
 	const { activeThread } = useChatCtx();
-	const dispatch = useChatDispatch();
+	const chatDispatch = useChatDispatch();
 
+	if (!agentEditorOpen) return null;
 	return (
-		<>
+		<Dialog
+			callback={() =>
+				configDispatch({
+					type: "TOGGLE_AGENT_EDITOR",
+					payload: false,
+				})
+			}
+		>
 			<div className="w-full pb-4 text-xl font-medium text-center">
 				Agent Editor
 			</div>
@@ -17,7 +29,7 @@ export default function AgentEditor() {
 					className="p-2 ml-2 border rounded-lg"
 					value={activeThread.agentConfig.model}
 					onChange={(e) => {
-						dispatch({
+						chatDispatch({
 							type: "CHANGE_MODEL",
 							payload: {
 								threadId: activeThread.id,
@@ -31,6 +43,6 @@ export default function AgentEditor() {
 					<option value="gpt-4">gpt-4</option>
 				</select>
 			</label>
-		</>
+		</Dialog>
 	);
 }

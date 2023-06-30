@@ -10,7 +10,7 @@ import {
 } from "react";
 import { v4 as uuidv4 } from "uuid";
 
-import { getChatHistory, readStream } from "../app/utils";
+import { getChatHistory, readStream } from "../utils";
 import { chatReducer } from "@/reducers/chatReducer";
 
 export const initialState: ChatState = {
@@ -212,6 +212,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 		activeThread.messages.length,
 		checkedLocal,
 	]);
+
+	if (state.threadList.length === 0) createNewThread();
 
 	return (
 		<ChatContext.Provider

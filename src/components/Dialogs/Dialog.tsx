@@ -4,7 +4,13 @@ import { useConfig, useConfigDispatch } from "@/providers/ConfigProvider";
 import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 
-export default function Dialog({ children }: { children: React.ReactNode }) {
+export default function Dialog({
+	children,
+	callback,
+}: {
+	children: React.ReactNode;
+	callback: () => void;
+}) {
 	const config = useConfig();
 	const dispatch = useConfigDispatch();
 	const ref = useRef<HTMLDivElement>(null);
@@ -12,15 +18,8 @@ export default function Dialog({ children }: { children: React.ReactNode }) {
 	// click outside to close
 	useEffect(() => {
 		function handleClickOutside(event: any) {
-			if (
-				ref.current &&
-				!ref.current.contains(event.target) &&
-				config.agentEditorOpen
-			) {
-				dispatch({
-					type: "TOGGLE_AGENT_EDITOR",
-					payload: false,
-				});
+			if (ref.current && !ref.current.contains(event.target)) {
+				callback();
 			}
 		}
 		document.addEventListener("mousedown", handleClickOutside);
@@ -29,7 +28,6 @@ export default function Dialog({ children }: { children: React.ReactNode }) {
 		};
 	}, [config, dispatch]);
 
-	if (!config.agentEditorOpen) return null;
 	return (
 		<motion.dialog
 			initial={{

@@ -39,4 +39,5 @@ interface ChatState {
 interface ConfigState {
 	sideBarOpen: boolean;
 	agentEditorOpen: boolean;
+	configEditorOpen: boolean;
 }

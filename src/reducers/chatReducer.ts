@@ -74,6 +74,12 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 				),
 			};
 
+		case "CLEAR_HISTORY":
+			return {
+				...state,
+				threadList: [],
+			};
+
 		default:
 			return state;
 	}

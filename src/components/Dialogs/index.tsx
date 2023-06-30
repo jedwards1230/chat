@@ -1,14 +1,15 @@
 "use client";
 
+import { useConfig } from "@/providers/ConfigProvider";
 import AgentEditor from "./AgentEditor";
-import Dialog from "./Dialog";
+import ConfigEditor from "./ConfigEditor";
 
 export default function Dialogs() {
+	const { agentEditorOpen, configEditorOpen } = useConfig();
 	return (
 		<>
-			<Dialog>
-				<AgentEditor />
-			</Dialog>
+			{agentEditorOpen && <AgentEditor />}
+			{configEditorOpen && <ConfigEditor />}
 		</>
 	);
 }
