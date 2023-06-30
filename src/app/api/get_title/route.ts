@@ -1,12 +1,5 @@
-import {
-	AIChatMessage,
-	HumanChatMessage,
-	SystemChatMessage,
-} from "langchain/schema";
-import { Calculator } from "langchain/tools/calculator";
-import { initializeAgentExecutorWithOptions } from "langchain/agents";
+import { HumanChatMessage, SystemChatMessage } from "langchain/schema";
 import { ChatOpenAI } from "langchain/chat_models/openai";
-import { BufferMemory, ChatMessageHistory } from "langchain/memory";
 import { Callbacks } from "langchain/dist/callbacks";
 
 export const runtime = "edge";
@@ -14,25 +7,16 @@ export const runtime = "edge";
 export async function POST(request: Request) {
 	const res = await request.json();
 	const {
-		input,
-		msgHistory,
+		history,
 	}: {
-		input: string;
-		msgHistory: Message[];
+		history: string;
 	} = res;
 
-	if (!input) {
-		return new Response("No query", {
+	if (!history) {
+		return new Response("No history", {
 			status: 400,
 		});
 	}
-
-	if (!msgHistory) {
-		return new Response("No message history", {
-			status: 400,
-		});
-	}
-
 	const stream = new ReadableStream({
 		async start(controller) {
 			const encoder = new TextEncoder();
@@ -57,13 +41,11 @@ export async function POST(request: Request) {
 			];
 
 			const llm = new ChatOpenAI({
-				modelName: "gpt-3.5-turbo-16k",
+				modelName: "gpt-3.5-turbo",
 				temperature: 0,
 				streaming: true,
 				callbacks,
 			});
-			const messages = msgHistory.map((msg) => JSON.stringify(msg));
-			messages.push(input);
 
 			await llm.call([
 				new SystemChatMessage(
@@ -71,7 +53,7 @@ export async function POST(request: Request) {
 						"Provide only the string for the title. No quotes or labels are necessary."
 				),
 				new HumanChatMessage(
-					"Messages Start:\n" + messages.join("\n") + "\nMessages End"
+					"Messages Start:\n" + history + "\nMessages End"
 				),
 			]);
 

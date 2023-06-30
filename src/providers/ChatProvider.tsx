@@ -164,11 +164,14 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
 			const l = activeThread.messages.length;
 			if (l < 2 || l > 10) return;
+			const history = activeThread.messages.map(
+				(msg) => msg.role + ": " + msg.content
+			);
+			history.push("user: " + input);
 			fetch("/api/get_title", {
 				method: "POST",
 				body: JSON.stringify({
-					msgHistory: activeThread.messages,
-					input,
+					history: history.join("\n"),
 				}),
 			})
 				.then(async (res) => {
