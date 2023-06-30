@@ -8,7 +8,7 @@ export default function ChatInput() {
 	return (
 		<form
 			onSubmit={handleSubmit}
-			className="flex items-center justify-center w-full gap-2 px-4 pt-2 pb-8 border-t shadow-xl sm:pb-4 dark:shadow-none border-neutral-300 dark:border-neutral-600 dark:border-0 justify-self-end "
+			className="flex items-center justify-center w-full gap-2 px-4 pt-2 pb-8 border shadow-xl sm:pb-4 dark:shadow-none border-neutral-300 dark:border-neutral-600 dark:border-0 justify-self-end "
 		>
 			<input
 				placeholder="Say something..."

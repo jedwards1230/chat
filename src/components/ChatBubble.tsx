@@ -122,7 +122,7 @@ export default function ChatBubble({
 				"flex flex-col transition-colors items-start justify-center py-1 px-2 m-1 border border-transparent dark:hover:border-neutral-600 hover:border-neutral-400/90 rounded",
 				role === "user"
 					? "bg-blue-100 dark:bg-blue-500"
-					: "bg-neutral-100 dark:bg-neutral-700"
+					: "bg-neutral-200/40 dark:bg-neutral-700"
 			)}
 		>
 			<ReactMarkdown
