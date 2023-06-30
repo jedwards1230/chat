@@ -13,7 +13,7 @@ export default function ChatHistoryEntry({ entry }: { entry: ChatEntry }) {
 				"p-2 flex w-full justify-between items-center",
 				entry.id === activeThread.id
 					? "bg-neutral-400 dark:bg-neutral-500"
-					: "cursor-pointer"
+					: "cursor-pointer hover:bg-neutral-600"
 			)}
 			onClick={() => jumpToChatEntry(entry.id)}
 		>

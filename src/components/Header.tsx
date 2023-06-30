@@ -20,7 +20,9 @@ export default function Header() {
 			>
 				<Bars />
 			</div>
-			<p className="col-span-10 text-center">{activeThread.title}</p>
+			<p className="col-span-10 font-semibold text-center">
+				{activeThread.title}
+			</p>
 		</div>
 	);
 }
