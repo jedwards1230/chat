@@ -3,7 +3,7 @@
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
-		"dev": "next dev --turbo --show-all",
+		"dev": "next dev --turbo",
 		"build": "next build",
 		"start": "next start",
 		"lint": "next lint"
@@ -20,10 +20,14 @@
 		"next": "13.4.7",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
+		"react-markdown": "^8.0.7",
+		"react-syntax-highlighter": "^15.5.0",
+		"remark-gfm": "^3.0.1",
 		"typescript": "5.1.6",
 		"uuid": "^9.0.0"
 	},
 	"devDependencies": {
+		"@types/react-syntax-highlighter": "^15.5.7",
 		"@types/uuid": "^9.0.2",
 		"autoprefixer": "^10.4.14",
 		"postcss": "^8.4.24",

@@ -1,13 +1,13 @@
 "use client";
 
-import { useChatCtx } from "@/app/context";
+import { useChatCtx } from "@/providers/ChatProvider";
 import ChatHistoryEntry from "./ChatHistoryEntry";
 
 export default function ChatHistory() {
 	const { threadList, createNewThread } = useChatCtx();
 
 	return (
-		<div className="flex flex-col items-center justify-start h-full max-w-sm gap-2 py-2 border-r dark:border-neutral-500 w-96 text-neutral-100 bg-neutral-700">
+		<div className="flex flex-col items-center justify-start h-full max-w-sm gap-2 py-2 border-r dark:border-neutral-500 w-96 text-neutral-100 bg-neutral-800 dark:bg-neutral-700">
 			<button
 				className="w-[95%] py-2 transition-colors border rounded-md hover:bg-neutral-500"
 				onClick={createNewThread}

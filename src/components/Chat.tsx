@@ -1,34 +1,20 @@
 "use client";
 
-import { useEffect } from "react";
-
 import ChatBubble from "./ChatBubble";
-import { useChatCtx } from "../app/context";
+import { useChatCtx } from "../providers/ChatProvider";
 
 export default function Chat() {
-	const {
-		messages,
-		setMessages,
-		input,
-		handleSubmit,
-		handleInputChange,
-		activeThread,
-	} = useChatCtx();
-
-	useEffect(() => {
-		setMessages(activeThread.messages);
-	}, [activeThread, setMessages]);
+	const { input, handleSubmit, handleInputChange, activeThread } =
+		useChatCtx();
 
 	return (
 		<div className="flex flex-col w-full h-full">
-			<div className="flex items-center justify-center px-2 py-4 border-b border-neutral-300 dark:bg-neutral-900/75 dark:border-neutral-500 bg-neutral-50">
+			<div className="flex items-center justify-center px-2 py-4 border-b shadow border-neutral-300 dark:bg-neutral-900/75 dark:border-neutral-500 bg-neutral-50">
 				<p>{activeThread.title}</p>
 			</div>
 			<div className="flex-1 p-2 overflow-scroll">
-				{messages.map((m) => (
-					<ChatBubble key={m.id} role={m.role}>
-						{m.content}
-					</ChatBubble>
+				{activeThread.messages.map((m) => (
+					<ChatBubble key={m.id} role={m.role} content={m.content} />
 				))}
 			</div>
 			<form
@@ -38,6 +24,7 @@ export default function Chat() {
 				<input
 					placeholder="Say something..."
 					value={input}
+					autoFocus
 					onChange={handleInputChange}
 					className="flex-1 w-full p-2 rounded dark:bg-neutral-600 focus:outline-none"
 				/>

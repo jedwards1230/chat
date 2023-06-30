@@ -1,5 +1,5 @@
 type Message = {
-	id?: string;
+	id: string;
 	createdAt?: Date | undefined;
 	content: string;
 	role: "system" | "user" | "assistant" | "function";
@@ -18,10 +18,8 @@ interface ChatEntry {
 
 interface State {
 	input: string;
-	messages: Message[];
 	activeThread: ChatEntry;
 	threadList: ChatEntry[];
-	setMessages: (messages: Message[]) => void;
 	handleSubmit: (e: React.FormEvent) => void;
 	handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 	jumpToChatEntry: (id: string) => void;

@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import "./globals.css";
+import Providers from "@/providers";
 
 export const metadata = {
 	title: "Create Next App",
@@ -13,8 +14,16 @@ export default function RootLayout({
 }) {
 	return (
 		<html lang="en">
-			<body className="bg-neutral-100 dark:text-neutral-100 dark:bg-neutral-800">
-				<Suspense>{children}</Suspense>
+			<body className="bg-neutral-50 dark:text-neutral-100 dark:bg-neutral-800">
+				<Suspense
+					fallback={
+						<div className="flex items-center justify-center w-full h-full">
+							<p>Loading...</p>
+						</div>
+					}
+				>
+					<Providers>{children}</Providers>
+				</Suspense>
 			</body>
 		</html>
 	);

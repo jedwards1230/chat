@@ -84,10 +84,11 @@ export async function POST(request: Request) {
 			const tools = [new Calculator()];
 
 			const llm = new ChatOpenAI({
-				modelName: "gpt-4-0613",
+				//modelName: "gpt-4-0613",
+				modelName: "gpt-3.5-turbo-16k",
 				temperature: 0,
-				callbacks,
 				streaming: true,
+				callbacks,
 			});
 
 			const executor = await initializeAgentExecutorWithOptions(
@@ -95,15 +96,13 @@ export async function POST(request: Request) {
 				llm,
 				{
 					agentType: "openai-functions",
-					//returnIntermediateSteps: true,
+					// returnIntermediateSteps: true,
 					memory,
 					callbacks,
 				}
 			);
 
-			const result = await executor.call({ input });
-
-			console.log({ result });
+			await executor.call({ input });
 
 			controller.close();
 		},
