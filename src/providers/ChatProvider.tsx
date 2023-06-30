@@ -10,9 +10,9 @@ import {
 import { v4 as uuidv4 } from "uuid";
 
 import { getChatHistory, readStream } from "../app/utils";
-import { reducer } from "@/app/reducer";
+import { chatReducer } from "@/reducers/chatReducer";
 
-export const initialState: State = {
+export const initialState: ChatState = {
 	threadList: [],
 	input: "",
 	activeThread: {
@@ -27,7 +27,7 @@ export const initialState: State = {
 	removeThread: () => {},
 };
 
-const ChatContext = createContext<State>(initialState);
+const ChatContext = createContext<ChatState>(initialState);
 
 export const useChatCtx = () => useContext(ChatContext);
 
@@ -42,7 +42,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 		messages: [],
 	};
 
-	const [state, dispatch] = useReducer(reducer, {
+	const [state, dispatch] = useReducer(chatReducer, {
 		...initialState,
 		threadList: [baseEntry],
 	});

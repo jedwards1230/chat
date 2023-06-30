@@ -2,15 +2,29 @@
 
 import ChatBubble from "./ChatBubble";
 import { useChatCtx } from "../providers/ChatProvider";
+import { useConfigDispatch } from "@/providers/ConfigProvider";
+import { Bars } from "./Icons";
 
 export default function Chat() {
 	const { input, handleSubmit, handleInputChange, activeThread } =
 		useChatCtx();
 
+	const dispatch = useConfigDispatch();
+
+	const handleSidebarToggle = () => {
+		dispatch({ type: "TOGGLE_SIDEBAR" });
+	};
+
 	return (
-		<div className="flex flex-col w-full h-full">
-			<div className="flex items-center justify-center px-2 py-4 border-b shadow border-neutral-300 dark:bg-neutral-900/75 dark:border-neutral-500 bg-neutral-50">
-				<p>{activeThread.title}</p>
+		<div className="flex flex-col w-full h-full ">
+			<div className="grid grid-cols-12 px-2 py-4 border-b shadow border-neutral-300 dark:bg-neutral-900/75 dark:border-neutral-500 bg-neutral-50">
+				<div
+					className="col-span-1 cursor-pointer"
+					onClick={handleSidebarToggle}
+				>
+					<Bars />
+				</div>
+				<p className="col-span-10 text-center">{activeThread.title}</p>
 			</div>
 			<div className="flex-1 p-2 overflow-scroll">
 				{activeThread.messages.map((m) => (

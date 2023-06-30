@@ -1,11 +1,9 @@
-import { Chat, ChatHistory } from "../components";
-import { ChatProvider } from "../providers/ChatProvider";
+import { ChatClient } from "../components";
 
 export default function Page() {
 	return (
-		<div className="flex w-full h-full">
-			<ChatHistory />
-			<Chat />
+		<div className="relative flex w-full h-full">
+			<ChatClient />
 		</div>
 	);
 }

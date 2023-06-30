@@ -1,5 +1,11 @@
 "use client";
 
+import resolveConfig from "tailwindcss/resolveConfig";
+
+import tailwindConfig from "../../tailwind.config.js";
+
+export const fullConfig = resolveConfig(tailwindConfig);
+
 export async function readStream(
 	stream: ReadableStream,
 	chunkCallback: (token: string) => void
@@ -31,3 +37,9 @@ export const getChatHistory = () => {
 
 	return null;
 };
+
+export function isMobile() {
+	if (typeof window === "undefined") return false;
+	const screens = fullConfig.theme?.screens as Record<string, string>;
+	if (window.innerWidth < parseInt(screens.sm)) return true;
+}

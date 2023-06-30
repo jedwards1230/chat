@@ -2,6 +2,7 @@
 
 import { useChatCtx } from "@/providers/ChatProvider";
 import clsx from "clsx";
+import { Trash } from "./Icons";
 
 export default function ChatHistoryEntry({ entry }: { entry: ChatEntry }) {
 	const { activeThread, jumpToChatEntry, removeThread } = useChatCtx();
@@ -9,7 +10,7 @@ export default function ChatHistoryEntry({ entry }: { entry: ChatEntry }) {
 	return (
 		<div
 			className={clsx(
-				"p-2 flex w-full justify-between",
+				"p-2 flex w-full justify-between items-center",
 				entry.id === activeThread.id
 					? "bg-neutral-400 dark:bg-neutral-500"
 					: "cursor-pointer"
@@ -23,11 +24,11 @@ export default function ChatHistoryEntry({ entry }: { entry: ChatEntry }) {
 				</div>
 			</div>
 			<div
-				className="flex items-center justify-center w-6 h-6 rounded-full cursor-pointer select-none hover:bg-neutral-500 justify-self-end"
+				className="flex items-center justify-center w-8 h-8 rounded-full cursor-pointer select-none hover:bg-neutral-500 justify-self-end"
 				onClick={() => removeThread(entry.id)}
 				title="Delete conversation"
 			>
-				x
+				<Trash />
 			</div>
 		</div>
 	);

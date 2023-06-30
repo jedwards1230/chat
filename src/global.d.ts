@@ -16,7 +16,7 @@ interface ChatEntry {
 	messages: Message[];
 }
 
-interface State {
+interface ChatState {
 	input: string;
 	activeThread: ChatEntry;
 	threadList: ChatEntry[];
@@ -26,3 +26,22 @@ interface State {
 	createNewThread: () => void;
 	removeThread: (id: string) => void;
 }
+
+interface ConfigState {
+	sideBarOpen: boolean;
+}
+
+type ConfigAction =
+	| { type: "TOGGLE_SIDEBAR"; payload?: boolean }
+	| { type: "CREATE_THREAD"; payload: ChatEntry }
+	| {
+			type: "REMOVE_THREAD";
+			payload: string;
+	  }
+	| {
+			type: "UPSERT_MESSAGE";
+			payload: {
+				threadId: string;
+				message: Message;
+			};
+	  };

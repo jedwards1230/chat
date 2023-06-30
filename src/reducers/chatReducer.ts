@@ -13,7 +13,7 @@ type Action =
 			};
 	  };
 
-export function reducer(state: State, action: Action) {
+export function chatReducer(state: ChatState, action: Action) {
 	switch (action.type) {
 		case "INITIALIZE":
 			return {

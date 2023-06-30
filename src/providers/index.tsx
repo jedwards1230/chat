@@ -1,7 +1,12 @@
 "use client";
 
 import { ChatProvider } from "./ChatProvider";
+import { ConfigProvider } from "./ConfigProvider";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
-	return <ChatProvider>{children}</ChatProvider>;
+	return (
+		<ConfigProvider>
+			<ChatProvider>{children}</ChatProvider>
+		</ConfigProvider>
+	);
 }
