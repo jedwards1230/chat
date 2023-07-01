@@ -40,7 +40,7 @@ export async function POST(request: Request) {
 		//max_tokens: 1024,
 		temperature,
 		stream: true,
-		functions: tools,
+		//functions: tools,
 	});
 
 	return new Response(completion.body, {

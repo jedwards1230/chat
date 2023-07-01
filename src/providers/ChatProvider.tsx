@@ -119,10 +119,18 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 			msgHistory.push(userMsg);
 
 			const getChat = async (msgHistory: Message[]) => {
+				console.log(msgHistory);
 				fetch("/api/chat", {
 					method: "POST",
 					body: JSON.stringify({
-						msgHistory,
+						msgHistory: msgHistory.map((msg) => {
+							return {
+								content: msg.content,
+								role: msg.role,
+								name: msg.name,
+								function_call: msg.function_call,
+							};
+						}),
 						modelName: state.activeThread.agentConfig.model,
 						temperature: 0.5,
 					}),
@@ -137,20 +145,22 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 						let tool: "calculator" | undefined;
 						let accumulatedResponse = "";
 						await readStream(res.body, (chunk: string) => {
-							const chunks = chunk
-								.split("\n")
-								.filter((c) => c.length > 0)
-								.map((c) => {
-									const jsonStr = c.replace("data: ", "");
-									if (jsonStr === "[DONE]") return;
-									try {
+							let chunks: any[] = [];
+							try {
+								chunks = chunk
+									.split("\n")
+									.filter((c) => c.length > 0)
+									.map((c) => {
+										const jsonStr = c.replace("data: ", "");
+										if (jsonStr === "[DONE]") return;
 										return JSON.parse(jsonStr);
-									} catch (e) {
-										console.error(e);
-										accumulatedResponse += jsonStr;
-										return;
-									}
-								});
+									});
+							} catch (e) {
+								console.error(e);
+								console.log(chunk);
+							}
+
+							if (!chunks) return;
 
 							accumulatedResponse = chunks.reduce(
 								(acc: string, curr: any) => {
@@ -196,7 +206,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 								id: assistantId,
 								content: input,
 								role: "assistant",
-								function_call: tool,
+								name: tool,
 							};
 							msgHistory.push(assistantMsg);
 
@@ -217,7 +227,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 								id: uuidv4(),
 								content: res,
 								role: "function",
-								name: tool as string,
+								name: tool,
 							};
 							msgHistory.push(functionMsg);
 
