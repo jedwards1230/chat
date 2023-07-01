@@ -1,9 +1,15 @@
 "use client";
 
-import { useChatCtx } from "@/providers/ChatProvider";
+import { useChatCtx, useChatDispatch } from "@/providers/ChatProvider";
 
 export default function ChatInput() {
-	const { input, handleSubmit, handleInputChange } = useChatCtx();
+	const { input, handleSubmit } = useChatCtx();
+	const dispatch = useChatDispatch();
+
+	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		e.preventDefault();
+		dispatch({ type: "CHANGE_INPUT", payload: e.target.value });
+	};
 
 	return (
 		<form

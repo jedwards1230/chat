@@ -7,6 +7,8 @@ type ChatAction =
 	| { type: "INITIALIZE"; payload: ChatEntry[] }
 	| { type: "CREATE_THREAD"; payload: ChatEntry }
 	| { type: "REMOVE_THREAD"; payload: string }
+	| { type: "CHANGE_INPUT"; payload: string }
+	| { type: "CHANGE_ACTIVE_THREAD"; payload: string }
 	| { type: "CLEAR_HISTORY" }
 	| {
 			type: "UPSERT_MESSAGE";

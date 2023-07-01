@@ -17,8 +17,8 @@ export const initialState: ChatState = {
 	threadList: [],
 	input: "",
 	activeThread: {
-		id: "",
-		title: "",
+		id: uuidv4(),
+		title: "New Chat",
 		messages: [],
 		agentConfig: {
 			id: "",
@@ -26,12 +26,14 @@ export const initialState: ChatState = {
 			model: "gpt-3.5-turbo-16k",
 		},
 	},
+	activeThreadId: "",
 	handleSubmit: () => {},
-	handleInputChange: () => {},
 	jumpToChatEntry: () => {},
 	createNewThread: () => {},
 	removeThread: () => {},
 };
+
+const baseEntry = initialState.activeThread;
 
 const ChatContext = createContext<ChatState>(initialState);
 const ChatDispatchContext = createContext<Dispatch<ChatAction>>(() => {});
@@ -40,24 +42,16 @@ export const useChatCtx = () => useContext(ChatContext);
 export const useChatDispatch = () => useContext(ChatDispatchContext);
 
 export function ChatProvider({ children }: { children: React.ReactNode }) {
-	const [activeThreadId, setActiveThreadId] = useState(uuidv4());
-	const [input, setInput] = useState("");
 	const [checkedLocal, setCheckedLocal] = useState(false);
-
-	const baseEntry: ChatEntry = {
-		id: activeThreadId,
-		title: "New Chat",
-		messages: [],
-		agentConfig: {
-			id: "",
-			name: "",
-			model: "gpt-3.5-turbo-16k",
-		},
-	};
 
 	const [state, dispatch] = useReducer(chatReducer, {
 		...initialState,
-		threadList: [baseEntry],
+		threadList: [
+			{
+				...baseEntry,
+			},
+		],
+		activeThreadId: baseEntry.id,
 	});
 
 	useEffect(() => {
@@ -68,7 +62,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
 	// Get active thread from local storage, or initialize with default entry
 	const active = state.threadList.find(
-		(thread) => thread.id === activeThreadId
+		(thread) => thread.id === state.activeThreadId
 	);
 
 	let activeThread: ChatEntry;
@@ -82,13 +76,28 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
 	const createNewThread = () => {
 		const newId = uuidv4();
-		setActiveThreadId(newId);
 		const newEntry: ChatEntry = {
 			...baseEntry,
 			id: newId,
 		};
+		dispatch({
+			type: "CHANGE_ACTIVE_THREAD",
+			payload: newId,
+		});
 		dispatch({ type: "CREATE_THREAD", payload: newEntry });
-		setInput("");
+		dispatch({ type: "CHANGE_INPUT", payload: "" });
+	};
+
+	const jumpToChatEntry = (id: string) => {
+		dispatch({
+			type: "CHANGE_ACTIVE_THREAD",
+			payload: id,
+		});
+
+		const thread = state.threadList.find((thread) => thread.id === id);
+		if (!thread) {
+			throw new Error("Thread not found");
+		}
 	};
 
 	// Function to remove a thread and update the local storage
@@ -96,24 +105,18 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 		dispatch({ type: "REMOVE_THREAD", payload: id });
 		if (state.threadList.length === 1) {
 			createNewThread();
-		}
-	};
-
-	const jumpToChatEntry = (id: string) => {
-		setActiveThreadId(id);
-		const thread = state.threadList.find((thread) => thread.id === id);
-		if (!thread) {
-			throw new Error("Thread not found");
+		} else {
+			jumpToChatEntry(state.threadList[0].id);
 		}
 	};
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if (input.length > 0) {
+		if (state.input.length > 0) {
 			const userId = uuidv4();
 			const userMsg: Message = {
 				id: userId,
-				content: input,
+				content: state.input,
 				role: "user",
 			};
 
@@ -125,12 +128,12 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 				},
 			});
 
-			setInput("");
+			dispatch({ type: "CHANGE_INPUT", payload: "" });
 
 			fetch("/api/chat", {
 				method: "POST",
 				body: JSON.stringify({
-					input,
+					input: state.input,
 					msgHistory: activeThread.messages,
 					modelName: activeThread.agentConfig.model,
 				}),
@@ -167,7 +170,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 			const history = activeThread.messages.map(
 				(msg) => msg.role + ": " + msg.content
 			);
-			history.push("user: " + input);
+			history.push("user: " + state.input);
 			fetch("/api/get_title", {
 				method: "POST",
 				body: JSON.stringify({
@@ -195,11 +198,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 		}
 	};
 
-	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		e.preventDefault();
-		setInput(e.target.value);
-	};
-
 	useEffect(() => {
 		if (typeof window !== "undefined" && checkedLocal) {
 			localStorage.setItem(
@@ -217,15 +215,14 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 	]);
 
 	if (state.threadList.length === 0) createNewThread();
-
 	return (
 		<ChatContext.Provider
 			value={{
 				threadList: state.threadList,
-				input,
+				input: state.input,
 				activeThread,
+				activeThreadId: state.activeThreadId,
 				handleSubmit,
-				handleInputChange,
 				jumpToChatEntry,
 				createNewThread,
 				removeThread,

@@ -80,6 +80,21 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 				threadList: [],
 			};
 
+		case "CHANGE_INPUT":
+			return {
+				...state,
+				input: action.payload,
+			};
+
+		case "CHANGE_ACTIVE_THREAD":
+			return {
+				...state,
+				activeThreadId: action.payload,
+				activeThread: state.threadList.find(
+					(thread) => thread.id === action.payload
+				) as ChatEntry,
+			};
+
 		default:
 			return state;
 	}

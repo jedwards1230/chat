@@ -1,8 +1,5 @@
-import { AIChatMessage, HumanChatMessage } from "langchain/schema";
-import { Calculator } from "langchain/tools/calculator";
-import { initializeAgentExecutorWithOptions } from "langchain/agents";
+import { AIChatMessage, HumanChatMessage, LLMResult } from "langchain/schema";
 import { ChatOpenAI } from "langchain/chat_models/openai";
-import { BufferMemory, ChatMessageHistory } from "langchain/memory";
 import { Callbacks } from "langchain/dist/callbacks";
 
 export const runtime = "edge";
@@ -42,20 +39,35 @@ export async function POST(request: Request) {
 		}
 	});
 
+	messages.push(new HumanChatMessage(input));
+
 	const stream = new ReadableStream({
 		async start(controller) {
 			const encoder = new TextEncoder();
 
 			const callbacks: Callbacks = [
 				{
-					handleLLMNewToken(token: string) {
+					handleLLMNewToken(token: string, idx, runId) {
 						const queue = encoder.encode(token);
 						controller.enqueue(queue);
 					},
 				},
 				{
+					handleLLMEnd(output, runId) {
+						const out = output.generations[0][0];
+						if (out) {
+							controller.close();
+						}
+					},
+				},
+				{
+					handleText(text, runId) {
+						console.log({ text });
+					},
+				},
+				{
 					handleAgentAction(action, runId) {
-						console.log("Action", action);
+						//console.log("Action", action);
 					},
 				},
 				{
@@ -75,14 +87,6 @@ export async function POST(request: Request) {
 				},
 			];
 
-			const memory = new BufferMemory({
-				chatHistory: new ChatMessageHistory(messages),
-				returnMessages: true,
-				memoryKey: "chat_history",
-			});
-
-			const tools = [new Calculator()];
-
 			const llm = new ChatOpenAI({
 				modelName: modelName,
 				temperature: 0,
@@ -90,18 +94,15 @@ export async function POST(request: Request) {
 				callbacks,
 			});
 
-			const executor = await initializeAgentExecutorWithOptions(
-				tools,
-				llm,
-				{
-					agentType: "openai-functions",
-					// returnIntermediateSteps: true,
-					memory,
-					callbacks,
-				}
-			);
+			const response = await llm.predictMessages(messages);
 
-			await executor.call({ input });
+			// this should break the stream and return just a json object of response
+			if (response.additional_kwargs.function_call) {
+				/* console.log(
+					"Function call",
+					response.additional_kwargs.function_call
+				); */
+			}
 
 			controller.close();
 		},

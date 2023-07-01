@@ -28,9 +28,9 @@ interface ChatEntry {
 interface ChatState {
 	input: string;
 	activeThread: ChatEntry;
+	activeThreadId: string;
 	threadList: ChatEntry[];
 	handleSubmit: (e: React.FormEvent) => void;
-	handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 	jumpToChatEntry: (id: string) => void;
 	createNewThread: () => void;
 	removeThread: (id: string) => void;
