@@ -1,50 +1,64 @@
 "use client";
 
 import clsx from "clsx";
+
 import TextBubble from "./TextBubble";
 import FunctionBubble from "./FunctionBubble";
+import { Clipboard, Trash } from "@/components/Icons";
+import { useChatCtx, useChatDispatch } from "@/providers/ChatProvider";
+import ProfilePicture from "../ProfilePicture";
 
-export default function ChatBubble({
-	message,
-	type,
-}: {
-	message: Message;
-	type: "text" | "function";
-}) {
+export default function ChatBubble({ message }: { message: Message }) {
+	const { activeThread } = useChatCtx();
+	const dispatch = useChatDispatch();
+
+	//if (message.role === "assistant" && message.function_call) return null;
 	return (
 		<div
 			className={clsx(
-				"flex gap-2 md:gap-4 transition-colors items-start p-2 justify-start border border-transparent dark:hover:border-neutral-600 hover:border-neutral-400/70 rounded"
+				"flex relative gap-4 transition-colors group items-start px-2 pt-2 pb-4 justify-start border border-transparent dark:hover:border-neutral-600 hover:border-neutral-400/70 rounded"
 			)}
 		>
-			<div className="flex items-end h-full my-1 justify-end">
-				<div
-					className={clsx(
-						"border rounded w-8 h-8 transition-colors items-center justify-center flex",
-						message.role === "user"
-							? "bg-neutral-300 dark:bg-neutral-600 dark:border-neutral-400"
-							: message.role === "assistant"
-							? "bg-green-500 dark:border-neutral-400 text-neutral-900 dark:text-neutral-50"
-							: "bg-purple-500 dark:border-neutral-400 text-neutral-900 dark:text-neutral-50"
-					)}
-					title={message.role === "user" ? "You" : "Agent"}
-				>
-					{message.role[0].toUpperCase()}
-				</div>
-			</div>
+			<ProfilePicture message={message} />
 			<div
 				className={clsx(
-					"flex transition-colors items-start justify-center w-full py-2 px-2 rounded",
+					"flex transition-colors items-start justify-center max-w-full overflow-x-scroll py-2 px-2 rounded",
 					message.role === "user"
 						? "bg-blue-100 dark:bg-blue-500"
-						: "hover:bg-neutral-200/40 dark:bg-neutral-700"
+						: "group-hover:bg-neutral-200/60 dark:bg-neutral-700"
 				)}
 			>
-				{type === "text" ? (
-					<TextBubble message={message.content} />
-				) : (
+				{message.role === "function" ? (
 					<FunctionBubble message={message} />
+				) : (
+					<TextBubble message={message.content} />
 				)}
+			</div>
+			<div className="absolute bottom-0 hidden gap-4 group-hover:flex right-2">
+				<button
+					className="p-1 border rounded-full bg-neutral-100 hover:text-red-500 hover:bg-neutral-200 active:bg-neutral-300 border-neutral-400"
+					title="Delete Message"
+					onClick={() => {
+						dispatch({
+							type: "REMOVE_MESSAGE",
+							payload: {
+								threadId: activeThread.id,
+								messageId: message.id,
+							},
+						});
+					}}
+				>
+					<Trash />
+				</button>
+				<button
+					className="p-1 border rounded-full bg-neutral-100 hover:bg-neutral-200 active:bg-neutral-300 border-neutral-400"
+					title="Copy"
+					onClick={() => {
+						navigator.clipboard.writeText(message.content);
+					}}
+				>
+					<Clipboard />
+				</button>
 			</div>
 		</div>
 	);

@@ -41,27 +41,37 @@ export default function TextBubble({ message }: { message: string }) {
 			/>
 		),
 		br: ({ node, ...props }) => <br {...props} className="my-1" />,
-		pre: ({ node, ...props }) => (
-			<pre {...props} className="w-full overflow-x-scroll" />
-		),
+		pre: ({ node, ...props }) => <pre {...props} className="" />,
 		code({ node, inline, className, children, ...props }) {
 			const match = /language-(\w+)/.exec(className || "");
 			return !inline && match ? (
-				<SyntaxHighlighter
-					{...props}
-					//style={resolvedTheme !== "dark" ? vs : vscDarkPlus}
-					style={vs}
-					language={match[1]}
-					className="!w-full !overflow-x-scroll"
-				>
-					{String(children).replace(/\n$/, "")}
-				</SyntaxHighlighter>
+				<div className="flex flex-col flex-grow-0 gap-0">
+					<SyntaxHighlighter
+						{...props}
+						//style={resolvedTheme !== "dark" ? vs : vscDarkPlus}
+						style={vs}
+						language={match[1]}
+						className="!w-full !overflow-x-scroll !mb-1"
+					>
+						{String(children).replace(/\n$/, "")}
+					</SyntaxHighlighter>
+					<div className="flex items-center justify-center">
+						<button
+							className="w-auto px-2 py-1 text-sm font-medium tracking-tight border rounded-full active:bg-neutral-300 hover:bg-neutral-200 bg-neutral-50 border-neutral-500"
+							onClick={() => {
+								navigator.clipboard.writeText(String(children));
+							}}
+						>
+							Copy Code
+						</button>
+					</div>
+				</div>
 			) : (
 				<code
 					{...props}
 					className={clsx(
 						className,
-						"!w-full !overflow-x-scroll bg-neutral-200 tracking-wide transition-colors dark:bg-neutral-500"
+						"!w-full !overflow-x-scroll p-1 border border-neutral-500 rounded-lg bg-neutral-100 tracking-wide transition-colors dark:bg-neutral-500"
 					)}
 				>
 					{children}
@@ -73,14 +83,12 @@ export default function TextBubble({ message }: { message: string }) {
 			<strong {...props} className="font-bold" />
 		),
 		hr: ({ node, ...props }) => <hr {...props} className="my-2" />,
-		li: ({ node, index, ordered, checked, ...props }) => (
-			<li {...props} className="list-disc" />
-		),
+		li: ({ node, index, ordered, checked, ...props }) => <li {...props} />,
 		ol: ({ node, depth, ordered, ...props }) => (
-			<ol {...props} className="list-decimal" />
+			<ol {...props} className="list-decimal list-inside" />
 		),
 		ul: ({ node, depth, ordered, ...props }) => (
-			<ul {...props} className="list-disc" />
+			<ul {...props} className="list-disc list-inside" />
 		),
 		a: ({ node, ...props }) => (
 			<a {...props} className="text-blue-500 hover:underline" />
@@ -112,7 +120,7 @@ export default function TextBubble({ message }: { message: string }) {
 
 	return (
 		<ReactMarkdown
-			className="flex w-full flex-col gap-1.5 overflow-x-scroll rounded pl-2"
+			className="flex flex-col whitespace-pre-wrap w-full gap-1.5 rounded"
 			remarkPlugins={[remarkGfm]}
 			components={components}
 		>

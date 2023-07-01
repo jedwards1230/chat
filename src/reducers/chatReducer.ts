@@ -21,6 +21,22 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 				),
 			};
 
+		case "REMOVE_MESSAGE":
+			return {
+				...state,
+				threadList: state.threadList.map((thread) => {
+					return thread.id === action.payload.threadId
+						? {
+								...thread,
+								messages: thread.messages.filter(
+									(message) =>
+										message.id !== action.payload.messageId
+								),
+						  }
+						: thread;
+				}),
+			};
+
 		case "UPSERT_MESSAGE":
 			return {
 				...state,

@@ -42,7 +42,7 @@ export default function ChatHistory() {
 	return (
 		<div
 			ref={sidebarRef}
-			className="fixed h-full max-w-xs py-2 border-r sm:max-w-sm sm:relative dark:border-neutral-500 w-96 text-neutral-100 bg-neutral-800 dark:bg-neutral-700"
+			className="fixed z-10 h-full max-w-xs py-2 border-r sm:z-auto w-96 lg:w-72 sm:max-w-sm sm:relative dark:border-neutral-500 text-neutral-100 bg-neutral-800 dark:bg-neutral-700"
 		>
 			<div className="relative flex flex-col items-center justify-start w-full h-full gap-2">
 				<div className="flex justify-between w-full px-2 gap-x-2">
@@ -59,7 +59,7 @@ export default function ChatHistory() {
 						<Settings />
 					</button>
 				</div>
-				<div className="flex flex-col-reverse w-full px-1">
+				<div className="flex flex-col-reverse w-full px-1 overflow-y-scroll">
 					{threadList &&
 						threadList.map((m, i) => (
 							<ChatHistoryEntry

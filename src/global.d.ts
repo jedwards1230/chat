@@ -1,7 +1,7 @@
 type Role = "system" | "user" | "assistant" | "function";
 
 type Message = {
-	id?: string;
+	id: string;
 	content: string;
 	role: Role;
 	createdAt?: Date | undefined;
