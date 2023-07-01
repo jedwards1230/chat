@@ -1,10 +1,13 @@
 "use client";
 
 import { useChatCtx } from "@/providers/ChatProvider";
-import { useConfigDispatch } from "@/providers/ConfigProvider";
+import { useConfig, useConfigDispatch } from "@/providers/ConfigProvider";
 import { Bars, Information } from "./Icons";
+import clsx from "clsx";
+import { isMobile } from "@/utils";
 
 export default function Header() {
+	const { sideBarOpen } = useConfig();
 	const { activeThread } = useChatCtx();
 	const dispatch = useConfigDispatch();
 
@@ -19,7 +22,10 @@ export default function Header() {
 	return (
 		<div className="grid w-full grid-cols-12 px-2 py-4 border-b shadow border-neutral-300 dark:bg-neutral-900/75 dark:border-neutral-500 bg-neutral-50">
 			<button
-				className="col-span-1 cursor-pointer"
+				className={clsx(
+					"col-span-1 cursor-pointer",
+					sideBarOpen && isMobile() && "hidden sm:flex"
+				)}
 				onClick={handleSidebarToggle}
 			>
 				<Bars />

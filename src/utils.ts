@@ -3,6 +3,7 @@
 import resolveConfig from "tailwindcss/resolveConfig";
 
 import tailwindConfig from "../tailwind.config.js";
+import { Calculator } from "./tools/calculator";
 
 export const fullConfig = resolveConfig(tailwindConfig);
 
@@ -42,4 +43,10 @@ export function isMobile() {
 	if (typeof window === "undefined") return false;
 	const screens = fullConfig.theme?.screens as Record<string, string>;
 	if (window.innerWidth < parseInt(screens.sm)) return true;
+}
+
+export function callTool(tool: string, input: string) {
+	if (tool === "calculator") {
+		return new Calculator().call(input);
+	}
 }

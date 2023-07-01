@@ -11,13 +11,7 @@ import {
 } from "react-syntax-highlighter/dist/esm/styles/prism";
 import clsx from "clsx";
 
-export default function ChatBubble({
-	content,
-	role,
-}: {
-	content: string;
-	role: "system" | "user" | "assistant" | "function";
-}) {
+export default function ChatBubble({ message }: { message: Message }) {
 	const components: Partial<
 		Omit<NormalComponents, keyof SpecialComponents> & SpecialComponents
 	> = {
@@ -120,7 +114,7 @@ export default function ChatBubble({
 		<div
 			className={clsx(
 				"flex flex-col transition-colors items-start justify-center py-1 px-2 m-1 border border-transparent dark:hover:border-neutral-600 hover:border-neutral-400/70 rounded",
-				role === "user"
+				message.role === "user"
 					? "bg-blue-100 dark:bg-blue-500"
 					: "hover:bg-neutral-200/20 dark:bg-neutral-700"
 			)}
@@ -130,7 +124,7 @@ export default function ChatBubble({
 				remarkPlugins={[remarkGfm]}
 				components={components}
 			>
-				{content}
+				{message.content}
 			</ReactMarkdown>
 		</div>
 	);

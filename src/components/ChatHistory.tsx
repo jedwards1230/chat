@@ -71,7 +71,7 @@ export default function ChatHistory() {
 				<button
 					title="Close Sidebar"
 					onClick={closeSidebar}
-					className="absolute text-black top-2 -right-8 md:hidden"
+					className="absolute text-black top-2 -right-8 sm:hidden dark:text-neutral-50"
 				>
 					<XMark />
 				</button>

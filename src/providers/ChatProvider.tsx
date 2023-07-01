@@ -10,7 +10,7 @@ import {
 } from "react";
 import { v4 as uuidv4 } from "uuid";
 
-import { getChatHistory, readStream } from "../utils";
+import { getChatHistory, readStream, callTool } from "../utils";
 import { chatReducer } from "@/reducers/chatReducer";
 
 export const initialState: ChatState = {
@@ -136,6 +136,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 					input: state.input,
 					msgHistory: activeThread.messages,
 					modelName: activeThread.agentConfig.model,
+					temperature: 0.5,
 				}),
 			})
 				.then(async (res) => {
@@ -145,11 +146,62 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
 					const assistantId = uuidv4();
 
+					let tool: "calculator" | undefined;
+					let accumulatedResponse = "";
 					await readStream(res.body, (chunk: string) => {
+						const chunks = chunk
+							.split("\n")
+							.filter((c) => c.length > 0)
+							.map((c) => {
+								const jsonStr = c.replace("data: ", "");
+								if (jsonStr === "[DONE]") return;
+								return JSON.parse(jsonStr);
+							});
+
+						accumulatedResponse = chunks.reduce(
+							(acc: string, curr: any) => {
+								if (!curr) return acc;
+								const res = curr.choices[0];
+								if (res.finish_reason) {
+									return acc;
+								}
+								if (res.delta.function_call) {
+									if (res.delta.function_call.name) {
+										tool = res.delta.function_call.name;
+									}
+									return (
+										acc + res.delta.function_call.arguments
+									);
+								}
+								return acc + res.delta.content;
+							},
+							""
+						);
+
+						if (!tool) {
+							const assistantMsg: Message = {
+								id: assistantId,
+								content: accumulatedResponse,
+								role: "assistant",
+							};
+
+							dispatch({
+								type: "UPSERT_MESSAGE",
+								payload: {
+									threadId: activeThread.id,
+									message: assistantMsg,
+								},
+							});
+						}
+					});
+
+					if (tool) {
+						const { input } = JSON.parse(accumulatedResponse);
 						const assistantMsg: Message = {
 							id: assistantId,
-							content: chunk,
+							content: input,
 							role: "assistant",
+							function_call: tool,
 						};
 
 						dispatch({
@@ -159,7 +211,27 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 								message: assistantMsg,
 							},
 						});
-					});
+
+						const res = callTool(tool, input);
+						if (!res) {
+							throw new Error("Tool failure");
+						}
+
+						const functionMsg: Message = {
+							id: uuidv4(),
+							content: res,
+							role: "function",
+							function_call: tool,
+						};
+
+						dispatch({
+							type: "UPSERT_MESSAGE",
+							payload: {
+								threadId: activeThread.id,
+								message: functionMsg,
+							},
+						});
+					}
 				})
 				.catch((err) => {
 					console.error(err);
@@ -214,7 +286,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 		checkedLocal,
 	]);
 
-	if (state.threadList.length === 0) createNewThread();
+	//if (state.threadList.length === 0) createNewThread();
 	return (
 		<ChatContext.Provider
 			value={{
