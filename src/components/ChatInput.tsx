@@ -31,10 +31,10 @@ export default function ChatInput() {
 				autoFocus
 				rows={inputRows > 10 ? 10 : inputRows}
 				onChange={handleInputChange}
-				className="flex-1 w-full p-2 border border-transparent rounded dark:bg-neutral-600 focus:border-neutral-500 focus:outline-none"
+				className="flex-1 w-full p-2 focus:border-blue-500 border-2 border-transparent rounded dark:bg-neutral-600  focus:outline-none"
 			/>
 			<button
-				className="px-8 py-2 transition-colors rounded-lg bg-neutral-200 dark:bg-neutral-600 dark:border-neutral-400 hover:bg-neutral-300/75 dark:hover:bg-neutral-500"
+				className="px-8 py-2 focus:outline-none transition-colors rounded-lg bg-blue-500 dark:bg-blue-500 hover:bg-blue-400 dark:hover:bg-blue-400"
 				type="submit"
 			>
 				Send
