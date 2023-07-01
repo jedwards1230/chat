@@ -24,8 +24,8 @@ export default function ChatHistoryEntry({ entry }: { entry: ChatEntry }) {
 			}
 		>
 			<div className="flex flex-col max-w-[90%] gap-0 leading-tight">
-				<div>{entry.title}</div>
-				<div className="text-sm truncate">
+				<div className="line-clamp-1">{entry.title}</div>
+				<div className="text-sm line-clamp-1">
 					{entry.messages.length > 0 ? entry.messages[0].content : ""}
 				</div>
 			</div>

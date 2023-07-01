@@ -198,7 +198,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 								return;
 							}
 
-							const accumulatedResponse = chunks.reduce(
+							accumulatedResponse = chunks.reduce(
 								(acc: string, curr: any) => {
 									if (!curr) return acc;
 									const res = curr.choices[0];
@@ -239,6 +239,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 						});
 
 						if (tool) {
+							//console.log(accumulatedResponse, tool);
 							const { input } = JSON.parse(accumulatedResponse);
 							const assistantMsg: Message = {
 								id: assistantId,

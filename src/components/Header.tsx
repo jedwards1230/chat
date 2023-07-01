@@ -20,7 +20,7 @@ export default function Header() {
 	};
 
 	return (
-		<div className="grid w-full grid-cols-12 px-2 py-4 border-b shadow border-neutral-300 dark:bg-neutral-900/75 dark:border-neutral-500 bg-neutral-50">
+		<div className="grid w-full grid-cols-12 px-2 py-2 border-b shadow border-neutral-300 dark:bg-neutral-900/75 dark:border-neutral-500 bg-neutral-50">
 			<button
 				className={clsx(
 					"col-span-1 cursor-pointer",
@@ -30,11 +30,15 @@ export default function Header() {
 			>
 				<Bars />
 			</button>
-			<p className="col-span-10 font-semibold text-center">
-				{activeThread.title}
-			</p>
+			<div className="col-span-10 text-center">
+				<p className="font-semibold">{activeThread.title}</p>
+				<p className="font-light text-sm">
+					{activeThread.agentConfig.model} |{" "}
+					{activeThread.messages.length} messages
+				</p>
+			</div>
 			<button
-				className="flex justify-end col-span-1 cursor-pointer"
+				className="flex justify-center items-center col-span-1 cursor-pointer"
 				onClick={handleAgentEditorToggle}
 			>
 				<Information />

@@ -1,7 +1,5 @@
 "use client";
 
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { SpecialComponents } from "react-markdown/lib/ast-to-react";
 import { NormalComponents } from "react-markdown/lib/complex-types";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -9,9 +7,11 @@ import {
 	vs,
 	vscDarkPlus,
 } from "react-syntax-highlighter/dist/esm/styles/prism";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import clsx from "clsx";
 
-export default function ChatBubble({ message }: { message: Message }) {
+export default function TextBubble({ message }: { message: string }) {
 	const components: Partial<
 		Omit<NormalComponents, keyof SpecialComponents> & SpecialComponents
 	> = {
@@ -33,7 +33,7 @@ export default function ChatBubble({ message }: { message: Message }) {
 		h6: ({ node, ...props }) => (
 			<h6 {...props} className="text-xs font-bold" />
 		),
-		p: ({ node, ...props }) => <p {...props} className="py-1 text-base" />,
+		p: ({ node, ...props }) => <p {...props} className="text-base" />,
 		blockquote: ({ node, ...props }) => (
 			<blockquote
 				{...props}
@@ -111,21 +111,12 @@ export default function ChatBubble({ message }: { message: Message }) {
 	};
 
 	return (
-		<div
-			className={clsx(
-				"flex flex-col transition-colors items-start justify-center py-1 px-2 m-1 border border-transparent dark:hover:border-neutral-600 hover:border-neutral-400/70 rounded",
-				message.role === "user"
-					? "bg-blue-100 dark:bg-blue-500"
-					: "hover:bg-neutral-200/20 dark:bg-neutral-700"
-			)}
+		<ReactMarkdown
+			className="flex w-full flex-col gap-1.5 overflow-x-scroll rounded pl-2"
+			remarkPlugins={[remarkGfm]}
+			components={components}
 		>
-			<ReactMarkdown
-				className="flex w-full flex-col overflow-x-scroll rounded pl-2 [&>*]:my-1"
-				remarkPlugins={[remarkGfm]}
-				components={components}
-			>
-				{message.content}
-			</ReactMarkdown>
-		</div>
+			{message}
+		</ReactMarkdown>
 	);
 }
