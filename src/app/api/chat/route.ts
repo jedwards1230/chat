@@ -1,10 +1,6 @@
+import { openai } from "@/lib/openai";
 import { Calculator } from "@/tools/calculator";
-import { Configuration, OpenAIApi } from "openai-edge";
-
-const configuration = new Configuration({
-	apiKey: process.env.OPENAI_API_KEY,
-});
-const openai = new OpenAIApi(configuration);
+import { ChatCompletionRequestMessage } from "openai-edge";
 
 export const runtime = "edge";
 
@@ -25,10 +21,12 @@ export async function POST(request: Request) {
 			status: 400,
 		});
 	}
-	const messages = msgHistory.map((msg) => {
+	const messages: ChatCompletionRequestMessage[] = msgHistory.map((msg) => {
 		return {
 			role: msg.role,
 			content: msg.content,
+			name: msg.name,
+			function_call: msg.function_call,
 		};
 	});
 
@@ -40,7 +38,7 @@ export async function POST(request: Request) {
 		//max_tokens: 1024,
 		temperature,
 		stream: true,
-		//functions: tools,
+		functions: tools,
 	});
 
 	return new Response(completion.body, {

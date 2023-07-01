@@ -36,8 +36,8 @@ dependencies:
     specifier: ^10.12.18
     version: 10.12.18(react-dom@18.2.0)(react@18.2.0)
   langchain:
-    specifier: ^0.0.101
-    version: 0.0.101
+    specifier: ^0.0.102
+    version: 0.0.102
   next:
     specifier: 13.4.7
     version: 13.4.7(@babel/core@7.22.5)(@opentelemetry/api@1.4.1)(react-dom@18.2.0)(react@18.2.0)
@@ -45,8 +45,8 @@ dependencies:
     specifier: ^5.6.0
     version: 5.6.0(@babel/core@7.22.5)(next@13.4.7)(webpack@5.88.1)
   openai-edge:
-    specifier: ^1.1.0
-    version: 1.1.0
+    specifier: ^1.1.1
+    version: 1.1.1
   react:
     specifier: ^18.2.0
     version: 18.2.0
@@ -3908,8 +3908,8 @@ packages:
     engines: {node: '>=6'}
     dev: false
 
-  /langchain@0.0.101:
-    resolution: {integrity: sha512-NB8lBIJ2YDxapauuZMyiYRxal6HD2YSWOxykUjpZWBZn7j6W75vn9k7tU1j0Dt+WXSy8s3Hz+zl1ev3NobJTbg==}
+  /langchain@0.0.102:
+    resolution: {integrity: sha512-fAZP9YI3qOruPKYa9QrRwGIg2xr9qCAIonYLh0WUb58lkEDQnY8XbSapgWy4a6er5OCfEh9z6x4EPri1+HpD0g==}
     engines: {node: '>=18'}
     peerDependencies:
       '@aws-sdk/client-dynamodb': ^3.310.0
@@ -4930,9 +4930,9 @@ packages:
       is-wsl: 2.2.0
     dev: false
 
-  /openai-edge@1.1.0:
-    resolution: {integrity: sha512-VkXT7yhKjr1QlC/wIMuPW/s003cPHUtiNjt/kH+54iKDZZ7eiGMPuymhpSWJ/zVZfVz6+94okGd6rNuu7JRBDw==}
-    engines: {node: '>=12'}
+  /openai-edge@1.1.1:
+    resolution: {integrity: sha512-dVbGYFU4kzHeqzUYlJQuLgahB5BvGCjuyVQMiet3WLTq5AIueyS572wLLSn764wKdjWbl8xurFL9cjmwlpAO5w==}
+    engines: {node: '>=18'}
     dev: false
 
   /openai@3.3.0:

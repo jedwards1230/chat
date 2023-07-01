@@ -30,7 +30,7 @@ export default function ChatHistoryEntry({ entry }: { entry: ChatEntry }) {
 				</div>
 			</div>
 			<div
-				className="flex items-center justify-center w-8 h-8 rounded-full cursor-pointer select-none hover:bg-neutral-500"
+				className="flex items-center text-neutral-300 hover:text-neutral-50 justify-center w-8 h-8 rounded-full cursor-pointer select-none hover:bg-neutral-500/50"
 				onClick={() => removeThread(entry.id)}
 				title="Delete conversation"
 			>

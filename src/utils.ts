@@ -50,3 +50,20 @@ export function callTool(tool: string, input: string) {
 		return new Calculator().call(input);
 	}
 }
+
+export function parseStreamData(chunk: string) {
+	try {
+		return chunk
+			.split("\n")
+			.filter((c) => c.length > 0)
+			.map((c) => {
+				const jsonStr = c.replace("data: ", "");
+				if (jsonStr === "[DONE]") return;
+				return JSON.parse(jsonStr);
+			});
+	} catch (e) {
+		console.error(e);
+		console.log(chunk);
+		return [];
+	}
+}

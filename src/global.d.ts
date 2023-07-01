@@ -6,7 +6,12 @@ type Message = {
 	role: Role;
 	createdAt?: Date | undefined;
 	name?: string | undefined;
-	function_call?: string | undefined;
+	function_call?:
+		| {
+				name?: string;
+				arguments?: string;
+		  }
+		| undefined;
 };
 
 type Model = "gpt-3.5-turbo" | "gpt-3.5-turbo-16k" | "gpt-4";

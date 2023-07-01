@@ -10,7 +10,12 @@ import {
 } from "react";
 import { v4 as uuidv4 } from "uuid";
 
-import { getChatHistory, readStream, callTool } from "../utils";
+import {
+	getChatHistory,
+	readStream,
+	callTool,
+	parseStreamData,
+} from "../utils";
 import { chatReducer } from "@/reducers/chatReducer";
 
 export const initialState: ChatState = {
@@ -116,6 +121,9 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 	};
 
 	const fetchTitle = async () => {
+		const l = state.activeThread.messages.length;
+		if (l < 2 || l > 10) return;
+
 		const history = state.activeThread.messages.map(
 			(msg) => msg.role + ": " + msg.content
 		);
@@ -128,15 +136,32 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 		})
 			.then(async (res) => {
 				if (!res.body) {
-					throw new Error("No response body from /api/chat");
+					throw new Error("No response body from /api/get_title");
 				}
 
 				await readStream(res.body, (chunk: string) => {
+					const chunks = parseStreamData(chunk);
+
+					const accumulatedResponse = chunks.reduce(
+						(acc: string, curr: any) => {
+							if (!curr) return acc;
+							const res = curr.choices[0];
+							if (res.finish_reason) {
+								return acc;
+							}
+							if (res.delta.function_call) {
+								throw new Error("Function call in get_title");
+							}
+							return acc + res.delta.content;
+						},
+						""
+					);
+
 					dispatch({
 						type: "UPSERT_TITLE",
 						payload: {
 							threadId: state.activeThread.id,
-							title: chunk,
+							title: accumulatedResponse,
 						},
 					});
 				});
@@ -157,7 +182,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 			msgHistory.push(userMsg);
 
 			const getChat = async (msgHistory: Message[]) => {
-				console.log(msgHistory);
 				fetch("/api/chat", {
 					method: "POST",
 					body: JSON.stringify({
@@ -182,21 +206,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 						let tool: string = "";
 						let accumulatedResponse = "";
 						await readStream(res.body, (chunk: string) => {
-							let chunks: any[] = [];
-							try {
-								chunks = chunk
-									.split("\n")
-									.filter((c) => c.length > 0)
-									.map((c) => {
-										const jsonStr = c.replace("data: ", "");
-										if (jsonStr === "[DONE]") return;
-										return JSON.parse(jsonStr);
-									});
-							} catch (e) {
-								console.error(e);
-								console.log(chunk);
-								return;
-							}
+							const chunks = parseStreamData(chunk);
 
 							accumulatedResponse = chunks.reduce(
 								(acc: string, curr: any) => {
@@ -239,13 +249,15 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 						});
 
 						if (tool) {
-							//console.log(accumulatedResponse, tool);
 							const { input } = JSON.parse(accumulatedResponse);
 							const assistantMsg: Message = {
 								id: assistantId,
 								content: input,
 								role: "assistant",
-								name: tool,
+								function_call: {
+									name: tool,
+									arguments: input,
+								},
 							};
 							msgHistory.push(assistantMsg);
 
@@ -287,9 +299,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 			};
 
 			getChat(msgHistory);
-
-			const l = state.activeThread.messages.length;
-			if (l < 2 || l > 10) return;
 			fetchTitle();
 		}
 	};
