@@ -30,7 +30,6 @@ interface ChatState {
 	activeThreadId: string;
 	threadList: ChatEntry[];
 	handleSubmit: (e: React.FormEvent) => void;
-	jumpToChatEntry: (id: string) => void;
 	createNewThread: () => void;
 	removeThread: (id: string) => void;
 }

@@ -11,33 +11,20 @@ export const runtime = "edge";
 export async function POST(request: Request) {
 	const res = await request.json();
 	const {
-		input,
 		msgHistory,
 		modelName,
 		temperature,
 	}: {
-		input: string;
 		msgHistory: Message[];
 		modelName: Model;
 		temperature: number;
 	} = res;
-
-	if (!input) {
-		return new Response("No query", {
-			status: 400,
-		});
-	}
 
 	if (!msgHistory) {
 		return new Response("No message history", {
 			status: 400,
 		});
 	}
-
-	msgHistory.push({
-		role: "user",
-		content: input,
-	});
 	const messages = msgHistory.map((msg) => {
 		return {
 			role: msg.role,

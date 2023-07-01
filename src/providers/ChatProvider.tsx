@@ -28,7 +28,6 @@ export const initialState: ChatState = {
 	},
 	activeThreadId: "",
 	handleSubmit: () => {},
-	jumpToChatEntry: () => {},
 	createNewThread: () => {},
 	removeThread: () => {},
 };
@@ -43,14 +42,9 @@ export const useChatDispatch = () => useContext(ChatDispatchContext);
 
 export function ChatProvider({ children }: { children: React.ReactNode }) {
 	const [checkedLocal, setCheckedLocal] = useState(false);
-
 	const [state, dispatch] = useReducer(chatReducer, {
 		...initialState,
-		threadList: [
-			{
-				...baseEntry,
-			},
-		],
+		threadList: [baseEntry],
 		activeThreadId: baseEntry.id,
 	});
 
@@ -74,30 +68,18 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 		activeThread = baseEntry;
 	}
 
+	useEffect(() => {
+		dispatch({ type: "CHANGE_ACTIVE_THREAD", payload: activeThread.id });
+	}, [activeThread.id]);
+
 	const createNewThread = () => {
 		const newId = uuidv4();
 		const newEntry: ChatEntry = {
 			...baseEntry,
 			id: newId,
 		};
-		dispatch({
-			type: "CHANGE_ACTIVE_THREAD",
-			payload: newId,
-		});
 		dispatch({ type: "CREATE_THREAD", payload: newEntry });
 		dispatch({ type: "CHANGE_INPUT", payload: "" });
-	};
-
-	const jumpToChatEntry = (id: string) => {
-		dispatch({
-			type: "CHANGE_ACTIVE_THREAD",
-			payload: id,
-		});
-
-		const thread = state.threadList.find((thread) => thread.id === id);
-		if (!thread) {
-			throw new Error("Thread not found");
-		}
 	};
 
 	// Function to remove a thread and update the local storage
@@ -106,7 +88,10 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 		if (state.threadList.length === 1) {
 			createNewThread();
 		} else {
-			jumpToChatEntry(state.threadList[0].id);
+			dispatch({
+				type: "CHANGE_ACTIVE_THREAD",
+				payload: state.threadList[0].id,
+			});
 		}
 	};
 
@@ -123,123 +108,140 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 			dispatch({
 				type: "UPSERT_MESSAGE",
 				payload: {
-					threadId: activeThread.id,
+					threadId: state.activeThread.id,
 					message: userMsg,
 				},
 			});
 
 			dispatch({ type: "CHANGE_INPUT", payload: "" });
 
-			fetch("/api/chat", {
-				method: "POST",
-				body: JSON.stringify({
-					input: state.input,
-					msgHistory: activeThread.messages,
-					modelName: activeThread.agentConfig.model,
-					temperature: 0.5,
-				}),
-			})
-				.then(async (res) => {
-					if (!res.body) {
-						throw new Error("No response body from /api/chat");
-					}
+			const msgHistory = state.activeThread.messages;
+			msgHistory.push(userMsg);
 
-					const assistantId = uuidv4();
+			const getChat = async (msgHistory: Message[]) => {
+				fetch("/api/chat", {
+					method: "POST",
+					body: JSON.stringify({
+						msgHistory,
+						modelName: state.activeThread.agentConfig.model,
+						temperature: 0.5,
+					}),
+				})
+					.then(async (res) => {
+						if (!res.body) {
+							throw new Error("No response body from /api/chat");
+						}
 
-					let tool: "calculator" | undefined;
-					let accumulatedResponse = "";
-					await readStream(res.body, (chunk: string) => {
-						const chunks = chunk
-							.split("\n")
-							.filter((c) => c.length > 0)
-							.map((c) => {
-								const jsonStr = c.replace("data: ", "");
-								if (jsonStr === "[DONE]") return;
-								return JSON.parse(jsonStr);
-							});
+						const assistantId = uuidv4();
 
-						accumulatedResponse = chunks.reduce(
-							(acc: string, curr: any) => {
-								if (!curr) return acc;
-								const res = curr.choices[0];
-								if (res.finish_reason) {
-									return acc;
-								}
-								if (res.delta.function_call) {
-									if (res.delta.function_call.name) {
-										tool = res.delta.function_call.name;
+						let tool: "calculator" | undefined;
+						let accumulatedResponse = "";
+						await readStream(res.body, (chunk: string) => {
+							const chunks = chunk
+								.split("\n")
+								.filter((c) => c.length > 0)
+								.map((c) => {
+									const jsonStr = c.replace("data: ", "");
+									if (jsonStr === "[DONE]") return;
+									try {
+										return JSON.parse(jsonStr);
+									} catch (e) {
+										console.error(e);
+										accumulatedResponse += jsonStr;
+										return;
 									}
-									return (
-										acc + res.delta.function_call.arguments
-									);
-								}
-								return acc + res.delta.content;
-							},
-							""
-						);
+								});
 
-						if (!tool) {
+							accumulatedResponse = chunks.reduce(
+								(acc: string, curr: any) => {
+									if (!curr) return acc;
+									const res = curr.choices[0];
+									if (res.finish_reason) {
+										return acc;
+									}
+									if (res.delta.function_call) {
+										if (res.delta.function_call.name) {
+											tool = res.delta.function_call.name;
+										}
+										return (
+											acc +
+											res.delta.function_call.arguments
+										);
+									}
+									return acc + res.delta.content;
+								},
+								""
+							);
+
+							if (!tool) {
+								const assistantMsg: Message = {
+									id: assistantId,
+									content: accumulatedResponse,
+									role: "assistant",
+								};
+
+								dispatch({
+									type: "UPSERT_MESSAGE",
+									payload: {
+										threadId: state.activeThread.id,
+										message: assistantMsg,
+									},
+								});
+							}
+						});
+
+						if (tool) {
+							const { input } = JSON.parse(accumulatedResponse);
 							const assistantMsg: Message = {
 								id: assistantId,
-								content: accumulatedResponse,
+								content: input,
 								role: "assistant",
+								function_call: tool,
 							};
+							msgHistory.push(assistantMsg);
 
 							dispatch({
 								type: "UPSERT_MESSAGE",
 								payload: {
-									threadId: activeThread.id,
+									threadId: state.activeThread.id,
 									message: assistantMsg,
 								},
 							});
+
+							const res = callTool(tool, input);
+							if (!res) {
+								throw new Error("Tool failure");
+							}
+
+							const functionMsg: Message = {
+								id: uuidv4(),
+								content: res,
+								role: "function",
+								name: tool as string,
+							};
+							msgHistory.push(functionMsg);
+
+							dispatch({
+								type: "UPSERT_MESSAGE",
+								payload: {
+									threadId: state.activeThread.id,
+									message: functionMsg,
+								},
+							});
+
+							getChat(msgHistory);
 						}
+					})
+					.catch((err) => {
+						console.error(err);
 					});
+			};
 
-					if (tool) {
-						const { input } = JSON.parse(accumulatedResponse);
-						const assistantMsg: Message = {
-							id: assistantId,
-							content: input,
-							role: "assistant",
-							function_call: tool,
-						};
+			getChat(msgHistory);
 
-						dispatch({
-							type: "UPSERT_MESSAGE",
-							payload: {
-								threadId: activeThread.id,
-								message: assistantMsg,
-							},
-						});
-
-						const res = callTool(tool, input);
-						if (!res) {
-							throw new Error("Tool failure");
-						}
-
-						const functionMsg: Message = {
-							id: uuidv4(),
-							content: res,
-							role: "function",
-							function_call: tool,
-						};
-
-						dispatch({
-							type: "UPSERT_MESSAGE",
-							payload: {
-								threadId: activeThread.id,
-								message: functionMsg,
-							},
-						});
-					}
-				})
-				.catch((err) => {
-					console.error(err);
-				});
-
-			const l = activeThread.messages.length;
+			const l = state.activeThread.messages.length;
 			if (l < 2 || l > 10) return;
-			const history = activeThread.messages.map(
+			const history = state.activeThread.messages.map(
 				(msg) => msg.role + ": " + msg.content
 			);
 			history.push("user: " + state.input);
@@ -258,7 +260,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 						dispatch({
 							type: "UPSERT_TITLE",
 							payload: {
-								threadId: activeThread.id,
+								threadId: state.activeThread.id,
 								title: chunk,
 							},
 						});
@@ -286,7 +288,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 		checkedLocal,
 	]);
 
-	//if (state.threadList.length === 0) createNewThread();
 	return (
 		<ChatContext.Provider
 			value={{
@@ -295,7 +296,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 				activeThread,
 				activeThreadId: state.activeThreadId,
 				handleSubmit,
-				jumpToChatEntry,
 				createNewThread,
 				removeThread,
 			}}

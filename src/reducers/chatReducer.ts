@@ -9,6 +9,8 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 			return {
 				...state,
 				threadList: [...state.threadList, action.payload],
+				activeThread: action.payload,
+				activeThreadId: action.payload.id,
 			};
 
 		case "REMOVE_THREAD":

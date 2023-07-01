@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@ducanh2912/next-pwa':
-    specifier: ^9.1.3
-    version: 9.1.3(next@13.4.7)(webpack@5.88.1)
+    specifier: ^9.1.4
+    version: 9.1.4(next@13.4.7)(webpack@5.88.1)
   '@opentelemetry/api':
     specifier: ^1.4.1
     version: 1.4.1
@@ -1333,8 +1333,8 @@ packages:
       to-fast-properties: 2.0.0
     dev: false
 
-  /@ducanh2912/next-pwa@9.1.3(next@13.4.7)(webpack@5.88.1):
-    resolution: {integrity: sha512-wdPACewaJugmUHXWUuz1NZlpQ1U5rfQIHTZeYowGNT1IoiYTgzngqipjyTFHt8pI4khpzuXPcxnZw0hbF8FJ1A==}
+  /@ducanh2912/next-pwa@9.1.4(next@13.4.7)(webpack@5.88.1):
+    resolution: {integrity: sha512-SXrgLAhcHLmInuwv+xzBYo1KutlCws/8SDwNn2QsKwoLQAgvFIpeRNP/k86u7wLNZ2BJLUmG2uU5YvnWdWNnCA==}
     peerDependencies:
       next: '>=11.0.0'
       webpack: '>=5.9.0'

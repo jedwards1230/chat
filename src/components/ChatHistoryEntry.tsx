@@ -1,11 +1,12 @@
 "use client";
 
-import { useChatCtx } from "@/providers/ChatProvider";
+import { useChatCtx, useChatDispatch } from "@/providers/ChatProvider";
 import clsx from "clsx";
 import { Trash } from "./Icons";
 
 export default function ChatHistoryEntry({ entry }: { entry: ChatEntry }) {
-	const { activeThread, jumpToChatEntry, removeThread } = useChatCtx();
+	const { activeThread, removeThread } = useChatCtx();
+	const dispatch = useChatDispatch();
 
 	return (
 		<div
@@ -15,7 +16,12 @@ export default function ChatHistoryEntry({ entry }: { entry: ChatEntry }) {
 					? "bg-neutral-400 dark:bg-neutral-500"
 					: "cursor-pointer hover:bg-neutral-600"
 			)}
-			onClick={() => jumpToChatEntry(entry.id)}
+			onClick={() =>
+				dispatch({
+					type: "CHANGE_ACTIVE_THREAD",
+					payload: entry.id,
+				})
+			}
 		>
 			<div className="flex flex-col max-w-[90%] gap-0 leading-tight">
 				<div>{entry.title}</div>

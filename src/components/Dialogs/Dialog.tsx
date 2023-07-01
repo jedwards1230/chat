@@ -26,7 +26,7 @@ export default function Dialog({
 		return () => {
 			document.removeEventListener("mousedown", handleClickOutside);
 		};
-	}, [config, dispatch]);
+	}, [callback, config, dispatch]);
 
 	return (
 		<motion.dialog
