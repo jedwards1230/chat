@@ -1,38 +1,47 @@
 import { v4 as uuidv4 } from "uuid";
 
-import initialState from "@/providers/initialChat";
+import { baseEntry } from "@/providers/initialChat";
 
-const baseEntry = initialState.activeThread;
+const DEBUG = false;
 
 export function chatReducer(state: ChatState, action: ChatAction) {
 	switch (action.type) {
 		case "INITIALIZE":
+			if (DEBUG) console.log("INITIALIZE");
 			return {
 				...state,
 				threadList: action.payload,
 				activeThread: baseEntry,
 			};
 		case "CREATE_THREAD":
-			const newEntry: ChatEntry = {
+			if (DEBUG) console.log("CREATE_THREAD");
+			const newEntry: ChatThread = {
 				...baseEntry,
+				messages: [],
 				id: uuidv4(),
 			};
+
 			return {
 				...state,
-				threadList: [...state.threadList, newEntry],
 				activeThread: newEntry,
 				input: "",
 			};
 
 		case "REMOVE_THREAD":
+			if (DEBUG) console.log("REMOVE_THREAD");
 			return {
 				...state,
 				threadList: state.threadList.filter(
 					(thread) => thread.id !== action.payload
 				),
+				activeThread:
+					state.activeThread.id === action.payload
+						? baseEntry
+						: state.activeThread,
 			};
 
 		case "REMOVE_MESSAGE":
+			if (DEBUG) console.log("REMOVE_MESSAGE");
 			return {
 				...state,
 				threadList: state.threadList.map((thread) => {
@@ -49,39 +58,72 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 			};
 
 		case "UPSERT_MESSAGE":
-			const upsertMessage = (thread: ChatEntry) => {
+			if (DEBUG) console.log("UPSERT_MESSAGE");
+			const upsertMessage = (thread: ChatThread) => {
+				if (thread.id !== action.payload.threadId) {
+					return thread;
+				}
+
+				// check if message already exists
 				const hasMessage = thread.messages.find(
 					(message) => message.id === action.payload.message.id
 				);
-				return thread.id === action.payload.threadId
-					? {
-							...thread,
-							messages: hasMessage
-								? thread.messages.map((message) =>
-										message.id === action.payload.message.id
-											? action.payload.message
-											: message
-								  )
-								: [...thread.messages, action.payload.message],
-					  }
-					: thread;
+
+				// if message exists, update it
+				// otherwise, add it to the list
+				const messages = hasMessage
+					? thread.messages.map((message) =>
+							message.id === action.payload.message.id
+								? action.payload.message
+								: message
+					  )
+					: [...thread.messages, action.payload.message];
+
+				return {
+					...thread,
+					messages,
+				};
 			};
 
-			const newThreadList = state.threadList.map((thread) =>
+			// update the active thread
+			const threadList = state.threadList.map((thread) =>
 				upsertMessage(thread)
 			);
 
-			const newActiveThread = newThreadList.find(
+			const getNewActiveThread = () => {
+				const newThread: ChatThread = {
+					...baseEntry,
+					id: action.payload.threadId,
+					messages: [action.payload.message],
+				};
+				threadList.push(newThread);
+				return {
+					...state,
+					threadList: threadList,
+					activeThread: newThread,
+				};
+			};
+
+			if (threadList.length === 0) {
+				return getNewActiveThread();
+			}
+
+			const newActiveThread = threadList.find(
 				(thread) => thread.id === action.payload.threadId
-			) as ChatEntry;
+			);
+
+			if (!newActiveThread) {
+				return getNewActiveThread();
+			}
 
 			return {
 				...state,
-				threadList: newThreadList,
+				threadList: threadList,
 				activeThread: newActiveThread,
 			};
 
 		case "UPSERT_TITLE":
+			if (DEBUG) console.log("UPSERT_TITLE");
 			return {
 				...state,
 				threadList: state.threadList.map((thread) =>
@@ -95,6 +137,7 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 			};
 
 		case "CHANGE_MODEL":
+			if (DEBUG) console.log("CHANGE_MODEL");
 			return {
 				...state,
 				threadList: state.threadList.map((thread) =>
@@ -111,24 +154,30 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 			};
 
 		case "CLEAR_HISTORY":
+			if (DEBUG) console.log("CLEAR_HISTORY");
 			return {
 				...state,
 				threadList: [],
 			};
 
 		case "CHANGE_INPUT":
+			if (DEBUG) console.log("CHANGE_INPUT");
 			return {
 				...state,
 				input: action.payload,
 			};
 
 		case "CHANGE_ACTIVE_THREAD":
+			if (DEBUG) console.log("CHANGE_ACTIVE_THREAD");
+			const activeThread = state.threadList.find(
+				(thread) => thread.id === action.payload.id
+			);
+			if (!activeThread) throw new Error("No active thread");
+
 			return {
 				...state,
 				input: "",
-				activeThread: state.threadList.find(
-					(thread) => thread.id === action.payload.id
-				) as ChatEntry,
+				activeThread,
 			};
 
 		default:

@@ -246,14 +246,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 				JSON.stringify(state.threadList)
 			);
 		}
-	}, [
-		state.threadList,
-		state.threadList.length,
-		state.activeThread,
-		state.activeThread.messages,
-		state.activeThread.messages.length,
-		checkedLocal,
-	]);
+	}, [state.threadList, state.threadList.length, checkedLocal]);
 
 	return (
 		<ChatContext.Provider

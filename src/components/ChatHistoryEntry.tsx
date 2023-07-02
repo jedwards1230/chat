@@ -5,18 +5,13 @@ import clsx from "clsx";
 import { Trash } from "./Icons";
 
 export default function ChatHistoryEntry({ entry }: { entry: ChatThread }) {
-	const { activeThread, threadList } = useChat();
+	const { activeThread } = useChat();
 	const dispatch = useChatDispatch();
 
 	// Function to remove a thread and update the local storage
 	const removeThread = (e: any) => {
 		e.stopPropagation();
 		dispatch({ type: "REMOVE_THREAD", payload: entry.id });
-		if (threadList.length === 1) {
-			dispatch({ type: "CREATE_THREAD" });
-		} else if (entry.id === activeThread.id) {
-			dispatch({ type: "CREATE_THREAD" });
-		}
 	};
 
 	return (
@@ -27,6 +22,7 @@ export default function ChatHistoryEntry({ entry }: { entry: ChatThread }) {
 					? "bg-neutral-400 dark:bg-neutral-500"
 					: "cursor-pointer hover:bg-neutral-600"
 			)}
+			title={`threadId: ${entry.id}`}
 			onClick={() =>
 				dispatch({
 					type: "CHANGE_ACTIVE_THREAD",
