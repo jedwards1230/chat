@@ -33,7 +33,7 @@ export const getChatHistory = () => {
 	if (typeof window !== "undefined") {
 		const storedThreads = localStorage.getItem("chatHistory");
 		if (storedThreads) {
-			const chatHistory: ChatEntry[] = JSON.parse(storedThreads);
+			const chatHistory: ChatThread[] = JSON.parse(storedThreads);
 			return chatHistory;
 		}
 	}

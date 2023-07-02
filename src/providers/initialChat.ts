@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 
-const baseEntry: ChatEntry = {
+export const baseEntry: ChatThread = {
 	id: uuidv4(),
 	title: "New Chat",
 	messages: [],

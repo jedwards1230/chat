@@ -100,6 +100,122 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 			});
 	};
 
+	const getChat = async (msgHistory: Message[]) => {
+		fetch("/api/chat", {
+			method: "POST",
+			body: JSON.stringify({
+				msgHistory: msgHistory.map((msg) => {
+					return {
+						content: msg.content,
+						role: msg.role,
+						name: msg.name,
+						function_call: msg.function_call,
+					};
+				}),
+				modelName: state.activeThread.agentConfig.model,
+				temperature: 0.7,
+			}),
+		})
+			.then(async (res) => {
+				if (!res.body) {
+					throw new Error("No response body from /api/chat");
+				}
+
+				const assistantId = uuidv4();
+				let tool: string = "";
+				let accumulatedResponse = "";
+				await readStream(res.body, (chunk: string) => {
+					const chunks = parseStreamData(chunk);
+
+					accumulatedResponse = chunks.reduce(
+						(acc: string, curr: any) => {
+							if (!curr) return acc;
+							const res = curr.choices[0];
+							if (res.finish_reason) {
+								return acc;
+							}
+							if (res.delta.function_call) {
+								if (res.delta.function_call.name) {
+									tool = res.delta.function_call.name;
+								}
+								return acc + res.delta.function_call.arguments;
+							}
+							return acc + res.delta.content;
+						},
+						""
+					);
+
+					// dispatch to frontend, chunk by chunk
+					// tool response must be built before dispatching
+					if (!tool) {
+						const assistantMsg: Message = {
+							id: assistantId,
+							content: accumulatedResponse,
+							role: "assistant",
+						};
+
+						dispatch({
+							type: "UPSERT_MESSAGE",
+							payload: {
+								threadId: state.activeThread.id,
+								message: assistantMsg,
+							},
+						});
+					}
+				});
+
+				if (tool) {
+					const { input } = JSON.parse(accumulatedResponse);
+					const assistantMsg: Message = {
+						id: assistantId,
+						content: input,
+						role: "assistant",
+						name: tool,
+						function_call: {
+							name: tool,
+							arguments: input,
+						},
+					};
+					msgHistory.push(assistantMsg);
+
+					dispatch({
+						type: "UPSERT_MESSAGE",
+						payload: {
+							threadId: state.activeThread.id,
+							message: assistantMsg,
+						},
+					});
+
+					const res = await callTool(tool, input);
+					if (!res) {
+						throw new Error("Tool failure");
+					}
+
+					const functionMsg: Message = {
+						id: uuidv4(),
+						content: res,
+						role: "function",
+						name: tool,
+					};
+
+					msgHistory.push(functionMsg);
+
+					dispatch({
+						type: "UPSERT_MESSAGE",
+						payload: {
+							threadId: state.activeThread.id,
+							message: functionMsg,
+						},
+					});
+
+					getChat(msgHistory);
+				}
+			})
+			.catch((err) => {
+				console.error(err);
+			});
+	};
+
 	// Handler for submitting the chat form
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -109,125 +225,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
 			const msgHistory = state.activeThread.messages;
 			msgHistory.push(userMsg);
-
-			const getChat = async (msgHistory: Message[]) => {
-				fetch("/api/chat", {
-					method: "POST",
-					body: JSON.stringify({
-						msgHistory: msgHistory.map((msg) => {
-							return {
-								content: msg.content,
-								role: msg.role,
-								name: msg.name,
-								function_call: msg.function_call,
-							};
-						}),
-						modelName: state.activeThread.agentConfig.model,
-						temperature: 0.7,
-					}),
-				})
-					.then(async (res) => {
-						if (!res.body) {
-							throw new Error("No response body from /api/chat");
-						}
-
-						const assistantId = uuidv4();
-						let tool: string = "";
-						let accumulatedResponse = "";
-						await readStream(res.body, (chunk: string) => {
-							const chunks = parseStreamData(chunk);
-
-							accumulatedResponse = chunks.reduce(
-								(acc: string, curr: any) => {
-									if (!curr) return acc;
-									const res = curr.choices[0];
-									if (res.finish_reason) {
-										return acc;
-									}
-									if (res.delta.function_call) {
-										if (res.delta.function_call.name) {
-											tool = res.delta.function_call.name;
-										}
-										return (
-											acc +
-											res.delta.function_call.arguments
-										);
-									}
-									return acc + res.delta.content;
-								},
-								""
-							);
-
-							// dispatch to frontend, chunk by chunk
-							// tool response must be built before dispatching
-							if (!tool) {
-								const assistantMsg: Message = {
-									id: assistantId,
-									content: accumulatedResponse,
-									role: "assistant",
-								};
-
-								dispatch({
-									type: "UPSERT_MESSAGE",
-									payload: {
-										threadId: state.activeThread.id,
-										message: assistantMsg,
-									},
-								});
-							}
-						});
-
-						if (tool) {
-							const { input } = JSON.parse(accumulatedResponse);
-							const assistantMsg: Message = {
-								id: assistantId,
-								content: input,
-								role: "assistant",
-								name: tool,
-								function_call: {
-									name: tool,
-									arguments: input,
-								},
-							};
-							msgHistory.push(assistantMsg);
-
-							dispatch({
-								type: "UPSERT_MESSAGE",
-								payload: {
-									threadId: state.activeThread.id,
-									message: assistantMsg,
-								},
-							});
-
-							const res = await callTool(tool, input);
-							if (!res) {
-								throw new Error("Tool failure");
-							}
-
-							const functionMsg: Message = {
-								id: uuidv4(),
-								content: res,
-								role: "function",
-								name: tool,
-							};
-
-							msgHistory.push(functionMsg);
-
-							dispatch({
-								type: "UPSERT_MESSAGE",
-								payload: {
-									threadId: state.activeThread.id,
-									message: functionMsg,
-								},
-							});
-
-							getChat(msgHistory);
-						}
-					})
-					.catch((err) => {
-						console.error(err);
-					});
-			};
 
 			getChat(msgHistory);
 			fetchTitle();

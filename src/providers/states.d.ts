@@ -1,7 +1,7 @@
 interface ChatState {
 	input: string;
-	activeThread: ChatEntry;
-	threadList: ChatEntry[];
+	activeThread: ChatThread;
+	threadList: ChatThread[];
 	handleSubmit: (e: React.FormEvent) => void;
 }
 

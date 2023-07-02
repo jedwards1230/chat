@@ -22,7 +22,7 @@ interface AgentConfig {
 	model: Model;
 }
 
-interface ChatEntry {
+interface ChatThread {
 	id: string;
 	title: string;
 	messages: Message[];

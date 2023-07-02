@@ -4,11 +4,11 @@ type ConfigAction =
 	| { type: "TOGGLE_CONFIG_EDITOR"; payload?: boolean };
 
 type ChatAction =
-	| { type: "INITIALIZE"; payload: ChatEntry[] }
+	| { type: "INITIALIZE"; payload: ChatThread[] }
 	| { type: "CREATE_THREAD" }
 	| { type: "REMOVE_THREAD"; payload: string }
 	| { type: "CHANGE_INPUT"; payload: string }
-	| { type: "CHANGE_ACTIVE_THREAD"; payload: ChatEntry }
+	| { type: "CHANGE_ACTIVE_THREAD"; payload: ChatThread }
 	| { type: "CLEAR_HISTORY" }
 	| {
 			type: "EDIT_MESSAGE";
