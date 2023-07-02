@@ -5,8 +5,21 @@ import clsx from "clsx";
 import { Trash } from "./Icons";
 
 export default function ChatHistoryEntry({ entry }: { entry: ChatEntry }) {
-	const { activeThread, removeThread } = useChat();
+	const { activeThread, threadList } = useChat();
 	const dispatch = useChatDispatch();
+
+	// Function to remove a thread and update the local storage
+	const removeThread = (id: string) => {
+		dispatch({ type: "REMOVE_THREAD", payload: id });
+		if (threadList.length === 1) {
+			dispatch({ type: "CREATE_THREAD" });
+		} else {
+			dispatch({
+				type: "CHANGE_ACTIVE_THREAD",
+				payload: threadList[0].id,
+			});
+		}
+	};
 
 	return (
 		<div
@@ -30,7 +43,7 @@ export default function ChatHistoryEntry({ entry }: { entry: ChatEntry }) {
 				</div>
 			</div>
 			<div
-				className="flex items-center text-neutral-300 hover:text-neutral-50 justify-center w-8 h-8 rounded-full cursor-pointer select-none hover:bg-neutral-500/50"
+				className="flex items-center justify-center w-8 h-8 rounded-full cursor-pointer select-none text-neutral-300 hover:text-neutral-50 hover:bg-neutral-500/50"
 				onClick={() => removeThread(entry.id)}
 				title="Delete conversation"
 			>

@@ -1,3 +1,9 @@
+import { v4 as uuidv4 } from "uuid";
+
+import initialState from "@/providers/initialChat";
+
+const baseEntry = initialState.activeThread;
+
 export function chatReducer(state: ChatState, action: ChatAction) {
 	switch (action.type) {
 		case "INITIALIZE":
@@ -6,11 +12,17 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 				threadList: action.payload,
 			};
 		case "CREATE_THREAD":
+			const newId = uuidv4();
+			const newEntry: ChatEntry = {
+				...baseEntry,
+				id: newId,
+			};
 			return {
 				...state,
-				threadList: [...state.threadList, action.payload],
-				activeThread: action.payload,
-				activeThreadId: action.payload.id,
+				threadList: [...state.threadList, newEntry],
+				activeThread: newEntry,
+				activeThreadId: newEntry.id,
+				input: "",
 			};
 
 		case "REMOVE_THREAD":
@@ -107,6 +119,7 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 		case "CHANGE_ACTIVE_THREAD":
 			return {
 				...state,
+				input: "",
 				activeThreadId: action.payload,
 				activeThread: state.threadList.find(
 					(thread) => thread.id === action.payload

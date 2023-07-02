@@ -5,7 +5,7 @@ type ConfigAction =
 
 type ChatAction =
 	| { type: "INITIALIZE"; payload: ChatEntry[] }
-	| { type: "CREATE_THREAD"; payload: ChatEntry }
+	| { type: "CREATE_THREAD" }
 	| { type: "REMOVE_THREAD"; payload: string }
 	| { type: "CHANGE_INPUT"; payload: string }
 	| { type: "CHANGE_ACTIVE_THREAD"; payload: string }

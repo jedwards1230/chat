@@ -65,8 +65,6 @@ interface ChatState {
 	activeThreadId: string;
 	threadList: ChatEntry[];
 	handleSubmit: (e: React.FormEvent) => void;
-	createNewThread: () => void;
-	removeThread: (id: string) => void;
 }
 
 interface ConfigState {

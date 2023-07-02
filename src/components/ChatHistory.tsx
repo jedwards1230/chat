@@ -1,6 +1,6 @@
 "use client";
 
-import { useChat } from "@/providers/ChatProvider";
+import { useChat, useChatDispatch } from "@/providers/ChatProvider";
 import ChatHistoryEntry from "./ChatHistoryEntry";
 import { useConfig, useConfigDispatch } from "@/providers/ConfigProvider";
 import { Settings, XMark } from "./Icons";
@@ -8,17 +8,18 @@ import { useEffect, useRef } from "react";
 import { isMobile } from "@/utils";
 
 export default function ChatHistory() {
-	const { threadList, createNewThread } = useChat();
+	const { threadList } = useChat();
 	const { sideBarOpen } = useConfig();
-	const dispatch = useConfigDispatch();
+	const configDispatch = useConfigDispatch();
+	const chatDispatch = useChatDispatch();
 	const sidebarRef = useRef<HTMLDivElement>(null);
 
 	const closeSidebar = () => {
-		dispatch({ type: "TOGGLE_SIDEBAR", payload: false });
+		configDispatch({ type: "TOGGLE_SIDEBAR", payload: false });
 	};
 
 	const openConfig = () => {
-		dispatch({ type: "TOGGLE_CONFIG_EDITOR", payload: true });
+		configDispatch({ type: "TOGGLE_CONFIG_EDITOR", payload: true });
 	};
 
 	useEffect(() => {
@@ -48,7 +49,7 @@ export default function ChatHistory() {
 				<div className="flex justify-between w-full px-2 gap-x-2">
 					<button
 						className="flex-1 py-2 font-semibold transition-colors rounded-md bg-neutral-600 hover:bg-neutral-500"
-						onClick={createNewThread}
+						onClick={() => chatDispatch({ type: "CREATE_THREAD" })}
 					>
 						New Chat
 					</button>

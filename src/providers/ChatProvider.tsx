@@ -17,25 +17,7 @@ import {
 	parseStreamData,
 } from "../utils";
 import { chatReducer } from "@/reducers/chatReducer";
-
-export const initialState: ChatState = {
-	threadList: [],
-	input: "",
-	activeThread: {
-		id: uuidv4(),
-		title: "New Chat",
-		messages: [],
-		agentConfig: {
-			id: "",
-			name: "",
-			model: "gpt-3.5-turbo-16k",
-		},
-	},
-	activeThreadId: "",
-	handleSubmit: () => {},
-	createNewThread: () => {},
-	removeThread: () => {},
-};
+import initialState from "./initialChat";
 
 const baseEntry = initialState.activeThread;
 
@@ -71,30 +53,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 	};
 
 	const activeThread = getActive();
-
-	// Function to create a new thread
-	const createNewThread = () => {
-		const newId = uuidv4();
-		const newEntry: ChatEntry = {
-			...baseEntry,
-			id: newId,
-		};
-		dispatch({ type: "CREATE_THREAD", payload: newEntry });
-		dispatch({ type: "CHANGE_INPUT", payload: "" });
-	};
-
-	// Function to remove a thread and update the local storage
-	const removeThread = (id: string) => {
-		dispatch({ type: "REMOVE_THREAD", payload: id });
-		if (state.threadList.length === 1) {
-			createNewThread();
-		} else {
-			dispatch({
-				type: "CHANGE_ACTIVE_THREAD",
-				payload: state.threadList[0].id,
-			});
-		}
-	};
 
 	// Function to create a user message
 	const createUserMsg = (content: string): Message => {
@@ -342,8 +300,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 				activeThread,
 				activeThreadId: state.activeThreadId,
 				handleSubmit,
-				createNewThread,
-				removeThread,
 			}}
 		>
 			<ChatDispatchContext.Provider value={dispatch}>

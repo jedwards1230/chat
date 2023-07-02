@@ -6,13 +6,13 @@ import { useChat, useChatDispatch } from "@/providers/ChatProvider";
 
 export default function ConfigEditor() {
 	const { configEditorOpen } = useConfig();
-	const { createNewThread, threadList } = useChat();
+	const { threadList } = useChat();
 	const chatDispatch = useChatDispatch();
 	const configDispatch = useConfigDispatch();
 
 	const clearAll = () => {
 		chatDispatch({ type: "CLEAR_HISTORY" });
-		createNewThread();
+		chatDispatch({ type: "CREATE_THREAD" });
 	};
 
 	if (!configEditorOpen) return null;
