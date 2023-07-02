@@ -1,10 +1,11 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+
 import { useChat, useChatDispatch } from "@/providers/ChatProvider";
 import ChatHistoryEntry from "./ChatHistoryEntry";
 import { useConfig, useConfigDispatch } from "@/providers/ConfigProvider";
 import { Settings, XMark } from "./Icons";
-import { useEffect, useRef } from "react";
 import { isMobile } from "@/utils";
 
 export default function ChatHistory() {
@@ -20,6 +21,7 @@ export default function ChatHistory() {
 
 	const openConfig = () => {
 		configDispatch({ type: "TOGGLE_CONFIG_EDITOR", payload: true });
+		configDispatch({ type: "TOGGLE_SIDEBAR", payload: false });
 	};
 
 	useEffect(() => {
@@ -29,12 +31,15 @@ export default function ChatHistory() {
 				sidebarRef.current &&
 				!sidebarRef.current.contains(event.target)
 			) {
+				event.preventDefault();
 				closeSidebar();
 			}
 		};
 		document.addEventListener("mousedown", handleClickOutside);
+		document.addEventListener("touchstart", handleClickOutside);
 		return () => {
 			document.removeEventListener("mousedown", handleClickOutside);
+			document.removeEventListener("touchstart", handleClickOutside);
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
@@ -69,13 +74,6 @@ export default function ChatHistory() {
 							/>
 						))}
 				</div>
-				<button
-					title="Close Sidebar"
-					onClick={closeSidebar}
-					className="absolute text-black border rounded-full bg-neutral-50 border-neutral-500 top-2 -right-8 sm:hidden"
-				>
-					<XMark />
-				</button>
 			</div>
 		</div>
 	);
