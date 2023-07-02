@@ -41,8 +41,29 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 						: state.activeThread,
 			};
 
+		case "CANCEL_EDIT":
+			if (DEBUG) console.log("CANCEL_EDIT");
+			return {
+				...state,
+				editId: null,
+				input: "",
+			};
+
 		case "REMOVE_MESSAGE":
 			if (DEBUG) console.log("REMOVE_MESSAGE");
+			console.log(
+				state.threadList.map((thread) => {
+					return thread.id === action.payload.threadId
+						? {
+								...thread,
+								messages: thread.messages.filter(
+									(message) =>
+										message.id !== action.payload.messageId
+								),
+						  }
+						: null;
+				})
+			);
 			return {
 				...state,
 				threadList: state.threadList.map((thread) => {
@@ -94,6 +115,16 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 				...state,
 				threadList: threadList,
 				activeThread: newActiveThread,
+			};
+
+		case "EDIT_MESSAGE":
+			if (DEBUG) console.log("EDIT_MESSAGE");
+			return {
+				...state,
+				editId: action.payload.messageId,
+				input: state.activeThread.messages.find(
+					(message) => message.id === action.payload.messageId
+				)?.content as string,
 			};
 
 		case "UPSERT_TITLE":

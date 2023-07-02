@@ -30,8 +30,11 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 	const [state, dispatch] = useReducer(chatReducer, initialState);
 
 	// Function to create a user message
-	const createUserMsg = (content: string): Message => ({
-		id: uuidv4(),
+	const createUserMsg = (
+		content: string,
+		editId?: string | null
+	): Message => ({
+		id: editId ? editId : uuidv4(),
 		role: "user",
 		content,
 	});
@@ -113,7 +116,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 					};
 				}),
 				modelName: state.activeThread.agentConfig.model,
-				temperature: 0.7,
+				temperature: state.activeThread.agentConfig.temperature,
 			}),
 		})
 			.then(async (res) => {
@@ -220,11 +223,18 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		if (state.input.length > 0) {
-			const userMsg: Message = createUserMsg(state.input);
+			const userMsg: Message = createUserMsg(state.input, state.editId);
 			dispatchUserMsg(userMsg);
 
 			const msgHistory = state.activeThread.messages;
-			msgHistory.push(userMsg);
+			if (state.editId) {
+				const editIndex = msgHistory.findIndex(
+					(msg) => msg.id === state.editId
+				);
+				msgHistory[editIndex] = userMsg;
+			} else {
+				msgHistory.push(userMsg);
+			}
 
 			getChat(msgHistory);
 			fetchTitle();

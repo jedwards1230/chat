@@ -20,6 +20,8 @@ interface AgentConfig {
 	id: string;
 	name: string;
 	model: Model;
+	temperature: number;
+	systemMessage: string;
 }
 
 interface ChatThread {

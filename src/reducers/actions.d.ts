@@ -10,6 +10,7 @@ type ChatAction =
 	| { type: "CHANGE_INPUT"; payload: string }
 	| { type: "CHANGE_ACTIVE_THREAD"; payload: ChatThread }
 	| { type: "CLEAR_HISTORY" }
+	| { type: "CANCEL_EDIT" }
 	| {
 			type: "EDIT_MESSAGE";
 			payload: {

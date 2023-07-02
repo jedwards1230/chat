@@ -14,7 +14,7 @@ export default function Chat() {
 			<div className="flex flex-col items-center w-full h-full overflow-scroll">
 				<div className="flex flex-col w-full h-full max-w-4xl p-2">
 					{activeThread.messages.map((m) => (
-						<ChatBubble key={m.id} message={m} />
+						<ChatBubble key={m.id + m.content} message={m} />
 					))}
 				</div>
 			</div>
