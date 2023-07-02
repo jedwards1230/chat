@@ -21,15 +21,17 @@ export default function Header() {
 
 	return (
 		<div className="grid w-full grid-cols-12 px-2 py-2 border-b shadow border-neutral-300 dark:bg-neutral-900/75 dark:border-neutral-500 bg-neutral-50">
-			<button
-				className={clsx(
-					"col-span-1 text-neutral-400 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50 cursor-pointer px-1",
-					sideBarOpen && isMobile() && "hidden sm:flex"
-				)}
-				onClick={handleSidebarToggle}
-			>
-				<Bars />
-			</button>
+			<div className="flex items-center justify-start col-span-1">
+				<button
+					className={clsx(
+						"text-neutral-400 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50 cursor-pointer px-1",
+						sideBarOpen && isMobile() && "hidden sm:flex"
+					)}
+					onClick={handleSidebarToggle}
+				>
+					<Bars />
+				</button>
+			</div>
 			<div
 				className={clsx(
 					"col-span-10 text-center",
@@ -48,12 +50,14 @@ export default function Header() {
 					)}
 				</p>
 			</div>
-			<button
-				className="flex items-center justify-end col-span-1 px-1 cursor-pointer text-neutral-400 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
-				onClick={handleAgentEditorToggle}
-			>
-				<Information />
-			</button>
+			<div className="flex items-center justify-end col-span-1">
+				<button
+					className="px-1 cursor-pointer text-neutral-400 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
+					onClick={handleAgentEditorToggle}
+				>
+					<Information />
+				</button>
+			</div>
 		</div>
 	);
 }

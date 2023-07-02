@@ -22,7 +22,7 @@ export async function POST(request: Request) {
 			status: 400,
 		});
 	}
-	const messages: ChatCompletionRequestMessage[] = msgHistory.map((msg) => {
+	const history: ChatCompletionRequestMessage[] = msgHistory.map((msg) => {
 		return {
 			role: msg.role,
 			content: msg.content,
@@ -30,6 +30,14 @@ export async function POST(request: Request) {
 			function_call: msg.function_call,
 		};
 	});
+
+	const sys = {
+		role: "system" as const,
+		content:
+			"You are a helpful assistant. Try to use your tools whenever you can.",
+	};
+
+	const messages = [sys, ...history];
 
 	const tools = [new Calculator(), new Search()];
 

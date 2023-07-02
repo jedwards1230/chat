@@ -152,7 +152,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 							};
 						}),
 						modelName: state.activeThread.agentConfig.model,
-						temperature: 0.5,
+						temperature: 0.7,
 					}),
 				})
 					.then(async (res) => {
