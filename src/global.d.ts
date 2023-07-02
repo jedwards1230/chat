@@ -29,6 +29,36 @@ interface ChatEntry {
 	agentConfig: AgentConfig;
 }
 
+type CustomTool = {
+	name: string;
+	description: string;
+	parameters: {
+		type: string;
+		properties: {
+			[key: string]: {
+				type: string;
+				description: string;
+			};
+		};
+		required: string[];
+	};
+};
+
+interface SearchResult {
+	/** Query used with Search Engine API */
+	query: string;
+	url: string;
+	snippet: string;
+	title: string;
+	/** AI-generated summary */
+	content?: string;
+	error?: string;
+	/** Finished analysis for primary chat */
+	reviewed?: boolean;
+	/** Fime taken to store text embeddings  */
+	timeToComplete?: number;
+}
+
 interface ChatState {
 	input: string;
 	activeThread: ChatEntry;

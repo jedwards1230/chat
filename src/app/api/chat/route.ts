@@ -1,5 +1,6 @@
 import { openai } from "@/lib/openai";
 import { Calculator } from "@/tools/calculator";
+import { Search } from "@/tools/search";
 import { ChatCompletionRequestMessage } from "openai-edge";
 
 export const runtime = "edge";
@@ -30,7 +31,7 @@ export async function POST(request: Request) {
 		};
 	});
 
-	const tools = [new Calculator()];
+	const tools = [new Calculator(), new Search()];
 
 	const completion = await openai.createChatCompletion({
 		model: modelName,

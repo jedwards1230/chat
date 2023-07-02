@@ -269,7 +269,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 								},
 							});
 
-							const res = callTool(tool, input);
+							const res = await callTool(tool, input);
 							if (!res) {
 								throw new Error("Tool failure");
 							}
@@ -280,6 +280,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 								role: "function",
 								name: tool,
 							};
+
 							msgHistory.push(functionMsg);
 
 							dispatch({
