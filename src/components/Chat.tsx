@@ -1,12 +1,12 @@
 "use client";
 
 import ChatBubble from "./ChatBubble";
-import { useChatCtx } from "../providers/ChatProvider";
+import { useChat } from "../providers/ChatProvider";
 import Header from "./Header";
 import ChatInput from "./ChatInput";
 
 export default function Chat() {
-	const { activeThread } = useChatCtx();
+	const { activeThread } = useChat();
 
 	return (
 		<div className="flex flex-col items-center w-full h-full">

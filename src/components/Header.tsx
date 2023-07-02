@@ -1,6 +1,6 @@
 "use client";
 
-import { useChatCtx } from "@/providers/ChatProvider";
+import { useChat } from "@/providers/ChatProvider";
 import { useConfig, useConfigDispatch } from "@/providers/ConfigProvider";
 import { Bars, Information } from "./Icons";
 import clsx from "clsx";
@@ -8,7 +8,7 @@ import { isMobile } from "@/utils";
 
 export default function Header() {
 	const { sideBarOpen } = useConfig();
-	const { activeThread } = useChatCtx();
+	const { activeThread } = useChat();
 	const dispatch = useConfigDispatch();
 
 	const handleSidebarToggle = () => {
@@ -30,7 +30,12 @@ export default function Header() {
 			>
 				<Bars />
 			</button>
-			<div className="col-span-10 text-center">
+			<div
+				className={clsx(
+					"col-span-10 text-center",
+					sideBarOpen && isMobile() && "col-start-2 sm:col-start-1"
+				)}
+			>
 				<p className="font-semibold">{activeThread.title}</p>
 				<p className="text-sm font-light text-neutral-500">
 					{activeThread.messages.length > 0 ? (

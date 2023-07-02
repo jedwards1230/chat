@@ -12,7 +12,13 @@ export default function ProfilePicture({ message }: { message: Message }) {
 						? "bg-green-500 text-neutral-900 dark:text-neutral-50"
 						: "bg-purple-500 text-neutral-900 dark:text-neutral-50"
 				)}
-				title={message.role === "user" ? "You" : "Agent"}
+				title={
+					message.role === "user"
+						? "You"
+						: message.role === "assistant"
+						? "Assistant"
+						: "Function"
+				}
 			>
 				{message.role[0].toUpperCase()}
 			</div>

@@ -1,13 +1,13 @@
 "use client";
 
-import { useChatCtx, useChatDispatch } from "@/providers/ChatProvider";
+import { useChat, useChatDispatch } from "@/providers/ChatProvider";
 import { useConfig, useConfigDispatch } from "@/providers/ConfigProvider";
 import Dialog from "./Dialog";
 
 export default function AgentEditor() {
 	const { agentEditorOpen } = useConfig();
 	const configDispatch = useConfigDispatch();
-	const { activeThread } = useChatCtx();
+	const { activeThread } = useChat();
 	const chatDispatch = useChatDispatch();
 
 	if (!agentEditorOpen) return null;

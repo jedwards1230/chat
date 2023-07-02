@@ -2,11 +2,11 @@
 
 import { useConfig, useConfigDispatch } from "@/providers/ConfigProvider";
 import Dialog from "./Dialog";
-import { useChatCtx, useChatDispatch } from "@/providers/ChatProvider";
+import { useChat, useChatDispatch } from "@/providers/ChatProvider";
 
 export default function ConfigEditor() {
 	const { configEditorOpen } = useConfig();
-	const { createNewThread, threadList } = useChatCtx();
+	const { createNewThread, threadList } = useChat();
 	const chatDispatch = useChatDispatch();
 	const configDispatch = useConfigDispatch();
 

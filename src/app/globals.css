@@ -2,7 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+	ul,
+	ol {
+		list-style: revert;
+	}
+}
+
 html,
 body {
 	height: 100%;
+}
+
+.list-marker {
+	margin-right: 0.5rem;
 }

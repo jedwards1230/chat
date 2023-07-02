@@ -1,6 +1,6 @@
 "use client";
 
-import { useChatCtx } from "@/providers/ChatProvider";
+import { useChat } from "@/providers/ChatProvider";
 import ChatHistoryEntry from "./ChatHistoryEntry";
 import { useConfig, useConfigDispatch } from "@/providers/ConfigProvider";
 import { Settings, XMark } from "./Icons";
@@ -8,7 +8,7 @@ import { useEffect, useRef } from "react";
 import { isMobile } from "@/utils";
 
 export default function ChatHistory() {
-	const { threadList, createNewThread } = useChatCtx();
+	const { threadList, createNewThread } = useChat();
 	const { sideBarOpen } = useConfig();
 	const dispatch = useConfigDispatch();
 	const sidebarRef = useRef<HTMLDivElement>(null);
@@ -71,7 +71,7 @@ export default function ChatHistory() {
 				<button
 					title="Close Sidebar"
 					onClick={closeSidebar}
-					className="absolute text-black border rounded-full bg-neutral-50 border-neutral-500 top-2 -right-8 sm:hidden dark:text-neutral-50"
+					className="absolute text-black border rounded-full bg-neutral-50 border-neutral-500 top-2 -right-8 sm:hidden"
 				>
 					<XMark />
 				</button>

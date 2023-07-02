@@ -1,10 +1,10 @@
 "use client";
 
-import { useChatCtx, useChatDispatch } from "@/providers/ChatProvider";
+import { useChat, useChatDispatch } from "@/providers/ChatProvider";
 import { motion } from "framer-motion";
 
 export default function ChatInput() {
-	const { input, handleSubmit } = useChatCtx();
+	const { input, handleSubmit } = useChat();
 	const dispatch = useChatDispatch();
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {

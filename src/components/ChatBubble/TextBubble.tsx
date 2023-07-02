@@ -11,7 +11,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import clsx from "clsx";
 
-export default function TextBubble({ message }: { message: string }) {
+export default function TextBubble({ message }: { message: Message }) {
 	const components: Partial<
 		Omit<NormalComponents, keyof SpecialComponents> & SpecialComponents
 	> = {
@@ -33,7 +33,7 @@ export default function TextBubble({ message }: { message: string }) {
 		h6: ({ node, ...props }) => (
 			<h6 {...props} className="text-xs font-bold" />
 		),
-		p: ({ node, ...props }) => <p {...props} className="text-base" />,
+		p: ({ node, ...props }) => <div {...props} className="text-base" />,
 		blockquote: ({ node, ...props }) => (
 			<blockquote
 				{...props}
@@ -57,7 +57,7 @@ export default function TextBubble({ message }: { message: string }) {
 					</SyntaxHighlighter>
 					<div className="flex items-center justify-center">
 						<button
-							className="w-auto px-2 py-1 text-sm font-medium tracking-tight border rounded-full active:bg-neutral-300 hover:bg-neutral-200 bg-neutral-50 border-neutral-500"
+							className="w-auto px-2 py-1 text-sm font-medium tracking-tight border rounded-full dark:bg-neutral-400 dark:text-neutral-900 active:bg-neutral-300 hover:bg-neutral-200 bg-neutral-50 border-neutral-500"
 							onClick={() => {
 								navigator.clipboard.writeText(String(children));
 							}}
@@ -83,12 +83,19 @@ export default function TextBubble({ message }: { message: string }) {
 			<strong {...props} className="font-bold" />
 		),
 		hr: ({ node, ...props }) => <hr {...props} className="my-2" />,
-		li: ({ node, index, ordered, checked, ...props }) => <li {...props} />,
+		li: ({ node, index, ordered, checked, children, ...props }) => (
+			<li className="flex ml-4" {...props}>
+				<span className="list-marker">
+					{ordered ? `${index + 1}.` : "-"}
+				</span>
+				{children}
+			</li>
+		),
 		ol: ({ node, depth, ordered, ...props }) => (
-			<ol {...props} className="list-decimal list-inside" />
+			<ol {...props} className="inline-block list-decimal list-outside" />
 		),
 		ul: ({ node, depth, ordered, ...props }) => (
-			<ul {...props} className="list-disc list-inside" />
+			<ul {...props} className="inline-block list-disc list-outside" />
 		),
 		a: ({ node, ...props }) => (
 			<a {...props} className="text-blue-500 hover:underline" />
@@ -118,13 +125,45 @@ export default function TextBubble({ message }: { message: string }) {
 		),
 	};
 
+	let content: string = message.content;
+	if (message.name && message.role !== "function") {
+		const tool = message.name[0].toUpperCase() + message.name.substring(1);
+		content = `${tool}: ${content}`;
+	}
+
 	return (
-		<ReactMarkdown
-			className="flex flex-col whitespace-pre-wrap w-full gap-1.5 rounded"
-			remarkPlugins={[remarkGfm]}
-			components={components}
+		<div
+			className={clsx(
+				"flex transition-colors items-start justify-center max-w-full overflow-x-scroll py-2 px-2 rounded",
+				message.role === "user" ? "bg-blue-100 dark:bg-blue-600/70" : ""
+			)}
 		>
-			{message}
-		</ReactMarkdown>
+			{message.role === "function" ? (
+				<details
+					className={"flex flex-col gap-2 items-start w-full rounded"}
+				>
+					<summary className="capitalize cursor-pointer">
+						{message.name} Result
+					</summary>
+					<div>
+						<ReactMarkdown
+							className="flex flex-col whitespace-pre-wrap w-full gap-1.5 rounded"
+							remarkPlugins={[remarkGfm]}
+							components={components}
+						>
+							{content}
+						</ReactMarkdown>
+					</div>
+				</details>
+			) : (
+				<ReactMarkdown
+					className="whitespace-pre-wrap w-full gap-1.5 rounded"
+					remarkPlugins={[remarkGfm]}
+					components={components}
+				>
+					{content}
+				</ReactMarkdown>
+			)}
+		</div>
 	);
 }

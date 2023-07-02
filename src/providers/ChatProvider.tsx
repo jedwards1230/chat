@@ -42,7 +42,7 @@ const baseEntry = initialState.activeThread;
 const ChatContext = createContext<ChatState>(initialState);
 const ChatDispatchContext = createContext<Dispatch<ChatAction>>(() => {});
 
-export const useChatCtx = () => useContext(ChatContext);
+export const useChat = () => useContext(ChatContext);
 export const useChatDispatch = () => useContext(ChatDispatchContext);
 
 export function ChatProvider({ children }: { children: React.ReactNode }) {
@@ -254,6 +254,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 								id: assistantId,
 								content: input,
 								role: "assistant",
+								name: tool,
 								function_call: {
 									name: tool,
 									arguments: input,
