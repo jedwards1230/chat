@@ -33,8 +33,14 @@ export default function Header() {
 			<div className="col-span-10 text-center">
 				<p className="font-semibold">{activeThread.title}</p>
 				<p className="text-sm font-light text-neutral-500">
-					{activeThread.agentConfig.model} |{" "}
-					{activeThread.messages.length} messages
+					{activeThread.messages.length > 0 ? (
+						<>
+							{activeThread.agentConfig.model} |{" "}
+							{activeThread.messages.length} messages
+						</>
+					) : (
+						<>Start a chat</>
+					)}
 				</p>
 			</div>
 			<button
