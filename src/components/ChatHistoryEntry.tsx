@@ -4,20 +4,18 @@ import { useChat, useChatDispatch } from "@/providers/ChatProvider";
 import clsx from "clsx";
 import { Trash } from "./Icons";
 
-export default function ChatHistoryEntry({ entry }: { entry: ChatEntry }) {
+export default function ChatHistoryEntry({ entry }: { entry: ChatThread }) {
 	const { activeThread, threadList } = useChat();
 	const dispatch = useChatDispatch();
 
 	// Function to remove a thread and update the local storage
-	const removeThread = (id: string) => {
-		dispatch({ type: "REMOVE_THREAD", payload: id });
+	const removeThread = (e: any) => {
+		e.stopPropagation();
+		dispatch({ type: "REMOVE_THREAD", payload: entry.id });
 		if (threadList.length === 1) {
 			dispatch({ type: "CREATE_THREAD" });
-		} else {
-			dispatch({
-				type: "CHANGE_ACTIVE_THREAD",
-				payload: threadList[0],
-			});
+		} else if (entry.id === activeThread.id) {
+			dispatch({ type: "CREATE_THREAD" });
 		}
 	};
 
@@ -44,7 +42,7 @@ export default function ChatHistoryEntry({ entry }: { entry: ChatEntry }) {
 			</div>
 			<div
 				className="flex items-center justify-center w-8 h-8 rounded-full cursor-pointer select-none text-neutral-300 hover:text-neutral-50 hover:bg-neutral-500/50"
-				onClick={() => removeThread(entry.id)}
+				onClick={removeThread}
 				title="Delete conversation"
 			>
 				<Trash />
