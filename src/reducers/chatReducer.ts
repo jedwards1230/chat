@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 
 import { baseEntry } from "@/providers/initialChat";
+import { upsertMessage } from "@/utils";
 
 const DEBUG = false;
 
@@ -59,35 +60,12 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 
 		case "UPSERT_MESSAGE":
 			if (DEBUG) console.log("UPSERT_MESSAGE");
-			const upsertMessage = (thread: ChatThread) => {
-				if (thread.id !== action.payload.threadId) {
-					return thread;
-				}
-
-				// check if message already exists
-				const hasMessage = thread.messages.find(
-					(message) => message.id === action.payload.message.id
-				);
-
-				// if message exists, update it
-				// otherwise, add it to the list
-				const messages = hasMessage
-					? thread.messages.map((message) =>
-							message.id === action.payload.message.id
-								? action.payload.message
-								: message
-					  )
-					: [...thread.messages, action.payload.message];
-
-				return {
-					...thread,
-					messages,
-				};
-			};
 
 			// update the active thread
 			const threadList = state.threadList.map((thread) =>
-				upsertMessage(thread)
+				thread.id !== action.payload.threadId
+					? thread
+					: upsertMessage(thread, action.payload.message)
 			);
 
 			const getNewActiveThread = () => {
@@ -103,10 +81,6 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 					activeThread: newThread,
 				};
 			};
-
-			if (threadList.length === 0) {
-				return getNewActiveThread();
-			}
 
 			const newActiveThread = threadList.find(
 				(thread) => thread.id === action.payload.threadId
