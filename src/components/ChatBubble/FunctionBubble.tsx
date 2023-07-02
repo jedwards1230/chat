@@ -1,6 +1,6 @@
 export default function FunctionBubble({ message }: { message: Message }) {
 	return (
-		<div className={"flex gap-2 items-center w-full rounded pl-2"}>
+		<div className={"flex gap-2 items-center w-full rounded"}>
 			{message.role === "assistant" ? (
 				<div>
 					Using{" "}

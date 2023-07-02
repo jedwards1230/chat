@@ -11,6 +11,13 @@ type ChatAction =
 	| { type: "CHANGE_ACTIVE_THREAD"; payload: string }
 	| { type: "CLEAR_HISTORY" }
 	| {
+			type: "EDIT_MESSAGE";
+			payload: {
+				threadId: string;
+				messageId: string;
+			};
+	  }
+	| {
 			type: "REMOVE_MESSAGE";
 			payload: {
 				threadId: string;

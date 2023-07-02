@@ -53,7 +53,7 @@ export default function RootLayout({
 }) {
 	return (
 		<html lang="en">
-			<body className="bg-neutral-50 dark:text-neutral-100 dark:bg-neutral-800">
+			<body className="overflow-hidden bg-neutral-50 dark:text-neutral-100 dark:bg-neutral-800">
 				<Suspense
 					fallback={
 						<div className="flex items-center justify-center w-full h-full">
