@@ -7,12 +7,15 @@ import {
 	vs,
 	vscDarkPlus,
 } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { useTheme } from "next-themes";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import clsx from "clsx";
 import { useMemo } from "react";
 
 export default function TextBubble({ message }: { message: Message }) {
+	const { resolvedTheme } = useTheme();
+
 	const components = useMemo<
 		Partial<
 			Omit<NormalComponents, keyof SpecialComponents> & SpecialComponents
@@ -52,8 +55,7 @@ export default function TextBubble({ message }: { message: Message }) {
 					<div className="flex flex-col flex-grow-0 gap-0">
 						<SyntaxHighlighter
 							{...props}
-							//style={resolvedTheme !== "dark" ? vs : vscDarkPlus}
-							style={vs}
+							style={resolvedTheme !== "dark" ? vs : vscDarkPlus}
 							language={match[1]}
 							className="!w-full !overflow-x-scroll !mb-1"
 						>
@@ -61,7 +63,7 @@ export default function TextBubble({ message }: { message: Message }) {
 						</SyntaxHighlighter>
 						<div className="flex items-center justify-center">
 							<button
-								className="w-auto px-2 py-1 text-sm font-medium tracking-tight border rounded-full dark:bg-neutral-400 dark:text-neutral-900 active:bg-neutral-300 hover:bg-neutral-200 bg-neutral-50 border-neutral-500"
+								className="w-auto px-2 py-1 text-sm font-medium tracking-tight border rounded-full dark:bg-neutral-300 dark:text-neutral-900 active:bg-neutral-300 hover:bg-neutral-200 bg-neutral-50 border-neutral-500"
 								onClick={() => {
 									navigator.clipboard.writeText(
 										String(children)
@@ -136,7 +138,7 @@ export default function TextBubble({ message }: { message: Message }) {
 				<tr {...props} className="border" />
 			),
 		}),
-		[]
+		[resolvedTheme]
 	);
 
 	let content: string = message.content;
