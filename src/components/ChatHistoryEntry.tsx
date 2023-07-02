@@ -16,7 +16,7 @@ export default function ChatHistoryEntry({ entry }: { entry: ChatEntry }) {
 		} else {
 			dispatch({
 				type: "CHANGE_ACTIVE_THREAD",
-				payload: threadList[0].id,
+				payload: threadList[0],
 			});
 		}
 	};
@@ -32,13 +32,13 @@ export default function ChatHistoryEntry({ entry }: { entry: ChatEntry }) {
 			onClick={() =>
 				dispatch({
 					type: "CHANGE_ACTIVE_THREAD",
-					payload: entry.id,
+					payload: entry,
 				})
 			}
 		>
 			<div className="flex flex-col max-w-[90%] gap-0 leading-tight">
 				<div className="line-clamp-1">{entry.title}</div>
-				<div className="text-sm line-clamp-1">
+				<div className="text-sm font-light line-clamp-1">
 					{entry.messages.length > 0 ? entry.messages[0].content : ""}
 				</div>
 			</div>

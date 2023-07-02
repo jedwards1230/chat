@@ -10,18 +10,17 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 			return {
 				...state,
 				threadList: action.payload,
+				activeThread: baseEntry,
 			};
 		case "CREATE_THREAD":
-			const newId = uuidv4();
 			const newEntry: ChatEntry = {
 				...baseEntry,
-				id: newId,
+				id: uuidv4(),
 			};
 			return {
 				...state,
 				threadList: [...state.threadList, newEntry],
 				activeThread: newEntry,
-				activeThreadId: newEntry.id,
 				input: "",
 			};
 
@@ -50,29 +49,36 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 			};
 
 		case "UPSERT_MESSAGE":
+			const upsertMessage = (thread: ChatEntry) => {
+				const hasMessage = thread.messages.find(
+					(message) => message.id === action.payload.message.id
+				);
+				return thread.id === action.payload.threadId
+					? {
+							...thread,
+							messages: hasMessage
+								? thread.messages.map((message) =>
+										message.id === action.payload.message.id
+											? action.payload.message
+											: message
+								  )
+								: [...thread.messages, action.payload.message],
+					  }
+					: thread;
+			};
+
+			const newThreadList = state.threadList.map((thread) =>
+				upsertMessage(thread)
+			);
+
+			const newActiveThread = newThreadList.find(
+				(thread) => thread.id === action.payload.threadId
+			) as ChatEntry;
+
 			return {
 				...state,
-				threadList: state.threadList.map((thread) => {
-					const hasMessage = thread.messages.find(
-						(message) => message.id === action.payload.message.id
-					);
-					return thread.id === action.payload.threadId
-						? {
-								...thread,
-								messages: hasMessage
-									? thread.messages.map((message) =>
-											message.id ===
-											action.payload.message.id
-												? action.payload.message
-												: message
-									  )
-									: [
-											...thread.messages,
-											action.payload.message,
-									  ],
-						  }
-						: thread;
-				}),
+				threadList: newThreadList,
+				activeThread: newActiveThread,
 			};
 
 		case "UPSERT_TITLE":
@@ -120,9 +126,8 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 			return {
 				...state,
 				input: "",
-				activeThreadId: action.payload,
 				activeThread: state.threadList.find(
-					(thread) => thread.id === action.payload
+					(thread) => thread.id === action.payload.id
 				) as ChatEntry,
 			};
 

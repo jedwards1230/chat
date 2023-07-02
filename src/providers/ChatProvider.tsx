@@ -19,8 +19,6 @@ import {
 import { chatReducer } from "@/reducers/chatReducer";
 import initialState from "./initialChat";
 
-const baseEntry = initialState.activeThread;
-
 const ChatContext = createContext<ChatState>(initialState);
 const ChatDispatchContext = createContext<Dispatch<ChatAction>>(() => {});
 
@@ -29,44 +27,18 @@ export const useChatDispatch = () => useContext(ChatDispatchContext);
 
 export function ChatProvider({ children }: { children: React.ReactNode }) {
 	const [checkedLocal, setCheckedLocal] = useState(false);
-	const [state, dispatch] = useReducer(chatReducer, {
-		...initialState,
-		threadList: [baseEntry],
-		activeThreadId: baseEntry.id,
-	});
-
-	// Get active thread from local storage, or initialize with default entry
-	const getActive = () => {
-		const active = state.threadList.find(
-			(thread) => thread.id === state.activeThreadId
-		);
-		let activeThread: ChatEntry;
-		if (active) {
-			activeThread = active;
-		} else if (state.threadList) {
-			activeThread = state.threadList[state.threadList.length - 1];
-		} else {
-			activeThread = baseEntry;
-		}
-
-		return activeThread;
-	};
-
-	const activeThread = getActive();
+	const [state, dispatch] = useReducer(chatReducer, initialState);
 
 	// Function to create a user message
-	const createUserMsg = (content: string): Message => {
-		const userId = uuidv4();
-		const userMsg: Message = {
-			id: userId,
-			content: content,
-			role: "user",
-		};
-		return userMsg;
-	};
+	const createUserMsg = (content: string): Message => ({
+		id: uuidv4(),
+		role: "user",
+		content,
+	});
 
 	// Function to dispatch user message
 	const dispatchUserMsg = (userMsg: Message) => {
+		dispatch({ type: "CHANGE_INPUT", payload: "" });
 		dispatch({
 			type: "UPSERT_MESSAGE",
 			payload: {
@@ -74,8 +46,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 				message: userMsg,
 			},
 		});
-
-		dispatch({ type: "CHANGE_INPUT", payload: "" });
 	};
 
 	const fetchTitle = async () => {
@@ -86,6 +56,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 			(msg) => msg.role + ": " + msg.content
 		);
 		history.push("user: " + state.input);
+
 		fetch("/api/get_title", {
 			method: "POST",
 			body: JSON.stringify({
@@ -270,11 +241,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 		setCheckedLocal(true);
 	}, []);
 
-	// Effect to change the active thread ID when the active thread is updated
-	useEffect(() => {
-		dispatch({ type: "CHANGE_ACTIVE_THREAD", payload: activeThread.id });
-	}, [activeThread.id]);
-
 	// Effect to sync local storage with the chat thread list
 	useEffect(() => {
 		if (typeof window !== "undefined" && checkedLocal) {
@@ -286,19 +252,16 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 	}, [
 		state.threadList,
 		state.threadList.length,
-		activeThread,
-		activeThread.messages,
-		activeThread.messages.length,
+		state.activeThread,
+		state.activeThread.messages,
+		state.activeThread.messages.length,
 		checkedLocal,
 	]);
 
 	return (
 		<ChatContext.Provider
 			value={{
-				threadList: state.threadList,
-				input: state.input,
-				activeThread,
-				activeThreadId: state.activeThreadId,
+				...state,
 				handleSubmit,
 			}}
 		>

@@ -58,17 +58,3 @@ interface SearchResult {
 	/** Fime taken to store text embeddings  */
 	timeToComplete?: number;
 }
-
-interface ChatState {
-	input: string;
-	activeThread: ChatEntry;
-	activeThreadId: string;
-	threadList: ChatEntry[];
-	handleSubmit: (e: React.FormEvent) => void;
-}
-
-interface ConfigState {
-	sideBarOpen: boolean;
-	agentEditorOpen: boolean;
-	configEditorOpen: boolean;
-}

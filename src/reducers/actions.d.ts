@@ -8,7 +8,7 @@ type ChatAction =
 	| { type: "CREATE_THREAD" }
 	| { type: "REMOVE_THREAD"; payload: string }
 	| { type: "CHANGE_INPUT"; payload: string }
-	| { type: "CHANGE_ACTIVE_THREAD"; payload: string }
+	| { type: "CHANGE_ACTIVE_THREAD"; payload: ChatEntry }
 	| { type: "CLEAR_HISTORY" }
 	| {
 			type: "EDIT_MESSAGE";
