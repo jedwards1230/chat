@@ -3,7 +3,8 @@ import { searchGoogle } from "@/utils";
 export class Search implements CustomTool {
 	name = "search";
 	description =
-		"a custom search engine. useful for when you need to answer questions about current events. input should be a search query. outputs a JSON array of results.";
+		"custom search engine. useful for when you need to answer questions about current events." +
+		"input should be a single search query. outputs a JSON array of results.";
 	parameters = {
 		type: "object",
 		properties: {
