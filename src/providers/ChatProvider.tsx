@@ -19,6 +19,7 @@ import {
 } from "../utils";
 import { chatReducer } from "@/providers/chatReducer";
 import initialState from "./initialChat";
+import { Session } from "next-auth";
 
 const ChatContext = createContext<ChatState>(initialState);
 const ChatDispatchContext = createContext<Dispatch<ChatAction>>(() => {});
@@ -26,9 +27,18 @@ const ChatDispatchContext = createContext<Dispatch<ChatAction>>(() => {});
 export const useChat = () => useContext(ChatContext);
 export const useChatDispatch = () => useContext(ChatDispatchContext);
 
-export function ChatProvider({ children }: { children: React.ReactNode }) {
+export function ChatProvider({
+	children,
+	session,
+}: {
+	children: React.ReactNode;
+	session: Session | null;
+}) {
 	const [checkedLocal, setCheckedLocal] = useState(false);
-	const [state, dispatch] = useReducer(chatReducer, initialState);
+	const [state, dispatch] = useReducer(chatReducer, {
+		...initialState,
+		signInOpen: !session,
+	});
 	const [botTyping, setBotTyping] = useState(false);
 
 	// Function to create a user message

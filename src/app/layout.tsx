@@ -2,6 +2,8 @@ import { Suspense } from "react";
 import "./globals.css";
 import Providers from "@/providers";
 import { Metadata } from "next";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 
 const APP_NAME = "Chat";
 const APP_DEFAULT_TITLE = "Chat";
@@ -46,11 +48,12 @@ export const metadata: Metadata = {
 	},
 };
 
-export default function RootLayout({
+export default async function RootLayout({
 	children,
 }: {
 	children: React.ReactNode;
 }) {
+	const session = await getServerSession(authOptions);
 	return (
 		<html lang="en" suppressHydrationWarning={true}>
 			<body className="overflow-hidden bg-neutral-50 dark:text-neutral-100 dark:bg-neutral-900">
@@ -61,7 +64,7 @@ export default function RootLayout({
 						</div>
 					}
 				>
-					<Providers>{children}</Providers>
+					<Providers session={session}>{children}</Providers>
 				</Suspense>
 			</body>
 		</html>

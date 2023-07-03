@@ -6,24 +6,28 @@ import { motion } from "framer-motion";
 export default function Dialog({
 	children,
 	callback,
+	required = false,
 }: {
 	children: React.ReactNode;
 	callback: () => void;
+	required?: boolean;
 }) {
 	const ref = useRef<HTMLDivElement>(null);
 
 	// click outside to close
 	useEffect(() => {
-		function handleClickOutside(event: any) {
-			if (ref.current && !ref.current.contains(event.target)) {
-				callback();
+		if (!required) {
+			function handleClickOutside(event: any) {
+				if (ref.current && !ref.current.contains(event.target)) {
+					callback();
+				}
 			}
+			document.addEventListener("mousedown", handleClickOutside);
+			return () => {
+				document.removeEventListener("mousedown", handleClickOutside);
+			};
 		}
-		document.addEventListener("mousedown", handleClickOutside);
-		return () => {
-			document.removeEventListener("mousedown", handleClickOutside);
-		};
-	}, [callback]);
+	}, [callback, required]);
 
 	return (
 		<motion.dialog

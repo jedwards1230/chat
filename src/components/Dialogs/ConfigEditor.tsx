@@ -1,9 +1,11 @@
 "use client";
 
 import clsx from "clsx";
+import { useState } from "react";
+import { signOut } from "next-auth/react";
+
 import Dialog from "./Dialog";
 import { useChat, useChatDispatch } from "@/providers/ChatProvider";
-import { useState } from "react";
 import { getChatHistory } from "@/utils";
 
 export default function ConfigEditor() {
@@ -81,6 +83,19 @@ export default function ConfigEditor() {
 								Save
 							</button>
 						</form>
+					</label>
+				</div>
+
+				{/* Auth */}
+				<div>
+					<div className="text-xl font-medium">Auth</div>
+					<label className="flex items-center justify-between w-full py-2 text-base">
+						<button
+							onClick={() => signOut()}
+							className="w-full py-1.5 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 rounded text-neutral-50"
+						>
+							Sign Out
+						</button>
 					</label>
 				</div>
 
