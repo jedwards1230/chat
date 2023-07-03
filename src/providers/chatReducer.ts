@@ -50,11 +50,6 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 				...state,
 				pluginsEnabled: action.payload ?? !state.pluginsEnabled,
 			};
-		case "TOGGLE_SIGN_IN":
-			return {
-				...state,
-				signInOpen: action.payload ?? !state.signInOpen,
-			};
 		case "INITIALIZE":
 			if (DEBUG) console.log("INITIALIZE");
 			return {

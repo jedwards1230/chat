@@ -12,7 +12,6 @@ interface ChatState {
 	configEditorOpen: boolean;
 	pluginsEditorOpen: boolean;
 	pluginsEnabled: boolean;
-	signInOpen: boolean;
 	handleSubmit: (e: React.FormEvent) => void;
 }
 
@@ -26,7 +25,6 @@ type ChatAction =
 	| { type: "CHANGE_TEMPERATURE"; payload: number }
 	| { type: "TOGGLE_PLUGINS"; payload?: boolean }
 	| { type: "TOGGLE_SIDEBAR"; payload?: boolean }
-	| { type: "TOGGLE_SIGN_IN"; payload?: boolean }
 	| { type: "CHANGE_USER_ID"; payload: string }
 	| { type: "REMOVE_THREAD"; payload: string }
 	| { type: "CHANGE_INPUT"; payload: string }

@@ -1,27 +1,6 @@
-"use client";
-
 import clsx from "clsx";
-import { useSession } from "next-auth/react";
-import Image from "next/image";
 
 export default function ProfilePicture({ message }: { message: Message }) {
-	const { data: session } = useSession();
-	const imgSrc = session?.user?.image;
-
-	if (message.role === "user" && imgSrc) {
-		return (
-			<div className="flex items-start justify-end h-full my-1">
-				<Image
-					src={imgSrc}
-					alt="Profile Picture"
-					className="w-8 h-8 rounded"
-					width={32}
-					height={32}
-				/>
-			</div>
-		);
-	}
-
 	return (
 		<div className="flex items-start justify-end h-full my-1">
 			<div

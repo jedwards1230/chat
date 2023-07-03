@@ -35,7 +35,6 @@ const initialState: ChatState = {
 	editId: null,
 	pluginsEnabled: false,
 	sideBarOpen: true,
-	signInOpen: false,
 	agentEditorOpen: false,
 	configEditorOpen: false,
 	pluginsEditorOpen: false,

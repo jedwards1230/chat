@@ -7,12 +7,4 @@ const nextConfig = {};
 
 module.exports = withPWA({
 	...nextConfig,
-	images: {
-		remotePatterns: [
-			{
-				protocol: "https",
-				hostname: "avatars.githubusercontent.com",
-			},
-		],
-	},
 });
