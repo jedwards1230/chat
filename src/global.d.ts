@@ -1,3 +1,5 @@
+type Model = "gpt-3.5-turbo" | "gpt-3.5-turbo-16k" | "gpt-4" | "gpt-4-0613";
+
 type Role = "system" | "user" | "assistant" | "function";
 
 type Message = {
@@ -13,8 +15,6 @@ type Message = {
 		  }
 		| undefined;
 };
-
-type Model = "gpt-3.5-turbo" | "gpt-3.5-turbo-16k" | "gpt-4" | "gpt-4-0613";
 
 interface AgentConfig {
 	id: string;
@@ -36,15 +36,35 @@ type CustomTool = {
 	description: string;
 	parameters: {
 		type: string;
+		required: string[];
 		properties: {
 			[key: string]: {
-				type: string;
 				description: string;
+				type: string;
 			};
 		};
-		required: string[];
 	};
 };
+
+type Choice = {
+	delta: {
+		function_call?: {
+			arguments?: string;
+			name?: string;
+		};
+		content?: string;
+	};
+	finish_reason: "function_call" | null;
+	index: number;
+};
+
+interface StreamData {
+	choices: Choice[];
+	created: number;
+	id: string;
+	model: Model;
+	object: string;
+}
 
 interface SearchResult {
 	/** Query used with Search Engine API */

@@ -1,23 +1,26 @@
 "use client";
 
+import clsx from "clsx";
 import Dialog from "./Dialog";
 import { useChat, useChatDispatch } from "@/providers/ChatProvider";
+import { useState } from "react";
+import { getChatHistory } from "@/utils";
 
 export default function ConfigEditor() {
-	const { threadList, configEditorOpen } = useChat();
-	const chatDispatch = useChatDispatch();
-	const configDispatch = useChatDispatch();
+	const { threadList, configEditorOpen, userId, userIdRequired } = useChat();
+	const dispatch = useChatDispatch();
+	const [userIdInput, setUserIdInput] = useState(userId);
 
 	const clearAll = () => {
-		chatDispatch({ type: "CLEAR_HISTORY" });
-		chatDispatch({ type: "CREATE_THREAD" });
+		dispatch({ type: "CLEAR_HISTORY" });
+		dispatch({ type: "CREATE_THREAD" });
 	};
 
 	if (!configEditorOpen) return null;
 	return (
 		<Dialog
 			callback={() =>
-				configDispatch({
+				dispatch({
 					type: "TOGGLE_CONFIG_EDITOR",
 					payload: false,
 				})
@@ -33,6 +36,53 @@ export default function ConfigEditor() {
 					<div className="text-xl font-medium">Model</div>
 					<div></div>
 				</div> */}
+
+				{/* Credentials */}
+				<div>
+					<div className="text-xl font-medium">Credentials</div>
+					<label className="flex flex-col justify-between w-full gap-2 py-2">
+						<span>User ID</span>
+						<form
+							onSubmit={(e) => {
+								e.preventDefault();
+								dispatch({
+									type: "CHANGE_USER_ID",
+									payload: userIdInput,
+								});
+								getChatHistory(userIdInput).then((history) => {
+									if (history) {
+										dispatch({
+											type: "INITIALIZE",
+											payload: {
+												...history,
+											},
+										});
+									}
+								});
+							}}
+							className="flex gap-4"
+						>
+							<input
+								className={clsx(
+									"w-full p-2 focus:outline-none border rounded-lg",
+									userIdRequired && userId === ""
+										? "border-red-500"
+										: "border-neutral-500"
+								)}
+								type="text"
+								value={userIdInput}
+								required={userIdRequired}
+								onChange={(e) => setUserIdInput(e.target.value)}
+							/>
+							<button
+								type="submit"
+								className="py-1.5 px-3 bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 rounded text-neutral-50"
+							>
+								Save
+							</button>
+						</form>
+					</label>
+				</div>
 
 				{/* Data */}
 				<div>

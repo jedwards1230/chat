@@ -33,6 +33,8 @@ const initialState: ChatState = {
 	sideBarOpen: true,
 	agentEditorOpen: false,
 	configEditorOpen: false,
+	userId: "",
+	userIdRequired: false,
 	handleSubmit: () => {},
 };
 

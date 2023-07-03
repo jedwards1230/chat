@@ -24,7 +24,8 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 			if (DEBUG) console.log("INITIALIZE");
 			return {
 				...state,
-				threadList: action.payload,
+				threadList: action.payload.chatHistory,
+				userId: action.payload.userId,
 				activeThread: getDefaultThread(),
 			};
 		case "CREATE_THREAD":
@@ -100,6 +101,16 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 						? newSystemMessage
 						: thread
 				),
+			};
+
+		case "CHANGE_USER_ID":
+			if (DEBUG) console.log("CHANGE_USER_ID");
+			if (window !== undefined) {
+				window.localStorage.setItem("userId", action.payload);
+			}
+			return {
+				...state,
+				userId: action.payload,
 			};
 
 		case "REMOVE_MESSAGE":

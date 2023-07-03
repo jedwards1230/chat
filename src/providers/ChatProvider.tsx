@@ -127,22 +127,30 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
 				const assistantId = uuidv4();
 				let tool: string = "";
+				let toolInput: string = "";
 				let accumulatedResponse = "";
+				let finishReason: string | null = null;
 				await readStream(res.body, (chunk: string) => {
 					const chunks = parseStreamData(chunk);
 
+					toolInput = "";
 					accumulatedResponse = chunks.reduce(
-						(acc: string, curr: any) => {
+						(acc: string, curr: StreamData) => {
 							if (!curr) return acc;
 							const res = curr.choices[0];
 							if (res.finish_reason) {
+								finishReason = res.finish_reason;
 								return acc;
 							}
 							if (res.delta.function_call) {
 								if (res.delta.function_call.name) {
 									tool = res.delta.function_call.name;
 								}
-								return acc + res.delta.function_call.arguments;
+								if (res.delta.function_call.arguments) {
+									toolInput +=
+										res.delta.function_call.arguments;
+								}
+								return acc;
 							}
 							return acc + res.delta.content;
 						},
@@ -167,11 +175,17 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 						});
 					}
 				});
+				console.log({
+					toolInput,
+					tool,
+					accumulatedResponse,
+					finishReason,
+				});
 
 				if (tool) {
-					const { input } = JSON.parse(accumulatedResponse);
+					const { input } = JSON.parse(toolInput);
 					const assistantMsg: Message = {
-						id: assistantId,
+						id: uuidv4(),
 						content: input,
 						role: "assistant",
 						name: tool,
@@ -249,10 +263,18 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 			state.sideBarOpen = false;
 		}
 
-		const history = getChatHistory();
-		if (history && history.length > 0)
-			dispatch({ type: "INITIALIZE", payload: history });
-		setCheckedLocal(true);
+		getChatHistory(state.userId).then((history) => {
+			if (history) {
+				dispatch({
+					type: "INITIALIZE",
+					payload: {
+						...history,
+					},
+				});
+			}
+			setCheckedLocal(true);
+		});
+
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
@@ -263,8 +285,40 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 				"chatHistory",
 				JSON.stringify(state.threadList)
 			);
+			fetch("/api/save_history", {
+				method: "POST",
+				body: JSON.stringify({
+					chatHistory: state.threadList.map((thread) => ({
+						id: thread.id,
+						title: thread.title,
+						agentConfig: thread.agentConfig,
+						messages: JSON.stringify(thread.messages),
+					})),
+					user: state.userId,
+				}),
+			})
+				.then((res) => {
+					if (res.status !== 200) {
+						res.text().then((text) => {
+							if (text === "No user id") {
+								dispatch({
+									type: "CHANGE_USER_ID_REQUIRED",
+									payload: true,
+								});
+								dispatch({
+									type: "TOGGLE_CONFIG_EDITOR",
+									payload: true,
+								});
+							}
+						});
+						throw new Error("Failed to save chat history");
+					}
+				})
+				.catch((err) => {
+					console.error(err);
+				});
 		}
-	}, [state.threadList, state.threadList.length, checkedLocal]);
+	}, [state.threadList, state.threadList.length, checkedLocal, state.userId]);
 
 	if (!checkedLocal) return null;
 	return (

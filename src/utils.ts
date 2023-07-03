@@ -29,17 +29,46 @@ export async function readStream(
 	return accumulatedResponse;
 }
 
-export const getChatHistory = () => {
+export async function getChatHistory(id: string): Promise<{
+	chatHistory: ChatThread[];
+	userId: string;
+} | null> {
+	let userId = id;
+	if (!userId) {
+		if (typeof window !== "undefined") {
+			userId = localStorage.getItem("userId") || "";
+		}
+	}
+
+	try {
+		const res = await fetch("/api/get_history", {
+			method: "POST",
+			body: JSON.stringify({ userId }),
+		});
+		if (res.ok) {
+			const { chatHistory }: { chatHistory: any[] } = await res.json();
+			return {
+				chatHistory: chatHistory.map((thread) => ({
+					...thread,
+					messages: JSON.parse(thread.messages),
+				})),
+				userId,
+			};
+		}
+	} catch (e) {
+		console.error(e);
+	}
+
 	if (typeof window !== "undefined") {
 		const storedThreads = localStorage.getItem("chatHistory");
 		if (storedThreads) {
 			const chatHistory: ChatThread[] = JSON.parse(storedThreads);
-			return chatHistory;
+			return { chatHistory, userId };
 		}
 	}
 
 	return null;
-};
+}
 
 export function isMobile() {
 	if (typeof window === "undefined") return false;
@@ -100,7 +129,7 @@ export async function callTool(tool: string, input: string) {
 	}
 }
 
-export function parseStreamData(chunk: string) {
+export function parseStreamData(chunk: string): StreamData[] {
 	try {
 		return chunk
 			.split("\n")
