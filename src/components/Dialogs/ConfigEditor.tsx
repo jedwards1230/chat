@@ -52,7 +52,7 @@ export default function ConfigEditor() {
 					<label className="flex items-center justify-between w-full py-2 text-base">
 						<button
 							onClick={clearAll}
-							className="w-full py-1.5 bg-red-500 rounded text-neutral-50"
+							className="w-full py-1.5 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 rounded text-neutral-50"
 						>
 							Clear Local Storage
 						</button>

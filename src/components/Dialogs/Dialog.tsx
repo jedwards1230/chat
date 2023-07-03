@@ -40,7 +40,7 @@ export default function Dialog({
 		>
 			<div
 				ref={ref}
-				className="w-full max-w-md p-4 border rounded-lg sm:px-6 bg-neutral-50"
+				className="w-full max-w-md p-4 border rounded-lg sm:px-6 bg-neutral-50 dark:bg-neutral-800 dark:border-neutral-500"
 			>
 				{children}
 			</div>
