@@ -10,12 +10,14 @@ interface ChatState {
 	sideBarOpen: boolean;
 	agentEditorOpen: boolean;
 	configEditorOpen: boolean;
+	pluginsEditorOpen: boolean;
 	handleSubmit: (e: React.FormEvent) => void;
 }
 
 type ChatAction =
 	| { type: "CHANGE_ACTIVE_THREAD"; payload: ChatThread }
 	| { type: "CHANGE_USER_ID_REQUIRED"; payload: boolean }
+	| { type: "TOGGLE_PLUGINS_EDITOR"; payload?: boolean }
 	| { type: "TOGGLE_CONFIG_EDITOR"; payload?: boolean }
 	| { type: "CHANGE_SYSTEM_MESSAGE"; payload: string }
 	| { type: "TOGGLE_AGENT_EDITOR"; payload?: boolean }
@@ -24,6 +26,7 @@ type ChatAction =
 	| { type: "TOGGLE_SIDEBAR"; payload?: boolean }
 	| { type: "REMOVE_THREAD"; payload: string }
 	| { type: "CHANGE_INPUT"; payload: string }
+	| { type: "TOGGLE_PLUGIN"; payload: Tool }
 	| { type: "CREATE_THREAD" }
 	| { type: "CLEAR_HISTORY" }
 	| { type: "CANCEL_EDIT" }

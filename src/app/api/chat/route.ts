@@ -11,10 +11,12 @@ export async function POST(request: Request) {
 		msgHistory,
 		modelName,
 		temperature,
+		tools,
 	}: {
 		msgHistory: Message[];
 		modelName: Model;
 		temperature: number;
+		tools: Tool[];
 	} = res;
 
 	if (!msgHistory) {
@@ -39,7 +41,23 @@ export async function POST(request: Request) {
 		};
 	});
 
-	const tools = [new Calculator(), new Search()];
+	const functions =
+		tools && tools.length > 0
+			? tools
+					.map((tool) => {
+						switch (tool) {
+							case "calculator":
+								return new Calculator();
+							case "search":
+								return new Search();
+						}
+					})
+					.map((tool) => ({
+						name: tool.name,
+						description: tool.description,
+						parameters: tool.parameters,
+					}))
+			: undefined;
 
 	const completion = await openai.createChatCompletion({
 		model: modelName,
@@ -47,7 +65,7 @@ export async function POST(request: Request) {
 		//max_tokens: 1024,
 		temperature,
 		stream: true,
-		functions: tools,
+		functions,
 	});
 
 	return new Response(completion.body, {

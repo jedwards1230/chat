@@ -19,7 +19,7 @@ export default function ChatBubble({ message }: { message: Message }) {
 			)}
 		>
 			<ProfilePicture message={message} />
-			<TextBubble message={message} />
+			<TextBubble key={message.id} message={message} />
 			<div className="absolute bottom-0 hidden gap-4 group-hover:flex right-2">
 				<button
 					className="p-1 border rounded-full dark:text-neutral-900 bg-neutral-100 active:bg-neutral-300 dark:active:bg-neutral-400 hover:text-blue-500 hover:bg-neutral-200 border-neutral-400"

@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { useChat, useChatDispatch } from "@/providers/ChatProvider";
 
 export default function Dialog({
 	children,
@@ -11,8 +10,6 @@ export default function Dialog({
 	children: React.ReactNode;
 	callback: () => void;
 }) {
-	const config = useChat();
-	const dispatch = useChatDispatch();
 	const ref = useRef<HTMLDivElement>(null);
 
 	// click outside to close
@@ -26,7 +23,7 @@ export default function Dialog({
 		return () => {
 			document.removeEventListener("mousedown", handleClickOutside);
 		};
-	}, [callback, config, dispatch]);
+	}, [callback]);
 
 	return (
 		<motion.dialog

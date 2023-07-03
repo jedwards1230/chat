@@ -22,6 +22,7 @@ interface AgentConfig {
 	model: Model;
 	temperature: number;
 	systemMessage: string;
+	tools: Tool[];
 }
 
 interface ChatThread {
@@ -30,21 +31,6 @@ interface ChatThread {
 	messages: Message[];
 	agentConfig: AgentConfig;
 }
-
-type CustomTool = {
-	name: string;
-	description: string;
-	parameters: {
-		type: string;
-		required: string[];
-		properties: {
-			[key: string]: {
-				description: string;
-				type: string;
-			};
-		};
-	};
-};
 
 type Choice = {
 	delta: {

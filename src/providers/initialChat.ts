@@ -19,6 +19,7 @@ export function getDefaultThread(): ChatThread {
 			model: "gpt-4-0613",
 			temperature: 0.7,
 			systemMessage,
+			tools: [],
 		},
 	};
 }
@@ -33,6 +34,7 @@ const initialState: ChatState = {
 	sideBarOpen: true,
 	agentEditorOpen: false,
 	configEditorOpen: false,
+	pluginsEditorOpen: false,
 	userId: "",
 	userIdRequired: false,
 	handleSubmit: () => {},

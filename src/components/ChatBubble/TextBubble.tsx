@@ -17,6 +17,12 @@ import { useChat } from "@/providers/ChatProvider";
 export default function TextBubble({ message }: { message: Message }) {
 	const { resolvedTheme } = useTheme();
 	const { activeThread } = useChat();
+	const content =
+		message.name && message.role !== "function"
+			? `${message.name[0].toUpperCase() + message.name.substring(1)}: ${
+					message.content
+			  }`
+			: message.content;
 
 	const components = useMemo<
 		Partial<
@@ -142,12 +148,6 @@ export default function TextBubble({ message }: { message: Message }) {
 		}),
 		[resolvedTheme]
 	);
-
-	let content: string = message.content;
-	if (message.name && message.role !== "function") {
-		const tool = message.name[0].toUpperCase() + message.name.substring(1);
-		content = `${tool}: ${content}`;
-	}
 
 	const FunctionBubble = () => (
 		<details className={"flex flex-col gap-2 items-start w-full rounded"}>

@@ -118,7 +118,7 @@ export async function searchGoogle(
 	return results;
 }
 
-export async function callTool(tool: string, input: string) {
+export async function callTool(tool: Tool, input: string) {
 	switch (tool) {
 		case "calculator":
 			return new Calculator().call(input);

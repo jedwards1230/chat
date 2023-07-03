@@ -29,6 +29,7 @@ export const useChatDispatch = () => useContext(ChatDispatchContext);
 export function ChatProvider({ children }: { children: React.ReactNode }) {
 	const [checkedLocal, setCheckedLocal] = useState(false);
 	const [state, dispatch] = useReducer(chatReducer, initialState);
+	const [botTyping, setBotTyping] = useState(false);
 
 	// Function to create a user message
 	const createUserMsg = (
@@ -105,90 +106,65 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 	};
 
 	const getChat = async (msgHistory: Message[]) => {
-		fetch("/api/chat", {
-			method: "POST",
-			body: JSON.stringify({
-				msgHistory: msgHistory.map((msg) => {
-					return {
+		try {
+			setBotTyping(true);
+			const response = await fetch("/api/chat", {
+				method: "POST",
+				body: JSON.stringify({
+					modelName: state.activeThread.agentConfig.model,
+					temperature: state.activeThread.agentConfig.temperature,
+					tools: state.activeThread.agentConfig.tools,
+					msgHistory: msgHistory.map((msg) => ({
 						content: msg.content,
 						role: msg.role,
 						name: msg.name,
 						function_call: msg.function_call,
-					};
+					})),
 				}),
-				modelName: state.activeThread.agentConfig.model,
-				temperature: state.activeThread.agentConfig.temperature,
-			}),
-		})
-			.then(async (res) => {
-				if (!res.body) {
-					throw new Error("No response body from /api/chat");
-				}
+			});
 
-				const assistantId = uuidv4();
-				let tool: string = "";
-				let toolInput: string = "";
-				let accumulatedResponse = "";
-				let finishReason: string | null = null;
-				await readStream(res.body, (chunk: string) => {
-					const chunks = parseStreamData(chunk);
+			if (!response.body) {
+				throw new Error("No response body from /api/chat");
+			}
 
-					toolInput = "";
-					accumulatedResponse = chunks.reduce(
-						(acc: string, curr: StreamData) => {
-							if (!curr) return acc;
-							const res = curr.choices[0];
-							if (res.finish_reason) {
-								finishReason = res.finish_reason;
-								return acc;
+			const assistantId = uuidv4();
+			let tool: Tool | null = null;
+			let toolInput: string = "";
+			let accumulatedResponse = "";
+			let finishReason: string | null = null;
+
+			await readStream(response.body, (chunk: string) => {
+				const chunks = parseStreamData(chunk);
+
+				toolInput = "";
+				accumulatedResponse = chunks.reduce(
+					(acc: string, curr: StreamData) => {
+						if (!curr) return acc;
+						const res = curr.choices[0];
+						if (res.finish_reason) {
+							finishReason = res.finish_reason;
+							return acc;
+						}
+						if (res.delta.function_call) {
+							if (res.delta.function_call.name) {
+								tool = res.delta.function_call.name as Tool;
 							}
-							if (res.delta.function_call) {
-								if (res.delta.function_call.name) {
-									tool = res.delta.function_call.name;
-								}
-								if (res.delta.function_call.arguments) {
-									toolInput +=
-										res.delta.function_call.arguments;
-								}
-								return acc;
+							if (res.delta.function_call.arguments) {
+								toolInput += res.delta.function_call.arguments;
 							}
-							return acc + res.delta.content;
-						},
-						""
-					);
+							return acc;
+						}
+						return acc + res.delta.content;
+					},
+					""
+				);
 
-					// dispatch to frontend, chunk by chunk
-					// tool response must be built before dispatching
-					if (!tool) {
-						const assistantMsg: Message = {
-							id: assistantId,
-							content: accumulatedResponse,
-							role: "assistant",
-						};
-
-						dispatch({
-							type: "UPSERT_MESSAGE",
-							payload: {
-								threadId: state.activeThread.id,
-								message: assistantMsg,
-							},
-						});
-					}
-				});
-
-				if (tool) {
-					const { input } = JSON.parse(toolInput);
+				if (!tool) {
 					const assistantMsg: Message = {
-						id: uuidv4(),
-						content: input,
+						id: assistantId,
+						content: accumulatedResponse,
 						role: "assistant",
-						name: tool,
-						function_call: {
-							name: tool,
-							arguments: input,
-						},
 					};
-					msgHistory.push(assistantMsg);
 
 					dispatch({
 						type: "UPSERT_MESSAGE",
@@ -197,35 +173,61 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 							message: assistantMsg,
 						},
 					});
-
-					const res = await callTool(tool, input);
-					if (!res) {
-						throw new Error("Tool failure");
-					}
-
-					const functionMsg: Message = {
-						id: uuidv4(),
-						content: res,
-						role: "function",
-						name: tool,
-					};
-
-					msgHistory.push(functionMsg);
-
-					dispatch({
-						type: "UPSERT_MESSAGE",
-						payload: {
-							threadId: state.activeThread.id,
-							message: functionMsg,
-						},
-					});
-
-					getChat(msgHistory);
 				}
-			})
-			.catch((err) => {
-				console.error(err);
 			});
+
+			setBotTyping(false);
+
+			if (tool) {
+				const { input } = JSON.parse(toolInput);
+				const assistantMsg: Message = {
+					id: uuidv4(),
+					content: input,
+					role: "assistant",
+					name: tool,
+					function_call: {
+						name: tool,
+						arguments: input,
+					},
+				};
+				msgHistory.push(assistantMsg);
+
+				dispatch({
+					type: "UPSERT_MESSAGE",
+					payload: {
+						threadId: state.activeThread.id,
+						message: assistantMsg,
+					},
+				});
+
+				const res = await callTool(tool, input);
+				if (!res) {
+					throw new Error("Tool failure");
+				}
+
+				const functionMsg: Message = {
+					id: uuidv4(),
+					content: res,
+					role: "function",
+					name: tool,
+				};
+
+				msgHistory.push(functionMsg);
+
+				dispatch({
+					type: "UPSERT_MESSAGE",
+					payload: {
+						threadId: state.activeThread.id,
+						message: functionMsg,
+					},
+				});
+
+				getChat(msgHistory);
+			}
+		} catch (error) {
+			setBotTyping(false);
+			console.error(error);
+		}
 	};
 
 	// Handler for submitting the chat form
@@ -274,7 +276,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
 	// Effect to sync local storage with the chat thread list
 	useEffect(() => {
-		if (typeof window !== "undefined" && checkedLocal) {
+		if (typeof window !== "undefined" && checkedLocal && !botTyping) {
 			localStorage.setItem(
 				"chatHistory",
 				JSON.stringify(state.threadList)
@@ -312,7 +314,13 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 					console.error(err);
 				});
 		}
-	}, [state.threadList, state.threadList.length, checkedLocal, state.userId]);
+	}, [
+		state.threadList,
+		state.threadList.length,
+		checkedLocal,
+		state.userId,
+		botTyping,
+	]);
 
 	if (!checkedLocal) return null;
 	return (

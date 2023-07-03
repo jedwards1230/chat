@@ -20,6 +20,31 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 				...state,
 				configEditorOpen: action.payload ?? !state.configEditorOpen,
 			};
+		case "TOGGLE_PLUGINS_EDITOR":
+			return {
+				...state,
+				pluginsEditorOpen: action.payload ?? !state.pluginsEditorOpen,
+			};
+		case "TOGGLE_PLUGIN":
+			const tools = state.activeThread.agentConfig.tools;
+			const newToolsThread = {
+				...state.activeThread,
+				agentConfig: {
+					...state.activeThread.agentConfig,
+					tools: tools.includes(action.payload)
+						? tools.filter((tool) => tool !== action.payload)
+						: [...tools, action.payload],
+				},
+			};
+			return {
+				...state,
+				activeThread: newToolsThread,
+				threadList: state.threadList.map((thread) =>
+					thread.id === state.activeThread.id
+						? newToolsThread
+						: thread
+				),
+			};
 		case "INITIALIZE":
 			if (DEBUG) console.log("INITIALIZE");
 			return {
