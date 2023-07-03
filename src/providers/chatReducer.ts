@@ -45,6 +45,11 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 						: thread
 				),
 			};
+		case "TOGGLE_PLUGINS":
+			return {
+				...state,
+				pluginsEnabled: action.payload ?? !state.pluginsEnabled,
+			};
 		case "INITIALIZE":
 			if (DEBUG) console.log("INITIALIZE");
 			return {

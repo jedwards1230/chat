@@ -15,7 +15,7 @@ export function getDefaultThread(): ChatThread {
 		],
 		agentConfig: {
 			id: "",
-			name: "",
+			name: "Chat",
 			model: "gpt-4-0613",
 			temperature: 0.7,
 			systemMessage,
@@ -31,6 +31,7 @@ const initialState: ChatState = {
 	input: "",
 	activeThread: baseEntry,
 	editId: null,
+	pluginsEnabled: false,
 	sideBarOpen: true,
 	agentEditorOpen: false,
 	configEditorOpen: false,

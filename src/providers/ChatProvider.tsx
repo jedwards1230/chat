@@ -113,7 +113,9 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 				body: JSON.stringify({
 					modelName: state.activeThread.agentConfig.model,
 					temperature: state.activeThread.agentConfig.temperature,
-					tools: state.activeThread.agentConfig.tools,
+					tools: state.pluginsEnabled
+						? state.activeThread.agentConfig.tools
+						: [],
 					msgHistory: msgHistory.map((msg) => ({
 						content: msg.content,
 						role: msg.role,

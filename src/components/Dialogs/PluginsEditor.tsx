@@ -30,7 +30,7 @@ export default function PluginsEditor() {
 					>
 						<span className="capitalize">{plugin}</span>
 						<input
-							className="p-2 border rounded-lg"
+							className="p-2 border rounded-lg cursor-pointer"
 							type="checkbox"
 							checked={checked}
 							onChange={() => {
