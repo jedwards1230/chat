@@ -2,7 +2,7 @@
 
 import { useChat, useChatDispatch } from "@/providers/ChatProvider";
 import clsx from "clsx";
-import { Trash } from "./Icons";
+import { Chat, Trash } from "./Icons";
 
 export default function ChatHistoryEntry({ entry }: { entry: ChatThread }) {
 	const { activeThread } = useChat();
@@ -16,12 +16,6 @@ export default function ChatHistoryEntry({ entry }: { entry: ChatThread }) {
 
 	return (
 		<div
-			className={clsx(
-				"py-2 px-4 flex w-full justify-between items-center",
-				entry.id === activeThread.id
-					? "bg-neutral-400 dark:bg-neutral-500"
-					: "cursor-pointer hover:bg-neutral-600"
-			)}
 			title={`threadId: ${entry.id}`}
 			onClick={() =>
 				dispatch({
@@ -29,8 +23,15 @@ export default function ChatHistoryEntry({ entry }: { entry: ChatThread }) {
 					payload: entry,
 				})
 			}
+			className={clsx(
+				"py-2 px-2 gap-2 flex w-full justify-between items-center",
+				entry.id === activeThread.id
+					? "bg-neutral-400 dark:bg-neutral-500"
+					: "cursor-pointer hover:bg-neutral-600"
+			)}
 		>
-			<div className="flex flex-col max-w-[90%] gap-0 leading-tight">
+			<Chat />
+			<div className="flex flex-col w-full gap-0 leading-tight">
 				<div className="line-clamp-1">{entry.title}</div>
 				<div className="text-sm font-light line-clamp-1">
 					{entry.messages.length > 1 ? entry.messages[1].content : ""}

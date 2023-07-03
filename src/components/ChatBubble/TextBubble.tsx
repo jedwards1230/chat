@@ -63,7 +63,7 @@ export default function TextBubble({ message }: { message: Message }) {
 						>
 							{String(children).replace(/\n$/, "")}
 						</SyntaxHighlighter>
-						<div className="flex items-center justify-center">
+						<div className="items-center justify-center hidden sm:flex">
 							<button
 								className="w-auto px-2 py-1 text-sm font-medium tracking-tight border rounded-full dark:bg-neutral-300 dark:text-neutral-900 active:bg-neutral-300 hover:bg-neutral-200 bg-neutral-50 border-neutral-500"
 								onClick={() => {
