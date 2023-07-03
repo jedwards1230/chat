@@ -23,6 +23,14 @@ export async function POST(request: Request) {
 		});
 	}
 	const messages: ChatCompletionRequestMessage[] = msgHistory.map((msg) => {
+		if (msg.role === "system") {
+			return {
+				role: msg.role,
+				content: `${
+					msg.content
+				}\n\nCurrent time: ${new Date().toLocaleString()}\n\n`,
+			};
+		}
 		return {
 			role: msg.role,
 			content: msg.content,
@@ -30,13 +38,6 @@ export async function POST(request: Request) {
 			function_call: msg.function_call,
 		};
 	});
-
-	/* const sys = {
-		role: "system" as const,
-		content: `${systemMessage} Try to use your tools whenever you can.`,
-	};
-
-	const messages = [sys, ...history]; */
 
 	const tools = [new Calculator(), new Search()];
 
