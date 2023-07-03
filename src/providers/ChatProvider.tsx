@@ -175,12 +175,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 						});
 					}
 				});
-				console.log({
-					toolInput,
-					tool,
-					accumulatedResponse,
-					finishReason,
-				});
 
 				if (tool) {
 					const { input } = JSON.parse(toolInput);

@@ -1,6 +1,8 @@
 import { redis } from "@/lib/redis";
 import { NextResponse } from "next/server";
 
+export const runtime = "edge";
+
 const USER_ID = process.env.USER_ID;
 
 export async function POST(request: Request) {
