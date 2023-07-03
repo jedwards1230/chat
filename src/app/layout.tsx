@@ -2,7 +2,6 @@ import { Suspense } from "react";
 import "./globals.css";
 import Providers from "@/providers";
 import { Metadata } from "next";
-import { cookies } from "next/headers";
 
 const APP_NAME = "Chat";
 const APP_DEFAULT_TITLE = "Chat";
