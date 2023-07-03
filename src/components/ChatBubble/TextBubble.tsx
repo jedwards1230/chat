@@ -12,9 +12,11 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import clsx from "clsx";
 import { useMemo } from "react";
+import { useChat } from "@/providers/ChatProvider";
 
 export default function TextBubble({ message }: { message: Message }) {
 	const { resolvedTheme } = useTheme();
+	const { activeThread } = useChat();
 
 	const components = useMemo<
 		Partial<
@@ -147,6 +149,40 @@ export default function TextBubble({ message }: { message: Message }) {
 		content = `${tool}: ${content}`;
 	}
 
+	const FunctionBubble = () => (
+		<details className={"flex flex-col gap-2 items-start w-full rounded"}>
+			<summary className="capitalize cursor-pointer">
+				{message.name} Result
+			</summary>
+			<div>
+				<ReactMarkdown
+					className="flex flex-col whitespace-pre-wrap w-full gap-1.5 rounded"
+					remarkPlugins={[remarkGfm]}
+					components={components}
+				>
+					{content}
+				</ReactMarkdown>
+			</div>
+		</details>
+	);
+
+	const SystemBubble = () => (
+		<div className="flex flex-col justify-start text-xs rounded text-neutral-400 dark:text-neutral-500">
+			<div>Model: {activeThread.agentConfig.model}</div>
+			<div>System Messages: {message.content}</div>
+		</div>
+	);
+
+	const TextBubble = () => (
+		<ReactMarkdown
+			className="whitespace-pre-wrap w-full gap-1.5 rounded"
+			remarkPlugins={[remarkGfm]}
+			components={components}
+		>
+			{content}
+		</ReactMarkdown>
+	);
+
 	return (
 		<div
 			className={clsx(
@@ -155,30 +191,11 @@ export default function TextBubble({ message }: { message: Message }) {
 			)}
 		>
 			{message.role === "function" ? (
-				<details
-					className={"flex flex-col gap-2 items-start w-full rounded"}
-				>
-					<summary className="capitalize cursor-pointer">
-						{message.name} Result
-					</summary>
-					<div>
-						<ReactMarkdown
-							className="flex flex-col whitespace-pre-wrap w-full gap-1.5 rounded"
-							remarkPlugins={[remarkGfm]}
-							components={components}
-						>
-							{content}
-						</ReactMarkdown>
-					</div>
-				</details>
+				<FunctionBubble />
+			) : message.role === "system" ? (
+				<SystemBubble />
 			) : (
-				<ReactMarkdown
-					className="whitespace-pre-wrap w-full gap-1.5 rounded"
-					remarkPlugins={[remarkGfm]}
-					components={components}
-				>
-					{content}
-				</ReactMarkdown>
+				<TextBubble />
 			)}
 		</div>
 	);

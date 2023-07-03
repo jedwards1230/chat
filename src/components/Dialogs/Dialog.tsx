@@ -1,8 +1,8 @@
 "use client";
 
-import { useConfig, useConfigDispatch } from "@/providers/ConfigProvider";
 import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
+import { useChat, useChatDispatch } from "@/providers/ChatProvider";
 
 export default function Dialog({
 	children,
@@ -11,8 +11,8 @@ export default function Dialog({
 	children: React.ReactNode;
 	callback: () => void;
 }) {
-	const config = useConfig();
-	const dispatch = useConfigDispatch();
+	const config = useChat();
+	const dispatch = useChatDispatch();
 	const ref = useRef<HTMLDivElement>(null);
 
 	// click outside to close

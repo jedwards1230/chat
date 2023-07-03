@@ -1,14 +1,12 @@
 "use client";
 
-import { useConfig, useConfigDispatch } from "@/providers/ConfigProvider";
 import Dialog from "./Dialog";
 import { useChat, useChatDispatch } from "@/providers/ChatProvider";
 
 export default function ConfigEditor() {
-	const { configEditorOpen } = useConfig();
-	const { threadList } = useChat();
+	const { threadList, configEditorOpen } = useChat();
 	const chatDispatch = useChatDispatch();
-	const configDispatch = useConfigDispatch();
+	const configDispatch = useChatDispatch();
 
 	const clearAll = () => {
 		chatDispatch({ type: "CLEAR_HISTORY" });

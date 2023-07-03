@@ -15,8 +15,9 @@ import {
 	readStream,
 	callTool,
 	parseStreamData,
+	isMobile,
 } from "../utils";
-import { chatReducer } from "@/reducers/chatReducer";
+import { chatReducer } from "@/providers/chatReducer";
 import initialState from "./initialChat";
 
 const ChatContext = createContext<ChatState>(initialState);
@@ -243,9 +244,16 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
 	// Effect to check stored chat history on component mount
 	useEffect(() => {
+		if (typeof window === "undefined") return;
+		if (isMobile()) {
+			state.sideBarOpen = false;
+		}
+
 		const history = getChatHistory();
-		if (history) dispatch({ type: "INITIALIZE", payload: history });
+		if (history && history.length > 0)
+			dispatch({ type: "INITIALIZE", payload: history });
 		setCheckedLocal(true);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	// Effect to sync local storage with the chat thread list
@@ -258,6 +266,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 		}
 	}, [state.threadList, state.threadList.length, checkedLocal]);
 
+	if (!checkedLocal) return null;
 	return (
 		<ChatContext.Provider
 			value={{

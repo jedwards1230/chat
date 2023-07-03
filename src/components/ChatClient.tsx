@@ -4,10 +4,10 @@ import { useSwipeable } from "react-swipeable";
 
 import Chat from "./Chat";
 import ChatHistory from "./ChatHistory";
-import { useConfigDispatch } from "@/providers/ConfigProvider";
+import { useChatDispatch } from "@/providers/ChatProvider";
 
 export default function ChatClient() {
-	const dispatch = useConfigDispatch();
+	const dispatch = useChatDispatch();
 	const handlers = useSwipeable({
 		onSwipedLeft: () =>
 			dispatch({ type: "TOGGLE_SIDEBAR", payload: false }),

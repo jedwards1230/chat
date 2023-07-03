@@ -1,30 +1,38 @@
-import { v4 as uuidv4 } from "uuid";
-
-import { baseEntry } from "@/providers/initialChat";
+import { getDefaultThread } from "@/providers/initialChat";
 import { upsertMessage } from "@/utils";
 
 const DEBUG = false;
 
 export function chatReducer(state: ChatState, action: ChatAction) {
 	switch (action.type) {
+		case "TOGGLE_SIDEBAR":
+			return {
+				...state,
+				sideBarOpen: action.payload ?? !state.sideBarOpen,
+			};
+		case "TOGGLE_AGENT_EDITOR":
+			return {
+				...state,
+				agentEditorOpen: action.payload ?? !state.agentEditorOpen,
+			};
+		case "TOGGLE_CONFIG_EDITOR":
+			return {
+				...state,
+				configEditorOpen: action.payload ?? !state.configEditorOpen,
+			};
 		case "INITIALIZE":
 			if (DEBUG) console.log("INITIALIZE");
 			return {
 				...state,
 				threadList: action.payload,
-				activeThread: baseEntry,
+				activeThread: getDefaultThread(),
 			};
 		case "CREATE_THREAD":
 			if (DEBUG) console.log("CREATE_THREAD");
-			const newEntry: ChatThread = {
-				...baseEntry,
-				messages: [],
-				id: uuidv4(),
-			};
 
 			return {
 				...state,
-				activeThread: newEntry,
+				activeThread: getDefaultThread(),
 				input: "",
 			};
 
@@ -37,7 +45,7 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 				),
 				activeThread:
 					state.activeThread.id === action.payload
-						? baseEntry
+						? getDefaultThread()
 						: state.activeThread,
 			};
 
@@ -47,6 +55,51 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 				...state,
 				editId: null,
 				input: "",
+			};
+
+		case "CHANGE_TEMPERATURE":
+			if (DEBUG) console.log("CHANGE_TEMPERATURE");
+			const newTemperature = {
+				...state.activeThread,
+				agentConfig: {
+					...state.activeThread.agentConfig,
+					temperature: action.payload,
+				},
+			};
+			return {
+				...state,
+				activeThread: newTemperature,
+				threadList: state.threadList.map((thread) =>
+					thread.id === state.activeThread.id
+						? newTemperature
+						: thread
+				),
+			};
+
+		case "CHANGE_SYSTEM_MESSAGE":
+			if (DEBUG) console.log("CHANGE_SYSTEM_MESSAGE");
+			const newSystemMessage = {
+				...state.activeThread,
+				agentConfig: {
+					...state.activeThread.agentConfig,
+					systemMessage: action.payload,
+				},
+				messages: [
+					{
+						...state.activeThread.messages[0],
+						content: action.payload,
+					},
+					...state.activeThread.messages.slice(1),
+				],
+			};
+			return {
+				...state,
+				activeThread: newSystemMessage,
+				threadList: state.threadList.map((thread) =>
+					thread.id === state.activeThread.id
+						? newSystemMessage
+						: thread
+				),
 			};
 
 		case "REMOVE_MESSAGE":
@@ -90,10 +143,25 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 			);
 
 			const getNewActiveThread = () => {
+				const defaultThread = getDefaultThread();
 				const newThread: ChatThread = {
-					...baseEntry,
+					...defaultThread,
 					id: action.payload.threadId,
-					messages: [action.payload.message],
+					agentConfig: {
+						...defaultThread.agentConfig,
+						temperature: state.activeThread.agentConfig.temperature,
+						systemMessage:
+							state.activeThread.agentConfig.systemMessage,
+					},
+					messages: [
+						{
+							...state.activeThread.messages[0],
+							content:
+								state.activeThread.agentConfig.systemMessage,
+						},
+						...defaultThread.messages.splice(1),
+						action.payload.message,
+					],
 				};
 				threadList.push(newThread);
 				return {
@@ -119,12 +187,16 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 
 		case "EDIT_MESSAGE":
 			if (DEBUG) console.log("EDIT_MESSAGE");
+			const messageToEdit = state.activeThread.messages.find(
+				(message) => message.id === action.payload.messageId
+			);
+
+			if (!messageToEdit) throw new Error("No message to edit");
+
 			return {
 				...state,
 				editId: action.payload.messageId,
-				input: state.activeThread.messages.find(
-					(message) => message.id === action.payload.messageId
-				)?.content as string,
+				input: messageToEdit.content,
 			};
 
 		case "UPSERT_TITLE":

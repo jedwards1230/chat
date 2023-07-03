@@ -17,7 +17,7 @@ export default function ChatHistoryEntry({ entry }: { entry: ChatThread }) {
 	return (
 		<div
 			className={clsx(
-				"p-2 flex w-full justify-between items-center",
+				"py-2 px-4 flex w-full justify-between items-center",
 				entry.id === activeThread.id
 					? "bg-neutral-400 dark:bg-neutral-500"
 					: "cursor-pointer hover:bg-neutral-600"
@@ -33,7 +33,7 @@ export default function ChatHistoryEntry({ entry }: { entry: ChatThread }) {
 			<div className="flex flex-col max-w-[90%] gap-0 leading-tight">
 				<div className="line-clamp-1">{entry.title}</div>
 				<div className="text-sm font-light line-clamp-1">
-					{entry.messages.length > 0 ? entry.messages[0].content : ""}
+					{entry.messages.length > 1 ? entry.messages[1].content : ""}
 				</div>
 			</div>
 			<div

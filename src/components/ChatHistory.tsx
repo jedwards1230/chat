@@ -4,14 +4,12 @@ import { useEffect, useRef } from "react";
 
 import { useChat, useChatDispatch } from "@/providers/ChatProvider";
 import ChatHistoryEntry from "./ChatHistoryEntry";
-import { useConfig, useConfigDispatch } from "@/providers/ConfigProvider";
 import { Settings, XMark } from "./Icons";
 import { isMobile } from "@/utils";
 
 export default function ChatHistory() {
-	const { threadList } = useChat();
-	const { sideBarOpen } = useConfig();
-	const configDispatch = useConfigDispatch();
+	const { threadList, sideBarOpen } = useChat();
+	const configDispatch = useChatDispatch();
 	const chatDispatch = useChatDispatch();
 	const sidebarRef = useRef<HTMLDivElement>(null);
 
@@ -65,7 +63,7 @@ export default function ChatHistory() {
 						<Settings />
 					</button>
 				</div>
-				<div className="flex flex-col-reverse w-full px-1 overflow-y-scroll">
+				<div className="flex flex-col-reverse w-full overflow-y-scroll">
 					{threadList &&
 						threadList.map((m, i) => (
 							<ChatHistoryEntry

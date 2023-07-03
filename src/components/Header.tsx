@@ -1,15 +1,13 @@
 "use client";
 
-import { useChat } from "@/providers/ChatProvider";
-import { useConfig, useConfigDispatch } from "@/providers/ConfigProvider";
+import { useChat, useChatDispatch } from "@/providers/ChatProvider";
 import { Bars, Information } from "./Icons";
 import clsx from "clsx";
 import { isMobile } from "@/utils";
 
 export default function Header() {
-	const { sideBarOpen } = useConfig();
-	const { activeThread } = useChat();
-	const dispatch = useConfigDispatch();
+	const { activeThread, sideBarOpen } = useChat();
+	const dispatch = useChatDispatch();
 
 	const handleSidebarToggle = () => {
 		dispatch({ type: "TOGGLE_SIDEBAR" });
@@ -40,7 +38,7 @@ export default function Header() {
 			>
 				<p className="font-semibold">{activeThread.title}</p>
 				<p className="text-sm font-light text-neutral-500">
-					{activeThread.messages.length > 0 ? (
+					{activeThread.messages.length > 1 ? (
 						<>
 							{activeThread.agentConfig.model} |{" "}
 							{activeThread.messages.length} messages
@@ -50,7 +48,7 @@ export default function Header() {
 					)}
 				</p>
 			</div>
-			<div className="flex items-center justify-end col-span-1">
+			<div className="items-center justify-end hidden col-span-1 ">
 				<button
 					className="px-1 cursor-pointer text-neutral-400 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
 					onClick={handleAgentEditorToggle}
