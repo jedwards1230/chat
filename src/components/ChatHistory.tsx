@@ -22,6 +22,11 @@ export default function ChatHistory() {
 		configDispatch({ type: "TOGGLE_SIDEBAR", payload: false });
 	};
 
+	const newThread = () => {
+		chatDispatch({ type: "CREATE_THREAD" });
+		if (isMobile()) closeSidebar();
+	};
+
 	useEffect(() => {
 		const handleClickOutside = (event: any) => {
 			if (
@@ -52,7 +57,7 @@ export default function ChatHistory() {
 				<div className="flex justify-between w-full px-2 gap-x-2">
 					<button
 						className="flex-1 py-2 font-semibold transition-colors rounded-md bg-neutral-600 hover:bg-neutral-500"
-						onClick={() => chatDispatch({ type: "CREATE_THREAD" })}
+						onClick={newThread}
 					>
 						New Chat
 					</button>

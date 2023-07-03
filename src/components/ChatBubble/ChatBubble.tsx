@@ -15,7 +15,7 @@ export default function ChatBubble({ message }: { message: Message }) {
 	return (
 		<div
 			className={clsx(
-				"flex relative gap-4 transition-colors hover:bg-neutral-200/60 dark:hover:bg-neutral-800 group items-start pt-2 pb-4 justify-start border border-transparent dark:hover:border-neutral-600 hover:border-neutral-400/70 rounded"
+				"flex relative gap-4 px-1 sm:px-2 transition-colors hover:bg-neutral-200/60 dark:hover:bg-neutral-800 group items-start pt-2 pb-4 justify-start border border-transparent dark:hover:border-neutral-600 hover:border-neutral-400/70 rounded"
 			)}
 		>
 			<ProfilePicture message={message} />
