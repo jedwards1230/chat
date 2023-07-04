@@ -15,7 +15,7 @@ import {
 	readStream,
 	callTool,
 	parseStreamData,
-	isMobile,
+	isMobile as iM,
 } from "../utils";
 import { chatReducer } from "@/providers/chatReducer";
 import initialState from "./initialChat";
@@ -28,7 +28,11 @@ export const useChatDispatch = () => useContext(ChatDispatchContext);
 
 export function ChatProvider({ children }: { children: React.ReactNode }) {
 	const [checkedLocal, setCheckedLocal] = useState(false);
-	const [state, dispatch] = useReducer(chatReducer, initialState);
+	const [isMobile, setIsMobile] = useState(iM() || false);
+	const [state, dispatch] = useReducer(chatReducer, {
+		...initialState,
+		sideBarOpen: !isMobile,
+	});
 	const [botTyping, setBotTyping] = useState(false);
 
 	// Function to create a user message
@@ -259,9 +263,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 	// Effect to check stored chat history on component mount
 	useEffect(() => {
 		if (typeof window === "undefined") return;
-		if (isMobile()) {
-			state.sideBarOpen = false;
-		}
 
 		getChatHistory(state.userId).then((history) => {
 			if (history) {
@@ -274,6 +275,34 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 			}
 			setCheckedLocal(true);
 		});
+
+		const handleResize = () => {
+			if (isMobile && !iM()) {
+				dispatch({
+					type: "TOGGLE_SIDEBAR",
+					payload: false,
+				});
+				setIsMobile(true);
+			} else if (!iM()) {
+				dispatch({
+					type: "TOGGLE_SIDEBAR",
+					payload: true,
+				});
+				setIsMobile(false);
+			} else {
+				console.log("isMobile()", isMobile, iM());
+				dispatch({
+					type: "TOGGLE_SIDEBAR",
+					payload: false,
+				});
+			}
+		};
+
+		window.addEventListener("resize", handleResize);
+
+		return () => {
+			window.removeEventListener("resize", handleResize);
+		};
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);

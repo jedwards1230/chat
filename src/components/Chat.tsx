@@ -21,12 +21,12 @@ export default function Chat() {
 	return (
 		<div
 			className={clsx(
-				"flex flex-col transition-all w-full h-full overflow-y-scroll",
+				"flex flex-col transition-all w-full h-full",
 				sideBarOpen ? "sm:pl-80" : "lg:pl-0"
 			)}
 		>
 			<Header />
-			<div className="flex flex-col items-center justify-center w-full h-full max-w-full overflow-y-scroll">
+			<div className="flex flex-col items-center justify-center w-full h-full max-w-full overflow-y-scroll grow-1">
 				<div className="flex flex-col w-full h-full max-w-4xl gap-4 p-2 mx-auto">
 					{activeThread.messages.length > 1 ? (
 						activeThread.messages.map((m) => (
