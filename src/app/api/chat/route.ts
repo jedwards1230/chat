@@ -59,6 +59,8 @@ export async function POST(request: Request) {
 					}))
 			: undefined;
 
+	//console.log({ messages });
+
 	const completion = await openai.createChatCompletion({
 		model: modelName,
 		messages,

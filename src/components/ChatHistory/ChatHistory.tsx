@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useChat, useChatDispatch } from "@/providers/ChatProvider";
 import ChatHistoryEntry from "./ChatHistoryEntry";
-import { Settings, XMark } from "./Icons";
+import { Settings } from "../Icons";
 import { isMobile } from "@/utils";
+import clsx from "clsx";
 
 export default function ChatHistory() {
 	const { threadList, sideBarOpen } = useChat();
@@ -30,6 +31,7 @@ export default function ChatHistory() {
 	useEffect(() => {
 		const handleClickOutside = (event: any) => {
 			if (
+				sideBarOpen &&
 				isMobile() &&
 				sidebarRef.current &&
 				!sidebarRef.current.contains(event.target)
@@ -47,11 +49,13 @@ export default function ChatHistory() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
-	if (!sideBarOpen) return null;
 	return (
 		<div
 			ref={sidebarRef}
-			className="fixed z-10 h-full max-w-xs min-w-[270px] transition-all py-2 border-r sm:z-auto w-96 sm:relative dark:border-neutral-500 text-neutral-100 bg-neutral-800 dark:bg-neutral-700"
+			className={clsx(
+				"z-20 h-full transition-all fixed lg:inset-y-0 lg:flex lg:w-80 max-w-xs min-w-[270px] py-2 border-r sm:z-auto w-96 dark:border-neutral-500 text-neutral-100 bg-neutral-800 dark:bg-neutral-700",
+				sideBarOpen ? "-translate-x-0" : "-translate-x-full"
+			)}
 		>
 			<div className="relative flex flex-col items-center justify-start w-full h-full gap-4">
 				<div className="flex justify-between w-full px-2 gap-x-2">

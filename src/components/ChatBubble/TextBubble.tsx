@@ -60,12 +60,11 @@ export default function TextBubble({ message }: { message: Message }) {
 			code({ node, inline, className, children, ...props }) {
 				const match = /language-(\w+)/.exec(className || "");
 				return !inline && match ? (
-					<div className="flex flex-col flex-grow-0 gap-0">
+					<div className="flex flex-col gap-1">
 						<SyntaxHighlighter
 							{...props}
 							style={resolvedTheme !== "dark" ? vs : vscDarkPlus}
 							language={match[1]}
-							className="!w-full !overflow-x-scroll !mb-1"
 						>
 							{String(children).replace(/\n$/, "")}
 						</SyntaxHighlighter>
@@ -100,11 +99,13 @@ export default function TextBubble({ message }: { message: Message }) {
 			),
 			hr: ({ node, ...props }) => <hr {...props} className="my-2" />,
 			li: ({ node, index, ordered, checked, children, ...props }) => (
-				<li className="flex ml-4" {...props}>
+				<li className="flex w-full" {...props}>
 					<span className="list-marker">
 						{ordered ? `${index + 1}.` : "-"}
 					</span>
-					{children}
+					<div className="flex flex-col overflow-x-scroll">
+						{children}
+					</div>
 				</li>
 			),
 			ol: ({ node, depth, ordered, ...props }) => (
@@ -149,14 +150,14 @@ export default function TextBubble({ message }: { message: Message }) {
 		[resolvedTheme]
 	);
 
-	const FunctionBubble = () => (
+	const FunctionContent = () => (
 		<details className={"flex flex-col gap-2 items-start w-full rounded"}>
 			<summary className="capitalize cursor-pointer">
 				{message.name} Result
 			</summary>
 			<div>
 				<ReactMarkdown
-					className="flex flex-col whitespace-pre-wrap w-full gap-1.5 rounded"
+					className="flex flex-col w-full gap-1.5 rounded"
 					remarkPlugins={[remarkGfm]}
 					components={components}
 				>
@@ -166,16 +167,16 @@ export default function TextBubble({ message }: { message: Message }) {
 		</details>
 	);
 
-	const SystemBubble = () => (
-		<div className="flex flex-col justify-start text-xs rounded text-neutral-400 dark:text-neutral-500">
+	const SystemContent = () => (
+		<div className="flex flex-col justify-start w-full text-xs rounded text-neutral-400 dark:text-neutral-500">
 			<div>Model: {activeThread.agentConfig.model}</div>
 			<div>System Messages: {message.content}</div>
 		</div>
 	);
 
-	const TextBubble = () => (
+	const TextContent = () => (
 		<ReactMarkdown
-			className="whitespace-pre-wrap w-full gap-1.5 rounded"
+			className="flex flex-col gap-1.5 rounded"
 			remarkPlugins={[remarkGfm]}
 			components={components}
 		>
@@ -186,16 +187,16 @@ export default function TextBubble({ message }: { message: Message }) {
 	return (
 		<div
 			className={clsx(
-				"flex transition-colors items-start justify-center max-w-full overflow-x-scroll py-2 px-2 rounded",
+				"flex flex-col transition-colors justify-center py-2 px-2 overflow-x-scroll rounded",
 				message.role === "user" ? "bg-blue-100 dark:bg-blue-600/70" : ""
 			)}
 		>
 			{message.role === "function" ? (
-				<FunctionBubble />
+				<FunctionContent />
 			) : message.role === "system" ? (
-				<SystemBubble />
+				<SystemContent />
 			) : (
-				<TextBubble />
+				<TextContent />
 			)}
 		</div>
 	);

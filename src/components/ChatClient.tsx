@@ -3,7 +3,7 @@
 import { useSwipeable } from "react-swipeable";
 
 import Chat from "./Chat";
-import ChatHistory from "./ChatHistory";
+import ChatHistory from "./ChatHistory/ChatHistory";
 import { useChatDispatch } from "@/providers/ChatProvider";
 
 export default function ChatClient() {

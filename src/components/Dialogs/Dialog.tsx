@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import clsx from "clsx";
 
 export default function Dialog({
 	children,
+	className,
 	callback,
 }: {
 	children: React.ReactNode;
+	className?: string;
 	callback: () => void;
 }) {
 	const ref = useRef<HTMLDivElement>(null);
@@ -20,27 +22,24 @@ export default function Dialog({
 			}
 		}
 		document.addEventListener("mousedown", handleClickOutside);
+		document.addEventListener("touchstart", handleClickOutside);
 		return () => {
 			document.removeEventListener("mousedown", handleClickOutside);
+			document.removeEventListener("touchstart", handleClickOutside);
 		};
 	}, [callback]);
 
 	return (
-		<motion.dialog
-			initial={{
-				opacity: 0,
-			}}
-			animate={{
-				opacity: 1,
-			}}
-			className="fixed top-0 right-0 z-50 flex items-center justify-center w-full h-full bg-neutral-900/50"
-		>
+		<dialog className="fixed top-0 right-0 z-50 flex items-center justify-center w-full h-full bg-neutral-900/50">
 			<div
 				ref={ref}
-				className="w-full max-w-md p-4 border rounded-lg sm:px-6 bg-neutral-50 dark:bg-neutral-800 dark:border-neutral-500"
+				className={clsx(
+					"w-full max-w-md p-4 border rounded-lg sm:px-6 bg-neutral-50 dark:bg-neutral-800 transition-all dark:border-neutral-500",
+					className
+				)}
 			>
 				{children}
 			</div>
-		</motion.dialog>
+		</dialog>
 	);
 }

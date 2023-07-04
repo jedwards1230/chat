@@ -4,18 +4,21 @@ import { useChat, useChatDispatch } from "@/providers/ChatProvider";
 import Dialog from "./Dialog";
 
 export default function PluginsEditor() {
-	const { activeThread } = useChat();
+	const { activeThread, pluginsEditorOpen } = useChat();
 	const chatDispatch = useChatDispatch();
 	const availableTools: Tool[] = ["calculator", "search"];
 
 	return (
 		<Dialog
-			callback={() =>
-				chatDispatch({
-					type: "TOGGLE_PLUGINS_EDITOR",
-					payload: false,
-				})
-			}
+			className={pluginsEditorOpen ? "opacity-1" : "opacity-0"}
+			callback={() => {
+				if (pluginsEditorOpen) {
+					chatDispatch({
+						type: "TOGGLE_PLUGINS_EDITOR",
+						payload: false,
+					});
+				}
+			}}
 		>
 			<div className="w-full pb-4 text-xl font-medium text-center">
 				Plugins Editor

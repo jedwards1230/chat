@@ -1,8 +1,9 @@
 "use client";
 
-import { useChat, useChatDispatch } from "@/providers/ChatProvider";
 import clsx from "clsx";
-import { Chat, Trash } from "./Icons";
+
+import { useChat, useChatDispatch } from "@/providers/ChatProvider";
+import { Chat, Trash } from "../Icons";
 
 export default function ChatHistoryEntry({ entry }: { entry: ChatThread }) {
 	const { activeThread } = useChat();

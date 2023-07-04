@@ -21,7 +21,7 @@ export function getDefaultThread(): ChatThread {
 			model: "gpt-4-0613",
 			temperature: 0.7,
 			systemMessage,
-			tools: [],
+			tools: ["search"],
 		},
 	};
 }
@@ -38,7 +38,7 @@ const initialState: ChatState = {
 		defaultTemperature: baseEntry.agentConfig.temperature,
 		defaultSystemMessage: baseEntry.agentConfig.systemMessage,
 	},
-	pluginsEnabled: false,
+	pluginsEnabled: true,
 	sideBarOpen: true,
 	agentEditorOpen: false,
 	configEditorOpen: false,

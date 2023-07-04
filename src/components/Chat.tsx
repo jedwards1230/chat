@@ -4,9 +4,10 @@ import ChatBubble from "./ChatBubble";
 import { useChat, useChatDispatch } from "../providers/ChatProvider";
 import Header from "./Header";
 import ChatInput from "./ChatInput";
+import clsx from "clsx";
 
 export default function Chat() {
-	const { activeThread, pluginsEnabled } = useChat();
+	const { activeThread, pluginsEnabled, sideBarOpen } = useChat();
 	const dispatch = useChatDispatch();
 
 	const handleAgentEditorToggle = () => {
@@ -18,18 +19,23 @@ export default function Chat() {
 	};
 
 	return (
-		<div className="flex flex-col items-center w-full h-full">
+		<div
+			className={clsx(
+				"flex flex-col transition-all w-full h-full overflow-y-scroll",
+				sideBarOpen ? "sm:pl-80" : "lg:pl-0"
+			)}
+		>
 			<Header />
-			<div className="flex flex-col items-center w-full h-full overflow-scroll">
-				<div className="flex flex-col w-full h-full max-w-4xl p-2">
+			<div className="flex flex-col items-center justify-center w-full h-full max-w-full overflow-y-scroll">
+				<div className="flex flex-col w-full h-full max-w-4xl gap-4 p-2 mx-auto">
 					{activeThread.messages.length > 1 ? (
 						activeThread.messages.map((m) => (
 							<ChatBubble key={m.id} message={m} />
 						))
 					) : (
-						<div className="flex flex-col items-center justify-start w-full h-full">
+						<div className="flex flex-col items-center justify-start w-full h-full select-none">
 							<div className="flex flex-col gap-2 pt-12 pb-48">
-								<div className="text-xl font-medium text-center">
+								<div className="text-4xl font-medium text-center">
 									{activeThread.agentConfig.name}
 								</div>
 								<div className="italic text-neutral-500 line-clamp-1">
