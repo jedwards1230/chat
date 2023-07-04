@@ -16,6 +16,11 @@ type Message = {
 		| undefined;
 };
 
+interface SaveData {
+	chatHistory: ChatThread[];
+	config: Config;
+}
+
 interface AgentConfig {
 	id: string;
 	name: string;

@@ -135,31 +135,30 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 			let accumulatedResponse = "";
 			let finishReason: string | null = null;
 
-			await readStream(response.body, (chunk: string) => {
+			const reduceStreamData = (acc: string, curr: StreamData) => {
+				if (!curr) return acc;
+				const res = curr.choices[0];
+				if (res.finish_reason) {
+					finishReason = res.finish_reason;
+					return acc;
+				}
+				if (res.delta.function_call) {
+					if (res.delta.function_call.name) {
+						tool = res.delta.function_call.name as Tool;
+					}
+					if (res.delta.function_call.arguments) {
+						toolInput += res.delta.function_call.arguments;
+					}
+					return acc;
+				}
+				return acc + res.delta.content;
+			};
+
+			const streamCallback = (chunk: string) => {
 				const chunks = parseStreamData(chunk);
 
 				toolInput = "";
-				accumulatedResponse = chunks.reduce(
-					(acc: string, curr: StreamData) => {
-						if (!curr) return acc;
-						const res = curr.choices[0];
-						if (res.finish_reason) {
-							finishReason = res.finish_reason;
-							return acc;
-						}
-						if (res.delta.function_call) {
-							if (res.delta.function_call.name) {
-								tool = res.delta.function_call.name as Tool;
-							}
-							if (res.delta.function_call.arguments) {
-								toolInput += res.delta.function_call.arguments;
-							}
-							return acc;
-						}
-						return acc + res.delta.content;
-					},
-					""
-				);
+				accumulatedResponse = chunks.reduce(reduceStreamData, "");
 
 				if (!tool) {
 					const assistantMsg: Message = {
@@ -176,11 +175,14 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 						},
 					});
 				}
-			});
+			};
+
+			await readStream(response.body, streamCallback);
 
 			setBotTyping(false);
 
 			if (tool) {
+				console.log("Calling tool", tool, toolInput);
 				const { input } = JSON.parse(toolInput);
 				const assistantMsg: Message = {
 					id: uuidv4(),
@@ -276,51 +278,71 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
+	const serializeSaveData = (saveData: SaveData): string => {
+		return JSON.stringify({
+			config: saveData.config,
+			chatHistory: saveData.chatHistory.map((thread) => ({
+				id: thread.id,
+				title: thread.title,
+				agentConfig: thread.agentConfig,
+				messages: JSON.stringify(thread.messages),
+			})),
+		});
+	};
+
 	// Effect to sync local storage with the chat thread list
 	useEffect(() => {
-		if (typeof window !== "undefined" && checkedLocal && !botTyping) {
-			localStorage.setItem(
-				"chatHistory",
-				JSON.stringify(state.threadList)
-			);
-			fetch("/api/save_history", {
-				method: "POST",
-				body: JSON.stringify({
-					chatHistory: state.threadList.map((thread) => ({
-						id: thread.id,
-						title: thread.title,
-						agentConfig: thread.agentConfig,
-						messages: JSON.stringify(thread.messages),
-					})),
-					user: state.userId,
-				}),
-			})
-				.then((res) => {
+		if (
+			typeof window !== "undefined" &&
+			state.threadList.length > 0 &&
+			checkedLocal &&
+			!botTyping
+		) {
+			const saveData = serializeSaveData({
+				config: state.config,
+				chatHistory: state.threadList,
+			});
+
+			const saveHistory = async () => {
+				try {
+					localStorage.setItem("chatHistory", saveData);
+					const res = await fetch("/api/save_history", {
+						method: "POST",
+						body: JSON.stringify({
+							saveData,
+							user: state.userId,
+						}),
+					});
+
 					if (res.status !== 200) {
-						res.text().then((text) => {
-							if (text === "No user id") {
-								dispatch({
-									type: "CHANGE_USER_ID_REQUIRED",
-									payload: true,
-								});
-								dispatch({
-									type: "TOGGLE_CONFIG_EDITOR",
-									payload: true,
-								});
-							}
-						});
+						const text = await res.text();
+
+						if (text === "No user id") {
+							dispatch({
+								type: "CHANGE_USER_ID_REQUIRED",
+								payload: true,
+							});
+							dispatch({
+								type: "TOGGLE_CONFIG_EDITOR",
+								payload: true,
+							});
+						}
+
 						throw new Error("Failed to save chat history");
 					}
-				})
-				.catch((err) => {
-					console.error(err);
-				});
+				} catch (error) {
+					console.error(error);
+				}
+			};
+
+			saveHistory();
 		}
 	}, [
 		state.threadList,
 		state.threadList.length,
 		checkedLocal,
 		state.userId,
+		state.config,
 		botTyping,
 	]);
 

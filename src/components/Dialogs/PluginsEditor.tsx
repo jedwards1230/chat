@@ -6,6 +6,7 @@ import Dialog from "./Dialog";
 export default function PluginsEditor() {
 	const { activeThread } = useChat();
 	const chatDispatch = useChatDispatch();
+	const availableTools: Tool[] = ["calculator", "search"];
 
 	return (
 		<Dialog
@@ -19,14 +20,12 @@ export default function PluginsEditor() {
 			<div className="w-full pb-4 text-xl font-medium text-center">
 				Plugins Editor
 			</div>
-			{["calculator", "search"].map((plugin) => {
-				const checked = activeThread.agentConfig.tools.includes(
-					plugin as Tool
-				);
+			{availableTools.map((plugin) => {
+				const checked = activeThread.agentConfig.tools.includes(plugin);
 				return (
 					<label
 						key={plugin}
-						className="flex items-center justify-between w-full px-4 py-2 hover:bg-neutral-200"
+						className="flex items-center justify-between w-full px-4 py-2 dark:hover:bg-neutral-600 hover:bg-neutral-200"
 					>
 						<span className="capitalize">{plugin}</span>
 						<input

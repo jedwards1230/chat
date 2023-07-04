@@ -29,10 +29,15 @@ export function getDefaultThread(): ChatThread {
 const baseEntry = getDefaultThread();
 
 const initialState: ChatState = {
-	threadList: [],
+	threadList: [] as ChatThread[],
 	input: "",
 	activeThread: baseEntry,
 	editId: null,
+	config: {
+		defaultModel: baseEntry.agentConfig.model,
+		defaultTemperature: baseEntry.agentConfig.temperature,
+		defaultSystemMessage: baseEntry.agentConfig.systemMessage,
+	},
 	pluginsEnabled: false,
 	sideBarOpen: true,
 	agentEditorOpen: false,

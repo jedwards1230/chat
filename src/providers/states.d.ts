@@ -12,7 +12,14 @@ interface ChatState {
 	configEditorOpen: boolean;
 	pluginsEditorOpen: boolean;
 	pluginsEnabled: boolean;
+	config: Config;
 	handleSubmit: (e: React.FormEvent) => void;
+}
+
+interface Config {
+	defaultModel: Model;
+	defaultTemperature: number;
+	defaultSystemMessage: string;
 }
 
 type ChatAction =
@@ -35,7 +42,7 @@ type ChatAction =
 	| {
 			type: "INITIALIZE";
 			payload: {
-				chatHistory: ChatThread[];
+				saveData: SaveData;
 				userId: string;
 			};
 	  }

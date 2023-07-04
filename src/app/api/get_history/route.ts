@@ -16,11 +16,11 @@ export async function POST(request: Request) {
 	}
 
 	const history: any[] | null | undefined = await redis.get(userId);
-	if (!history) {
+	/* if (!history) {
 		return new Response("Error getting chat history", {
 			status: 500,
 		});
-	}
+	} */
 
 	return NextResponse.json(history, {
 		status: 200,

@@ -7,7 +7,8 @@ import { useState } from "react";
 import { getChatHistory } from "@/utils";
 
 export default function ConfigEditor() {
-	const { threadList, configEditorOpen, userId, userIdRequired } = useChat();
+	const { threadList, configEditorOpen, userId, userIdRequired, config } =
+		useChat();
 	const dispatch = useChatDispatch();
 	const [userIdInput, setUserIdInput] = useState(userId);
 
@@ -31,11 +32,11 @@ export default function ConfigEditor() {
 			</div>
 
 			<div className="flex flex-col gap-4">
-				{/* Model */}
-				{/* <div>
-					<div className="text-xl font-medium">Model</div>
-					<div></div>
-				</div> */}
+				{/* Default Model */}
+				<div>
+					<div className="text-xl font-medium">Default Model</div>
+					<div>{config.defaultModel}</div>
+				</div>
 
 				{/* Credentials */}
 				<div>

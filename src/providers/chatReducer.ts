@@ -54,7 +54,8 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 			if (DEBUG) console.log("INITIALIZE");
 			return {
 				...state,
-				threadList: action.payload.chatHistory,
+				config: action.payload.saveData.config,
+				threadList: action.payload.saveData.chatHistory,
 				userId: action.payload.userId,
 				activeThread: getDefaultThread(),
 			};

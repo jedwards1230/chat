@@ -30,7 +30,7 @@ export async function readStream(
 }
 
 export async function getChatHistory(id: string): Promise<{
-	chatHistory: ChatThread[];
+	saveData: SaveData;
 	userId: string;
 } | null> {
 	let userId = id;
@@ -46,24 +46,31 @@ export async function getChatHistory(id: string): Promise<{
 			body: JSON.stringify({ userId }),
 		});
 		if (res.ok) {
-			const { chatHistory }: { chatHistory: any[] } = await res.json();
+			const data = await res.json();
+			const saveData: SaveData = JSON.parse(data);
 			return {
-				chatHistory: chatHistory.map((thread) => ({
-					...thread,
-					messages: JSON.parse(thread.messages),
-				})),
+				saveData: {
+					...saveData,
+					chatHistory: saveData.chatHistory.map((thread) => ({
+						...thread,
+						messages: JSON.parse(thread.messages as any),
+					})),
+				},
 				userId,
 			};
 		}
 	} catch (e) {
-		console.error(e);
+		//console.error(e);
 	}
 
 	if (typeof window !== "undefined") {
 		const storedThreads = localStorage.getItem("chatHistory");
 		if (storedThreads) {
-			const chatHistory: ChatThread[] = JSON.parse(storedThreads);
-			return { chatHistory, userId };
+			const saveData: SaveData = JSON.parse(storedThreads);
+			return {
+				saveData,
+				userId,
+			};
 		}
 	}
 
