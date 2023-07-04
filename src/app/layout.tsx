@@ -52,7 +52,11 @@ export default function RootLayout({
 	children: React.ReactNode;
 }) {
 	return (
-		<html lang="en" suppressHydrationWarning={true}>
+		<html
+			lang="en"
+			className="overflow-hidden"
+			suppressHydrationWarning={true}
+		>
 			<body className="overflow-hidden bg-neutral-50 dark:text-neutral-100 dark:bg-neutral-900">
 				<Suspense
 					fallback={

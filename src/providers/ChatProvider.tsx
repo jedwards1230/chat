@@ -290,7 +290,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 				});
 				setIsMobile(false);
 			} else {
-				console.log("isMobile()", isMobile, iM());
 				dispatch({
 					type: "TOGGLE_SIDEBAR",
 					payload: false,

@@ -21,7 +21,7 @@ export default function Chat() {
 	return (
 		<div
 			className={clsx(
-				"flex flex-col transition-all w-full h-full",
+				"flex flex-col overflow-hidden transition-all w-full h-full",
 				sideBarOpen ? "sm:pl-80" : "lg:pl-0"
 			)}
 		>
