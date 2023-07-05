@@ -27,6 +27,8 @@ const ChatDispatchContext = createContext<Dispatch<ChatAction>>(() => {});
 export const useChat = () => useContext(ChatContext);
 export const useChatDispatch = () => useContext(ChatDispatchContext);
 
+const MAX_LOOPS = 10;
+
 export function ChatProvider({ children }: { children: React.ReactNode }) {
 	const [checkedLocal, setCheckedLocal] = useState(false);
 	const [isMobile, setIsMobile] = useState(iM() || false);
@@ -111,9 +113,13 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
 	const getChat = async (
 		msgHistory: Message[],
-		controller: AbortController
+		controller: AbortController,
+		loops: number = 0
 	) => {
 		try {
+			if (loops > MAX_LOOPS) {
+				throw new Error("Too many loops");
+			}
 			const signal = controller.signal;
 			dispatch({ type: "TOGGLE_BOT_TYPING", payload: controller });
 
@@ -241,7 +247,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 					},
 				});
 
-				getChat(msgHistory, controller);
+				getChat(msgHistory, controller, loops + 1);
 			}
 		} catch (error: any) {
 			if (error.name === "AbortError") {
