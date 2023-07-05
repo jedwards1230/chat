@@ -103,9 +103,7 @@ export default function TextBubble({ message }: { message: Message }) {
 					<span className="list-marker">
 						{ordered ? `${index + 1}.` : "-"}
 					</span>
-					<div className="flex flex-col overflow-x-scroll">
-						{children}
-					</div>
+					<div className="overflow-x-scroll">{children}</div>
 				</li>
 			),
 			ol: ({ node, depth, ordered, ...props }) => (

@@ -186,8 +186,13 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 			setBotTyping(false);
 
 			if (tool) {
-				console.log("Calling tool", tool, toolInput);
-				const { input } = JSON.parse(toolInput);
+				let input = "";
+				try {
+					const cleaned = JSON.parse(toolInput);
+					input = cleaned.input;
+				} catch (err) {
+					input = toolInput;
+				}
 				const assistantMsg: Message = {
 					id: uuidv4(),
 					content: input,

@@ -5,6 +5,7 @@ import Dialog from "./Dialog";
 import { useChat, useChatDispatch } from "@/providers/ChatProvider";
 import { useState } from "react";
 import { getChatHistory } from "@/utils";
+import { Select } from "../Forms";
 
 export default function ConfigEditor() {
 	const { threadList, configEditorOpen, userId, userIdRequired, config } =
@@ -33,10 +34,28 @@ export default function ConfigEditor() {
 
 			<div className="flex flex-col gap-4">
 				{/* Default Model */}
-				<div>
-					<div className="text-xl font-medium">Default Model</div>
-					<div>{config.defaultModel}</div>
-				</div>
+				<Select
+					label="Default Model"
+					value={config.defaultModel}
+					options={[
+						{ label: "gpt-3.5-turbo", value: "gpt-3.5-turbo" },
+						{
+							label: "gpt-3.5-turbo-16k",
+							value: "gpt-3.5-turbo-16k",
+						},
+						{ label: "gpt-4", value: "gpt-4" },
+						{ label: "gpt-4-0613", value: "gpt-4-0613" },
+					]}
+					onChange={(e) => {
+						dispatch({
+							type: "UPDATE_CONFIG",
+							payload: {
+								...config,
+								defaultModel: e.target.value as Model,
+							},
+						});
+					}}
+				/>
 
 				{/* Credentials */}
 				<div>

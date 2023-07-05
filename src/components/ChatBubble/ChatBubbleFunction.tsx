@@ -9,14 +9,15 @@ export default function ChatBubbleFunction({
 	title: string;
 	onClick: () => void;
 	icon: JSX.Element;
-	color?: "red" | "blue";
+	color?: "red" | "blue" | "green";
 }) {
 	return (
 		<button
 			className={clsx(
 				"p-1 border rounded-full dark:text-neutral-900 bg-neutral-100 active:bg-neutral-300 dark:active:bg-neutral-400 hover:bg-neutral-200 border-neutral-400",
 				color === "red" && "hover:text-red-500",
-				color === "blue" && "hover:text-blue-500"
+				color === "blue" && "hover:text-blue-500",
+				color === "green" && "hover:text-green-600"
 			)}
 			title={title}
 			onClick={onClick}

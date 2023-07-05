@@ -64,7 +64,7 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 
 			return {
 				...state,
-				activeThread: getDefaultThread(),
+				activeThread: getDefaultThread(state.config),
 				input: "",
 			};
 
@@ -142,6 +142,13 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 			return {
 				...state,
 				userId: action.payload,
+			};
+
+		case "UPDATE_CONFIG":
+			if (DEBUG) console.log("UPDATE_CONFIG");
+			return {
+				...state,
+				config: action.payload,
 			};
 
 		case "REMOVE_MESSAGE":

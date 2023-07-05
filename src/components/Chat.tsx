@@ -55,7 +55,7 @@ export default function Chat() {
 										{activeThread.agentConfig.temperature}
 									</div>
 								</div>
-								<div className="flex items-center transition-colors border divide-x-2 rounded border-neutral-500 dark:border-neutral-600">
+								<div className="flex items-center transition-colors border divide-x-2 rounded dark:divide-neutral-600 border-neutral-500 dark:border-neutral-600">
 									<div className="px-4 dark:border-neutral-600">
 										<input
 											type="checkbox"

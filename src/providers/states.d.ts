@@ -36,6 +36,7 @@ type ChatAction =
 	| { type: "REMOVE_THREAD"; payload: string }
 	| { type: "CHANGE_INPUT"; payload: string }
 	| { type: "TOGGLE_PLUGIN"; payload: Tool }
+	| { type: "UPDATE_CONFIG"; payload: Config }
 	| { type: "CREATE_THREAD" }
 	| { type: "CLEAR_HISTORY" }
 	| { type: "CANCEL_EDIT" }

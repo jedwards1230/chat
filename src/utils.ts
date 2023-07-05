@@ -142,6 +142,7 @@ export function parseStreamData(chunk: string): StreamData[] {
 			.split("\n")
 			.filter((c) => c.length > 0)
 			.map((c) => {
+				// TODO: ensure this only replaces the first instance
 				const jsonStr = c.replace("data: ", "");
 				if (jsonStr === "[DONE]") return;
 				return JSON.parse(jsonStr);

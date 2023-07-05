@@ -30,7 +30,7 @@ export default function ChatInput() {
 		<form
 			onSubmit={handleSubmit}
 			className={clsx(
-				"flex items-center justify-center w-full gap-2 px-4 pt-2 pb-8 border-t shadow-xl sm:pb-4 dark:shadow-none border-neutral-300 dark:border-neutral-600 dark:border-0 justify-self-end",
+				"flex items-center transition-all justify-center w-full gap-2 px-4 pt-2 pb-8 border-t shadow-xl sm:pb-4 dark:shadow-none border-neutral-300 dark:border-neutral-600 dark:border-0 justify-self-end",
 				editId ? "flex-col" : ""
 			)}
 		>
@@ -41,10 +41,10 @@ export default function ChatInput() {
 				rows={inputRows > 10 ? 10 : inputRows}
 				onChange={handleInputChange}
 				onKeyDown={onKeyDownHandler}
-				className="flex-1 w-full p-2 border-2 rounded border-neutral-200 dark:border-neutral-500 focus:border-blue-500 dark:bg-neutral-600 focus:outline-none"
+				className="flex-1 w-full p-2 border-2 rounded border-neutral-200 dark:border-neutral-500 focus:border-blue-500 dark:bg-neutral-700 focus:outline-none"
 			/>
-			{input ? (
-				editId ? (
+			{input &&
+				(editId ? (
 					<div className="flex gap-4">
 						<button
 							className="px-6 py-1.5 text-neutral-50 focus:outline-none transition-colors rounded-lg border border-transparent focus:border-blue-500 focus:bg-blue-400 bg-blue-500 dark:bg-blue-500 hover:bg-blue-400 dark:hover:bg-blue-400"
@@ -74,8 +74,7 @@ export default function ChatInput() {
 					>
 						Send
 					</button>
-				)
-			) : null}
+				))}
 		</form>
 	);
 }
