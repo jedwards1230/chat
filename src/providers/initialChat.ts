@@ -33,6 +33,7 @@ const initialState: ChatState = {
 	input: "",
 	activeThread: baseEntry,
 	editId: null,
+	botTyping: false,
 	config: {
 		defaultModel: baseEntry.agentConfig.model,
 		defaultTemperature: baseEntry.agentConfig.temperature,

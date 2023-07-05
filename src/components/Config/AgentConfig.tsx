@@ -54,7 +54,7 @@ export default function AgentConfig() {
 					value={activeThread.agentConfig.systemMessage}
 					onChange={(e) => {
 						dispatch({
-							type: "CHANGE_SYSTEM_MESSAGE",
+							type: "SET_SYSTEM_MESSAGE",
 							payload: e.target.value,
 						});
 					}}

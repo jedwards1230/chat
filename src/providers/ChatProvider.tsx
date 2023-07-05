@@ -16,6 +16,7 @@ import {
 	callTool,
 	parseStreamData,
 	isMobile as iM,
+	serializeSaveData,
 } from "../utils";
 import { chatReducer } from "@/providers/chatReducer";
 import initialState from "./initialChat";
@@ -33,7 +34,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 		...initialState,
 		sideBarOpen: !isMobile,
 	});
-	const [botTyping, setBotTyping] = useState(false);
 
 	// Function to create a user message
 	const createUserMsg = (
@@ -109,11 +109,17 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 			});
 	};
 
-	const getChat = async (msgHistory: Message[]) => {
+	const getChat = async (
+		msgHistory: Message[],
+		controller: AbortController
+	) => {
 		try {
-			setBotTyping(true);
+			const signal = controller.signal;
+			dispatch({ type: "TOGGLE_BOT_TYPING", payload: controller });
+
 			const response = await fetch("/api/chat", {
 				method: "POST",
+				signal,
 				body: JSON.stringify({
 					modelName: state.activeThread.agentConfig.model,
 					temperature: state.activeThread.agentConfig.temperature,
@@ -183,7 +189,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
 			await readStream(response.body, streamCallback);
 
-			setBotTyping(false);
+			dispatch({ type: "TOGGLE_BOT_TYPING" });
 
 			if (tool) {
 				let input = "";
@@ -235,16 +241,20 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 					},
 				});
 
-				getChat(msgHistory);
+				getChat(msgHistory, controller);
 			}
-		} catch (error) {
-			setBotTyping(false);
-			console.error(error);
+		} catch (error: any) {
+			if (error.name === "AbortError") {
+				console.log("Fetch aborted");
+			} else {
+				console.error("Error:", error);
+			}
+			dispatch({ type: "TOGGLE_BOT_TYPING" });
 		}
 	};
 
 	// Handler for submitting the chat form
-	const handleSubmit = async (e: React.FormEvent) => {
+	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 		if (state.input.length > 0) {
 			const userMsg: Message = createUserMsg(state.input, state.editId);
@@ -260,7 +270,9 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 				msgHistory.push(userMsg);
 			}
 
-			getChat(msgHistory);
+			const controller = new AbortController();
+
+			getChat(msgHistory, controller);
 			fetchTitle();
 		}
 	};
@@ -306,22 +318,11 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
 		return () => {
 			window.removeEventListener("resize", handleResize);
+			state.abortController?.abort();
 		};
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
-
-	const serializeSaveData = (saveData: SaveData): string => {
-		return JSON.stringify({
-			config: saveData.config,
-			chatHistory: saveData.chatHistory.map((thread) => ({
-				id: thread.id,
-				title: thread.title,
-				agentConfig: thread.agentConfig,
-				messages: JSON.stringify(thread.messages),
-			})),
-		});
-	};
 
 	// Effect to sync local storage with the chat thread list
 	useEffect(() => {
@@ -329,7 +330,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 			typeof window !== "undefined" &&
 			state.threadList.length > 0 &&
 			checkedLocal &&
-			!botTyping
+			!state.botTyping
 		) {
 			const saveData = serializeSaveData({
 				config: state.config,
@@ -376,7 +377,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 		checkedLocal,
 		state.userId,
 		state.config,
-		botTyping,
+		state.botTyping,
 	]);
 
 	if (!checkedLocal) return null;

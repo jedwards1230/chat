@@ -29,6 +29,18 @@ export async function readStream(
 	return accumulatedResponse;
 }
 
+export function serializeSaveData(saveData: SaveData): string {
+	return JSON.stringify({
+		config: saveData.config,
+		chatHistory: saveData.chatHistory.map((thread) => ({
+			id: thread.id,
+			title: thread.title,
+			agentConfig: thread.agentConfig,
+			messages: JSON.stringify(thread.messages),
+		})),
+	});
+}
+
 export async function getChatHistory(id: string): Promise<{
 	saveData: SaveData;
 	userId: string;

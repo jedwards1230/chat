@@ -50,6 +50,12 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 				...state,
 				pluginsEnabled: action.payload ?? !state.pluginsEnabled,
 			};
+		case "TOGGLE_BOT_TYPING":
+			return {
+				...state,
+				botTyping: action.payload ? true : false,
+				abortController: action.payload,
+			};
 		case "INITIALIZE":
 			if (DEBUG) console.log("INITIALIZE");
 			return {
@@ -108,8 +114,8 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 				),
 			};
 
-		case "CHANGE_SYSTEM_MESSAGE":
-			if (DEBUG) console.log("CHANGE_SYSTEM_MESSAGE");
+		case "SET_SYSTEM_MESSAGE":
+			if (DEBUG) console.log("SET_SYSTEM_MESSAGE");
 			const newSystemMessage = {
 				...state.activeThread,
 				agentConfig: {
@@ -293,8 +299,8 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 				input: action.payload,
 			};
 
-		case "CHANGE_ACTIVE_THREAD":
-			if (DEBUG) console.log("CHANGE_ACTIVE_THREAD");
+		case "SET_ACTIVE_THREAD":
+			if (DEBUG) console.log("SET_ACTIVE_THREAD");
 			const activeThread = state.threadList.find(
 				(thread) => thread.id === action.payload.id
 			);

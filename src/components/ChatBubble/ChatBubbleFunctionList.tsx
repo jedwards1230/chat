@@ -11,7 +11,7 @@ export function ChatBubbleFunctionList({ message }: { message: Message }) {
 	const isUser = message.role === "user";
 
 	return (
-		<div className="absolute bottom-0 hidden gap-4 group-hover:flex right-2">
+		<div className="absolute bottom-0 hidden gap-2 group-hover:flex right-2">
 			{isUser && (
 				<ChatBubbleFunction
 					icon={<Reset />}

@@ -13,7 +13,9 @@ interface ChatState {
 	pluginsEditorOpen: boolean;
 	pluginsEnabled: boolean;
 	config: Config;
+	botTyping: boolean;
 	handleSubmit: (e: React.FormEvent) => void;
+	abortController?: AbortController;
 }
 
 interface Config {
@@ -23,20 +25,21 @@ interface Config {
 }
 
 type ChatAction =
-	| { type: "CHANGE_ACTIVE_THREAD"; payload: ChatThread }
 	| { type: "CHANGE_USER_ID_REQUIRED"; payload: boolean }
 	| { type: "TOGGLE_PLUGINS_EDITOR"; payload?: boolean }
 	| { type: "TOGGLE_CONFIG_EDITOR"; payload?: boolean }
-	| { type: "CHANGE_SYSTEM_MESSAGE"; payload: string }
+	| { type: "SET_ACTIVE_THREAD"; payload: ChatThread }
 	| { type: "TOGGLE_AGENT_EDITOR"; payload?: boolean }
 	| { type: "CHANGE_TEMPERATURE"; payload: number }
+	| { type: "SET_SYSTEM_MESSAGE"; payload: string }
 	| { type: "TOGGLE_PLUGINS"; payload?: boolean }
 	| { type: "TOGGLE_SIDEBAR"; payload?: boolean }
+	| { type: "TOGGLE_BOT_TYPING"; payload?: AbortController }
 	| { type: "CHANGE_USER_ID"; payload: string }
 	| { type: "REMOVE_THREAD"; payload: string }
+	| { type: "UPDATE_CONFIG"; payload: Config }
 	| { type: "CHANGE_INPUT"; payload: string }
 	| { type: "TOGGLE_PLUGIN"; payload: Tool }
-	| { type: "UPDATE_CONFIG"; payload: Config }
 	| { type: "CREATE_THREAD" }
 	| { type: "CLEAR_HISTORY" }
 	| { type: "CANCEL_EDIT" }

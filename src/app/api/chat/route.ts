@@ -62,10 +62,17 @@ export async function POST(request: Request) {
 	const completion = await openai.createChatCompletion({
 		model: modelName,
 		messages,
-		//max_tokens: 1024,
 		temperature,
 		stream: true,
 		functions,
+		//top_p: 1,
+		//n: 1,
+		//stop,
+		//max_tokens: 1024,
+		//presence_penalty: 0,
+		//frequency_penalty: 0,
+		//logit_bias: {},
+		//user: "",
 	});
 
 	return new Response(completion.body, {

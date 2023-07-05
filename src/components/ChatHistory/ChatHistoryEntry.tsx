@@ -20,7 +20,7 @@ export default function ChatHistoryEntry({ entry }: { entry: ChatThread }) {
 			title={`threadId: ${entry.id}`}
 			onClick={() =>
 				dispatch({
-					type: "CHANGE_ACTIVE_THREAD",
+					type: "SET_ACTIVE_THREAD",
 					payload: entry,
 				})
 			}
