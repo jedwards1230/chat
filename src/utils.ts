@@ -166,19 +166,19 @@ export function parseStreamData(chunk: string): StreamData[] {
 	}
 }
 
-export function upsertMessage(thread: ChatThread, newMessage: Message) {
-	// check if message already exists
-	const hasMessage = thread.messages.find(
-		(message) => message.id === newMessage.id
-	);
-
-	// if message exists, update it
-	// otherwise, add it to the list
-	const messages = hasMessage
-		? thread.messages.map((message) =>
-				message.id === newMessage.id ? newMessage : message
-		  )
-		: [...thread.messages, newMessage];
+export function upsertMessage(
+	thread: ChatThread,
+	newMessage: Message
+): ChatThread {
+	let foundMessage = false;
+	const messages = thread.messages.map((message) => {
+		if (message.id === newMessage.id) {
+			foundMessage = true;
+			return newMessage;
+		}
+		return message;
+	});
+	if (!foundMessage) messages.push(newMessage);
 
 	return {
 		...thread,
