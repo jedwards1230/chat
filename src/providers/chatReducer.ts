@@ -307,6 +307,7 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 				(thread) => thread.id === action.payload.id
 			);
 			if (!activeThread) throw new Error("No active thread");
+			if (state.abortController) state.abortController.abort();
 
 			return {
 				...state,
