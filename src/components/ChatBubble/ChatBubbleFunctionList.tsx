@@ -72,6 +72,7 @@ export function ChatBubbleFunctionList({ message }: { message: Message }) {
 				<ChatBubbleFunction
 					title={"Copy"}
 					onClick={() => {
+						// Requires https on iOS Safari. Will not work on localhost.
 						navigator.clipboard.writeText(message.content);
 					}}
 					icon={<Clipboard />}

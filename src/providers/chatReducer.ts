@@ -63,7 +63,7 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 				config: action.payload.saveData.config,
 				threadList: action.payload.saveData.chatHistory,
 				userId: action.payload.userId,
-				activeThread: getDefaultThread(),
+				activeThread: getDefaultThread(state.config),
 			};
 		case "CREATE_THREAD":
 			if (DEBUG) console.log("CREATE_THREAD");
@@ -83,7 +83,7 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 				),
 				activeThread:
 					state.activeThread.id === action.payload
-						? getDefaultThread()
+						? getDefaultThread(state.config)
 						: state.activeThread,
 			};
 
@@ -198,7 +198,7 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 			);
 
 			const getNewActiveThread = () => {
-				const defaultThread = getDefaultThread();
+				const defaultThread = getDefaultThread(state.config);
 				const newThread: ChatThread = {
 					...defaultThread,
 					id: action.payload.threadId,

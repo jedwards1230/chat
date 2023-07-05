@@ -1,7 +1,7 @@
 "use client";
 
 import { useChat, useChatDispatch } from "@/providers/ChatProvider";
-import { Bars, Information } from "./Icons";
+import { Bars } from "./Icons";
 import clsx from "clsx";
 import { isMobile } from "@/utils";
 
@@ -11,10 +11,6 @@ export default function Header() {
 
 	const handleSidebarToggle = () => {
 		dispatch({ type: "TOGGLE_SIDEBAR" });
-	};
-
-	const handleAgentEditorToggle = () => {
-		dispatch({ type: "TOGGLE_AGENT_EDITOR" });
 	};
 
 	return (
@@ -47,14 +43,6 @@ export default function Header() {
 						<>Start a chat</>
 					)}
 				</p>
-			</div>
-			<div className="items-center justify-end hidden col-span-1 ">
-				<button
-					className="px-1 cursor-pointer text-neutral-400 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
-					onClick={handleAgentEditorToggle}
-				>
-					<Information />
-				</button>
 			</div>
 		</div>
 	);

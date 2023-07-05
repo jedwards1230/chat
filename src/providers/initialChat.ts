@@ -4,7 +4,13 @@ import { v4 as uuidv4 } from "uuid";
 
 const systemMessage = "You are a helpful assistant.";
 
-export function getDefaultThread(config?: Config): ChatThread {
+const defaultConfig: Config = {
+	defaultModel: "gpt-4-0613",
+	defaultTemperature: 0.7,
+	defaultSystemMessage: systemMessage,
+};
+
+export function getDefaultThread(config: Config): ChatThread {
 	return {
 		id: uuidv4(),
 		title: "New Chat",
@@ -18,15 +24,15 @@ export function getDefaultThread(config?: Config): ChatThread {
 		agentConfig: {
 			id: "",
 			name: "Chat",
-			model: config?.defaultModel || "gpt-4-0613",
-			temperature: config?.defaultTemperature || 0.7,
-			systemMessage: config?.defaultSystemMessage || systemMessage,
+			model: config.defaultModel,
+			temperature: config.defaultTemperature,
+			systemMessage: config.defaultSystemMessage,
 			tools: ["search"],
 		},
 	};
 }
 
-const baseEntry = getDefaultThread();
+const baseEntry = getDefaultThread(defaultConfig);
 
 const initialState: ChatState = {
 	threadList: [] as ChatThread[],
