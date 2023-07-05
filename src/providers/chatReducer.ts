@@ -67,6 +67,7 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 			};
 		case "CREATE_THREAD":
 			if (DEBUG) console.log("CREATE_THREAD");
+			document.title = "Chat";
 
 			return {
 				...state,
@@ -308,6 +309,7 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 			);
 			if (!activeThread) throw new Error("No active thread");
 			if (state.abortController) state.abortController.abort();
+			document.title = "Chat | " + activeThread.title;
 
 			return {
 				...state,
