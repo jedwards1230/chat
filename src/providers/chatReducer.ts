@@ -202,12 +202,7 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 				const newThread: ChatThread = {
 					...defaultThread,
 					id: action.payload.threadId,
-					agentConfig: {
-						...defaultThread.agentConfig,
-						temperature: state.activeThread.agentConfig.temperature,
-						systemMessage:
-							state.activeThread.agentConfig.systemMessage,
-					},
+					agentConfig: state.activeThread.agentConfig,
 					messages: [
 						{
 							...state.activeThread.messages[0],
@@ -283,6 +278,13 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 						  }
 						: thread
 				),
+				activeThread: {
+					...state.activeThread,
+					agentConfig: {
+						...state.activeThread.agentConfig,
+						model: action.payload.model,
+					},
+				},
 			};
 
 		case "CLEAR_HISTORY":

@@ -168,7 +168,12 @@ export default function TextBubble({ message }: { message: Message }) {
 	const SystemContent = () => (
 		<div className="flex flex-col justify-start w-full text-xs rounded text-neutral-400 dark:text-neutral-500">
 			<div>Model: {activeThread.agentConfig.model}</div>
-			<div>System Messages: {message.content}</div>
+			<div>System Message: {message.content}</div>
+			{activeThread.agentConfig.tools.length > 0 && (
+				<div className="capitalize">
+					Plugins: {activeThread.agentConfig.tools.join(" | ")}
+				</div>
+			)}
 		</div>
 	);
 
