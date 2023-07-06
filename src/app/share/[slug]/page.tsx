@@ -3,8 +3,6 @@ import { notFound } from "next/navigation";
 
 import { SharedBubble } from "@/components/ChatBubble";
 
-export const runtime = "edge";
-
 export default async function Page({ params }: { params: { slug: string } }) {
 	const shareData: ChatThread | null | undefined = await redis.get(
 		"share_" + params.slug
