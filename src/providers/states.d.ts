@@ -1,9 +1,5 @@
 interface ChatState {
 	input: string;
-	// todo: proper auth
-	/** User Id for chat history */
-	userId: string;
-	userIdRequired: boolean;
 	activeThread: ChatThread;
 	threadList: ChatThread[];
 	editId: string | null;

@@ -20,6 +20,7 @@ import {
 } from "../utils";
 import { chatReducer } from "@/providers/chatReducer";
 import initialState from "./initialChat";
+import { useAuth } from "@clerk/nextjs";
 
 const ChatContext = createContext<ChatState>(initialState);
 const ChatDispatchContext = createContext<Dispatch<ChatAction>>(() => {});
@@ -32,6 +33,7 @@ const MAX_LOOPS = 10;
 export function ChatProvider({ children }: { children: React.ReactNode }) {
 	const [checkedLocal, setCheckedLocal] = useState(false);
 	const [isMobile, setIsMobile] = useState(iM() || false);
+	const { userId } = useAuth();
 	const [state, dispatch] = useReducer(chatReducer, {
 		...initialState,
 		sideBarOpen: !isMobile,
@@ -286,8 +288,9 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 	// Effect to check stored chat history on component mount
 	useEffect(() => {
 		if (typeof window === "undefined") return;
+		console.log(userId);
 
-		getChatHistory(state.userId).then((history) => {
+		getChatHistory(userId!).then((history) => {
 			if (history) {
 				dispatch({
 					type: "INITIALIZE",
@@ -336,7 +339,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 			typeof window !== "undefined" &&
 			state.threadList.length > 0 &&
 			checkedLocal &&
-			!state.botTyping
+			!state.botTyping &&
+			userId
 		) {
 			const saveData = serializeSaveData({
 				config: state.config,
@@ -350,7 +354,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 						method: "POST",
 						body: JSON.stringify({
 							saveData,
-							user: state.userId,
+							user: userId,
 						}),
 					});
 
@@ -381,7 +385,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 		state.threadList,
 		state.threadList.length,
 		checkedLocal,
-		state.userId,
+		userId,
 		state.config,
 		state.botTyping,
 	]);

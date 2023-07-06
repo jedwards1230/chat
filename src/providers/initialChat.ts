@@ -50,8 +50,6 @@ const initialState: ChatState = {
 	agentEditorOpen: false,
 	configEditorOpen: false,
 	pluginsEditorOpen: false,
-	userId: "",
-	userIdRequired: false,
 	handleSubmit: () => {},
 };
 

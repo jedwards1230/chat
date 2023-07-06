@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import "./globals.css";
 import Providers from "@/providers";
 import { Metadata } from "next";
+import { ClerkProvider } from "@clerk/nextjs";
 
 const APP_NAME = "Chat";
 const APP_DEFAULT_TITLE = "Chat";
@@ -52,22 +53,24 @@ export default function RootLayout({
 	children: React.ReactNode;
 }) {
 	return (
-		<html
-			lang="en"
-			className="overflow-hidden"
-			suppressHydrationWarning={true}
-		>
-			<body className="overflow-hidden bg-neutral-50 dark:text-neutral-100 dark:bg-neutral-900">
-				<Suspense
-					fallback={
-						<div className="flex items-center justify-center w-full h-full">
-							<p>Loading...</p>
-						</div>
-					}
-				>
-					<Providers>{children}</Providers>
-				</Suspense>
-			</body>
-		</html>
+		<ClerkProvider>
+			<html
+				lang="en"
+				className="overflow-hidden"
+				suppressHydrationWarning={true}
+			>
+				<body className="overflow-hidden bg-neutral-50 dark:text-neutral-100 dark:bg-neutral-900">
+					<Suspense
+						fallback={
+							<div className="flex items-center justify-center w-full h-full">
+								<p>Loading...</p>
+							</div>
+						}
+					>
+						<Providers>{children}</Providers>
+					</Suspense>
+				</body>
+			</html>
+		</ClerkProvider>
 	);
 }

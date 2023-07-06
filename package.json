@@ -3,12 +3,13 @@
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
-		"dev": "next dev --turbo",
+		"dev": "next dev",
 		"build": "next build",
 		"start": "next start",
 		"lint": "next lint"
 	},
 	"dependencies": {
+		"@clerk/nextjs": "^4.21.14",
 		"@ducanh2912/next-pwa": "^9.1.4",
 		"@opentelemetry/api": "^1.4.1",
 		"@types/node": "20.4.0",
