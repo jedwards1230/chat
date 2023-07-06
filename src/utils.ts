@@ -2,9 +2,6 @@
 
 import resolveConfig from "tailwindcss/resolveConfig";
 
-import { Calculator } from "./tools/calculator";
-import { Search } from "./tools/search";
-
 import tailwindConfig from "../tailwind.config.js";
 
 export const fullConfig = resolveConfig(tailwindConfig);
@@ -100,8 +97,8 @@ export async function searchGoogle(
 	googleApiKey?: string,
 	googleCSEId?: string
 ) {
-	const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY || googleApiKey;
-	const CSEId = process.env.NEXT_PUBLIC_GOOGLE_CSE_ID || googleCSEId;
+	const apiKey = process.env.GOOGLE_API_KEY || googleApiKey;
+	const CSEId = process.env.GOOGLE_CSE_ID || googleCSEId;
 
 	if (!apiKey || !CSEId) {
 		throw new Error(
@@ -138,14 +135,20 @@ export async function searchGoogle(
 }
 
 export async function callTool(tool: Tool, input: string) {
-	switch (tool) {
-		case "calculator":
-			return new Calculator().call(input);
-		case "search":
-			return await new Search().call(input);
-		default:
-			return "";
+	const res = await fetch("/api/use_tool", {
+		method: "POST",
+		body: JSON.stringify({ tool, input }),
+	});
+
+	if (!res.ok) {
+		throw new Error(
+			`Got ${res.status} error from tool endpoint: ${res.statusText}`
+		);
 	}
+
+	const json = await res.json();
+
+	return json;
 }
 
 export function parseStreamData(chunk: string): StreamData[] {
