@@ -24,6 +24,8 @@ export default function Chat() {
 		},
 	});
 
+	if (window !== undefined) localStorage.clear();
+
 	return (
 		<div className="flex w-full h-full" {...handlers}>
 			<ChatHistory />
