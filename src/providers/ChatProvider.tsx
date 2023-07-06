@@ -17,10 +17,9 @@ import {
 	parseStreamData,
 	isMobile as iM,
 	serializeSaveData,
-} from "../utils";
+} from "../utils.client";
 import { chatReducer } from "@/providers/chatReducer";
 import initialState from "./initialChat";
-import { useAuth } from "@clerk/nextjs";
 
 const ChatContext = createContext<ChatState>(initialState);
 const ChatDispatchContext = createContext<Dispatch<ChatAction>>(() => {});
@@ -298,9 +297,7 @@ export function ChatProvider({
 			if (history) {
 				dispatch({
 					type: "INITIALIZE",
-					payload: {
-						...history,
-					},
+					payload: history,
 				});
 			}
 			setCheckedLocal(true);
@@ -337,59 +334,43 @@ export function ChatProvider({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
+	const saveHistory = async (saveData: string) => {
+		try {
+			localStorage.setItem("chatHistory", saveData);
+			const res = await fetch("/api/save_history", {
+				method: "POST",
+				body: JSON.stringify({
+					saveData,
+				}),
+			});
+
+			if (!res.ok) {
+				throw new Error("Failed to save chat history");
+			}
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
 	// Effect to sync local storage with the chat thread list
 	useEffect(() => {
 		if (
 			typeof window !== "undefined" &&
 			state.threadList.length > 0 &&
 			checkedLocal &&
-			!state.botTyping &&
-			userId
+			!state.botTyping
 		) {
 			const saveData = serializeSaveData({
 				config: state.config,
 				chatHistory: state.threadList,
 			});
 
-			const saveHistory = async () => {
-				try {
-					localStorage.setItem("chatHistory", saveData);
-					const res = await fetch("/api/save_history", {
-						method: "POST",
-						body: JSON.stringify({
-							saveData,
-							user: userId,
-						}),
-					});
-
-					if (res.status !== 200) {
-						const text = await res.text();
-
-						if (text === "No user id") {
-							dispatch({
-								type: "CHANGE_USER_ID_REQUIRED",
-								payload: true,
-							});
-							dispatch({
-								type: "SET_CONFIG_EDITOR_OPEN",
-								payload: true,
-							});
-						}
-
-						throw new Error("Failed to save chat history");
-					}
-				} catch (error) {
-					console.error(error);
-				}
-			};
-
-			saveHistory();
+			saveHistory(saveData);
 		}
 	}, [
 		state.threadList,
 		state.threadList.length,
 		checkedLocal,
-		userId,
 		state.config,
 		state.botTyping,
 	]);

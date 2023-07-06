@@ -21,13 +21,6 @@ interface Config {
 }
 
 type ChatAction =
-	| {
-			type: "INITIALIZE";
-			payload: {
-				saveData: SaveData;
-				userId: string;
-			};
-	  }
 	/* Chat */
 	| { type: "SET_BOT_TYPING"; payload?: AbortController }
 	| { type: "SET_ACTIVE_THREAD"; payload: ChatThread }
@@ -81,6 +74,5 @@ type ChatAction =
 	| { type: "SET_AGENT_EDITOR_OPEN"; payload?: boolean }
 	| { type: "SET_SIDEBAR_OPEN"; payload?: boolean }
 	/* Config */
-	| { type: "CHANGE_USER_ID_REQUIRED"; payload: boolean }
-	| { type: "CHANGE_USER_ID"; payload: string }
+	| { type: "INITIALIZE"; payload: SaveData }
 	| { type: "UPDATE_CONFIG"; payload: Config };

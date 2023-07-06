@@ -1,15 +1,21 @@
 import { redis } from "@/lib/redis";
+import { auth } from "@clerk/nextjs";
 
 export const runtime = "edge";
 
-const USER_ID = process.env.USER_ID;
-
 export async function POST(request: Request) {
 	const res = await request.json();
-	const { saveData, user }: { saveData: string; user: string } = res;
+	const { saveData }: { saveData: string } = res;
+	const { userId } = auth();
 
-	if (!user && !USER_ID) {
+	if (!userId) {
 		return new Response("No user id", {
+			status: 400,
+		});
+	}
+
+	if (!saveData) {
+		return new Response("No save data", {
 			status: 400,
 		});
 	}
@@ -17,13 +23,12 @@ export async function POST(request: Request) {
 	const data: SaveData = await JSON.parse(saveData);
 
 	if (!data || !data.chatHistory || data.chatHistory.length === 0) {
-		console.log(data.chatHistory);
 		return new Response("No chat history", {
 			status: 400,
 		});
 	}
 
-	const success = await redis.set(user, JSON.stringify(saveData));
+	const success = await redis.set(userId, saveData);
 	if (!success) {
 		return new Response("Error saving chat history", {
 			status: 500,

@@ -1,5 +1,5 @@
 import { getDefaultThread } from "@/providers/initialChat";
-import { upsertMessage } from "@/utils";
+import { upsertMessage } from "@/utils.client";
 
 const DEBUG = false;
 
@@ -60,9 +60,8 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 			if (DEBUG) console.log("INITIALIZE");
 			return {
 				...state,
-				config: action.payload.saveData.config,
-				threadList: action.payload.saveData.chatHistory,
-				userId: action.payload.userId,
+				config: action.payload.config,
+				threadList: action.payload.chatHistory,
 				activeThread: getDefaultThread(state.config),
 			};
 		case "CREATE_THREAD":
@@ -139,16 +138,6 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 						? newSystemMessage
 						: thread
 				),
-			};
-
-		case "CHANGE_USER_ID":
-			if (DEBUG) console.log("CHANGE_USER_ID");
-			if (window !== undefined) {
-				window.localStorage.setItem("userId", action.payload);
-			}
-			return {
-				...state,
-				userId: action.payload,
 			};
 
 		case "UPDATE_CONFIG":

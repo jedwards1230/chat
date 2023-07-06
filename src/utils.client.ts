@@ -38,17 +38,7 @@ export function serializeSaveData(saveData: SaveData): string {
 	});
 }
 
-export async function getChatHistory(id: string): Promise<{
-	saveData: SaveData;
-	userId: string;
-} | null> {
-	let userId = id;
-	if (!userId) {
-		if (typeof window !== "undefined") {
-			userId = localStorage.getItem("userId") || "";
-		}
-	}
-
+export async function getChatHistory(userId: string): Promise<SaveData | null> {
 	try {
 		const res = await fetch("/api/get_history", {
 			method: "POST",
@@ -56,16 +46,12 @@ export async function getChatHistory(id: string): Promise<{
 		});
 		if (res.ok) {
 			const data = await res.json();
-			const saveData: SaveData = JSON.parse(data);
 			return {
-				saveData: {
-					...saveData,
-					chatHistory: saveData.chatHistory.map((thread) => ({
-						...thread,
-						messages: JSON.parse(thread.messages as any),
-					})),
-				},
-				userId,
+				...data,
+				chatHistory: data.chatHistory.map((thread: ChatThread) => ({
+					...thread,
+					messages: JSON.parse(thread.messages as any),
+				})),
 			};
 		}
 	} catch (e) {
@@ -76,10 +62,7 @@ export async function getChatHistory(id: string): Promise<{
 		const storedThreads = localStorage.getItem("chatHistory");
 		if (storedThreads) {
 			const saveData: SaveData = JSON.parse(storedThreads);
-			return {
-				saveData,
-				userId,
-			};
+			return saveData;
 		}
 	}
 
@@ -90,48 +73,6 @@ export function isMobile() {
 	if (typeof window === "undefined") return false;
 	const screens = fullConfig.theme?.screens as Record<string, string>;
 	if (window.innerWidth < parseInt(screens.sm)) return true;
-}
-
-export async function searchGoogle(
-	input: string,
-	googleApiKey?: string,
-	googleCSEId?: string
-) {
-	const apiKey = process.env.GOOGLE_API_KEY || googleApiKey;
-	const CSEId = process.env.GOOGLE_CSE_ID || googleCSEId;
-
-	if (!apiKey || !CSEId) {
-		throw new Error(
-			"Missing GOOGLE_API_KEY or GOOGLE_CSE_ID environment variables"
-		);
-	}
-
-	const url = new URL("https://www.googleapis.com/customsearch/v1");
-	url.searchParams.set("key", apiKey);
-	url.searchParams.set("cx", CSEId);
-	url.searchParams.set("q", input);
-	url.searchParams.set("start", "1");
-
-	const res = await fetch(url);
-
-	if (!res.ok) {
-		throw new Error(
-			`Got ${res.status} error from Google custom search: ${res.statusText}`
-		);
-	}
-
-	const json = await res.json();
-
-	const results: SearchResult[] =
-		json?.items?.map(
-			(item: { title?: string; link?: string; snippet?: string }) => ({
-				query: input,
-				title: item.title,
-				url: item.link,
-				snippet: item.snippet,
-			})
-		) ?? [];
-	return results;
 }
 
 export async function callTool(tool: Tool, input: string) {

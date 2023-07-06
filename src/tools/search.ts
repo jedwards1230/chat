@@ -1,4 +1,4 @@
-import { searchGoogle } from "@/utils";
+import { searchGoogle } from "@/utils.server";
 
 export class Search implements CustomTool {
 	name = "search";
@@ -25,6 +25,7 @@ export class Search implements CustomTool {
 			const markdown = listItems.join("\n\n");
 			return markdown;
 		} catch (error) {
+			console.error(error);
 			return "I don't know how to do that.";
 		}
 	}

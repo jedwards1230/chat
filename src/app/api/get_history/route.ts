@@ -13,7 +13,12 @@ export async function POST(request: Request) {
 		});
 	}
 
-	const history: any[] | null | undefined = await redis.get(userId);
+	const history: any | null | undefined = await redis.get(userId);
+	if (!history) {
+		return new Response("No chat history", {
+			status: 400,
+		});
+	}
 
 	return NextResponse.json(history, {
 		status: 200,

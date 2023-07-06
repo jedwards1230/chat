@@ -9,7 +9,7 @@ export default function ProfilePicture({ message }: { message: Message }) {
 		<div className="flex items-start justify-end h-full my-1">
 			<div
 				className={clsx(
-					"border rounded overflow-hidden w-8 h-8 select-none transition-colors dark:border-neutral-400 items-center justify-center flex",
+					"border rounded overflow-hidden w-8 h-8 select-none transition-colors dark:border-neutral-500/80 items-center justify-center flex",
 					message.role === "user" &&
 						"bg-neutral-300 dark:bg-neutral-600",
 					message.role === "assistant" &&
