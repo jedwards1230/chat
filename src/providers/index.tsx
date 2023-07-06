@@ -14,10 +14,14 @@ export default function Providers({
 }) {
 	return (
 		<ThemeProvider>
-			<ChatProvider userId={userId}>
-				{children}
-				<Dialogs />
-			</ChatProvider>
+			{userId ? (
+				<ChatProvider userId={userId}>
+					{children}
+					<Dialogs />
+				</ChatProvider>
+			) : (
+				children
+			)}
 		</ThemeProvider>
 	);
 }

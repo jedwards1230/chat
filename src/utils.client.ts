@@ -30,19 +30,16 @@ export function serializeSaveData(saveData: SaveData): string {
 	return JSON.stringify({
 		config: saveData.config,
 		chatHistory: saveData.chatHistory.map((thread) => ({
-			id: thread.id,
-			title: thread.title,
-			agentConfig: thread.agentConfig,
+			...thread,
 			messages: JSON.stringify(thread.messages),
 		})),
 	});
 }
 
-export async function getChatHistory(userId: string): Promise<SaveData | null> {
+export async function getChatHistory(): Promise<SaveData | null> {
 	try {
 		const res = await fetch("/api/get_history", {
 			method: "POST",
-			body: JSON.stringify({ userId }),
 		});
 		if (res.ok) {
 			const data = await res.json();
@@ -50,12 +47,14 @@ export async function getChatHistory(userId: string): Promise<SaveData | null> {
 				...data,
 				chatHistory: data.chatHistory.map((thread: ChatThread) => ({
 					...thread,
+					created: new Date(thread.created),
+					lastModified: new Date(thread.lastModified),
 					messages: JSON.parse(thread.messages as any),
 				})),
 			};
 		}
 	} catch (e) {
-		//console.error(e);
+		console.error(e);
 	}
 
 	if (typeof window !== "undefined") {
@@ -126,6 +125,7 @@ export function upsertMessage(
 
 	return {
 		...thread,
+		lastModified: new Date(),
 		messages,
 	};
 }

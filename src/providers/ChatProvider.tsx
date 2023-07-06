@@ -34,7 +34,7 @@ export function ChatProvider({
 	userId,
 }: {
 	children: React.ReactNode;
-	userId: string | null;
+	userId: string;
 }) {
 	const [checkedLocal, setCheckedLocal] = useState(false);
 	const [isMobile, setIsMobile] = useState(iM() || false);
@@ -89,8 +89,8 @@ export function ChatProvider({
 					const chunks = parseStreamData(chunk);
 
 					const accumulatedResponse = chunks.reduce(
-						(acc: string, curr: any) => {
-							if (!curr) return acc;
+						(acc: string, curr: StreamData) => {
+							if (!curr || !curr.choices) return acc;
 							const res = curr.choices[0];
 							if (res.finish_reason) {
 								return acc;
@@ -293,7 +293,7 @@ export function ChatProvider({
 	useEffect(() => {
 		if (typeof window === "undefined") return;
 
-		getChatHistory(userId!).then((history) => {
+		getChatHistory().then((history) => {
 			if (history) {
 				dispatch({
 					type: "INITIALIZE",

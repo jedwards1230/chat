@@ -31,6 +31,8 @@ interface AgentConfig {
 }
 
 interface ChatThread {
+	created: Date;
+	lastModified: Date;
 	id: string;
 	title: string;
 	messages: Message[];

@@ -29,6 +29,7 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 			const tools = state.activeThread.agentConfig.tools;
 			const newToolsThread = {
 				...state.activeThread,
+				lastModified: new Date(),
 				agentConfig: {
 					...state.activeThread.agentConfig,
 					tools: tools.includes(action.payload)
@@ -102,6 +103,7 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 			if (DEBUG) console.log("CHANGE_TEMPERATURE");
 			const newTemperature = {
 				...state.activeThread,
+				lastModified: new Date(),
 				agentConfig: {
 					...state.activeThread.agentConfig,
 					temperature: action.payload,
@@ -121,6 +123,7 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 			if (DEBUG) console.log("SET_SYSTEM_MESSAGE");
 			const newSystemMessage = {
 				...state.activeThread,
+				lastModified: new Date(),
 				agentConfig: {
 					...state.activeThread.agentConfig,
 					systemMessage: action.payload,
@@ -152,32 +155,20 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 
 		case "REMOVE_MESSAGE":
 			if (DEBUG) console.log("REMOVE_MESSAGE");
-			console.log(
-				state.threadList.map((thread) => {
-					return thread.id === action.payload.threadId
-						? {
-								...thread,
-								messages: thread.messages.filter(
-									(message) =>
-										message.id !== action.payload.messageId
-								),
-						  }
-						: null;
-				})
-			);
 			return {
 				...state,
-				threadList: state.threadList.map((thread) => {
-					return thread.id === action.payload.threadId
+				threadList: state.threadList.map((thread) =>
+					thread.id === action.payload.threadId
 						? {
 								...thread,
+								lastModified: new Date(),
 								messages: thread.messages.filter(
 									(message) =>
 										message.id !== action.payload.messageId
 								),
 						  }
-						: thread;
-				}),
+						: thread
+				),
 			};
 
 		case "UPSERT_MESSAGE":
@@ -251,6 +242,7 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 					thread.id === action.payload.threadId
 						? {
 								...thread,
+								lastModified: new Date(),
 								title: action.payload.title,
 						  }
 						: thread
@@ -265,6 +257,7 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 					thread.id === action.payload.threadId
 						? {
 								...thread,
+								lastModified: new Date(),
 								agentConfig: {
 									...thread.agentConfig,
 									model: action.payload.model,
@@ -274,6 +267,7 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 				),
 				activeThread: {
 					...state.activeThread,
+					lastModified: new Date(),
 					agentConfig: {
 						...state.activeThread.agentConfig,
 						model: action.payload.model,

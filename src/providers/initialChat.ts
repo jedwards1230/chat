@@ -14,6 +14,8 @@ export function getDefaultThread(config: Config): ChatThread {
 	return {
 		id: uuidv4(),
 		title: "New Chat",
+		created: new Date(),
+		lastModified: new Date(),
 		messages: [
 			{
 				id: uuidv4(),

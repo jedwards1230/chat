@@ -48,6 +48,10 @@ export default function ChatHistory() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
+	const sortedThreadList = threadList.sort(
+		(a, b) => b.lastModified.getTime() - a.lastModified.getTime()
+	);
+
 	return (
 		<div
 			ref={sidebarRef}
@@ -71,9 +75,9 @@ export default function ChatHistory() {
 						<Settings />
 					</button>
 				</div>
-				<div className="flex flex-col-reverse w-full gap-1 overflow-y-scroll">
-					{threadList &&
-						threadList.map((m, i) => (
+				<div className="flex flex-col w-full gap-1 overflow-y-scroll">
+					{sortedThreadList &&
+						sortedThreadList.map((m, i) => (
 							<ChatHistoryEntry
 								key={`${i}-${m.messages.length}`}
 								entry={m}
