@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import "./globals.css";
 import Providers from "@/providers";
 import { Metadata } from "next";
-import { ClerkProvider } from "@clerk/nextjs";
+import { ClerkProvider, auth } from "@clerk/nextjs";
 
 const APP_NAME = "Chat";
 const APP_DEFAULT_TITLE = "Chat";
@@ -52,6 +52,8 @@ export default function RootLayout({
 }: {
 	children: React.ReactNode;
 }) {
+	const { userId } = auth();
+
 	return (
 		<ClerkProvider>
 			<html
@@ -67,7 +69,7 @@ export default function RootLayout({
 							</div>
 						}
 					>
-						<Providers>{children}</Providers>
+						<Providers userId={userId}>{children}</Providers>
 					</Suspense>
 				</body>
 			</html>

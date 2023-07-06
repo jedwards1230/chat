@@ -30,10 +30,15 @@ export const useChatDispatch = () => useContext(ChatDispatchContext);
 
 const MAX_LOOPS = 10;
 
-export function ChatProvider({ children }: { children: React.ReactNode }) {
+export function ChatProvider({
+	children,
+	userId,
+}: {
+	children: React.ReactNode;
+	userId: string | null;
+}) {
 	const [checkedLocal, setCheckedLocal] = useState(false);
 	const [isMobile, setIsMobile] = useState(iM() || false);
-	const { userId } = useAuth();
 	const [state, dispatch] = useReducer(chatReducer, {
 		...initialState,
 		sideBarOpen: !isMobile,

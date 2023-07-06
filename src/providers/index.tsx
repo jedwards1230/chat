@@ -5,10 +5,16 @@ import { ThemeProvider } from "next-themes";
 import Dialogs from "@/components/Dialogs";
 import { ChatProvider } from "./ChatProvider";
 
-export default function Providers({ children }: { children: React.ReactNode }) {
+export default function Providers({
+	children,
+	userId,
+}: {
+	children: React.ReactNode;
+	userId: string | null;
+}) {
 	return (
 		<ThemeProvider>
-			<ChatProvider>
+			<ChatProvider userId={userId}>
 				{children}
 				<Dialogs />
 			</ChatProvider>
