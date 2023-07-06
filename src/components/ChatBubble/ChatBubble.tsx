@@ -1,6 +1,6 @@
 "use client";
 
-import TextBubble from "./TextBubble";
+import TextBubble from "./TextContent";
 import ProfilePicture from "./ProfilePicture";
 import { ChatBubbleFunctionList } from "./ChatBubbleFunctionList";
 import { useEffect, useState } from "react";

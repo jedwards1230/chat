@@ -11,10 +11,11 @@ Chat comes with a range of features designed to enhance user experience:
 -   **Chat Personalization**: Customize the AI's personality with a leading system message.
 -   **Interactivity**: The AI can hold a conversation and use functions to perform tasks.
 -   **Fast Streaming**: Leverages Edge Functions for quick and seamless exchanges.
+-   **Share Chat**: Share your conversations with a generated link.
+-   **Privacy First**: All data is stored locally in the browser.
 -   **Data Storage**: Securely stores data in Upstash KV Store.
 -   **OAuth Access**: Provides GitHub OAuth access via Clerk.dev.
 -   **Responsive Design**: Offers a responsive design with dark mode and PWA.
--   **Privacy First**: All data is stored locally in the browser.
 
 ## Installation
 
@@ -31,7 +32,6 @@ We're constantly working on improving Chat with new features:
 
 -   **User Prompt**: Users can edit and save custom prompts to the prompt list.
 -   **Prompt Template**: Create a new chat with pre-defined in-context prompts.
--   **Share as Image**: Share your conversations as images.
 -   **Import/Export Chat**: Easily import or export chat data.
 
 ## Technologies Used

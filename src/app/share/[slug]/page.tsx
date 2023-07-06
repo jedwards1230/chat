@@ -6,18 +6,18 @@ import { SharedBubble } from "@/components/ChatBubble";
 export const runtime = "edge";
 
 export default async function Page({ params }: { params: { slug: string } }) {
-	const saveData: ChatThread | null | undefined = await redis.get(
+	const shareData: ChatThread | null | undefined = await redis.get(
 		"share_" + params.slug
 	);
-	if (!saveData) {
+	if (!shareData) {
 		notFound();
 	}
 
 	const thread: ChatThread = {
-		...saveData,
-		created: new Date(saveData.created),
-		lastModified: new Date(saveData.lastModified),
-		messages: JSON.parse(saveData.messages as any),
+		...shareData,
+		created: new Date(shareData.created),
+		lastModified: new Date(shareData.lastModified),
+		messages: JSON.parse(shareData.messages as any),
 	};
 
 	return (
@@ -25,7 +25,11 @@ export default async function Page({ params }: { params: { slug: string } }) {
 			<div className="flex flex-col items-center justify-center w-full h-full max-w-full overflow-y-scroll grow-1">
 				<div className="flex flex-col w-full h-full gap-4 p-2 mx-auto lg:max-w-4xl">
 					{thread.messages.map((m) => (
-						<SharedBubble key={m.id} message={m} />
+						<SharedBubble
+							key={m.id}
+							message={m}
+							config={shareData.agentConfig}
+						/>
 					))}
 				</div>
 			</div>
