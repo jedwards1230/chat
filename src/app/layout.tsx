@@ -3,6 +3,7 @@ import "./globals.css";
 import Providers from "@/providers";
 import { Metadata } from "next";
 import { ClerkProvider, auth } from "@clerk/nextjs";
+import { Analytics } from "@vercel/analytics/react";
 
 const APP_NAME = "Chat";
 const APP_DEFAULT_TITLE = "Chat";
@@ -71,6 +72,7 @@ export default function RootLayout({
 					>
 						<Providers userId={userId}>{children}</Providers>
 					</Suspense>
+					<Analytics />
 				</body>
 			</html>
 		</ClerkProvider>
