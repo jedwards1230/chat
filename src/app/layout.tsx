@@ -61,7 +61,7 @@ export default function RootLayout({
 				className="overflow-hidden"
 				suppressHydrationWarning={true}
 			>
-				<body className="overflow-hidden bg-neutral-50 dark:text-neutral-100 dark:bg-neutral-900">
+				<body className="overflow-hidden transition-colors bg-neutral-100 dark:text-neutral-100 dark:bg-neutral-900">
 					<Suspense
 						fallback={
 							<div className="flex items-center justify-center w-full h-full">

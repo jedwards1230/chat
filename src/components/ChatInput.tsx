@@ -44,7 +44,7 @@ export default function ChatInput() {
 					rows={inputRows > 10 ? 10 : inputRows}
 					onChange={handleInputChange}
 					onKeyDown={onKeyDownHandler}
-					className="flex-1 w-full p-2 border-2 rounded border-neutral-200 dark:border-neutral-500 focus:border-blue-500 dark:bg-neutral-700 focus:outline-none"
+					className="flex-1 w-full p-2 transition-colors border-2 rounded border-neutral-200 dark:border-neutral-500 focus:border-blue-500 dark:bg-neutral-700 focus:outline-none"
 				/>
 				{input &&
 					(editId ? (

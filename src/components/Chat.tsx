@@ -30,7 +30,7 @@ export default function Chat() {
 			<div
 				className={clsx(
 					"flex flex-col overflow-hidden transition-all w-full h-full",
-					sideBarOpen ? "sm:pl-80" : "lg:pl-0"
+					sideBarOpen ? "sm:pl-72" : "lg:pl-0"
 				)}
 			>
 				<Header />

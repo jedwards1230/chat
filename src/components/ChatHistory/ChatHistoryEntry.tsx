@@ -25,9 +25,9 @@ export default function ChatHistoryEntry({ entry }: { entry: ChatThread }) {
 				})
 			}
 			className={clsx(
-				"py-2 px-2 gap-2 grid grid-cols-16 w-full max-w-full justify-between items-center",
+				"py-1 px-2 rounded-lg gap-2 grid grid-cols-16 w-full max-w-full justify-between items-center",
 				entry.id === activeThread.id
-					? "bg-neutral-400 dark:bg-neutral-500"
+					? "bg-neutral-400/70"
 					: "cursor-pointer hover:bg-neutral-600"
 			)}
 		>
@@ -41,7 +41,7 @@ export default function ChatHistoryEntry({ entry }: { entry: ChatThread }) {
 				</div>
 			</div>
 			<div
-				className="flex items-center justify-center col-span-2 rounded-full cursor-pointer select-none text-neutral-300 hover:text-neutral-50 hover:bg-neutral-500/50"
+				className="flex items-center justify-center col-span-2 rounded-full cursor-pointer select-none text-neutral-300 hover:text-neutral-50"
 				onClick={removeThread}
 				title="Delete conversation"
 			>

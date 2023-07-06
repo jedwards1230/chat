@@ -191,7 +191,7 @@ export default function TextBubble({ message }: { message: Message }) {
 		<div
 			className={clsx(
 				"flex flex-col transition-colors justify-center py-2 px-2 overflow-x-scroll rounded",
-				message.role === "user" ? "bg-blue-100 dark:bg-blue-600/70" : ""
+				message.role === "user" ? "bg-blue-200 dark:bg-blue-600/70" : ""
 			)}
 		>
 			{message.role === "function" ? (
