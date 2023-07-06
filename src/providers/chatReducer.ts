@@ -76,6 +76,9 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 
 		case "REMOVE_THREAD":
 			if (DEBUG) console.log("REMOVE_THREAD");
+			if (state.activeThread.id === action.payload) {
+				document.title = "Chat";
+			}
 			return {
 				...state,
 				threadList: state.threadList.filter(
