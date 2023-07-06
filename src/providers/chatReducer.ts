@@ -5,22 +5,22 @@ const DEBUG = false;
 
 export function chatReducer(state: ChatState, action: ChatAction) {
 	switch (action.type) {
-		case "TOGGLE_SIDEBAR":
+		case "SET_SIDEBAR_OPEN":
 			return {
 				...state,
 				sideBarOpen: action.payload ?? !state.sideBarOpen,
 			};
-		case "TOGGLE_AGENT_EDITOR":
+		case "SET_AGENT_EDITOR_OPEN":
 			return {
 				...state,
 				agentEditorOpen: action.payload ?? !state.agentEditorOpen,
 			};
-		case "TOGGLE_CONFIG_EDITOR":
+		case "SET_CONFIG_EDITOR_OPEN":
 			return {
 				...state,
 				configEditorOpen: action.payload ?? !state.configEditorOpen,
 			};
-		case "TOGGLE_PLUGINS_EDITOR":
+		case "SET_PLUGINS_EDITOR_OPEN":
 			return {
 				...state,
 				pluginsEditorOpen: action.payload ?? !state.pluginsEditorOpen,
@@ -50,7 +50,7 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 				...state,
 				pluginsEnabled: action.payload ?? !state.pluginsEnabled,
 			};
-		case "TOGGLE_BOT_TYPING":
+		case "SET_BOT_TYPING":
 			return {
 				...state,
 				botTyping: action.payload ? true : false,

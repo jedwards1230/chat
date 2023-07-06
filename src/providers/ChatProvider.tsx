@@ -121,7 +121,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 				throw new Error("Too many loops");
 			}
 			const signal = controller.signal;
-			dispatch({ type: "TOGGLE_BOT_TYPING", payload: controller });
+			dispatch({ type: "SET_BOT_TYPING", payload: controller });
 
 			const response = await fetch("/api/chat", {
 				method: "POST",
@@ -195,7 +195,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
 			await readStream(response.body, streamCallback);
 
-			dispatch({ type: "TOGGLE_BOT_TYPING" });
+			dispatch({ type: "SET_BOT_TYPING" });
 
 			if (tool) {
 				let input = "";
@@ -255,7 +255,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 			} else {
 				console.error("Error:", error);
 			}
-			dispatch({ type: "TOGGLE_BOT_TYPING" });
+			dispatch({ type: "SET_BOT_TYPING" });
 		}
 	};
 
@@ -302,19 +302,19 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 		const handleResize = () => {
 			if (isMobile && !iM()) {
 				dispatch({
-					type: "TOGGLE_SIDEBAR",
+					type: "SET_SIDEBAR_OPEN",
 					payload: false,
 				});
 				setIsMobile(true);
 			} else if (!iM()) {
 				dispatch({
-					type: "TOGGLE_SIDEBAR",
+					type: "SET_SIDEBAR_OPEN",
 					payload: true,
 				});
 				setIsMobile(false);
 			} else {
 				dispatch({
-					type: "TOGGLE_SIDEBAR",
+					type: "SET_SIDEBAR_OPEN",
 					payload: false,
 				});
 			}
@@ -363,7 +363,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 								payload: true,
 							});
 							dispatch({
-								type: "TOGGLE_CONFIG_EDITOR",
+								type: "SET_CONFIG_EDITOR_OPEN",
 								payload: true,
 							});
 						}

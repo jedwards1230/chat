@@ -20,7 +20,7 @@ export function ChatBubbleFunctionList({ message }: { message: Message }) {
 					onClick={() => {
 						isSystem
 							? dispatch({
-									type: "TOGGLE_AGENT_EDITOR",
+									type: "SET_AGENT_EDITOR_OPEN",
 									payload: true,
 							  })
 							: dispatch({
@@ -40,7 +40,7 @@ export function ChatBubbleFunctionList({ message }: { message: Message }) {
 				onClick={() => {
 					isSystem
 						? dispatch({
-								type: "TOGGLE_AGENT_EDITOR",
+								type: "SET_AGENT_EDITOR_OPEN",
 								payload: true,
 						  })
 						: dispatch({

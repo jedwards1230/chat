@@ -10,21 +10,20 @@ import clsx from "clsx";
 
 export default function ChatHistory() {
 	const { threadList, sideBarOpen } = useChat();
-	const configDispatch = useChatDispatch();
-	const chatDispatch = useChatDispatch();
+	const dispatch = useChatDispatch();
 	const sidebarRef = useRef<HTMLDivElement>(null);
 
 	const closeSidebar = () => {
-		configDispatch({ type: "TOGGLE_SIDEBAR", payload: false });
+		dispatch({ type: "SET_SIDEBAR_OPEN", payload: false });
 	};
 
 	const openConfig = () => {
-		configDispatch({ type: "TOGGLE_CONFIG_EDITOR", payload: true });
-		configDispatch({ type: "TOGGLE_SIDEBAR", payload: false });
+		dispatch({ type: "SET_CONFIG_EDITOR_OPEN", payload: true });
+		dispatch({ type: "SET_SIDEBAR_OPEN", payload: false });
 	};
 
 	const newThread = () => {
-		chatDispatch({ type: "CREATE_THREAD" });
+		dispatch({ type: "CREATE_THREAD" });
 		if (isMobile()) closeSidebar();
 	};
 

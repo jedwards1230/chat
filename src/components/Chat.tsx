@@ -15,11 +15,11 @@ export default function Chat() {
 	const handlers = useSwipeable({
 		onSwipedLeft: () => {
 			if (sideBarOpen)
-				dispatch({ type: "TOGGLE_SIDEBAR", payload: false });
+				dispatch({ type: "SET_SIDEBAR_OPEN", payload: false });
 		},
 		onSwipedRight: (e) => {
 			if (!sideBarOpen && e.absX > 280) {
-				dispatch({ type: "TOGGLE_SIDEBAR", payload: true });
+				dispatch({ type: "SET_SIDEBAR_OPEN", payload: true });
 			}
 		},
 	});

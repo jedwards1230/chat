@@ -21,8 +21,8 @@ export default function AgentEditor() {
 			callback={() =>
 				chatDispatch({
 					type: pluginsEditorOpen
-						? "TOGGLE_PLUGINS_EDITOR"
-						: "TOGGLE_AGENT_EDITOR",
+						? "SET_PLUGINS_EDITOR_OPEN"
+						: "SET_AGENT_EDITOR_OPEN",
 					payload: false,
 				})
 			}

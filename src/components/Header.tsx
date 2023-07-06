@@ -10,7 +10,7 @@ export default function Header() {
 	const dispatch = useChatDispatch();
 
 	const handleSidebarToggle = () => {
-		dispatch({ type: "TOGGLE_SIDEBAR" });
+		dispatch({ type: "SET_SIDEBAR_OPEN" });
 	};
 
 	return (

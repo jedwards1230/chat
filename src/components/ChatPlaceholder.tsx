@@ -7,11 +7,11 @@ export function ChatPlaceholder() {
 	const dispatch = useChatDispatch();
 
 	const handleAgentEditorToggle = () => {
-		dispatch({ type: "TOGGLE_AGENT_EDITOR" });
+		dispatch({ type: "SET_AGENT_EDITOR_OPEN" });
 	};
 
 	const handlePluginsEditorToggle = () => {
-		dispatch({ type: "TOGGLE_PLUGINS_EDITOR" });
+		dispatch({ type: "SET_PLUGINS_EDITOR_OPEN" });
 	};
 
 	return (

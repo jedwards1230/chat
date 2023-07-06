@@ -25,24 +25,6 @@ interface Config {
 }
 
 type ChatAction =
-	| { type: "CHANGE_USER_ID_REQUIRED"; payload: boolean }
-	| { type: "TOGGLE_PLUGINS_EDITOR"; payload?: boolean }
-	| { type: "TOGGLE_CONFIG_EDITOR"; payload?: boolean }
-	| { type: "SET_ACTIVE_THREAD"; payload: ChatThread }
-	| { type: "TOGGLE_AGENT_EDITOR"; payload?: boolean }
-	| { type: "CHANGE_TEMPERATURE"; payload: number }
-	| { type: "SET_SYSTEM_MESSAGE"; payload: string }
-	| { type: "TOGGLE_PLUGINS"; payload?: boolean }
-	| { type: "TOGGLE_SIDEBAR"; payload?: boolean }
-	| { type: "TOGGLE_BOT_TYPING"; payload?: AbortController }
-	| { type: "CHANGE_USER_ID"; payload: string }
-	| { type: "REMOVE_THREAD"; payload: string }
-	| { type: "UPDATE_CONFIG"; payload: Config }
-	| { type: "CHANGE_INPUT"; payload: string }
-	| { type: "TOGGLE_PLUGIN"; payload: Tool }
-	| { type: "CREATE_THREAD" }
-	| { type: "CLEAR_HISTORY" }
-	| { type: "CANCEL_EDIT" }
 	| {
 			type: "INITIALIZE";
 			payload: {
@@ -50,6 +32,18 @@ type ChatAction =
 				userId: string;
 			};
 	  }
+	/* Chat */
+	| { type: "SET_BOT_TYPING"; payload?: AbortController }
+	| { type: "SET_ACTIVE_THREAD"; payload: ChatThread }
+	| { type: "CHANGE_TEMPERATURE"; payload: number }
+	| { type: "SET_SYSTEM_MESSAGE"; payload: string }
+	| { type: "TOGGLE_PLUGINS"; payload?: boolean }
+	| { type: "REMOVE_THREAD"; payload: string }
+	| { type: "CHANGE_INPUT"; payload: string }
+	| { type: "TOGGLE_PLUGIN"; payload: Tool }
+	| { type: "CREATE_THREAD" }
+	| { type: "CLEAR_HISTORY" }
+	| { type: "CANCEL_EDIT" }
 	| {
 			type: "EDIT_MESSAGE";
 			payload: {
@@ -84,4 +78,13 @@ type ChatAction =
 				threadId: string;
 				model: Model;
 			};
-	  };
+	  }
+	/* Views */
+	| { type: "SET_PLUGINS_EDITOR_OPEN"; payload?: boolean }
+	| { type: "SET_CONFIG_EDITOR_OPEN"; payload?: boolean }
+	| { type: "SET_AGENT_EDITOR_OPEN"; payload?: boolean }
+	| { type: "SET_SIDEBAR_OPEN"; payload?: boolean }
+	/* Config */
+	| { type: "CHANGE_USER_ID_REQUIRED"; payload: boolean }
+	| { type: "CHANGE_USER_ID"; payload: string }
+	| { type: "UPDATE_CONFIG"; payload: Config };

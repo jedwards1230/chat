@@ -23,7 +23,7 @@ export default function ConfigEditor() {
 		<Dialog
 			callback={() =>
 				dispatch({
-					type: "TOGGLE_CONFIG_EDITOR",
+					type: "SET_CONFIG_EDITOR_OPEN",
 					payload: false,
 				})
 			}
