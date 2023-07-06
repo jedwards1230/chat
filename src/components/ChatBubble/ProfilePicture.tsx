@@ -13,7 +13,7 @@ export default function ProfilePicture({ message }: { message: Message }) {
 					alt="You"
 					width={32}
 					height={32}
-					className="w-8 h-8 border rounded dark:border-neutral-400"
+					className="flex-shrink-0 w-8 h-8 border rounded dark:border-neutral-400"
 				/>
 			) : (
 				<div

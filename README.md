@@ -1,34 +1,55 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Chat: Conversational AI Application
 
-## Getting Started
+## Description
 
-First, run the development server:
+Chat is a versatile AI chat application, leveraging OpenAI's ChatGPT to offer a dynamic chat experience. It serves as a platform where users can interact with an AI, customize its personality, and engage in meaningful conversation. Ideal for those seeking a virtual assistant, language practice, or simply an engaging conversation.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
+## Key Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Chat comes with a range of features designed to enhance user experience:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+-   **Chat Personalization**: Customize the AI's personality with a leading system message.
+-   **Interactivity**: The AI can hold a conversation and use functions to perform tasks.
+-   **Fast Streaming**: Leverages Edge Functions for quick and seamless exchanges.
+-   **Data Storage**: Securely stores data in Upstash KV Store.
+-   **OAuth Access**: Provides GitHub OAuth access via Clerk.dev.
+-   **Responsive Design**: Offers a responsive design with dark mode and PWA.
+-   **Privacy First**: All data is stored locally in the browser.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## Installation
 
-## Learn More
+To install and run the application locally, follow these steps:
 
-To learn more about Next.js, take a look at the following resources:
+1. Clone the repository to your local machine.
+2. Navigate to the project directory.
+3. Run `pnpm i` to install the necessary packages.
+4. Run `npm run dev` to start the application.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Roadmap
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+We're constantly working on improving Chat with new features:
 
-## Deploy on Vercel
+-   **User Prompt**: Users can edit and save custom prompts to the prompt list.
+-   **Prompt Template**: Create a new chat with pre-defined in-context prompts.
+-   **Share as Image**: Share your conversations as images.
+-   **Import/Export Chat**: Easily import or export chat data.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Technologies Used
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+-   Next.js 13
+-   Edge Functions
+-   TypeScript
+-   Tailwind CSS
+-   OpenAI API
+-   Clerk.dev (OAuth)
+-   Upstash KV Store
+
+## Contribution
+
+We welcome contributions to the development of Chat. Feel free to fork the repository and submit a pull request.
+
+## License
+
+This project is licensed under the MIT License. For more details, please see the [LICENSE.md](LICENSE.md) file.
+
+Chat is a blend of technology and creativity, aiming to redefine the way we interact with AI. Join us on this journey today!
