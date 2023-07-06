@@ -18,7 +18,10 @@ export default function ChatThread() {
 				prevScrollHeight.current;
 
 			if (isAtBottom) {
-				threadEl.scrollTop = threadEl.scrollHeight;
+				threadEl.scrollTo({
+					top: threadEl.scrollHeight,
+					behavior: "smooth",
+				});
 			}
 
 			prevScrollHeight.current = threadEl.scrollHeight;
