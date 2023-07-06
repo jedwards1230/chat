@@ -1,3 +1,5 @@
+"use client";
+
 import TextBubble from "./TextBubble";
 import ProfilePicture from "./ProfilePicture";
 import { ChatBubbleFunctionList } from "./ChatBubbleFunctionList";

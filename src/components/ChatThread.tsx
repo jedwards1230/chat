@@ -1,7 +1,7 @@
 "use client";
 
 import { useChat } from "@/providers/ChatProvider";
-import ChatBubble from "./ChatBubble";
+import { ChatBubble } from "./ChatBubble";
 import { ChatPlaceholder } from "./ChatPlaceholder";
 import { useRef, useEffect } from "react";
 

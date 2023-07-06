@@ -52,6 +52,7 @@ const initialState: ChatState = {
 	agentEditorOpen: false,
 	configEditorOpen: false,
 	pluginsEditorOpen: false,
+	shareModalOpen: false,
 	handleSubmit: () => {},
 };
 

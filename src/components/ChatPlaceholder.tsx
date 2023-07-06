@@ -32,6 +32,7 @@ export function ChatPlaceholder() {
 					<div className="px-4 dark:border-neutral-600">
 						<input
 							type="checkbox"
+							title="Toggle plugins"
 							className="w-4 h-4 cursor-pointer"
 							checked={pluginsEnabled}
 							onChange={() =>

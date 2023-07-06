@@ -26,16 +26,6 @@ export async function readStream(
 	return accumulatedResponse;
 }
 
-export function serializeSaveData(saveData: SaveData): string {
-	return JSON.stringify({
-		config: saveData.config,
-		chatHistory: saveData.chatHistory.map((thread) => ({
-			...thread,
-			messages: JSON.stringify(thread.messages),
-		})),
-	});
-}
-
 export function isMobile() {
 	if (typeof window === "undefined") return false;
 	const screens = fullConfig.theme?.screens as Record<string, string>;

@@ -7,6 +7,7 @@ interface ChatState {
 	agentEditorOpen: boolean;
 	configEditorOpen: boolean;
 	pluginsEditorOpen: boolean;
+	shareModalOpen: boolean;
 	pluginsEnabled: boolean;
 	config: Config;
 	botTyping: boolean;
@@ -73,6 +74,7 @@ type ChatAction =
 	| { type: "SET_CONFIG_EDITOR_OPEN"; payload?: boolean }
 	| { type: "SET_AGENT_EDITOR_OPEN"; payload?: boolean }
 	| { type: "SET_SIDEBAR_OPEN"; payload?: boolean }
+	| { type: "SET_SHARE_MODAL_OPEN"; payload?: boolean }
 	/* Config */
 	| { type: "INITIALIZE"; payload: SaveData }
 	| { type: "UPDATE_CONFIG"; payload: Config };

@@ -5,6 +5,7 @@ import Edit from "./Edit";
 import Information from "./Information";
 import Reset from "./Reset";
 import Settings from "./Settings";
+import Share from "./Share";
 import Trash from "./Trash";
 import XMark from "./XMark";
 
@@ -16,6 +17,7 @@ export {
 	Information,
 	Reset,
 	Settings,
+	Share,
 	Trash,
 	XMark,
 };

@@ -15,11 +15,11 @@ import {
 	callTool,
 	parseStreamData,
 	isMobile as iM,
-	serializeSaveData,
 } from "@/utils.client";
 import { chatReducer } from "@/providers/chatReducer";
 import initialState from "./initialChat";
 import { getCloudHistory, saveCloudHistory } from "@/utils.server";
+import { serializeSaveData } from "@/utils";
 
 const ChatContext = createContext<ChatState>(initialState);
 const ChatDispatchContext = createContext<Dispatch<ChatAction>>(() => {});

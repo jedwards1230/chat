@@ -21,6 +21,10 @@ interface SaveData {
 	config: Config;
 }
 
+interface ShareData {
+	thread: ChatThread;
+}
+
 interface AgentConfig {
 	id: string;
 	name: string;

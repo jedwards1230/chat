@@ -1,9 +1,10 @@
 "use client";
 
 import { useChat, useChatDispatch } from "@/providers/ChatProvider";
-import { Bars } from "./Icons";
+import { Bars, Share } from "./Icons";
 import clsx from "clsx";
 import { isMobile } from "@/utils.client";
+import { shareChatThread } from "@/utils.server";
 
 export default function Header() {
 	const { activeThread, sideBarOpen } = useChat();
@@ -11,6 +12,18 @@ export default function Header() {
 
 	const handleSidebarToggle = () => {
 		dispatch({ type: "SET_SIDEBAR_OPEN" });
+	};
+
+	const handleShare = async () => {
+		try {
+			await shareChatThread(activeThread);
+			dispatch({
+				type: "SET_SHARE_MODAL_OPEN",
+				payload: true,
+			});
+		} catch (error) {
+			console.error(error);
+		}
 	};
 
 	return (
@@ -44,6 +57,16 @@ export default function Header() {
 					)}
 				</p>
 			</div>
+			{activeThread.messages.length > 1 && (
+				<div className="flex items-center justify-end col-span-1">
+					<button
+						className="px-1 cursor-pointer text-neutral-400 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
+						onClick={handleShare}
+					>
+						<Share />
+					</button>
+				</div>
+			)}
 		</div>
 	);
 }

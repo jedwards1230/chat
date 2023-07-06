@@ -25,6 +25,11 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 				...state,
 				pluginsEditorOpen: action.payload ?? !state.pluginsEditorOpen,
 			};
+		case "SET_SHARE_MODAL_OPEN":
+			return {
+				...state,
+				shareModalOpen: action.payload ?? !state.shareModalOpen,
+			};
 		case "TOGGLE_PLUGIN":
 			const tools = state.activeThread.agentConfig.tools;
 			const newToolsThread = {

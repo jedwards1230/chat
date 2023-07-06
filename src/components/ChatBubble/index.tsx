@@ -1,3 +1,4 @@
 import ChatBubble from "./ChatBubble";
+import SharedBubble from "./SharedBubble";
 
-export default ChatBubble;
+export { ChatBubble, SharedBubble };
