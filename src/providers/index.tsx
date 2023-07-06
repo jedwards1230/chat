@@ -15,7 +15,7 @@ export default function Providers({
 	return (
 		<ThemeProvider>
 			{userId ? (
-				<ChatProvider userId={userId}>
+				<ChatProvider>
 					{children}
 					<Dialogs />
 				</ChatProvider>

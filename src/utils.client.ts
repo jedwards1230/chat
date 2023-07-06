@@ -36,38 +36,6 @@ export function serializeSaveData(saveData: SaveData): string {
 	});
 }
 
-export async function getChatHistory(): Promise<SaveData | null> {
-	try {
-		const res = await fetch("/api/get_history", {
-			method: "POST",
-		});
-		if (res.ok) {
-			const data = await res.json();
-			return {
-				...data,
-				chatHistory: data.chatHistory.map((thread: ChatThread) => ({
-					...thread,
-					created: new Date(thread.created),
-					lastModified: new Date(thread.lastModified),
-					messages: JSON.parse(thread.messages as any),
-				})),
-			};
-		}
-	} catch (e) {
-		console.error(e);
-	}
-
-	if (typeof window !== "undefined") {
-		const storedThreads = localStorage.getItem("chatHistory");
-		if (storedThreads) {
-			const saveData: SaveData = JSON.parse(storedThreads);
-			return saveData;
-		}
-	}
-
-	return null;
-}
-
 export function isMobile() {
 	if (typeof window === "undefined") return false;
 	const screens = fullConfig.theme?.screens as Record<string, string>;

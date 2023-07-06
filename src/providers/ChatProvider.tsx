@@ -11,15 +11,15 @@ import {
 import { v4 as uuidv4 } from "uuid";
 
 import {
-	getChatHistory,
 	readStream,
 	callTool,
 	parseStreamData,
 	isMobile as iM,
 	serializeSaveData,
-} from "../utils.client";
+} from "@/utils.client";
 import { chatReducer } from "@/providers/chatReducer";
 import initialState from "./initialChat";
+import { getCloudHistory, saveCloudHistory } from "@/utils.server";
 
 const ChatContext = createContext<ChatState>(initialState);
 const ChatDispatchContext = createContext<Dispatch<ChatAction>>(() => {});
@@ -29,13 +29,7 @@ export const useChatDispatch = () => useContext(ChatDispatchContext);
 
 const MAX_LOOPS = 10;
 
-export function ChatProvider({
-	children,
-	userId,
-}: {
-	children: React.ReactNode;
-	userId: string;
-}) {
+export function ChatProvider({ children }: { children: React.ReactNode }) {
 	const [checkedLocal, setCheckedLocal] = useState(false);
 	const [isMobile, setIsMobile] = useState(iM() || false);
 	const [state, dispatch] = useReducer(chatReducer, {
@@ -293,13 +287,20 @@ export function ChatProvider({
 	useEffect(() => {
 		if (typeof window === "undefined") return;
 
-		getChatHistory().then((history) => {
+		getCloudHistory().then((history) => {
 			if (history) {
 				dispatch({
 					type: "INITIALIZE",
 					payload: history,
 				});
+			} else if (typeof window !== "undefined") {
+				const storedThreads = localStorage.getItem("chatHistory");
+				if (storedThreads) {
+					const saveData: SaveData = JSON.parse(storedThreads);
+					return saveData;
+				}
 			}
+
 			setCheckedLocal(true);
 		});
 
@@ -337,16 +338,7 @@ export function ChatProvider({
 	const saveHistory = async (saveData: string) => {
 		try {
 			localStorage.setItem("chatHistory", saveData);
-			const res = await fetch("/api/save_history", {
-				method: "POST",
-				body: JSON.stringify({
-					saveData,
-				}),
-			});
-
-			if (!res.ok) {
-				throw new Error("Failed to save chat history");
-			}
+			await saveCloudHistory(saveData);
 		} catch (error) {
 			console.error(error);
 		}

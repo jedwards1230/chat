@@ -7,6 +7,9 @@ const nextConfig = {};
 
 module.exports = withPWA({
 	...nextConfig,
+	experimental: {
+		serverActions: true,
+	},
 	images: {
 		remotePatterns: [
 			{
