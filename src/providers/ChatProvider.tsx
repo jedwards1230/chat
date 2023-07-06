@@ -354,12 +354,7 @@ export function ChatProvider({
 
 	// Effect to sync local storage with the chat thread list
 	useEffect(() => {
-		if (
-			typeof window !== "undefined" &&
-			state.threadList.length > 0 &&
-			checkedLocal &&
-			!state.botTyping
-		) {
+		if (typeof window !== "undefined" && checkedLocal && !state.botTyping) {
 			const saveData = serializeSaveData({
 				config: state.config,
 				chatHistory: state.threadList,
@@ -367,13 +362,7 @@ export function ChatProvider({
 
 			saveHistory(saveData);
 		}
-	}, [
-		state.threadList,
-		state.threadList.length,
-		checkedLocal,
-		state.config,
-		state.botTyping,
-	]);
+	}, [checkedLocal, state.botTyping, state.config, state.threadList]);
 
 	if (!checkedLocal) return null;
 	return (
