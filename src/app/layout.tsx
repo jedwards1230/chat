@@ -10,8 +10,6 @@ const APP_DEFAULT_TITLE = "Chat";
 const APP_TITLE_TEMPLATE = "Chat - %s";
 const APP_DESCRIPTION = "Chat";
 
-export const runtime = "edge";
-
 export const metadata: Metadata = {
 	metadataBase: new URL("http://localhost:3000"),
 	applicationName: APP_NAME,
