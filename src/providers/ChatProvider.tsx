@@ -288,7 +288,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 	// Effect to check stored chat history on component mount
 	useEffect(() => {
 		if (typeof window === "undefined") return;
-		console.log(userId);
 
 		getChatHistory(userId!).then((history) => {
 			if (history) {
