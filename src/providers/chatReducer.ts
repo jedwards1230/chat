@@ -244,6 +244,7 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 
 		case "UPSERT_TITLE":
 			if (DEBUG) console.log("UPSERT_TITLE");
+			document.title = action.payload.title;
 			return {
 				...state,
 				threadList: state.threadList.map((thread) =>
