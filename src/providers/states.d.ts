@@ -11,7 +11,6 @@ interface ChatState {
 	pluginsEnabled: boolean;
 	config: Config;
 	botTyping: boolean;
-	handleSubmit: (e: React.FormEvent) => void;
 	abortController?: AbortController;
 }
 

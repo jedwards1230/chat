@@ -1,4 +1,4 @@
-import { searchGoogle } from "@/utils.server";
+import { searchGoogle } from "@/utils/server";
 
 export class Search implements CustomTool {
 	name = "search";

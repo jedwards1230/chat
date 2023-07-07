@@ -3,8 +3,8 @@
 import { useChat, useChatDispatch } from "@/providers/ChatProvider";
 import { Bars, Share } from "./Icons";
 import clsx from "clsx";
-import { isMobile } from "@/utils.client";
-import { shareChatThread } from "@/utils.server";
+import { isMobile } from "@/utils/client";
+import { shareChatThread } from "@/utils/server";
 
 export default function Header() {
 	const { activeThread, sideBarOpen } = useChat();

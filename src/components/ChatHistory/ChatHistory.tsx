@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 import { useChat, useChatDispatch } from "@/providers/ChatProvider";
 import ChatHistoryEntry from "./ChatHistoryEntry";
 import { Settings } from "../Icons";
-import { isMobile } from "@/utils.client";
+import { isMobile } from "@/utils/client";
 import clsx from "clsx";
 
 export default function ChatHistory() {

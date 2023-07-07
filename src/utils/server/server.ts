@@ -2,8 +2,8 @@
 
 import { auth } from "@clerk/nextjs";
 
-import { redis } from "./lib/redis";
-import { serializeSaveData } from "./utils";
+import { redis } from "../../lib/redis";
+import { serializeSaveData } from "..";
 
 export async function getCloudHistory(): Promise<SaveData | null> {
 	const { userId } = auth();

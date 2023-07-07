@@ -62,7 +62,6 @@ const initialState: ChatState = {
 	configEditorOpen: false,
 	pluginsEditorOpen: false,
 	shareModalOpen: false,
-	handleSubmit: () => {},
 };
 
 export default initialState;

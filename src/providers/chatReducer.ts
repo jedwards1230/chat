@@ -1,5 +1,5 @@
 import { getDefaultThread } from "@/providers/initialChat";
-import { upsertMessage } from "@/utils.client";
+import { upsertMessage } from "@/utils/client";
 
 const DEBUG = false;
 

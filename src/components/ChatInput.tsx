@@ -4,9 +4,11 @@ import { useChat, useChatDispatch } from "@/providers/ChatProvider";
 import clsx from "clsx";
 import { motion } from "framer-motion";
 import QuickActions from "./QuickActions";
+import { handleSubmit } from "@/utils/client";
 
 export default function ChatInput() {
-	const { input, handleSubmit, editId } = useChat();
+	const state = useChat();
+	const { input, editId } = state;
 	const dispatch = useChatDispatch();
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -21,7 +23,7 @@ export default function ChatInput() {
 				type: "CHANGE_INPUT",
 				payload: e.target.value,
 			});
-			handleSubmit(e);
+			handleSubmit(e, state, dispatch);
 		}
 	};
 
@@ -31,7 +33,7 @@ export default function ChatInput() {
 		<div className="relative w-full">
 			<QuickActions />
 			<form
-				onSubmit={handleSubmit}
+				onSubmit={(e) => handleSubmit(e, state, dispatch)}
 				className={clsx(
 					"flex items-center transition-all justify-center w-full gap-2 px-4 pt-2 pb-8 border-t shadow-xl sm:pb-4 dark:shadow-none border-neutral-300 dark:border-neutral-600 dark:border-0 justify-self-end",
 					editId ? "flex-col" : ""
