@@ -2,8 +2,28 @@ import { redis } from "@/lib/redis";
 import { notFound } from "next/navigation";
 
 import { SharedBubble } from "@/components/ChatBubble";
+import { Metadata } from "next";
 
-export default async function Page({ params }: { params: { slug: string } }) {
+type Props = {
+	params: { slug: string };
+};
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+	const shareData: ChatThread | null | undefined = await redis.get(
+		"share_" + params.slug
+	);
+	if (!shareData) {
+		return {
+			title: "Chat not found",
+		};
+	}
+
+	return {
+		title: shareData.title,
+	};
+}
+
+export default async function Page({ params }: Props) {
 	const shareData: ChatThread | null | undefined = await redis.get(
 		"share_" + params.slug
 	);

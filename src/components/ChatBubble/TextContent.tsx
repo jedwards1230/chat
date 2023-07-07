@@ -11,18 +11,24 @@ import { useTheme } from "next-themes";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import clsx from "clsx";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+
 import { useChat } from "@/providers/ChatProvider";
 
 export default function TextBubble({ message }: { message: Message }) {
 	const { resolvedTheme } = useTheme();
 	const { activeThread } = useChat();
-	const content =
-		message.name && message.role !== "function"
-			? `${message.name[0].toUpperCase() + message.name.substring(1)}: ${
-					message.content
-			  }`
-			: message.content;
+	const [open, setOpen] = useState(false);
+	const content = useMemo(
+		() =>
+			message.name && message.role !== "function"
+				? `${
+						message.name[0].toUpperCase() +
+						message.name.substring(1)
+				  }: ${message.content}`
+				: message.content,
+		[message]
+	);
 
 	const components = useMemo<
 		Partial<
@@ -149,7 +155,11 @@ export default function TextBubble({ message }: { message: Message }) {
 	);
 
 	const FunctionContent = () => (
-		<details className={"flex flex-col gap-2 items-start w-full rounded"}>
+		<details
+			open={open}
+			onClick={() => setOpen(!open)}
+			className={"flex flex-col gap-2 items-start w-full rounded"}
+		>
 			<summary className="capitalize cursor-pointer">
 				{message.name} Result
 			</summary>

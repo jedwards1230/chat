@@ -7,7 +7,7 @@ import { Analytics } from "@vercel/analytics/react";
 
 const APP_NAME = "Chat";
 const APP_DEFAULT_TITLE = "Chat";
-const APP_TITLE_TEMPLATE = "Chat - %s";
+const APP_TITLE_TEMPLATE = "Chat | %s";
 const APP_DESCRIPTION = "Chat";
 
 export const metadata: Metadata = {

@@ -14,7 +14,7 @@ export default function ChatBubbleFunction({
 	return (
 		<button
 			className={clsx(
-				"p-1 border scale-[85%] rounded-full dark:text-neutral-900 bg-neutral-100 active:bg-neutral-300 dark:active:bg-neutral-400 hover:bg-neutral-200 border-neutral-400",
+				"p-1 border scale-[85%] rounded-full dark:text-neutral-900 bg-neutral-100 active:bg-neutral-300 dark:bg-neutral-300 dark:active:bg-neutral-400 dark:hover:bg-neutral-200 hover:bg-neutral-200 border-neutral-400",
 				color === "red" && "hover:text-red-500",
 				color === "blue" && "hover:text-blue-500",
 				color === "green" && "hover:text-green-600"

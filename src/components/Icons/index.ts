@@ -3,6 +3,7 @@ import Chat from "./Chat";
 import Clipboard from "./Clipboard";
 import Edit from "./Edit";
 import Information from "./Information";
+import OpenNew from "./OpenNew";
 import Reset from "./Reset";
 import Settings from "./Settings";
 import Share from "./Share";
@@ -15,6 +16,7 @@ export {
 	Clipboard,
 	Edit,
 	Information,
+	OpenNew,
 	Reset,
 	Settings,
 	Share,

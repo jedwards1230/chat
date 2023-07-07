@@ -27,7 +27,7 @@ export default function ChatHistoryEntry({ entry }: { entry: ChatThread }) {
 			className={clsx(
 				"py-1 px-2 rounded-lg gap-2 grid grid-cols-16 w-full max-w-full justify-between items-center",
 				entry.id === activeThread.id
-					? "bg-neutral-400/70"
+					? "bg-neutral-400/70 dark:bg-neutral-600"
 					: "cursor-pointer hover:bg-neutral-600"
 			)}
 		>

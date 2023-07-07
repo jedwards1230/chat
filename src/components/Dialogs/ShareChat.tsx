@@ -1,7 +1,10 @@
 "use client";
 
+import Link from "next/link";
+
 import { useChat, useChatDispatch } from "@/providers/ChatProvider";
 import Dialog from "./Dialog";
+import { OpenNew } from "../Icons";
 
 export default function ShareChat() {
 	const { activeThread } = useChat();
@@ -18,14 +21,23 @@ export default function ShareChat() {
 				})
 			}
 		>
-			<div className="w-full text-center">
+			<div className="w-full text-lg text-center">
 				Share URL
-				<input
-					type="text"
-					readOnly
-					className="w-full px-2 py-1 mt-2 border rounded-lg focus:outline-none"
-					value={shareUrl}
-				/>
+				<div className="flex items-center justify-between gap-2 mt-2">
+					<input
+						type="text"
+						readOnly
+						className="w-full px-2 py-1 border rounded-lg focus:outline-none"
+						value={shareUrl}
+					/>
+					<Link
+						href={shareUrl}
+						target="_blank"
+						className="flex items-center justify-center p-1.5 bg-green-600 dark:hover:bg-green-600/80 rounded-lg"
+					>
+						<OpenNew />
+					</Link>
+				</div>
 			</div>
 		</Dialog>
 	);
