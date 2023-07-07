@@ -60,9 +60,8 @@ export function parseStreamData(chunk: string): StreamData[] {
 				if (jsonStr === "[DONE]") return;
 				try {
 					return JSON.parse(jsonStr);
-				} catch (e) {
-					console.error(e);
-					console.log(jsonStr);
+				} catch {
+					return;
 				}
 			});
 	} catch (e) {
