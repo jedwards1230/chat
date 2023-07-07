@@ -31,36 +31,38 @@ export default function AgentEditor() {
 				Agent Editor
 			</div>
 			<div className="flex flex-col gap-4 h-96">
-				<div className="relative flex flex-row gap-4 group">
-					<button
-						className={clsx(
-							"flex-1 z-10 px-4 py-2 font-medium text-center rounded-lg",
-							activeTab === "config"
-								? "text-white"
-								: "text-neutral-500 dark:text-neutral-400"
-						)}
-						onClick={() => setActiveTab("config")}
-					>
-						Config
-					</button>
-					<button
-						className={clsx(
-							"flex-1 z-10 px-4 py-2 font-medium text-center rounded-lg",
-							activeTab === "plugins"
-								? "text-white"
-								: "text-neutral-500 dark:text-neutral-400"
-						)}
-						onClick={() => setActiveTab("plugins")}
-					>
-						Plugins
-					</button>
-					<motion.div
-						layoutId="config-tab"
-						className={clsx(
-							"absolute top-0 group-hover:dark:bg-neutral-600 w-1/2 bg-neutral-600/40 h-full rounded-lg",
-							activeTab === "config" ? "left-0" : "right-0"
-						)}
-					/>
+				<div className="relative p-1 rounded-lg bg-neutral-900">
+					<div className="relative flex flex-row gap-4 group">
+						<button
+							className={clsx(
+								"flex-1 z-10 px-4 py-2 font-medium text-center rounded-lg",
+								activeTab === "config"
+									? "text-white"
+									: "text-neutral-500 dark:text-neutral-400"
+							)}
+							onClick={() => setActiveTab("config")}
+						>
+							Config
+						</button>
+						<button
+							className={clsx(
+								"flex-1 z-10 px-4 py-2 font-medium text-center rounded-lg",
+								activeTab === "plugins"
+									? "text-white"
+									: "text-neutral-500 dark:text-neutral-400"
+							)}
+							onClick={() => setActiveTab("plugins")}
+						>
+							Plugins
+						</button>
+						<motion.div
+							layoutId="config-tab"
+							className={clsx(
+								"absolute top-0 group-hover:dark:bg-neutral-600 w-1/2 bg-neutral-600/40 h-full rounded-lg",
+								activeTab === "config" ? "left-0" : "right-0"
+							)}
+						/>
+					</div>
 				</div>
 				{activeTab === "config" ? <AgentConfig /> : <PluginsConfig />}
 			</div>

@@ -17,9 +17,9 @@ export default function ChatHistory() {
 		dispatch({ type: "SET_SIDEBAR_OPEN", payload: false });
 	};
 
-	const openConfig = () => {
+	const openConfig = (e: any) => {
 		dispatch({ type: "SET_CONFIG_EDITOR_OPEN", payload: true });
-		dispatch({ type: "SET_SIDEBAR_OPEN", payload: false });
+		if (isMobile()) dispatch({ type: "SET_SIDEBAR_OPEN", payload: false });
 	};
 
 	const newThread = () => {

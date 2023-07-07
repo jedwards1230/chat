@@ -8,6 +8,14 @@ const defaultConfig: Config = {
 	defaultModel: "gpt-4-0613",
 	defaultTemperature: 0.7,
 	defaultSystemMessage: systemMessage,
+	defaultTopP: 1,
+	defaultN: 1,
+	defaultMaxTokens: 150,
+	defaultFrequencyPenalty: 0,
+	defaultPresencePenalty: 0,
+	defaultStop: [],
+	defaultLogitBias: {},
+	defaultUser: "",
 };
 
 export function getDefaultThread(config: Config): ChatThread {
@@ -43,6 +51,7 @@ const initialState: ChatState = {
 	editId: null,
 	botTyping: false,
 	config: {
+		...defaultConfig,
 		defaultModel: baseEntry.agentConfig.model,
 		defaultTemperature: baseEntry.agentConfig.temperature,
 		defaultSystemMessage: baseEntry.agentConfig.systemMessage,
