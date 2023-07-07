@@ -58,7 +58,12 @@ export function parseStreamData(chunk: string): StreamData[] {
 				// TODO: ensure this only replaces the first instance
 				const jsonStr = c.replace("data: ", "");
 				if (jsonStr === "[DONE]") return;
-				return JSON.parse(jsonStr);
+				try {
+					return JSON.parse(jsonStr);
+				} catch (e) {
+					console.error(e);
+					console.log(jsonStr);
+				}
 			});
 	} catch (e) {
 		console.error(e);
