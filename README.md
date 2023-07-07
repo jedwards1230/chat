@@ -1,5 +1,7 @@
 # Chat: Conversational AI Application
 
+![Default Page](./screenshots/screenshot-0.png)
+
 ## Description
 
 Chat is a versatile AI chat application, leveraging OpenAI's ChatGPT to offer a dynamic chat experience. It serves as a platform where users can interact with an AI, customize its personality, and engage in meaningful conversation. Ideal for those seeking a virtual assistant, language practice, or simply an engaging conversation.
