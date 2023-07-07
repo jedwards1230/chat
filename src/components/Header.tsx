@@ -5,6 +5,7 @@ import { Bars, Share } from "./Icons";
 import clsx from "clsx";
 import { isMobile } from "@/utils/client";
 import { shareChatThread } from "@/utils/server";
+import { motion } from "framer-motion";
 
 export default function Header() {
 	const { activeThread, sideBarOpen } = useChat();
@@ -27,9 +28,17 @@ export default function Header() {
 	};
 
 	return (
-		<div className="grid w-full grid-cols-12 px-2 py-2 border-b shadow border-neutral-300 dark:border-neutral-500">
+		<div
+			className={clsx(
+				"grid w-full grid-cols-12 px-2 py-2 border-b",
+				activeThread.messages.length > 1
+					? "border-neutral-300 shadow dark:border-neutral-500"
+					: "border-transparent bg-transparent"
+			)}
+		>
 			<div className="flex items-center justify-start col-span-1">
-				<button
+				<motion.button
+					layoutId="sidebar-toggle"
 					className={clsx(
 						"text-neutral-400 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50 cursor-pointer px-1",
 						sideBarOpen && isMobile() && "hidden sm:flex"
@@ -37,7 +46,7 @@ export default function Header() {
 					onClick={handleSidebarToggle}
 				>
 					<Bars />
-				</button>
+				</motion.button>
 			</div>
 			<div
 				className={clsx(
@@ -45,17 +54,15 @@ export default function Header() {
 					sideBarOpen && isMobile() && "col-start-2 sm:col-start-1"
 				)}
 			>
-				<p className="font-semibold">{activeThread.title}</p>
-				<p className="text-sm font-light text-neutral-500">
-					{activeThread.messages.length > 1 ? (
-						<>
+				{activeThread.messages.length > 1 && (
+					<>
+						<p className="font-semibold">{activeThread.title}</p>
+						<p className="text-sm font-light text-neutral-500">
 							{activeThread.agentConfig.model} |{" "}
 							{activeThread.messages.length} messages
-						</>
-					) : (
-						<>Start a chat</>
-					)}
-				</p>
+						</p>
+					</>
+				)}
 			</div>
 			{activeThread.messages.length > 1 && (
 				<div className="flex items-center justify-end col-span-1">

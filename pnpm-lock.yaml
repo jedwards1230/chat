@@ -54,8 +54,8 @@ dependencies:
     specifier: ^0.2.1
     version: 0.2.1(next@13.4.9)(react-dom@18.2.0)(react@18.2.0)
   openai-edge:
-    specifier: ^1.1.1
-    version: 1.1.1
+    specifier: ^1.2.0
+    version: 1.2.0
   react:
     specifier: ^18.2.0
     version: 18.2.0
@@ -5160,8 +5160,8 @@ packages:
       is-wsl: 2.2.0
     dev: false
 
-  /openai-edge@1.1.1:
-    resolution: {integrity: sha512-dVbGYFU4kzHeqzUYlJQuLgahB5BvGCjuyVQMiet3WLTq5AIueyS572wLLSn764wKdjWbl8xurFL9cjmwlpAO5w==}
+  /openai-edge@1.2.0:
+    resolution: {integrity: sha512-eaQs+O/1k6OZMUibNlBzWPXdHFxpUNLMy4BwhtXCFDub5iz7ve/PxOJTL8GBG3/1S1j6LIL93xjdlzCPQpbdgQ==}
     engines: {node: '>=18'}
     dev: false
 

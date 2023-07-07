@@ -10,7 +10,7 @@ import ChatThread from "./ChatThread";
 import Header from "./Header";
 
 export default function Chat() {
-	const { sideBarOpen } = useChat();
+	const { sideBarOpen, activeThread } = useChat();
 	const dispatch = useChatDispatch();
 	const handlers = useSwipeable({
 		onSwipedLeft: () => {
@@ -33,7 +33,7 @@ export default function Chat() {
 					sideBarOpen ? "sm:pl-72" : "lg:pl-0"
 				)}
 			>
-				<Header />
+				{activeThread.messages.length > 1 && <Header />}
 				<ChatThread />
 				<ChatInput />
 			</div>

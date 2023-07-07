@@ -12,46 +12,38 @@ export function ChatBubbleFunctionList({ message }: { message: Message }) {
 
 	return (
 		<div className="absolute bottom-0 hidden gap-2 group-hover:flex right-2">
-			{isUser && (
+			{isUser && !isSystem && (
 				<ChatBubbleFunction
 					icon={<Reset />}
 					color="green"
 					title={"Regenerate Message"}
-					onClick={() => {
-						isSystem
-							? dispatch({
-									type: "SET_AGENT_EDITOR_OPEN",
-									payload: true,
-							  })
-							: dispatch({
-									type: "EDIT_MESSAGE",
-									payload: {
-										threadId: activeThread.id,
-										messageId: message.id,
-									},
-							  });
-					}}
+					onClick={() =>
+						dispatch({
+							type: "EDIT_MESSAGE",
+							payload: {
+								threadId: activeThread.id,
+								messageId: message.id,
+							},
+						})
+					}
 				/>
 			)}
-			<ChatBubbleFunction
-				icon={<Edit />}
-				color="blue"
-				title={"Edit Message"}
-				onClick={() => {
-					isSystem
-						? dispatch({
-								type: "SET_AGENT_EDITOR_OPEN",
-								payload: true,
-						  })
-						: dispatch({
-								type: "EDIT_MESSAGE",
-								payload: {
-									threadId: activeThread.id,
-									messageId: message.id,
-								},
-						  });
-				}}
-			/>
+			{!isSystem && (
+				<ChatBubbleFunction
+					icon={<Edit />}
+					color="blue"
+					title={"Edit Message"}
+					onClick={() =>
+						dispatch({
+							type: "EDIT_MESSAGE",
+							payload: {
+								threadId: activeThread.id,
+								messageId: message.id,
+							},
+						})
+					}
+				/>
+			)}
 			{!isSystem && (
 				<ChatBubbleFunction
 					icon={<Trash />}

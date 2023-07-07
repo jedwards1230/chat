@@ -4,9 +4,7 @@ interface ChatState {
 	threadList: ChatThread[];
 	editId: string | null;
 	sideBarOpen: boolean;
-	agentEditorOpen: boolean;
 	configEditorOpen: boolean;
-	pluginsEditorOpen: boolean;
 	shareModalOpen: boolean;
 	pluginsEnabled: boolean;
 	config: Config;
@@ -77,9 +75,7 @@ type ChatAction =
 			};
 	  }
 	/* Views */
-	| { type: "SET_PLUGINS_EDITOR_OPEN"; payload?: boolean }
 	| { type: "SET_CONFIG_EDITOR_OPEN"; payload?: boolean }
-	| { type: "SET_AGENT_EDITOR_OPEN"; payload?: boolean }
 	| { type: "SET_SIDEBAR_OPEN"; payload?: boolean }
 	| { type: "SET_SHARE_MODAL_OPEN"; payload?: boolean }
 	/* Config */

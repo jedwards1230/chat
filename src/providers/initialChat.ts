@@ -58,9 +58,7 @@ const initialState: ChatState = {
 	},
 	pluginsEnabled: true,
 	sideBarOpen: true,
-	agentEditorOpen: false,
 	configEditorOpen: false,
-	pluginsEditorOpen: false,
 	shareModalOpen: false,
 };
 

@@ -10,20 +10,10 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 				...state,
 				sideBarOpen: action.payload ?? !state.sideBarOpen,
 			};
-		case "SET_AGENT_EDITOR_OPEN":
-			return {
-				...state,
-				agentEditorOpen: action.payload ?? !state.agentEditorOpen,
-			};
 		case "SET_CONFIG_EDITOR_OPEN":
 			return {
 				...state,
 				configEditorOpen: action.payload ?? !state.configEditorOpen,
-			};
-		case "SET_PLUGINS_EDITOR_OPEN":
-			return {
-				...state,
-				pluginsEditorOpen: action.payload ?? !state.pluginsEditorOpen,
 			};
 		case "SET_SHARE_MODAL_OPEN":
 			return {
