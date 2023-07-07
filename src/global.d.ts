@@ -31,6 +31,14 @@ interface AgentConfig {
 	model: Model;
 	temperature: number;
 	systemMessage: string;
+	topP: number;
+	n: number;
+	maxTokens: number;
+	frequencyPenalty: number;
+	presencePenalty: number;
+	stop: string[];
+	logitBias: { [key: string]: number };
+	user: string;
 	tools: Tool[];
 }
 

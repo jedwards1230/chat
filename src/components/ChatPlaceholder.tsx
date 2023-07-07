@@ -97,11 +97,49 @@ export function Config() {
 	const dispatch = useChatDispatch();
 	const availableTools: Tool[] = ["calculator", "search"];
 
+	const modelInfo = [
+		{
+			label: "Temperature",
+			value: activeThread.agentConfig.temperature,
+		},
+		{
+			label: "Top P",
+			value: activeThread.agentConfig.topP,
+		},
+		{
+			label: "N",
+			value: activeThread.agentConfig.n,
+		},
+		{
+			label: "Max Tokens",
+			value: activeThread.agentConfig.maxTokens,
+		},
+		{
+			label: "Frequency Penalty",
+			value: activeThread.agentConfig.frequencyPenalty,
+		},
+		{
+			label: "Presence Penalty",
+			value: activeThread.agentConfig.presencePenalty,
+		},
+		{
+			label: "Stop Sequences",
+			value: activeThread.agentConfig.stop.join(", "),
+		},
+	];
+
 	return (
 		<>
-			<div className="flex flex-col justify-center w-full max-w-lg gap-4 p-3 border rounded-lg bg-neutral-200 dark:bg-neutral-800 border-neutral-600">
-				<div className="text-sm text-neutral-600 dark:text-neutral-400">
-					Temperature: {activeThread.agentConfig.temperature}
+			<div className="z-10 flex flex-col justify-center w-full max-w-lg gap-4 p-3 border rounded-lg bg-neutral-200 dark:bg-neutral-800 border-neutral-600">
+				<div>
+					{modelInfo.map((info) => (
+						<div
+							key={info.label}
+							className="text-sm text-neutral-600 dark:text-neutral-400"
+						>
+							{info.label}: {info.value}
+						</div>
+					))}
 				</div>
 				<label className="flex flex-col justify-between w-full gap-2 py-2 text-sm">
 					<span>System Message</span>
