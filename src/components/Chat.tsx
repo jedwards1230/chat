@@ -8,9 +8,13 @@ import clsx from "clsx";
 import ChatInput from "./ChatInput";
 import ChatThread from "./ChatThread";
 import Header from "./Header";
+import { useEffect, useState } from "react";
 
 export default function Chat() {
 	const { sideBarOpen, activeThread } = useChat();
+	const [showHeader, setShowHeader] = useState(
+		activeThread.messages.length > 1
+	);
 	const dispatch = useChatDispatch();
 	const handlers = useSwipeable({
 		onSwipedLeft: () => {
@@ -24,6 +28,12 @@ export default function Chat() {
 		},
 	});
 
+	useEffect(() => {
+		if (activeThread.messages.length > 1) {
+			setShowHeader(true);
+		}
+	}, [activeThread.messages.length]);
+
 	return (
 		<div className="flex w-full h-full" {...handlers}>
 			<ChatHistory />
@@ -33,7 +43,7 @@ export default function Chat() {
 					sideBarOpen ? "sm:pl-72" : "lg:pl-0"
 				)}
 			>
-				{activeThread.messages.length > 1 && <Header />}
+				{showHeader && <Header />}
 				<ChatThread />
 				<ChatInput />
 			</div>

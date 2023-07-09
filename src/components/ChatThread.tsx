@@ -79,7 +79,11 @@ export default function ChatThread() {
 			<div className="flex flex-col w-full h-full gap-2 p-2 mx-auto lg:max-w-4xl">
 				{hasMultipleMessages ? (
 					activeThread.messages.map((m) => (
-						<ChatBubble key={m.id} message={m} />
+						<ChatBubble
+							key={m.id}
+							message={m}
+							config={activeThread.agentConfig}
+						/>
 					))
 				) : (
 					<ChatPlaceholder open={isConfigOpen} />

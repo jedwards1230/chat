@@ -11,24 +11,22 @@ import { useTheme } from "next-themes";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import clsx from "clsx";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 
-import { useChat } from "@/providers/ChatProvider";
-
-export default function TextBubble({ message }: { message: Message }) {
+export default function TextContent({
+	message,
+	config,
+}: {
+	message: Message;
+	config: AgentConfig;
+}) {
 	const { resolvedTheme } = useTheme();
-	const { activeThread } = useChat();
-	const [open, setOpen] = useState(false);
-	const content = useMemo(
-		() =>
-			message.name && message.role !== "function"
-				? `${
-						message.name[0].toUpperCase() +
-						message.name.substring(1)
-				  }: ${message.content}`
-				: message.content,
-		[message]
-	);
+	const content =
+		message.name && message.role !== "function"
+			? `${message.name[0].toUpperCase() + message.name.substring(1)}: ${
+					message.content
+			  }`
+			: message.content;
 
 	const components = useMemo<
 		Partial<
@@ -64,16 +62,25 @@ export default function TextBubble({ message }: { message: Message }) {
 			br: ({ node, ...props }) => <br {...props} className="my-1" />,
 			pre: ({ node, ...props }) => <pre {...props} className="" />,
 			code({ node, inline, className, children, ...props }) {
+				const language = className?.replace("language-", "");
 				const match = /language-(\w+)/.exec(className || "");
 				return !inline && match ? (
 					<div className="flex flex-col gap-1">
-						<SyntaxHighlighter
-							{...props}
-							style={resolvedTheme !== "dark" ? vs : vscDarkPlus}
-							language={match[1]}
-						>
-							{String(children).replace(/\n$/, "")}
-						</SyntaxHighlighter>
+						<div className="border rounded-t-lg bg-neutral-200">
+							<div className="px-2 pt-1 text-sm">
+								{language ? language : "code"}
+							</div>
+							<SyntaxHighlighter
+								{...props}
+								style={
+									resolvedTheme !== "dark" ? vs : vscDarkPlus
+								}
+								className="!mb-0"
+								language={match[1]}
+							>
+								{String(children).replace(/\n$/, "")}
+							</SyntaxHighlighter>
+						</div>
 						<div className="items-center justify-center hidden sm:flex">
 							<button
 								className="w-auto px-2 py-1 text-sm font-medium tracking-tight border rounded-full dark:bg-neutral-300 dark:text-neutral-900 active:bg-neutral-300 hover:bg-neutral-200 bg-neutral-50 border-neutral-500"
@@ -92,7 +99,7 @@ export default function TextBubble({ message }: { message: Message }) {
 						{...props}
 						className={clsx(
 							className,
-							"!w-full !overflow-x-scroll py-0.5 px-1 border border-neutral-500 rounded bg-neutral-100 tracking-wide transition-colors dark:bg-neutral-600"
+							"!w-full !overflow-x-scroll py-0.5 px-1 border border-neutral-500 rounded bg-neutral-100 tracking-wide transition-colors dark:bg-neutral-500"
 						)}
 					>
 						{children}
@@ -155,11 +162,7 @@ export default function TextBubble({ message }: { message: Message }) {
 	);
 
 	const FunctionContent = () => (
-		<details
-			open={open}
-			onClick={() => setOpen(!open)}
-			className={"flex flex-col gap-2 items-start w-full rounded"}
-		>
+		<details className={"flex flex-col gap-2 items-start w-full rounded"}>
 			<summary className="capitalize cursor-pointer">
 				{message.name} Result
 			</summary>
@@ -177,11 +180,11 @@ export default function TextBubble({ message }: { message: Message }) {
 
 	const SystemContent = () => (
 		<div className="flex flex-col justify-start w-full text-xs rounded text-neutral-400 dark:text-neutral-500">
-			<div>Model: {activeThread.agentConfig.model}</div>
+			<div>Model: {config.model}</div>
 			<div>System Message: {message.content}</div>
-			{activeThread.agentConfig.tools.length > 0 && (
+			{config.tools.length > 0 && (
 				<div className="capitalize">
-					Plugins: {activeThread.agentConfig.tools.join(" | ")}
+					Plugins: {config.tools.join(" | ")}
 				</div>
 			)}
 		</div>

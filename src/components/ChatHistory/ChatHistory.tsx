@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 import { useChat, useChatDispatch } from "@/providers/ChatProvider";
 import ChatHistoryEntry from "./ChatHistoryEntry";
@@ -48,8 +48,12 @@ export default function ChatHistory() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
-	const sortedThreadList = threadList.sort(
-		(a, b) => b.lastModified.getTime() - a.lastModified.getTime()
+	const sortedThreadList = useMemo(
+		() =>
+			threadList.sort(
+				(a, b) => b.lastModified.getTime() - a.lastModified.getTime()
+			),
+		[threadList]
 	);
 
 	return (

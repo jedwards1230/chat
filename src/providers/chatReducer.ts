@@ -216,17 +216,22 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 			};
 		case "EDIT_MESSAGE":
 			if (DEBUG) console.log("EDIT_MESSAGE");
-			const messageToEdit = state.activeThread.messages.find(
-				(message) => message.id === action.payload.messageId
-			);
+			try {
+				const messageToEdit = state.activeThread.messages.find(
+					(message) => message.id === action.payload.messageId
+				);
 
-			if (!messageToEdit) throw new Error("No message to edit");
+				if (!messageToEdit) throw new Error("No message to edit");
 
-			return {
-				...state,
-				editId: action.payload.messageId,
-				input: messageToEdit.content,
-			};
+				return {
+					...state,
+					editId: action.payload.messageId,
+					input: messageToEdit.content,
+				};
+			} catch (e) {
+				console.error(e);
+				return state;
+			}
 		case "UPSERT_TITLE":
 			if (DEBUG) console.log("UPSERT_TITLE");
 			document.title = "Chat | " + action.payload.title;
@@ -281,18 +286,24 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 			};
 		case "SET_ACTIVE_THREAD":
 			if (DEBUG) console.log("SET_ACTIVE_THREAD");
-			const activeThread = state.threadList.find(
-				(thread) => thread.id === action.payload.id
-			);
-			if (!activeThread) throw new Error("No active thread");
-			if (state.abortController) state.abortController.abort();
-			document.title = "Chat | " + activeThread.title;
+			try {
+				const activeThread = state.threadList.find(
+					(thread) => thread.id === action.payload.id
+				);
+				if (!activeThread) throw new Error("No active thread");
+				if (state.abortController) state.abortController.abort();
+				document.title = "Chat | " + activeThread.title;
 
-			return {
-				...state,
-				input: "",
-				activeThread,
-			};
+				return {
+					...state,
+					input: "",
+					activeThread,
+				};
+			} catch (error) {
+				console.error(error);
+				return state;
+			}
+
 		default:
 			return state;
 	}

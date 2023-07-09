@@ -60,7 +60,7 @@ export function ChatPlaceholder({ open }: { open: boolean }) {
 							<motion.div
 								layoutId="config-tab"
 								className={clsx(
-									"absolute top-0 w-32 group-hover:dark:bg-neutral-600 bg-neutral-100 dark:bg-neutral-600/40 h-full rounded-lg",
+									"absolute top-0 w-32 sm:group-hover:dark:bg-neutral-600 bg-neutral-100 dark:bg-neutral-600/40 h-full rounded-lg",
 									activeModel === "gpt-3.5-turbo-16k" ||
 										activeModel === "gpt-3.5-turbo"
 										? "left-0"
