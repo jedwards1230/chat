@@ -66,10 +66,10 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 
 			return {
 				...state,
+				abortController: undefined,
 				activeThread: getDefaultThread(state.config),
 				input: "",
 			};
-
 		case "REMOVE_THREAD":
 			if (DEBUG) console.log("REMOVE_THREAD");
 			if (state.activeThread.id === action.payload) {
@@ -85,7 +85,6 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 						? getDefaultThread(state.config)
 						: state.activeThread,
 			};
-
 		case "CANCEL_EDIT":
 			if (DEBUG) console.log("CANCEL_EDIT");
 			return {
@@ -93,7 +92,6 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 				editId: null,
 				input: "",
 			};
-
 		case "CHANGE_TEMPERATURE":
 			if (DEBUG) console.log("CHANGE_TEMPERATURE");
 			const newTemperature = {
@@ -113,7 +111,6 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 						: thread
 				),
 			};
-
 		case "SET_SYSTEM_MESSAGE":
 			if (DEBUG) console.log("SET_SYSTEM_MESSAGE");
 			const newSystemMessage = {
@@ -140,14 +137,12 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 						: thread
 				),
 			};
-
 		case "UPDATE_CONFIG":
 			if (DEBUG) console.log("UPDATE_CONFIG");
 			return {
 				...state,
 				config: action.payload,
 			};
-
 		case "REMOVE_MESSAGE":
 			if (DEBUG) console.log("REMOVE_MESSAGE");
 			return {
@@ -164,8 +159,14 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 						  }
 						: thread
 				),
+				activeThread: {
+					...state.activeThread,
+					lastModified: new Date(),
+					messages: state.activeThread.messages.filter(
+						(message) => message.id !== action.payload.messageId
+					),
+				},
 			};
-
 		case "UPSERT_MESSAGE":
 			if (DEBUG) console.log("UPSERT_MESSAGE");
 
@@ -213,7 +214,6 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 				threadList: threadList,
 				activeThread: newActiveThread,
 			};
-
 		case "EDIT_MESSAGE":
 			if (DEBUG) console.log("EDIT_MESSAGE");
 			const messageToEdit = state.activeThread.messages.find(
@@ -227,7 +227,6 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 				editId: action.payload.messageId,
 				input: messageToEdit.content,
 			};
-
 		case "UPSERT_TITLE":
 			if (DEBUG) console.log("UPSERT_TITLE");
 			document.title = "Chat | " + action.payload.title;
@@ -243,7 +242,6 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 						: thread
 				),
 			};
-
 		case "CHANGE_MODEL":
 			if (DEBUG) console.log("CHANGE_MODEL");
 			return {
@@ -269,21 +267,18 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 					},
 				},
 			};
-
 		case "CLEAR_HISTORY":
 			if (DEBUG) console.log("CLEAR_HISTORY");
 			return {
 				...state,
 				threadList: [],
 			};
-
 		case "CHANGE_INPUT":
 			if (DEBUG) console.log("CHANGE_INPUT");
 			return {
 				...state,
 				input: action.payload,
 			};
-
 		case "SET_ACTIVE_THREAD":
 			if (DEBUG) console.log("SET_ACTIVE_THREAD");
 			const activeThread = state.threadList.find(
@@ -298,7 +293,6 @@ export function chatReducer(state: ChatState, action: ChatAction) {
 				input: "",
 				activeThread,
 			};
-
 		default:
 			return state;
 	}

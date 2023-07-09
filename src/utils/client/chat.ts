@@ -245,6 +245,9 @@ export const handleSubmit = (
 	e.preventDefault();
 	if (state.input.length > 0) {
 		const userMsg: Message = createUserMsg(state.input, state.editId);
+		if (state.editId) {
+			dispatch({ type: "CANCEL_EDIT" });
+		}
 		dispatchUserMsg(userMsg, dispatch, state);
 
 		const msgHistory = state.activeThread.messages;

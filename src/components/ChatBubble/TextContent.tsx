@@ -92,7 +92,7 @@ export default function TextBubble({ message }: { message: Message }) {
 						{...props}
 						className={clsx(
 							className,
-							"!w-full !overflow-x-scroll py-0.5 px-1 border border-neutral-500 rounded bg-neutral-100 tracking-wide transition-colors dark:bg-neutral-500"
+							"!w-full !overflow-x-scroll py-0.5 px-1 border border-neutral-500 rounded bg-neutral-100 tracking-wide transition-colors dark:bg-neutral-600"
 						)}
 					>
 						{children}
