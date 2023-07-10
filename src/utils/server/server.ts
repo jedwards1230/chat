@@ -47,16 +47,15 @@ export async function shareChatThread(thread: ChatThread) {
 	}
 }
 
-export async function saveCloudHistory(saveData: string) {
+export async function saveCloudHistory(saveData: SaveData) {
+	if (saveData.chatHistory.length === 0) return;
+
 	const { userId } = auth();
 	if (!userId) {
 		throw new Error("No user id");
 	}
 
-	const data: SaveData = await JSON.parse(saveData);
-	if (data.chatHistory.length === 0) return;
-
-	const success = await redis.set(userId, saveData);
+	const success = await redis.set(userId, serializeSaveData(saveData));
 	if (!success) {
 		throw new Error("Error saving chat history");
 	}

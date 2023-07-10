@@ -13,6 +13,7 @@ export default function ChatThread() {
 	const { activeThread, sideBarOpen } = useChat();
 	const dispatch = useChatDispatch();
 	const [isConfigOpen, setIsConfigOpen] = useState(false);
+	const [messages, setMessages] = useState(activeThread.messages);
 
 	const threadRef = useRef<HTMLDivElement>(null);
 	let prevScrollHeight = useRef<number>(0);
@@ -22,6 +23,8 @@ export default function ChatThread() {
 	};
 
 	useEffect(() => {
+		setMessages(activeThread.messages);
+
 		const threadEl = threadRef.current;
 		if (!threadEl) return;
 
@@ -78,7 +81,7 @@ export default function ChatThread() {
 
 			<div className="flex flex-col w-full h-full gap-2 p-2 mx-auto lg:max-w-4xl">
 				{hasMultipleMessages ? (
-					activeThread.messages.map((m) => (
+					messages.map((m) => (
 						<ChatBubble
 							key={m.id}
 							message={m}

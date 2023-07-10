@@ -33,23 +33,28 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 	useEffect(() => {
 		if (typeof window === "undefined") return;
 
+		// initialize with cloud data
 		getCloudHistory().then((history) => {
 			if (history) {
 				dispatch({
 					type: "INITIALIZE",
 					payload: history,
 				});
-			} else if (typeof window !== "undefined") {
+			} else {
 				const storedThreads = localStorage.getItem("chatHistory");
 				if (storedThreads) {
 					const saveData: SaveData = JSON.parse(storedThreads);
-					return saveData;
+					dispatch({
+						type: "INITIALIZE",
+						payload: saveData,
+					});
 				}
 			}
 
 			setCheckedLocal(true);
 		});
 
+		// responsive sidebar
 		const handleResize = () => {
 			if (isMobile && !iM()) {
 				dispatch({
@@ -75,15 +80,16 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
 		return () => {
 			window.removeEventListener("resize", handleResize);
+			// ensure that any pending requests are cancelled
 			state.abortController?.abort();
 		};
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
-	const saveHistory = async (saveData: string) => {
+	const saveHistory = async (saveData: SaveData) => {
 		try {
-			localStorage.setItem("chatHistory", saveData);
+			localStorage.setItem("chatHistory", serializeSaveData(saveData));
 			await saveCloudHistory(saveData);
 		} catch (error) {
 			console.error(error);
@@ -93,12 +99,10 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 	// Effect to sync local storage with the chat thread list
 	useEffect(() => {
 		if (typeof window !== "undefined" && checkedLocal && !state.botTyping) {
-			const saveData = serializeSaveData({
+			saveHistory({
 				config: state.config,
 				chatHistory: state.threadList,
 			});
-
-			saveHistory(saveData);
 		}
 	}, [checkedLocal, state.botTyping, state.config, state.threadList]);
 
