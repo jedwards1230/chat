@@ -31,6 +31,8 @@ export default function Chat() {
 	useEffect(() => {
 		if (activeThread.messages.length > 1) {
 			setShowHeader(true);
+		} else {
+			setShowHeader(false);
 		}
 	}, [activeThread.messages.length]);
 

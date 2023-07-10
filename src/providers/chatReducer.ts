@@ -3,7 +3,7 @@ import { upsertMessage } from "@/utils/client";
 
 const DEBUG = false;
 
-export function chatReducer(state: ChatState, action: ChatAction) {
+export function chatReducer(state: ChatState, action: ChatAction): ChatState {
 	switch (action.type) {
 		case "SET_SIDEBAR_OPEN":
 			return {

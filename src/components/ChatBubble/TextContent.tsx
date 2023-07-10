@@ -66,7 +66,7 @@ export default function TextContent({
 				const match = /language-(\w+)/.exec(className || "");
 				return !inline && match ? (
 					<div className="flex flex-col gap-1">
-						<div className="border rounded-t-lg bg-neutral-200">
+						<div className="border rounded-t-lg bg-neutral-200 dark:bg-neutral-700">
 							<div className="px-2 pt-1 text-sm">
 								{language ? language : "code"}
 							</div>
