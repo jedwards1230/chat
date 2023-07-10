@@ -6,14 +6,12 @@ type Message = {
 	id: string;
 	content: string;
 	role: Role;
-	createdAt?: Date | undefined;
-	name?: string | undefined;
-	function_call?:
-		| {
-				name?: string;
-				arguments?: string;
-		  }
-		| undefined;
+	createdAt?: Date;
+	name?: string;
+	function_call?: {
+		name?: string;
+		arguments?: string;
+	};
 };
 
 interface SaveData {

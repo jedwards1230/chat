@@ -4,12 +4,15 @@ import ProfilePicture from "./ProfilePicture";
 import { ChatBubbleFunctionList } from "./ChatBubbleFunctionList";
 import { useEffect, useState } from "react";
 import TextContent from "./TextContent";
+import clsx from "clsx";
 
 export default function ChatBubble({
 	message,
+	input,
 	config,
 }: {
 	message: Message;
+	input?: string;
 	config: AgentConfig;
 }) {
 	const [messageInfo, setMessage] = useState<Message>(message);
@@ -19,9 +22,16 @@ export default function ChatBubble({
 	}, [message]);
 
 	return (
-		<div className="relative flex gap-4 px-1 pt-2 pb-4 transition-colors border border-transparent rounded sm:px-2 group dark:hover:border-neutral-700 hover:border-neutral-400/70">
+		<div
+			className={clsx(
+				"relative flex gap-4 w-full justify-center px-1 pt-4 pb-6 transition-colors rounded sm:px-2 group",
+				message.role !== "user"
+					? "bg-neutral-200 dark:bg-neutral-800/70"
+					: "border-y dark:border-neutral-700"
+			)}
+		>
 			<ProfilePicture message={messageInfo} />
-			<TextContent message={messageInfo} config={config} />
+			<TextContent message={messageInfo} input={input} config={config} />
 			<ChatBubbleFunctionList message={messageInfo} />
 		</div>
 	);

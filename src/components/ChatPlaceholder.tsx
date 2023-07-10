@@ -12,7 +12,7 @@ export function ChatPlaceholder({ open }: { open: boolean }) {
 	const activeModel = activeThread.agentConfig.model;
 
 	return (
-		<div className="relative flex flex-col items-center justify-start w-full h-full gap-8 select-none">
+		<div className="relative flex flex-col items-center justify-start w-full h-full gap-8 py-2 select-none">
 			<div className="flex flex-col items-center w-full gap-4">
 				<div className="flex flex-col items-center justify-center gap-4">
 					<div className="flex p-1 rounded-lg bg-neutral-200 dark:bg-neutral-900">
@@ -130,7 +130,7 @@ export function Config() {
 
 	return (
 		<>
-			<div className="z-10 flex flex-col justify-center w-full max-w-lg gap-4 p-3 border rounded-lg bg-neutral-200 dark:bg-neutral-800 border-neutral-600">
+			<div className="z-10 flex flex-col justify-center w-full max-w-lg gap-4 p-3 border bg-neutral-200 dark:bg-neutral-800 border-neutral-600">
 				<div>
 					{modelInfo.map((info) => (
 						<div

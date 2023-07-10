@@ -79,15 +79,35 @@ export default function ChatThread() {
 				</>
 			)}
 
-			<div className="flex flex-col w-full h-full gap-2 p-2 mx-auto lg:max-w-4xl">
+			<div className="flex flex-col w-full h-full">
 				{hasMultipleMessages ? (
-					messages.map((m) => (
-						<ChatBubble
-							key={m.id}
-							message={m}
-							config={activeThread.agentConfig}
-						/>
-					))
+					messages.map((m, i) => {
+						if (m.role === "assistant" && m.function_call) {
+							return null;
+						}
+						const lastMessage = messages[i - 1];
+						if (
+							m.role === "function" &&
+							lastMessage.function_call &&
+							lastMessage.function_call.arguments
+						) {
+							return (
+								<ChatBubble
+									key={m.id}
+									message={m}
+									input={lastMessage.function_call?.arguments}
+									config={activeThread.agentConfig}
+								/>
+							);
+						}
+						return (
+							<ChatBubble
+								key={m.id}
+								message={m}
+								config={activeThread.agentConfig}
+							/>
+						);
+					})
 				) : (
 					<ChatPlaceholder open={isConfigOpen} />
 				)}

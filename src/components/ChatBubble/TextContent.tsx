@@ -15,9 +15,11 @@ import { useMemo } from "react";
 
 export default function TextContent({
 	message,
+	input,
 	config,
 }: {
 	message: Message;
+	input?: string;
 	config: AgentConfig;
 }) {
 	const { resolvedTheme } = useTheme();
@@ -164,7 +166,7 @@ export default function TextContent({
 	const FunctionContent = () => (
 		<details className={"flex flex-col gap-2 items-start w-full rounded"}>
 			<summary className="capitalize cursor-pointer">
-				{message.name} Result
+				{message.name}: {input}
 			</summary>
 			<div>
 				<ReactMarkdown
@@ -201,12 +203,7 @@ export default function TextContent({
 	);
 
 	return (
-		<div
-			className={clsx(
-				"flex flex-col transition-colors justify-center py-2 px-2 overflow-x-scroll rounded",
-				message.role === "user" ? "bg-blue-200 dark:bg-blue-600/70" : ""
-			)}
-		>
+		<div className="flex flex-col justify-center w-full px-2 py-2 overflow-x-scroll transition-colors rounded lg:max-w-4xl">
 			{message.role === "function" ? (
 				<FunctionContent />
 			) : message.role === "system" ? (
