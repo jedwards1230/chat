@@ -127,13 +127,13 @@ export const getChat = async (
 		let tool: Tool | null = null;
 		let toolInput: string = "";
 		let accumulatedResponse = "";
-		let finishReason: string | null = null;
+		//let finishReason: string | null = null;
 
 		const reduceStreamData = (acc: string, curr: StreamData) => {
 			if (!curr) return acc;
 			const res = curr.choices[0];
 			if (res.finish_reason) {
-				finishReason = res.finish_reason;
+				//finishReason = res.finish_reason;
 				return acc;
 			}
 			if (res.delta.function_call) {

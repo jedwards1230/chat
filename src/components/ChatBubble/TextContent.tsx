@@ -97,15 +97,15 @@ export default function TextContent({
 						</div>
 					</div>
 				) : (
-					<code
+					<div
 						{...props}
 						className={clsx(
 							className,
-							"!w-full !overflow-x-scroll py-0.5 px-1 border border-neutral-500 rounded bg-neutral-100 tracking-wide transition-colors dark:bg-neutral-500"
+							"py-0.5 overflow-x-scroll px-1 border border-neutral-500 rounded bg-neutral-100 tracking-wide transition-colors dark:bg-neutral-500"
 						)}
 					>
-						{children}
-					</code>
+						<code>{children}</code>
+					</div>
 				);
 			},
 			em: ({ node, ...props }) => <em {...props} className="italic" />,

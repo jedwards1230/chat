@@ -6,11 +6,11 @@ settings:
 
 dependencies:
   '@clerk/nextjs':
-    specifier: ^4.21.14
-    version: 4.21.14(next@13.4.9)(react-dom@18.2.0)(react@18.2.0)
+    specifier: ^4.21.15
+    version: 4.21.15(next@13.4.9)(react-dom@18.2.0)(react@18.2.0)
   '@ducanh2912/next-pwa':
-    specifier: ^9.1.4
-    version: 9.1.4(next@13.4.9)(webpack@5.88.1)
+    specifier: ^9.2.0
+    version: 9.2.0(next@13.4.9)(webpack@5.88.1)
   '@opentelemetry/api':
     specifier: ^1.4.1
     version: 1.4.1
@@ -45,8 +45,8 @@ dependencies:
     specifier: ^10.12.18
     version: 10.12.18(react-dom@18.2.0)(react@18.2.0)
   langchain:
-    specifier: ^0.0.105
-    version: 0.0.105(@upstash/redis@1.22.0)
+    specifier: ^0.0.106
+    version: 0.0.106(@upstash/redis@1.22.0)
   next:
     specifier: 13.4.9
     version: 13.4.9(@babel/core@7.22.5)(@opentelemetry/api@1.4.1)(react-dom@18.2.0)(react@18.2.0)
@@ -1386,8 +1386,8 @@ packages:
       tslib: 2.4.1
     dev: false
 
-  /@clerk/nextjs@4.21.14(next@13.4.9)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-r+s9EKG0CPPj31p6UZmxPQ2A3+JVE70PmBYiC/pRrF3Oo57pYJGVmBB+eUWVYaYJNcJxhYoYb/QLsL8Xl0dUVQ==}
+  /@clerk/nextjs@4.21.15(next@13.4.9)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-paFf+kgXEb5Chea4Gpjy65xYRpEm88yezu1riQWQRPFOJCcEbYrhzWe6xRtErioyjZM0QxDFYaIP4FQeVmNf4g==}
     engines: {node: '>=14'}
     peerDependencies:
       next: '>=10'
@@ -1423,18 +1423,16 @@ packages:
       csstype: 3.1.1
     dev: false
 
-  /@ducanh2912/next-pwa@9.1.4(next@13.4.9)(webpack@5.88.1):
-    resolution: {integrity: sha512-SXrgLAhcHLmInuwv+xzBYo1KutlCws/8SDwNn2QsKwoLQAgvFIpeRNP/k86u7wLNZ2BJLUmG2uU5YvnWdWNnCA==}
+  /@ducanh2912/next-pwa@9.2.0(next@13.4.9)(webpack@5.88.1):
+    resolution: {integrity: sha512-59j04ZKMzevuoRVxTpyQ0UH7u2ayEsiHmw4EDvBJ4LDUo9qOE6Qqbn4ItuIC6QWRNm+6BJmPY55489esSCtPYA==}
     peerDependencies:
       next: '>=11.0.0'
-      webpack: '>=5.9.0'
     dependencies:
       clean-webpack-plugin: 4.0.0(webpack@5.88.1)
       fast-glob: 3.2.12
       next: 13.4.9(@babel/core@7.22.5)(@opentelemetry/api@1.4.1)(react-dom@18.2.0)(react@18.2.0)
       semver: 7.5.3
       terser-webpack-plugin: 5.3.9(webpack@5.88.1)
-      webpack: 5.88.1
       workbox-build: 7.0.0
       workbox-core: 7.0.0
       workbox-webpack-plugin: 7.0.0(webpack@5.88.1)
@@ -1445,6 +1443,7 @@ packages:
       - esbuild
       - supports-color
       - uglify-js
+      - webpack
     dev: false
 
   /@emotion/is-prop-valid@0.8.8:
@@ -1540,6 +1539,7 @@ packages:
 
   /@jridgewell/source-map@0.3.4:
     resolution: {integrity: sha512-KE/SxsDqNs3rrWwFHcRh15ZLVFrI0YoZtgAdIyIq9k5hUNmiWRXXThPomIxHuL20sLdgzbDFyvkUMna14bvtrw==}
+    deprecated: the version has a bug with typescript type resolution
     dev: false
 
   /@jridgewell/sourcemap-codec@1.4.14:
@@ -4148,8 +4148,8 @@ packages:
     engines: {node: '>=6'}
     dev: false
 
-  /langchain@0.0.105(@upstash/redis@1.22.0):
-    resolution: {integrity: sha512-iytaHWDQw6U1KG47MTeZOlzQeWGjadBWXxkf1LkmZSPnbGsgFHea/fufKcaIrhsHJn7whf7UIhuBjqu+6TjDmg==}
+  /langchain@0.0.106(@upstash/redis@1.22.0):
+    resolution: {integrity: sha512-L9S/NuzsJy5GeJj+azCsjfw77QQhfpfYX3cEbVxYIZ7HdDUsrXTVnqMnJnOmDH4KEMcLsCUm2sctRPfwvZX+Iw==}
     engines: {node: '>=18'}
     peerDependencies:
       '@aws-sdk/client-dynamodb': ^3.310.0
