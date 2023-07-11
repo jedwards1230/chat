@@ -4,7 +4,7 @@ import { useChat, useChatDispatch } from "@/providers/ChatProvider";
 import clsx from "clsx";
 import { motion } from "framer-motion";
 import QuickActions from "./QuickActions";
-import { handleSubmit } from "@/utils/client";
+import { handleSubmit, isMobile } from "@/utils/client";
 
 export default function ChatInput() {
 	const state = useChat();
@@ -17,7 +17,7 @@ export default function ChatInput() {
 	};
 
 	const onKeyDownHandler = (e: any) => {
-		if (e.key === "Enter" && !e.shiftKey) {
+		if (e.key === "Enter" && !e.shiftKey && !isMobile()) {
 			e.preventDefault();
 			dispatch({
 				type: "CHANGE_INPUT",
