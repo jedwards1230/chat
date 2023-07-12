@@ -4,8 +4,6 @@ import { notFound } from "next/navigation";
 import { SharedBubble } from "@/components/ChatBubble";
 import { Metadata } from "next";
 
-export const runtime = "edge";
-
 type Props = {
 	params: { slug: string };
 };
