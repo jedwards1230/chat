@@ -7,7 +7,7 @@ type Message = {
 	content: string;
 	role: Role;
 	createdAt?: Date;
-	name?: string;
+	name?: Tool;
 	function_call?: {
 		name?: string;
 		arguments?: string;
