@@ -1,4 +1,4 @@
-type Tool = "calculator" | "search";
+type Tool = "calculator" | "search" | "web-browser";
 
 type CustomTool = {
 	name: string;

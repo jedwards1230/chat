@@ -1,6 +1,10 @@
+import { ChatOpenAI } from "langchain/chat_models/openai";
+import { OpenAIEmbeddings } from "langchain/embeddings/openai";
+import { NextResponse } from "next/server";
+
 import { Calculator } from "@/tools/calculator";
 import { Search } from "@/tools/search";
-import { NextResponse } from "next/server";
+import { WebBrowser } from "@/tools/webBrowser";
 
 export const runtime = "edge";
 
@@ -33,6 +37,14 @@ export async function POST(request: Request) {
 			break;
 		case "search":
 			result = await new Search().call(input);
+			break;
+		case "web-browser":
+			const model = new ChatOpenAI({
+				temperature: 0.3,
+				modelName: "gpt-3.5-turbo-16k",
+			});
+			const embeddings = new OpenAIEmbeddings();
+			result = await new WebBrowser({ model, embeddings }).call(input);
 			break;
 		default:
 			return new Response("Invalid tool", {

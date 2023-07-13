@@ -19,14 +19,23 @@ export default function TextContent({
 	const FunctionContent = () => {
 		const mdContent = `\`\`\`md\n${content}\`\`\``;
 
+		let inputDisplay = input;
+		if (message.name === "web-browser" && input) {
+			// parse this string into two
+			// `https://nextjs.org/docs/pages/building-your-application/upgrading/version-13, ""`
+			// `https://nextjs.org/docs/app/building-your-application/upgrading/version-13, "Node.js"`
+			const [url, text] = input.split(", ");
+			inputDisplay = text && text !== `""` ? `[${text}](${url})` : url;
+		}
+
 		return (
-			<details
-				className={"flex flex-col gap-4 items-start w-full rounded"}
-			>
-				<summary className="capitalize cursor-pointer">
-					{message.name}: {input}
+			<details className="flex flex-col items-start w-full rounded">
+				<summary className="flex gap-2 p-2 capitalize rounded-lg cursor-pointer hover:bg-neutral-300">
+					{message.name}: <Markdown content={inputDisplay} />
 				</summary>
-				<Markdown content={mdContent} />
+				<div className="mt-4">
+					<Markdown content={mdContent} />
+				</div>
 			</details>
 		);
 	};

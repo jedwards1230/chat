@@ -1,7 +1,11 @@
+import { ChatCompletionRequestMessage } from "openai-edge";
+import { ChatOpenAI } from "langchain/chat_models/openai";
+import { OpenAIEmbeddings } from "langchain/embeddings/openai";
+
 import { openai } from "@/lib/openai";
 import { Calculator } from "@/tools/calculator";
 import { Search } from "@/tools/search";
-import { ChatCompletionRequestMessage } from "openai-edge";
+import { WebBrowser } from "@/tools/webBrowser";
 
 export const runtime = "edge";
 
@@ -50,6 +54,13 @@ export async function POST(request: Request) {
 								return new Calculator();
 							case "search":
 								return new Search();
+							case "web-browser":
+								const model = new ChatOpenAI({
+									temperature: 0,
+									modelName: "gpt-3.5-turbo-16k",
+								});
+								const embeddings = new OpenAIEmbeddings();
+								return new WebBrowser({ model, embeddings });
 						}
 					})
 					.map((tool) => ({

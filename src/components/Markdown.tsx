@@ -57,9 +57,9 @@ export default function Markdown({
 				const language = className?.replace("language-", "");
 				const match = /language-(\w+)/.exec(className || "");
 				return !inline && match ? (
-					<div className="flex flex-col gap-1">
-						<div className="border rounded-t-lg bg-neutral-200 dark:bg-neutral-700">
-							<div className="px-2 pt-1 text-sm">
+					<div className="flex flex-col gap-2">
+						<div className="border rounded-t-lg border-neutral-600 bg-neutral-200 dark:bg-neutral-700">
+							<div className="pt-2 pb-1 pl-4 text-sm">
 								{language ? language : "code"}
 							</div>
 							<SyntaxHighlighter
