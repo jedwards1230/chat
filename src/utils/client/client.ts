@@ -43,6 +43,41 @@ export function isMobile(size?: "sm" | "md" | "lg" | "xl") {
 	}
 }
 
+export async function analyzeSingleResult(
+	searchResult: SearchResult,
+	query: string,
+	quickSearch?: boolean
+) {
+	const controller = new AbortController();
+	const timeout = setTimeout(() => {
+		controller.abort();
+		throw new Error("Fetch request timed out");
+	}, 15000); // 15 seconds
+
+	try {
+		const res = await fetch("/api/analyze_result", {
+			method: "POST",
+			body: JSON.stringify({
+				searchResult,
+				query,
+				quickSearch,
+			}),
+			signal: controller.signal,
+		});
+
+		if (!res.ok) {
+			throw new Error("Analyze result failed");
+		}
+
+		const context: string = await res.json();
+		clearTimeout(timeout); // Clear the timeout if the fetch request completes within the timeout period
+		return context;
+	} catch (error) {
+		clearTimeout(timeout); // Clear the timeout if an error occurs
+		throw error;
+	}
+}
+
 export async function callTool(tool: Tool, input: string) {
 	const res = await fetch("/api/use_tool", {
 		method: "POST",
@@ -55,7 +90,22 @@ export async function callTool(tool: Tool, input: string) {
 		);
 	}
 
-	const json = await res.json();
+	const json: string = await res.json();
+
+	if (tool === "search") {
+		const searchResults: SearchResult[] = JSON.parse(json);
+
+		const analyzedResultsPromises = searchResults.map(
+			async (result) => await analyzeSingleResult(result, input, true)
+		);
+		await Promise.allSettled(analyzedResultsPromises);
+
+		const listItems = searchResults.map((result) => {
+			return `Title: ${result.title}\nURL: ${result.url}\nSnippet: ${result.snippet}`;
+		});
+		const markdown = listItems.join("\n\n");
+		return markdown;
+	}
 
 	return json;
 }

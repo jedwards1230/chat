@@ -23,7 +23,7 @@ export const useChatDispatch = () => useContext(ChatDispatchContext);
 
 export function ChatProvider({ children }: { children: React.ReactNode }) {
 	const [checkedLocal, setCheckedLocal] = useState(false);
-	const [isMobile, setIsMobile] = useState(iM() || false);
+	const [isMobile, setIsMobile] = useState(iM("md") || false);
 	const [state, dispatch] = useReducer(chatReducer, {
 		...initialState,
 		sideBarOpen: !isMobile,

@@ -10,7 +10,7 @@ export default function QuickActions() {
 	const btn = "px-3 py-1 rounded-full";
 
 	return (
-		<div className="absolute inset-x-auto flex justify-center w-full -top-12">
+		<div className="absolute inset-x-auto flex justify-center w-full gap-2 -top-12">
 			{botTyping && abortController && (
 				<button
 					onClick={() => abortController.abort()}

@@ -16,16 +16,20 @@ export default function TextContent({
 			  }`
 			: message.content;
 
-	const FunctionContent = () => (
-		<details className={"flex flex-col gap-2 items-start w-full rounded"}>
-			<summary className="capitalize cursor-pointer">
-				{message.name}: {input}
-			</summary>
-			<div>
-				<Markdown content={content} />
-			</div>
-		</details>
-	);
+	const FunctionContent = () => {
+		const mdContent = `\`\`\`md\n${content}\`\`\``;
+
+		return (
+			<details
+				className={"flex flex-col gap-4 items-start w-full rounded"}
+			>
+				<summary className="capitalize cursor-pointer">
+					{message.name}: {input}
+				</summary>
+				<Markdown content={mdContent} />
+			</details>
+		);
+	};
 
 	const SystemContent = () => (
 		<div className="flex flex-col justify-start w-full text-xs rounded text-neutral-400 dark:text-neutral-500">
@@ -40,7 +44,7 @@ export default function TextContent({
 	);
 
 	return (
-		<div className="flex flex-col w-full px-2 py-2 transition-colors rounded lg:max-w-4xl">
+		<div className="flex flex-col w-full px-2 py-2 overflow-x-scroll transition-colors rounded">
 			{message.role === "function" ? (
 				<FunctionContent />
 			) : message.role === "system" ? (

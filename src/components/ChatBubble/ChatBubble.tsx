@@ -24,15 +24,21 @@ export default function ChatBubble({
 	return (
 		<div
 			className={clsx(
-				"relative flex gap-4 w-full px-1 pt-4 pb-6 transition-colors rounded sm:px-2 group",
+				"relative w-full px-1 pt-4 pb-6 transition-colors rounded sm:px-2 group",
 				message.role !== "user"
 					? "bg-neutral-200/60 dark:bg-neutral-800/70"
 					: "border-y dark:border-neutral-700"
 			)}
 		>
-			<ProfilePicture message={messageInfo} />
-			<TextContent message={messageInfo} input={input} config={config} />
-			<ChatBubbleFunctionList message={messageInfo} />
+			<div className="flex w-full max-w-4xl gap-4 mx-auto ">
+				<ProfilePicture message={messageInfo} />
+				<TextContent
+					message={messageInfo}
+					input={input}
+					config={config}
+				/>
+				<ChatBubbleFunctionList message={messageInfo} />
+			</div>
 		</div>
 	);
 }
