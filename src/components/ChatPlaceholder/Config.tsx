@@ -32,24 +32,24 @@ export default function Config() {
 			label: "Presence Penalty",
 			value: activeThread.agentConfig.presencePenalty,
 		},
-		{
-			label: "Stop Sequences",
-			value: activeThread.agentConfig.stop.join(", "),
-		},
 	];
 
 	return (
 		<div className="z-10 flex flex-col justify-center w-full max-w-lg gap-4 p-3 border bg-neutral-200 dark:bg-neutral-800 border-neutral-600">
-			<div>
-				{modelInfo.map((info) => (
-					<div
-						key={info.label}
-						className="text-sm text-neutral-600 dark:text-neutral-400"
-					>
-						{info.label}: {info.value}
-					</div>
-				))}
-			</div>
+			<label className="flex flex-col justify-between w-full gap-2 py-2 text-sm">
+				<span>Name</span>
+				<input
+					className="w-full p-2 border rounded-lg"
+					type="text"
+					value={activeThread.agentConfig.name}
+					onChange={(e) => {
+						dispatch({
+							type: "SET_SYSTEM_NAME",
+							payload: e.target.value,
+						});
+					}}
+				/>
+			</label>
 			<label className="flex flex-col justify-between w-full gap-2 py-2 text-sm">
 				<span>System Message</span>
 				<input
@@ -64,6 +64,18 @@ export default function Config() {
 					}}
 				/>
 			</label>
+			<details>
+				<summary>Advanced</summary>
+				{modelInfo.map((info) => (
+					<div
+						key={info.label}
+						className="flex justify-between w-full text-sm text-neutral-600 dark:text-neutral-400"
+					>
+						<div>{info.label}:</div>
+						<div>{info.value}</div>
+					</div>
+				))}
+			</details>
 			<div className="flex flex-col gap-2">
 				<div className="flex flex-col px-1">
 					<div className="flex items-center justify-between gap-4 dark:border-neutral-600">

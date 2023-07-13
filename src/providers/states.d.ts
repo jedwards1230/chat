@@ -32,6 +32,7 @@ type ChatAction =
 	| { type: "SET_ACTIVE_THREAD"; payload: ChatThread }
 	| { type: "CHANGE_TEMPERATURE"; payload: number }
 	| { type: "SET_SYSTEM_MESSAGE"; payload: string }
+	| { type: "SET_SYSTEM_NAME"; payload: string }
 	| { type: "TOGGLE_PLUGINS"; payload?: boolean }
 	| { type: "REMOVE_THREAD"; payload: string }
 	| { type: "CHANGE_INPUT"; payload: string }

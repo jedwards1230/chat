@@ -111,6 +111,23 @@ export function chatReducer(state: ChatState, action: ChatAction): ChatState {
 						: thread
 				),
 			};
+		case "SET_SYSTEM_NAME":
+			if (DEBUG) console.log("SET_SYSTEM_NAME");
+			const newSystemName: ChatThread = {
+				...state.activeThread,
+				lastModified: new Date(),
+				agentConfig: {
+					...state.activeThread.agentConfig,
+					name: action.payload,
+				},
+			};
+			return {
+				...state,
+				activeThread: newSystemName,
+				threadList: state.threadList.map((thread) =>
+					thread.id === state.activeThread.id ? newSystemName : thread
+				),
+			};
 		case "SET_SYSTEM_MESSAGE":
 			if (DEBUG) console.log("SET_SYSTEM_MESSAGE");
 			const newSystemMessage = {
