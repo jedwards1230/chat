@@ -5,7 +5,7 @@ import clsx from "clsx";
 
 import { useChat, useChatDispatch } from "@/providers/ChatProvider";
 import { ChatBubble } from "./ChatBubble";
-import { ChatPlaceholder } from "./ChatPlaceholder";
+import ChatPlaceholder from "./ChatPlaceholder";
 import { isMobile } from "@/utils/client";
 import { Bars, Settings } from "./Icons";
 
@@ -86,25 +86,18 @@ export default function ChatThread() {
 							return null;
 						}
 						const lastMessage = messages[i - 1];
-						if (
-							m.role === "function" &&
-							lastMessage.function_call &&
-							lastMessage.function_call.arguments
-						) {
-							return (
-								<ChatBubble
-									key={m.id}
-									message={m}
-									input={lastMessage.function_call?.arguments}
-									config={activeThread.agentConfig}
-								/>
-							);
-						}
 						return (
 							<ChatBubble
 								key={m.id}
 								message={m}
 								config={activeThread.agentConfig}
+								input={
+									m.role === "function" &&
+									lastMessage.function_call &&
+									lastMessage.function_call.arguments
+										? lastMessage.function_call.arguments
+										: undefined
+								}
 							/>
 						);
 					})

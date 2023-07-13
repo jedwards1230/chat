@@ -6,7 +6,7 @@ export default function ProfilePicture({ message }: { message: Message }) {
 	const { user } = useUser();
 
 	return (
-		<div className="flex items-start justify-end h-full my-1">
+		<div className="flex items-start h-full my-1">
 			<div
 				className={clsx(
 					"border rounded overflow-hidden w-8 h-8 select-none transition-colors dark:border-neutral-500/80 items-center justify-center flex",

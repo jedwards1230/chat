@@ -40,7 +40,7 @@ export default function TextContent({
 	);
 
 	return (
-		<div className="flex flex-col justify-center w-full px-2 py-2 overflow-x-scroll transition-colors rounded lg:max-w-4xl">
+		<div className="flex flex-col w-full px-2 py-2 transition-colors rounded lg:max-w-4xl">
 			{message.role === "function" ? (
 				<FunctionContent />
 			) : message.role === "system" ? (

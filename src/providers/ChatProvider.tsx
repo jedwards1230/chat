@@ -56,13 +56,13 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
 		// responsive sidebar
 		const handleResize = () => {
-			if (isMobile && !iM()) {
+			if (isMobile && !iM("md")) {
 				dispatch({
 					type: "SET_SIDEBAR_OPEN",
 					payload: false,
 				});
 				setIsMobile(true);
-			} else if (!iM()) {
+			} else if (!iM("md")) {
 				dispatch({
 					type: "SET_SIDEBAR_OPEN",
 					payload: true,

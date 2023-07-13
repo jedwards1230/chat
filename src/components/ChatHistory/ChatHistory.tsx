@@ -31,7 +31,7 @@ export default function ChatHistory() {
 		const handleClickOutside = (event: any) => {
 			if (
 				sideBarOpen &&
-				isMobile() &&
+				isMobile("md") &&
 				sidebarRef.current &&
 				!sidebarRef.current.contains(event.target)
 			) {

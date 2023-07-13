@@ -94,7 +94,7 @@ export default function Markdown({
 							"py-0.5 px-1 inline-block border border-neutral-500 rounded bg-neutral-100 tracking-wide transition-colors dark:bg-neutral-500"
 						)}
 					>
-						<code>{children}</code>
+						<code className="whitespace-pre-wrap">{children}</code>
 					</div>
 				);
 			},
@@ -155,7 +155,8 @@ export default function Markdown({
 
 	return (
 		<ReactMarkdown
-			className="flex flex-col gap-1.5 rounded"
+			className="w-full overflow-x-scroll"
+			linkTarget="_blank"
 			remarkPlugins={[remarkGfm]}
 			components={components}
 		>

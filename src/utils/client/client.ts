@@ -26,10 +26,21 @@ export async function readStream(
 	return accumulatedResponse;
 }
 
-export function isMobile() {
+export function isMobile(size?: "sm" | "md" | "lg" | "xl") {
 	if (typeof window === "undefined") return false;
 	const screens = fullConfig.theme?.screens as Record<string, string>;
-	if (window.innerWidth < parseInt(screens.sm)) return true;
+	switch (size) {
+		case "sm":
+			return window.innerWidth < parseInt(screens.sm);
+		case "md":
+			return window.innerWidth < parseInt(screens.md);
+		case "lg":
+			return window.innerWidth < parseInt(screens.lg);
+		case "xl":
+			return window.innerWidth < parseInt(screens.xl);
+		default:
+			return window.innerWidth < parseInt(screens.sm);
+	}
 }
 
 export async function callTool(tool: Tool, input: string) {

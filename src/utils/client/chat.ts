@@ -1,12 +1,7 @@
 "use client";
 
 import { v4 as uuidv4 } from "uuid";
-import {
-	readStream,
-	callTool,
-	parseStreamData,
-	isMobile as iM,
-} from "@/utils/client/client";
+import { readStream, callTool, parseStreamData } from "@/utils/client/client";
 import { Dispatch } from "react";
 
 const MAX_LOOPS = 10;
