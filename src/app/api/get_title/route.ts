@@ -25,7 +25,7 @@ export async function POST(request: Request) {
 					"You are a helpful assistant that generates a brief chat title based on provided chat messages. " +
 					"Provide only the string for the title. No quotes or labels are necessary." +
 					"There should only be one subject in the title. " +
-					"Max length is 30 characters. ",
+					"Max length is 20 characters. ",
 			},
 			{
 				role: "user",

@@ -79,7 +79,7 @@ export default function ChatThread() {
 				</>
 			)}
 
-			<div className="flex flex-col w-full h-full overflow-y-scroll">
+			<div className="flex flex-col w-full h-full">
 				{hasMultipleMessages ? (
 					messages.map((m, i) => {
 						if (m.role === "assistant" && m.function_call) {
