@@ -62,7 +62,13 @@ type Choice = {
 };
 
 interface StreamData {
-	choices: Choice[];
+	error?: {
+		code: string | null;
+		message: string;
+		param: string | null;
+		type: string;
+	};
+	choices?: Choice[];
 	created: number;
 	id: string;
 	model: Model;

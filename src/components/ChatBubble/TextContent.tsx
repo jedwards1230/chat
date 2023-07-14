@@ -25,15 +25,26 @@ export default function TextContent({
 			// `https://nextjs.org/docs/pages/building-your-application/upgrading/version-13, ""`
 			// `https://nextjs.org/docs/app/building-your-application/upgrading/version-13, "Node.js"`
 			const [url, text] = input.split(", ");
-			inputDisplay = text && text !== `""` ? `[${text}](${url})` : url;
+			if (text && text !== `""`) {
+				inputDisplay = `[${text}](${url})`;
+			} else if (url.slice(-1) === ",") {
+				inputDisplay = url.slice(0, -1);
+			} else {
+				inputDisplay = url;
+			}
 		}
 
 		return (
 			<details className="flex flex-col items-start w-full rounded">
-				<summary className="flex gap-2 p-2 capitalize rounded-lg cursor-pointer hover:bg-neutral-300">
-					{message.name}: <Markdown content={inputDisplay} />
+				<summary className="w-full gap-2 p-2 capitalize rounded-lg cursor-pointer text-ellipsis hover:bg-neutral-300 dark:hover:bg-neutral-700">
+					<div className="inline-block align-middle">
+						{message.name}:
+					</div>{" "}
+					<div className="inline-block overflow-x-scroll align-middle">
+						<Markdown content={inputDisplay} />
+					</div>
 				</summary>
-				<div className="mt-4">
+				<div className="mt-4 line-clamp-1">
 					<Markdown content={mdContent} />
 				</div>
 			</details>

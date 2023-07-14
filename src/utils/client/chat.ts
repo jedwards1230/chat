@@ -122,10 +122,17 @@ export const getChat = async (
 		let tool: Tool | null = null;
 		let toolInput: string = "";
 		let accumulatedResponse = "";
+		let error: any | null = null;
 		//let finishReason: string | null = null;
 
 		const reduceStreamData = (acc: string, curr: StreamData) => {
-			if (!curr) return acc;
+			if (!curr || !curr.choices) {
+				if (curr && curr.error) {
+					//console.log(curr.error);
+					error = JSON.stringify(curr.error);
+				}
+				return acc;
+			}
 			const res = curr.choices[0];
 			if (res.finish_reason) {
 				//finishReason = res.finish_reason;
@@ -152,7 +159,7 @@ export const getChat = async (
 			if (!tool) {
 				const assistantMsg: Message = {
 					id: assistantId,
-					content: accumulatedResponse,
+					content: error || accumulatedResponse,
 					role: "assistant",
 				};
 

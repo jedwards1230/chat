@@ -32,9 +32,7 @@ export async function POST(request: Request) {
 		if (msg.role === "system") {
 			return {
 				role: msg.role,
-				content: `${
-					msg.content
-				}\n\nCurrent time: ${new Date().toLocaleString()}\n\n`,
+				content: msg.content,
 			};
 		}
 		return {
@@ -45,50 +43,56 @@ export async function POST(request: Request) {
 		};
 	});
 
-	const functions =
-		tools && tools.length > 0
-			? tools
-					.map((tool) => {
-						switch (tool) {
-							case "calculator":
-								return new Calculator();
-							case "search":
-								return new Search();
-							case "web-browser":
-								const model = new ChatOpenAI({
-									temperature: 0,
-									modelName: "gpt-3.5-turbo-16k",
-								});
-								const embeddings = new OpenAIEmbeddings();
-								return new WebBrowser({ model, embeddings });
-						}
-					})
-					.map((tool) => ({
-						name: tool.name,
-						description: tool.description,
-						parameters: tool.parameters,
-					}))
-			: undefined;
+	let functions;
+	if (tools && tools.length > 0) {
+		functions = tools
+			.map((tool) => {
+				switch (tool) {
+					case "calculator":
+						return new Calculator();
+					case "search":
+						return new Search();
+					case "web-browser":
+						const model = new ChatOpenAI({
+							temperature: 0,
+							modelName: "gpt-3.5-turbo-16k",
+						});
+						const embeddings = new OpenAIEmbeddings();
+						return new WebBrowser({ model, embeddings });
+				}
+			})
+			.map((tool) => ({
+				name: tool.name,
+				description: tool.description,
+				parameters: tool.parameters,
+			}));
+	}
 
-	const completion = await openai.createChatCompletion({
-		model: modelName,
-		messages,
-		temperature,
-		stream: true,
-		functions,
-		//top_p: 1,
-		//n: 1,
-		//stop,
-		//max_tokens: 1024,
-		//presence_penalty: 0,
-		//frequency_penalty: 0,
-		//logit_bias: {},
-		//user: "",
-	});
-
-	return new Response(completion.body, {
-		headers: {
-			"content-type": "text/event-stream",
-		},
-	});
+	try {
+		const completion = await openai.createChatCompletion({
+			model: modelName,
+			messages,
+			temperature,
+			stream: true,
+			functions,
+			//top_p: 1,
+			//n: 1,
+			//stop,
+			//max_tokens: 1024,
+			//presence_penalty: 0,
+			//frequency_penalty: 0,
+			//logit_bias: {},
+			//user: "",
+		});
+		return new Response(completion.body, {
+			headers: {
+				"content-type": "text/event-stream",
+			},
+		});
+	} catch (err) {
+		console.error(err);
+		return new Response(JSON.stringify(err), {
+			status: 500,
+		});
+	}
 }
