@@ -13,3 +13,8 @@ export function serializeSaveData(saveData: SaveData | ShareData): string {
 		})),
 	});
 }
+
+export function calculateRows(text: string, maxRows: number = 15) {
+	let newlines = (text.match(/\n/g) || []).length;
+	return newlines > 0 ? Math.min(newlines + 1, maxRows) : 1;
+}

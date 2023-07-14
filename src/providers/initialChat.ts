@@ -13,9 +13,6 @@ const defaultConfig: Config = {
 	maxTokens: 1024,
 	frequencyPenalty: 0,
 	presencePenalty: 0,
-	stop: [],
-	logitBias: {},
-	user: "",
 };
 
 export function getDefaultThread(config: Config): ChatThread {

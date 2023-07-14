@@ -32,9 +32,6 @@ interface Config {
 	maxTokens: number;
 	frequencyPenalty: number;
 	presencePenalty: number;
-	stop: string[];
-	logitBias: { [key: string]: number };
-	user: string;
 }
 
 interface AgentConfig extends Config {

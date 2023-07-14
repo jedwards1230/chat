@@ -5,11 +5,14 @@ import clsx from "clsx";
 import { motion } from "framer-motion";
 import QuickActions from "./QuickActions";
 import { handleSubmit, isMobile } from "@/utils/client";
+import { calculateRows } from "@/utils";
 
 export default function ChatInput() {
 	const state = useChat();
 	const { input, editId } = state;
 	const dispatch = useChatDispatch();
+
+	const rows = calculateRows(input);
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		e.preventDefault();
@@ -27,8 +30,6 @@ export default function ChatInput() {
 		}
 	};
 
-	const inputRows = (input.match(/\n/g) || []).length + 1;
-
 	return (
 		<div className="relative w-full">
 			<QuickActions />
@@ -43,7 +44,7 @@ export default function ChatInput() {
 					placeholder="Say something..."
 					value={input}
 					autoFocus
-					rows={inputRows > 10 ? 10 : inputRows}
+					rows={rows}
 					onChange={handleInputChange}
 					onKeyDown={onKeyDownHandler}
 					className="flex-1 w-full p-2 transition-colors border-2 rounded border-neutral-200 dark:border-neutral-500 focus:border-blue-500 dark:bg-neutral-700 focus:outline-none"

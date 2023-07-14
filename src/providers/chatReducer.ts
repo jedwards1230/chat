@@ -63,6 +63,7 @@ export function chatReducer(state: ChatState, action: ChatAction): ChatState {
 		case "CREATE_THREAD":
 			if (DEBUG) console.log("CREATE_THREAD");
 			document.title = "Chat";
+			state.abortController?.abort();
 
 			return {
 				...state,

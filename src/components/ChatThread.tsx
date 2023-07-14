@@ -104,6 +104,8 @@ export default function ChatThread() {
 				) : (
 					<ChatPlaceholder open={isConfigOpen} />
 				)}
+				{/* Blank row at bottom. Better view of quick actions. */}
+				{hasMultipleMessages && <div className="w-full min-h-[72px]" />}
 			</div>
 		</div>
 	);
