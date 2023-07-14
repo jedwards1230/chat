@@ -79,9 +79,9 @@ export default function Markdown({
 							<button
 								className={clsx(
 									btnClicked
-										? "text-green-500"
-										: "dark:text-neutral-900",
-									"px-2 py-1 w-24 flex justify-center h-8 text-sm font-medium tracking-tight border rounded-full dark:bg-neutral-300 active:bg-neutral-300 hover:bg-neutral-200 bg-neutral-50 border-neutral-500"
+										? "text-green-500 bg-neutral-50 dark:bg-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-500 border-neutral-400"
+										: "dark:text-neutral-900 dark:bg-neutral-300 hover:bg-neutral-200 bg-neutral-50 border-neutral-500",
+									"px-2 py-1 w-24 flex justify-center h-8 text-sm font-medium tracking-tight border rounded-full active:bg-neutral-300 dark:active:bg-neutral-400"
 								)}
 								onClick={() => {
 									navigator.clipboard.writeText(
