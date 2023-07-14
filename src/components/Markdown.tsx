@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from "clsx";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { SpecialComponents } from "react-markdown/lib/ast-to-react";
 import { NormalComponents } from "react-markdown/lib/complex-types";
 import { PrismAsync as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -10,6 +10,7 @@ import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { useTheme } from "next-themes";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { Check } from "./Icons";
 
 export default function Markdown({
 	content = "",
@@ -19,6 +20,7 @@ export default function Markdown({
 	children?: string;
 }) {
 	const { resolvedTheme } = useTheme();
+	const [btnClicked, setBtnClicked] = useState(false);
 
 	const components = useMemo<
 		Partial<
@@ -75,14 +77,23 @@ export default function Markdown({
 						</div>
 						<div className="items-center justify-center hidden sm:flex">
 							<button
-								className="w-auto px-2 py-1 text-sm font-medium tracking-tight border rounded-full dark:bg-neutral-300 dark:text-neutral-900 active:bg-neutral-300 hover:bg-neutral-200 bg-neutral-50 border-neutral-500"
+								className={clsx(
+									btnClicked
+										? "text-green-500"
+										: "dark:text-neutral-900",
+									"px-2 py-1 w-24 flex justify-center h-8 text-sm font-medium tracking-tight border rounded-full dark:bg-neutral-300 active:bg-neutral-300 hover:bg-neutral-200 bg-neutral-50 border-neutral-500"
+								)}
 								onClick={() => {
 									navigator.clipboard.writeText(
 										String(children)
 									);
+									setBtnClicked(true);
+									setTimeout(() => {
+										setBtnClicked(false);
+									}, 1000);
 								}}
 							>
-								Copy Code
+								{btnClicked ? <Check /> : "Copy Code"}
 							</button>
 						</div>
 					</div>
@@ -150,7 +161,7 @@ export default function Markdown({
 				<tr {...props} className="border" />
 			),
 		}),
-		[resolvedTheme]
+		[btnClicked, resolvedTheme]
 	);
 
 	return (

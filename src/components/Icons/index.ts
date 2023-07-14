@@ -1,5 +1,6 @@
 import Bars from "./Bars";
 import Chat from "./Chat";
+import Check from "./Check";
 import Clipboard from "./Clipboard";
 import Edit from "./Edit";
 import Information from "./Information";
@@ -13,6 +14,7 @@ import XMark from "./XMark";
 export {
 	Bars,
 	Chat,
+	Check,
 	Clipboard,
 	Edit,
 	Information,
