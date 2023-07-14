@@ -56,7 +56,9 @@ export default function Header() {
 			>
 				{activeThread.messages.length > 1 && (
 					<>
-						<p className="font-semibold">{activeThread.title}</p>
+						<p className="font-semibold line-clamp-1">
+							{activeThread.title}
+						</p>
 						<p className="text-sm font-light text-neutral-500">
 							{activeThread.agentConfig.model} |{" "}
 							{activeThread.messages.length} messages
