@@ -45,7 +45,7 @@ export function getDefaultThread(config: Config): ChatThread {
 			stop: config.defaultStop,
 			logitBias: config.defaultLogitBias,
 			user: config.defaultUser,
-			tools: ["search"],
+			tools: ["search", "wikipedia-api"],
 		},
 	};
 }

@@ -1,4 +1,4 @@
-type Tool = "calculator" | "search" | "web-browser";
+type Tool = "calculator" | "search" | "web-browser" | "wikipedia-api";
 
 type CustomTool = {
 	name: string;

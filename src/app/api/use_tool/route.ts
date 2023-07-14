@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import { Calculator } from "@/tools/calculator";
 import { Search } from "@/tools/search";
 import { WebBrowser } from "@/tools/webBrowser";
+import { WikipediaQueryRun } from "@/tools/wikipedia";
 
 export const runtime = "edge";
 
@@ -45,6 +46,9 @@ export async function POST(request: Request) {
 			});
 			const embeddings = new OpenAIEmbeddings();
 			result = await new WebBrowser({ model, embeddings }).call(input);
+			break;
+		case "wikipedia-api":
+			result = await new WikipediaQueryRun().call(input);
 			break;
 		default:
 			return new Response("Invalid tool", {

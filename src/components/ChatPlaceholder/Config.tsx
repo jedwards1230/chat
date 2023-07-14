@@ -5,7 +5,12 @@ import { useChat, useChatDispatch } from "@/providers/ChatProvider";
 export default function Config() {
 	const { activeThread, pluginsEnabled } = useChat();
 	const dispatch = useChatDispatch();
-	const availableTools: Tool[] = ["calculator", "search", "web-browser"];
+	const availableTools: Tool[] = [
+		"calculator",
+		"search",
+		"web-browser",
+		"wikipedia-api",
+	];
 
 	const modelInfo = [
 		{

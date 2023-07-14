@@ -6,6 +6,7 @@ import { openai } from "@/lib/openai";
 import { Calculator } from "@/tools/calculator";
 import { Search } from "@/tools/search";
 import { WebBrowser } from "@/tools/webBrowser";
+import { WikipediaQueryRun } from "@/tools/wikipedia";
 
 export const runtime = "edge";
 
@@ -59,6 +60,8 @@ export async function POST(request: Request) {
 						});
 						const embeddings = new OpenAIEmbeddings();
 						return new WebBrowser({ model, embeddings });
+					case "wikipedia-api":
+						return new WikipediaQueryRun();
 				}
 			})
 			.map((tool) => ({
