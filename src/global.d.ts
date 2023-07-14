@@ -23,20 +23,23 @@ interface ShareData {
 	thread: ChatThread;
 }
 
-interface AgentConfig {
-	id: string;
-	name: string;
+interface Config {
 	model: Model;
 	temperature: number;
 	systemMessage: string;
 	topP: number;
-	n: number;
+	N: number;
 	maxTokens: number;
 	frequencyPenalty: number;
 	presencePenalty: number;
 	stop: string[];
 	logitBias: { [key: string]: number };
 	user: string;
+}
+
+interface AgentConfig extends Config {
+	id: string;
+	name: string;
 	tools: Tool[];
 }
 

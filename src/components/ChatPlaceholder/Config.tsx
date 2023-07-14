@@ -23,7 +23,7 @@ export default function Config() {
 		},
 		{
 			label: "N",
-			value: activeThread.agentConfig.n,
+			value: activeThread.agentConfig.N,
 		},
 		{
 			label: "Max Tokens",

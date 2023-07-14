@@ -12,20 +12,6 @@ interface ChatState {
 	abortController?: AbortController;
 }
 
-interface Config {
-	defaultModel: Model;
-	defaultTemperature: number;
-	defaultSystemMessage: string;
-	defaultTopP: number;
-	defaultN: number;
-	defaultMaxTokens: number;
-	defaultFrequencyPenalty: number;
-	defaultPresencePenalty: number;
-	defaultStop: string[];
-	defaultLogitBias: { [key: string]: number };
-	defaultUser: string;
-}
-
 type ChatAction =
 	/* Chat */
 	| { type: "SET_BOT_TYPING"; payload?: AbortController }

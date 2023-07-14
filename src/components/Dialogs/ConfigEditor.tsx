@@ -33,7 +33,7 @@ export default function ConfigEditor() {
 				{/* Default Model */}
 				<Select
 					label="Default Model"
-					value={config.defaultModel}
+					value={config.model}
 					options={[
 						{ label: "gpt-3.5-turbo", value: "gpt-3.5-turbo" },
 						{
@@ -48,7 +48,7 @@ export default function ConfigEditor() {
 							type: "UPDATE_CONFIG",
 							payload: {
 								...config,
-								defaultModel: e.target.value as Model,
+								model: e.target.value as Model,
 							},
 						});
 					}}
