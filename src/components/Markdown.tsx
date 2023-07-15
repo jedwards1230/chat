@@ -75,7 +75,7 @@ export default function Markdown({
 								{String(children).replace(/\n$/, "")}
 							</SyntaxHighlighter>
 						</div>
-						<div className="items-center justify-center hidden sm:flex">
+						<div className="flex items-center justify-center">
 							<button
 								className={clsx(
 									btnClicked

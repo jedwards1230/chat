@@ -44,7 +44,7 @@ export default function TextContent({
 						<Markdown content={inputDisplay} />
 					</div>
 				</summary>
-				<div className="mt-4 line-clamp-1">
+				<div className="mt-4">
 					<Markdown content={mdContent} />
 				</div>
 			</details>
