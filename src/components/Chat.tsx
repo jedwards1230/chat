@@ -28,9 +28,9 @@ export default function Chat() {
 		event: MouseEvent | TouchEvent | PointerEvent,
 		info: PanInfo
 	) {
-		if (!sideBarOpen && info.point.x < 300 && info.offset.x > 150) {
+		if (!sideBarOpen && info.point.x < 300 && info.offset.x > 120) {
 			dispatch({ type: "SET_SIDEBAR_OPEN", payload: true });
-		} else if (sideBarOpen && info.offset.x < -150) {
+		} else if (sideBarOpen && info.offset.x < -120) {
 			dispatch({ type: "SET_SIDEBAR_OPEN", payload: false });
 		}
 	}
