@@ -1,27 +1,27 @@
-"use client";
+'use client';
 
-import { ThemeProvider } from "next-themes";
+import { ThemeProvider } from 'next-themes';
 
-import Dialogs from "@/components/Dialogs";
-import { ChatProvider } from "./ChatProvider";
+import Dialogs from '@/components/Dialogs';
+import { ChatProvider } from './ChatProvider';
 
 export default function Providers({
-	children,
-	userId,
+    children,
+    userId,
 }: {
-	children: React.ReactNode;
-	userId: string | null;
+    children: React.ReactNode;
+    userId: string | null;
 }) {
-	return (
-		<ThemeProvider>
-			{userId ? (
-				<ChatProvider>
-					{children}
-					<Dialogs />
-				</ChatProvider>
-			) : (
-				children
-			)}
-		</ThemeProvider>
-	);
+    return (
+        <ThemeProvider>
+            {userId ? (
+                <ChatProvider>
+                    {children}
+                    <Dialogs />
+                </ChatProvider>
+            ) : (
+                children
+            )}
+        </ThemeProvider>
+    );
 }

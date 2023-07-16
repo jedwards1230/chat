@@ -1,32 +1,32 @@
-"use client";
+'use client';
 
-import { useChat, useChatDispatch } from "@/providers/ChatProvider";
-import clsx from "clsx";
+import { useChat, useChatDispatch } from '@/providers/ChatProvider';
+import clsx from 'clsx';
 
 export default function QuickActions() {
-	const { activeThread, botTyping, abortController } = useChat();
-	const dispatch = useChatDispatch();
+    const { activeThread, botTyping, abortController } = useChat();
+    const dispatch = useChatDispatch();
 
-	const btn = "px-3 py-1 rounded-full";
+    const btn = 'px-3 py-1 rounded-full';
 
-	return (
-		<div className="absolute inset-x-auto flex justify-center w-full gap-2 -top-12">
-			{botTyping && abortController && (
-				<button
-					onClick={() => abortController.abort()}
-					className={clsx(btn, "bg-red-500 text-neutral-50")}
-				>
-					Stop
-				</button>
-			)}
-			{activeThread.messages.length > 1 && (
-				<button
-					onClick={() => dispatch({ type: "CREATE_THREAD" })}
-					className={clsx(btn, "bg-blue-500 text-neutral-50")}
-				>
-					New Chat
-				</button>
-			)}
-		</div>
-	);
+    return (
+        <div className="absolute inset-x-auto -top-12 flex w-full justify-center gap-2">
+            {botTyping && abortController && (
+                <button
+                    onClick={() => abortController.abort()}
+                    className={clsx(btn, 'bg-red-500 text-neutral-50')}
+                >
+                    Stop
+                </button>
+            )}
+            {activeThread.messages.length > 1 && (
+                <button
+                    onClick={() => dispatch({ type: 'CREATE_THREAD' })}
+                    className={clsx(btn, 'bg-blue-500 text-neutral-50')}
+                >
+                    New Chat
+                </button>
+            )}
+        </div>
+    );
 }

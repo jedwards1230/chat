@@ -1,14 +1,14 @@
-import { authMiddleware } from "@clerk/nextjs";
+import { authMiddleware } from '@clerk/nextjs';
 
 export default authMiddleware({
-	publicRoutes: ["/share/:path"],
+    publicRoutes: ['/share/:path'],
 });
 
 export const config = {
-	matcher: [
-		"/((?!.*\\..*|_next).*)",
-		"/",
-		"/(api|trpc)(.*)",
-		"/!share/:path",
-	],
+    matcher: [
+        '/((?!.*\\..*|_next).*)',
+        '/',
+        '/(api|trpc)(.*)',
+        '/!share/:path',
+    ],
 };

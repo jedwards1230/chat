@@ -1,9 +1,9 @@
-import { Chat } from "../components";
+import { Chat } from '../components';
 
 export default function Page() {
-	return (
-		<div className="relative flex w-full h-full">
-			<Chat />
-		</div>
-	);
+    return (
+        <div className="relative flex h-full w-full">
+            <Chat />
+        </div>
+    );
 }
