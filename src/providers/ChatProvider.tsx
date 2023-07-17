@@ -28,7 +28,7 @@ export function ChatProvider({
     children: React.ReactNode;
     history: SaveData | null;
 }) {
-    const [checkedLocal, setCheckedLocal] = useState(false);
+    const [checkedLocal, setCheckedLocal] = useState(history !== null);
     const [isMobile, setIsMobile] = useState(iM('md') || false);
 
     const [state, dispatch] = useReducer(chatReducer, {
