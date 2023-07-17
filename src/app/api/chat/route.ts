@@ -13,36 +13,22 @@ export const runtime = 'edge';
 export async function POST(request: Request) {
     const res = await request.json();
     const {
-        msgHistory,
+        messages,
         modelName,
         temperature,
         tools,
     }: {
-        msgHistory: Message[];
+        messages: ChatCompletionRequestMessage[];
         modelName: Model;
         temperature: number;
         tools: Tool[];
     } = res;
 
-    if (!msgHistory) {
+    if (!messages) {
         return new Response('No message history', {
             status: 400,
         });
     }
-    const messages: ChatCompletionRequestMessage[] = msgHistory.map((msg) => {
-        if (msg.role === 'system') {
-            return {
-                role: msg.role,
-                content: msg.content,
-            };
-        }
-        return {
-            role: msg.role,
-            content: msg.content,
-            name: msg.name,
-            function_call: msg.function_call,
-        };
-    });
 
     let functions;
     if (tools && tools.length > 0) {

@@ -1,3 +1,5 @@
+import type { ChatCompletionRequestMessage } from 'openai-edge';
+
 export function serializeSaveData(saveData: SaveData | ShareData): string {
     if ('thread' in saveData) {
         return JSON.stringify({
@@ -17,4 +19,23 @@ export function serializeSaveData(saveData: SaveData | ShareData): string {
 export function calculateRows(text: string, maxRows: number = 15) {
     let newlines = (text.match(/\n/g) || []).length;
     return newlines > 0 ? Math.min(newlines + 1, maxRows) : 1;
+}
+
+export function prepareMessages(
+    messages: Message[],
+): ChatCompletionRequestMessage[] {
+    return messages.map((msg) => {
+        if (msg.role === 'system') {
+            return {
+                role: msg.role,
+                content: msg.content,
+            };
+        }
+        return {
+            role: msg.role,
+            content: msg.content,
+            name: msg.name,
+            function_call: msg.function_call,
+        };
+    });
 }

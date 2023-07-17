@@ -3,6 +3,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { readStream, callTool, parseStreamData } from '@/utils/client/client';
 import { Dispatch } from 'react';
+import { prepareMessages } from '..';
 
 const MAX_LOOPS = 10;
 
@@ -96,21 +97,18 @@ export const getChat = async (
         const signal = controller.signal;
         dispatch({ type: 'SET_BOT_TYPING', payload: controller });
 
+        const messages = prepareMessages(msgHistory);
+
         const response = await fetch('/api/chat', {
             method: 'POST',
             signal,
             body: JSON.stringify({
                 modelName: state.activeThread.agentConfig.model,
                 temperature: state.activeThread.agentConfig.temperature,
+                messages,
                 tools: state.pluginsEnabled
                     ? state.activeThread.agentConfig.tools
                     : [],
-                msgHistory: msgHistory.map((msg) => ({
-                    content: msg.content,
-                    role: msg.role,
-                    name: msg.name,
-                    function_call: msg.function_call,
-                })),
             }),
         });
 
