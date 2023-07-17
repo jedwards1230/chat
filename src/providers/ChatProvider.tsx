@@ -35,7 +35,6 @@ export function ChatProvider({
         ...initialState,
         config: history ? history.config : initialState.config,
         threadList: history ? history.chatHistory : initialState.threadList,
-        sideBarOpen: !isMobile,
     });
 
     // Effect to check stored chat history on component mount
@@ -83,7 +82,6 @@ export function ChatProvider({
             // ensure that any pending requests are cancelled
             state.abortController?.abort();
         };
-
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

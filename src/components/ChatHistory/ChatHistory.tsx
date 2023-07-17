@@ -28,6 +28,15 @@ export default function ChatHistory() {
     };
 
     useEffect(() => {
+        if (sidebarRef.current) {
+            const styles = window.getComputedStyle(sidebarRef.current);
+            console.log(styles.display);
+            dispatch({
+                type: 'SET_SIDEBAR_OPEN',
+                payload: styles.display === 'flex',
+            });
+        }
+
         const handleClickOutside = (event: any) => {
             if (
                 sideBarOpen &&
