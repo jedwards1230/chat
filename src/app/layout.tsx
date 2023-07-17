@@ -4,6 +4,7 @@ import Providers from '@/providers';
 import { Metadata } from 'next';
 import { ClerkProvider, auth } from '@clerk/nextjs';
 import { Analytics } from '@vercel/analytics/react';
+import { getCloudHistory } from '@/utils/server';
 
 const APP_NAME = 'Chat';
 const APP_DEFAULT_TITLE = 'Chat';
@@ -48,12 +49,13 @@ export const metadata: Metadata = {
     },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
     const { userId } = auth();
+    const history = await getCloudHistory();
 
     return (
         <ClerkProvider>
@@ -70,7 +72,9 @@ export default function RootLayout({
                             </div>
                         }
                     >
-                        <Providers userId={userId}>{children}</Providers>
+                        <Providers userId={userId} history={history}>
+                            {children}
+                        </Providers>
                     </Suspense>
                     <Analytics />
                 </body>

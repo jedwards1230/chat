@@ -8,14 +8,16 @@ import { ChatProvider } from './ChatProvider';
 export default function Providers({
     children,
     userId,
+    history,
 }: {
     children: React.ReactNode;
     userId: string | null;
+    history: SaveData | null;
 }) {
     return (
         <ThemeProvider>
             {userId ? (
-                <ChatProvider>
+                <ChatProvider history={history}>
                     {children}
                     <Dialogs />
                 </ChatProvider>

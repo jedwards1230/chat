@@ -36,8 +36,8 @@ export default function ChatInput() {
             <form
                 onSubmit={(e) => handleSubmit(e, state, dispatch)}
                 className={clsx(
-                    'flex w-full items-center justify-center gap-2 justify-self-end border-t border-neutral-300 px-4 pb-8 pt-2 shadow-xl transition-all dark:border-0 dark:border-neutral-600 dark:shadow-none sm:pb-4',
-                    editId ? 'flex-col' : '',
+                    'flex w-full items-end justify-center gap-2 justify-self-end border-t border-neutral-300 px-4 pb-8 pt-2 shadow-xl transition-all dark:border-0 dark:border-neutral-600 dark:shadow-none sm:pb-4',
+                    editId && 'flex-col',
                 )}
             >
                 <motion.textarea
@@ -77,7 +77,7 @@ export default function ChatInput() {
                         </div>
                     ) : (
                         <button
-                            className="rounded-lg border border-transparent bg-blue-500 px-6 py-1.5 text-neutral-50 transition-colors hover:bg-blue-400 focus:border-blue-500 focus:bg-blue-400 focus:outline-none dark:bg-blue-500 dark:hover:bg-blue-400"
+                            className="rounded-lg border border-transparent bg-blue-500 px-4 py-1.5 text-neutral-50 transition-colors hover:bg-blue-400 focus:border-blue-500 focus:bg-blue-400 focus:outline-none dark:bg-blue-500 dark:hover:bg-blue-400 md:px-6"
                             type="submit"
                         >
                             Send

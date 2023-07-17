@@ -12,7 +12,7 @@ import {
 import { isMobile as iM } from '@/utils/client';
 import { chatReducer } from '@/providers/chatReducer';
 import initialState from './initialChat';
-import { getCloudHistory, saveCloudHistory } from '@/utils/server';
+import { saveCloudHistory } from '@/utils/server';
 import { serializeSaveData } from '@/utils';
 
 const ChatContext = createContext<ChatState>(initialState);
@@ -21,11 +21,20 @@ const ChatDispatchContext = createContext<Dispatch<ChatAction>>(() => {});
 export const useChat = () => useContext(ChatContext);
 export const useChatDispatch = () => useContext(ChatDispatchContext);
 
-export function ChatProvider({ children }: { children: React.ReactNode }) {
+export function ChatProvider({
+    children,
+    history,
+}: {
+    children: React.ReactNode;
+    history: SaveData | null;
+}) {
     const [checkedLocal, setCheckedLocal] = useState(false);
     const [isMobile, setIsMobile] = useState(iM('md') || false);
+
     const [state, dispatch] = useReducer(chatReducer, {
         ...initialState,
+        config: history ? history.config : initialState.config,
+        threadList: history ? history.chatHistory : initialState.threadList,
         sideBarOpen: !isMobile,
     });
 
@@ -33,26 +42,17 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         if (typeof window === 'undefined') return;
 
-        // initialize with cloud data
-        getCloudHistory().then((history) => {
-            if (history) {
+        if (!history) {
+            const storedThreads = localStorage.getItem('chatHistory');
+            if (storedThreads) {
+                const saveData: SaveData = JSON.parse(storedThreads);
                 dispatch({
                     type: 'INITIALIZE',
-                    payload: history,
+                    payload: saveData,
                 });
-            } else {
-                const storedThreads = localStorage.getItem('chatHistory');
-                if (storedThreads) {
-                    const saveData: SaveData = JSON.parse(storedThreads);
-                    dispatch({
-                        type: 'INITIALIZE',
-                        payload: saveData,
-                    });
-                }
             }
-
-            setCheckedLocal(true);
-        });
+        }
+        setCheckedLocal(true);
 
         // responsive sidebar
         const handleResize = () => {
