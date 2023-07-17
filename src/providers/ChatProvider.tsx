@@ -28,13 +28,14 @@ export function ChatProvider({
     children: React.ReactNode;
     history: SaveData | null;
 }) {
-    const [checkedLocal, setCheckedLocal] = useState(history !== null);
+    const [checkedLocal, setCheckedLocal] = useState(false);
     const [isMobile, setIsMobile] = useState(iM('md') || false);
 
     const [state, dispatch] = useReducer(chatReducer, {
         ...initialState,
         config: history ? history.config : initialState.config,
         threadList: history ? history.chatHistory : initialState.threadList,
+        sideBarOpen: !isMobile,
     });
 
     // Effect to check stored chat history on component mount
