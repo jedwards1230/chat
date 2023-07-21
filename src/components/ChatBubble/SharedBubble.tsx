@@ -3,10 +3,12 @@ import SharedProfilePicture from './SharedProfilePicture';
 import clsx from 'clsx';
 
 export default function SharedBubble({
+    input,
     message,
     config,
 }: {
     message: Message;
+    input?: string;
     config: AgentConfig;
 }) {
     return (
@@ -20,7 +22,7 @@ export default function SharedBubble({
         >
             <div className="mx-auto flex w-full max-w-4xl gap-4 ">
                 <SharedProfilePicture message={message} />
-                <TextContent message={message} config={config} />
+                <TextContent message={message} input={input} config={config} />
             </div>
         </div>
     );
