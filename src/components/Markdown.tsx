@@ -81,7 +81,7 @@ export default function Markdown({
                                     btnClicked
                                         ? 'border-neutral-400 bg-neutral-50 text-green-500 hover:bg-neutral-100 dark:bg-neutral-500 dark:hover:bg-neutral-500'
                                         : 'border-neutral-500 bg-neutral-50 hover:bg-neutral-200 dark:bg-neutral-300 dark:text-neutral-900',
-                                    'flex h-8 w-24 justify-center rounded-full border px-2 py-1 text-sm font-medium tracking-tight active:bg-neutral-300 dark:active:bg-neutral-400',
+                                    'flex h-8 w-20 justify-center rounded-full border px-2 py-1 text-sm font-medium tracking-tight active:bg-neutral-300 dark:active:bg-neutral-400',
                                 )}
                                 onClick={() => {
                                     navigator.clipboard.writeText(
@@ -93,7 +93,7 @@ export default function Markdown({
                                     }, 1000);
                                 }}
                             >
-                                {btnClicked ? <Check /> : 'Copy Code'}
+                                {btnClicked ? <Check /> : 'Copy'}
                             </button>
                         </div>
                     </div>

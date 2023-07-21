@@ -1,5 +1,6 @@
 import TextContent from './TextContent';
 import SharedProfilePicture from './SharedProfilePicture';
+import clsx from 'clsx';
 
 export default function SharedBubble({
     message,
@@ -9,9 +10,18 @@ export default function SharedBubble({
     config: AgentConfig;
 }) {
     return (
-        <div className="group relative flex gap-4 rounded border border-transparent px-1 pb-4 pt-2 transition-colors hover:border-neutral-400/70 hover:bg-neutral-200/60 dark:hover:border-neutral-600 dark:hover:bg-neutral-800 sm:px-2">
-            <SharedProfilePicture message={message} />
-            <TextContent message={message} config={config} />
+        <div
+            className={clsx(
+                'group relative w-full rounded px-1 pb-6 pt-4 transition-colors sm:px-2',
+                message.role !== 'user'
+                    ? 'bg-neutral-200/60 dark:bg-neutral-800/70'
+                    : 'border-y dark:border-neutral-700',
+            )}
+        >
+            <div className="mx-auto flex w-full max-w-4xl gap-4 ">
+                <SharedProfilePicture message={message} />
+                <TextContent message={message} config={config} />
+            </div>
         </div>
     );
 }

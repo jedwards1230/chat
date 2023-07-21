@@ -40,16 +40,14 @@ export default async function Page({ params }: Props) {
 
     return (
         <div className="flex h-full w-full flex-col overflow-hidden transition-all">
-            <div className="grow-1 flex h-full w-full max-w-full flex-col items-center justify-center overflow-y-scroll">
-                <div className="mx-auto flex h-full w-full flex-col gap-4 p-2 lg:max-w-4xl">
-                    {thread.messages.map((m) => (
-                        <SharedBubble
-                            key={m.id}
-                            message={m}
-                            config={shareData.agentConfig}
-                        />
-                    ))}
-                </div>
+            <div className="grow-1 flex h-full w-full max-w-full flex-col overflow-y-scroll">
+                {thread.messages.map((m) => (
+                    <SharedBubble
+                        key={m.id}
+                        message={m}
+                        config={shareData.agentConfig}
+                    />
+                ))}
             </div>
         </div>
     );
