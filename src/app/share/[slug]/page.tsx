@@ -41,13 +41,18 @@ export default async function Page({ params }: Props) {
     return (
         <div className="flex h-full w-full flex-col overflow-hidden transition-all">
             <div className="grow-1 flex h-full w-full max-w-full flex-col overflow-y-scroll">
-                {thread.messages.map((m) => (
-                    <SharedBubble
-                        key={m.id}
-                        message={m}
-                        config={shareData.agentConfig}
-                    />
-                ))}
+                {thread.messages.map((m) => {
+                    if (m.role === 'assistant' && m.function_call) {
+                        return null;
+                    }
+                    return (
+                        <SharedBubble
+                            key={m.id}
+                            message={m}
+                            config={shareData.agentConfig}
+                        />
+                    );
+                })}
             </div>
         </div>
     );
