@@ -10,7 +10,7 @@ import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { useTheme } from 'next-themes';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { Check } from './Icons';
+import { Check } from '../../Icons';
 
 export default function Markdown({
     content = '',

@@ -1,6 +1,6 @@
 'use client';
 
-import ChatHistory from './ChatHistory/ChatHistory';
+import ChatHistory from './ChatHistory';
 import { useChat, useChatDispatch } from '@/providers/ChatProvider';
 import clsx from 'clsx';
 import ChatInput from './ChatInput';

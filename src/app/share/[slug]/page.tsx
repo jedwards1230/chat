@@ -1,7 +1,7 @@
 import { redis } from '@/lib/redis';
 import { notFound } from 'next/navigation';
 
-import { SharedBubble } from '@/components/ChatBubble';
+import { SharedBubble } from '@/components/ChatThread/ChatBubble';
 import { Metadata } from 'next';
 
 type Props = {
