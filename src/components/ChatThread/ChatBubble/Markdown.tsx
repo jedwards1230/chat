@@ -10,6 +10,7 @@ import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { useTheme } from 'next-themes';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+
 import { Check } from '../../Icons';
 
 export default function Markdown({
@@ -58,46 +59,69 @@ export default function Markdown({
             code({ node, inline, className, children, ...props }) {
                 const language = className?.replace('language-', '');
                 const match = /language-(\w+)/.exec(className || '');
-                return !inline && match ? (
-                    <div className="flex flex-col gap-2">
-                        <div className="rounded-t-lg border border-neutral-600 bg-neutral-200 dark:bg-neutral-700">
-                            <div className="pb-1 pl-4 pt-2 text-sm">
-                                {language ? language : 'code'}
+
+                const value = (node.children[0] as any).value;
+                const isImg = value.startsWith('![');
+
+                if (isImg) {
+                    const url = value.match(/\(([^)]+)\)/)[1];
+                    return (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                            alt={url}
+                            src={url}
+                            className="h-auto w-auto rounded-lg border border-gray-300"
+                            loading="lazy"
+                        />
+                    );
+                }
+
+                if (!inline && match) {
+                    return (
+                        <div className="flex flex-col gap-2">
+                            <div className="rounded-t-lg border border-neutral-600 bg-neutral-200 dark:bg-neutral-700">
+                                <div className="pb-1 pl-4 pt-2 text-sm">
+                                    {language ? language : 'code'}
+                                </div>
+                                <SyntaxHighlighter
+                                    {...props}
+                                    style={
+                                        resolvedTheme !== 'dark'
+                                            ? vs
+                                            : vscDarkPlus
+                                    }
+                                    className="!mb-0"
+                                    language={match[1]}
+                                >
+                                    {String(children).replace(/\n$/, '')}
+                                </SyntaxHighlighter>
                             </div>
-                            <SyntaxHighlighter
-                                {...props}
-                                style={
-                                    resolvedTheme !== 'dark' ? vs : vscDarkPlus
-                                }
-                                className="!mb-0"
-                                language={match[1]}
-                            >
-                                {String(children).replace(/\n$/, '')}
-                            </SyntaxHighlighter>
+                            <div className="flex items-center justify-center">
+                                <button
+                                    className={clsx(
+                                        btnClicked
+                                            ? 'border-neutral-400 bg-neutral-50 text-green-500 hover:bg-neutral-100 dark:bg-neutral-500 dark:hover:bg-neutral-500'
+                                            : 'border-neutral-500 bg-neutral-50 hover:bg-neutral-200 dark:bg-neutral-300 dark:text-neutral-900',
+                                        'flex h-8 w-20 justify-center rounded-full border px-2 py-1 text-sm font-medium tracking-tight active:bg-neutral-300 dark:active:bg-neutral-400',
+                                    )}
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(
+                                            String(children),
+                                        );
+                                        setBtnClicked(true);
+                                        setTimeout(() => {
+                                            setBtnClicked(false);
+                                        }, 1000);
+                                    }}
+                                >
+                                    {btnClicked ? <Check /> : 'Copy'}
+                                </button>
+                            </div>
                         </div>
-                        <div className="flex items-center justify-center">
-                            <button
-                                className={clsx(
-                                    btnClicked
-                                        ? 'border-neutral-400 bg-neutral-50 text-green-500 hover:bg-neutral-100 dark:bg-neutral-500 dark:hover:bg-neutral-500'
-                                        : 'border-neutral-500 bg-neutral-50 hover:bg-neutral-200 dark:bg-neutral-300 dark:text-neutral-900',
-                                    'flex h-8 w-20 justify-center rounded-full border px-2 py-1 text-sm font-medium tracking-tight active:bg-neutral-300 dark:active:bg-neutral-400',
-                                )}
-                                onClick={() => {
-                                    navigator.clipboard.writeText(
-                                        String(children),
-                                    );
-                                    setBtnClicked(true);
-                                    setTimeout(() => {
-                                        setBtnClicked(false);
-                                    }, 1000);
-                                }}
-                            >
-                                {btnClicked ? <Check /> : 'Copy'}
-                            </button>
-                        </div>
-                    </div>
-                ) : (
+                    );
+                }
+
+                return (
                     <div
                         {...props}
                         className={clsx(
