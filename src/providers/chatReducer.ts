@@ -1,5 +1,5 @@
 import { getDefaultThread } from '@/providers/initialChat';
-import { upsertMessage } from '@/utils/client';
+import { isMobile, upsertMessage } from '@/utils/client';
 
 const DEBUG = false;
 
@@ -9,6 +9,13 @@ export function chatReducer(state: ChatState, action: ChatAction): ChatState {
             return {
                 ...state,
                 sideBarOpen: action.payload ?? !state.sideBarOpen,
+                chatSettingsOpen: isMobile() ? false : state.chatSettingsOpen,
+            };
+        case 'SET_CHATSETTINGS_OPEN':
+            return {
+                ...state,
+                sideBarOpen: isMobile() ? false : state.sideBarOpen,
+                chatSettingsOpen: action.payload ?? !state.chatSettingsOpen,
             };
         case 'SET_CONFIG_EDITOR_OPEN':
             return {

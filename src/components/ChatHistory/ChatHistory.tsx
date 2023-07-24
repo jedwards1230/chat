@@ -30,7 +30,6 @@ export default function ChatHistory() {
     useEffect(() => {
         if (sidebarRef.current) {
             const styles = window.getComputedStyle(sidebarRef.current);
-            console.log(styles.display);
             dispatch({
                 type: 'SET_SIDEBAR_OPEN',
                 payload: styles.display === 'flex',
@@ -57,11 +56,12 @@ export default function ChatHistory() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    const sortThread = (a: ChatThread, b: ChatThread) => {
+        return b.lastModified.getTime() - a.lastModified.getTime();
+    };
+
     const sortedThreadList = useMemo(
-        () =>
-            threadList.sort(
-                (a, b) => b.lastModified.getTime() - a.lastModified.getTime(),
-            ),
+        () => threadList.sort(sortThread),
         [threadList],
     );
 

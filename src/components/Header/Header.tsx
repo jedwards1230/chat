@@ -1,44 +1,30 @@
 'use client';
 
 import { useChat, useChatDispatch } from '@/providers/ChatProvider';
-import { Bars, Share } from './Icons';
+import { Bars, Settings, Share } from '../Icons';
 import clsx from 'clsx';
 import { isMobile } from '@/utils/client';
-import { shareChatThread } from '@/utils/server';
-import { motion } from 'framer-motion';
+import ModelSelector from './ModelSelector';
 
 export default function Header() {
-    const { activeThread, sideBarOpen } = useChat();
+    const { activeThread, sideBarOpen, chatSettingsOpen } = useChat();
     const dispatch = useChatDispatch();
 
     const handleSidebarToggle = () => {
         dispatch({ type: 'SET_SIDEBAR_OPEN' });
     };
 
-    const handleShare = async () => {
-        try {
-            await shareChatThread(activeThread);
-            dispatch({
-                type: 'SET_SHARE_MODAL_OPEN',
-                payload: true,
-            });
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
     return (
         <div
             className={clsx(
-                'grid w-full grid-cols-12 border-b px-2 py-2',
+                'grid h-16 w-full shrink-0 grid-cols-12 border-b p-2',
                 activeThread.messages.length > 1
                     ? 'border-neutral-300 shadow dark:border-neutral-500'
                     : 'border-transparent bg-transparent',
             )}
         >
             <div className="col-span-1 flex items-center justify-start">
-                <motion.button
-                    layoutId="sidebar-toggle"
+                <button
                     className={clsx(
                         'cursor-pointer px-1 text-neutral-400 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-50',
                         sideBarOpen && isMobile() && 'hidden sm:flex',
@@ -46,7 +32,7 @@ export default function Header() {
                     onClick={handleSidebarToggle}
                 >
                     <Bars />
-                </motion.button>
+                </button>
             </div>
             <div
                 className={clsx(
@@ -54,7 +40,7 @@ export default function Header() {
                     sideBarOpen && isMobile() && 'col-start-2 sm:col-start-1',
                 )}
             >
-                {activeThread.messages.length > 1 && (
+                {activeThread.messages.length > 1 ? (
                     <>
                         <p className="line-clamp-1 font-semibold">
                             {activeThread.title}
@@ -64,18 +50,26 @@ export default function Header() {
                             {activeThread.messages.length} messages
                         </p>
                     </>
+                ) : (
+                    <ModelSelector />
                 )}
             </div>
-            {activeThread.messages.length > 1 && (
-                <div className="col-span-1 flex items-center justify-end">
-                    <button
-                        className="cursor-pointer px-1 text-neutral-400 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-50"
-                        onClick={handleShare}
-                    >
-                        <Share />
-                    </button>
-                </div>
-            )}
+            <div className="col-span-1 flex items-center justify-end">
+                <button
+                    className={clsx(
+                        'cursor-pointer px-1 text-neutral-400 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-50',
+                        chatSettingsOpen && isMobile() && 'hidden sm:flex',
+                    )}
+                    onClick={() =>
+                        dispatch({
+                            type: 'SET_CHATSETTINGS_OPEN',
+                            payload: !chatSettingsOpen,
+                        })
+                    }
+                >
+                    <Settings />
+                </button>
+            </div>
         </div>
     );
 }

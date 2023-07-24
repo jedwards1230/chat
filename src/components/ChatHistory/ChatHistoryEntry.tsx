@@ -4,6 +4,7 @@ import clsx from 'clsx';
 
 import { useChat, useChatDispatch } from '@/providers/ChatProvider';
 import { Chat, Trash } from '../Icons';
+import { isMobile } from '@/utils/client';
 
 export default function ChatHistoryEntry({ entry }: { entry: ChatThread }) {
     const { activeThread } = useChat();
@@ -15,15 +16,23 @@ export default function ChatHistoryEntry({ entry }: { entry: ChatThread }) {
         dispatch({ type: 'REMOVE_THREAD', payload: entry.id });
     };
 
+    const setActive = () => {
+        dispatch({
+            type: 'SET_ACTIVE_THREAD',
+            payload: entry,
+        });
+        if (isMobile()) {
+            dispatch({
+                type: 'SET_SIDEBAR_OPEN',
+                payload: false,
+            });
+        }
+    };
+
     return (
         <div
             title={`threadId: ${entry.id}`}
-            onClick={() =>
-                dispatch({
-                    type: 'SET_ACTIVE_THREAD',
-                    payload: entry,
-                })
-            }
+            onClick={setActive}
             className={clsx(
                 'grid w-full max-w-full grid-cols-16 items-center justify-between gap-2 rounded-lg px-2 py-1',
                 entry.id === activeThread.id

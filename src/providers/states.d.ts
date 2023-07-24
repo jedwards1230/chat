@@ -5,6 +5,7 @@ interface ChatState {
     editId: string | null;
     sideBarOpen: boolean;
     configEditorOpen: boolean;
+    chatSettingsOpen: boolean;
     shareModalOpen: boolean;
     pluginsEnabled: boolean;
     config: Config;
@@ -64,6 +65,7 @@ type ChatAction =
     /* Views */
     | { type: 'SET_CONFIG_EDITOR_OPEN'; payload?: boolean }
     | { type: 'SET_SIDEBAR_OPEN'; payload?: boolean }
+    | { type: 'SET_CHATSETTINGS_OPEN'; payload?: boolean }
     | { type: 'SET_SHARE_MODAL_OPEN'; payload?: boolean }
     /* Config */
     | { type: 'INITIALIZE'; payload: SaveData }

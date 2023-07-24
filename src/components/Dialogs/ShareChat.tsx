@@ -12,6 +12,10 @@ export default function ShareChat() {
 
     const shareUrl = `${window.location.origin}/share/${activeThread.id}`;
 
+    const handleInputClick = (event: any) => {
+        event.target.select();
+    };
+
     return (
         <Dialog
             callback={() =>
@@ -29,6 +33,8 @@ export default function ShareChat() {
                         readOnly
                         className="w-full rounded-lg border px-2 py-1 focus:outline-none"
                         value={shareUrl}
+                        onClick={handleInputClick}
+                        onTouchStart={handleInputClick}
                     />
                     <Link
                         href={shareUrl}

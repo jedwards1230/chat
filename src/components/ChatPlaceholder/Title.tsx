@@ -17,7 +17,7 @@ export default function Title() {
             <div className="flex gap-1 text-neutral-400">
                 System:
                 <textarea
-                    rows={rows}
+                    //rows={rows}
                     value={activeThread.agentConfig.systemMessage}
                     onChange={(e) =>
                         dispatch({
@@ -25,7 +25,7 @@ export default function Title() {
                             payload: e.target.value,
                         })
                     }
-                    className="max-h-48 resize-none rounded border border-transparent bg-transparent italic text-neutral-500 focus:border-neutral-500 focus:outline-none"
+                    className="h-auto max-h-48 resize-none overflow-y-visible rounded border border-transparent bg-transparent italic text-neutral-500 focus:border-neutral-500 focus:outline-none"
                 />
             </div>
         </div>

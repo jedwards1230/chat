@@ -3,24 +3,20 @@
 import { useRef, useEffect, useState } from 'react';
 import clsx from 'clsx';
 
-import { useChat, useChatDispatch } from '@/providers/ChatProvider';
 import { ChatBubble } from './ChatBubble';
 import ChatPlaceholder from '../ChatPlaceholder';
-import { isMobile } from '@/utils/client';
-import { Bars, Settings } from '../Icons';
 
-export default function ChatThread() {
-    const { activeThread, sideBarOpen } = useChat();
-    const dispatch = useChatDispatch();
-    const [isConfigOpen, setIsConfigOpen] = useState(false);
+export default function ChatThread({
+    style,
+    activeThread,
+}: {
+    style?: React.CSSProperties;
+    activeThread: ChatThread;
+}) {
     const [messages, setMessages] = useState(activeThread.messages);
 
     const threadRef = useRef<HTMLDivElement>(null);
-    let prevScrollHeight = useRef<number>(0);
-
-    const handleSidebarToggle = () => {
-        dispatch({ type: 'SET_SIDEBAR_OPEN' });
-    };
+    const prevScrollHeight = useRef<number>(0);
 
     useEffect(() => {
         setMessages(activeThread.messages);
@@ -43,42 +39,16 @@ export default function ChatThread() {
     }, [activeThread.messages]);
 
     const hasMultipleMessages = activeThread.messages.length > 1;
-    const isSidebarHidden = sideBarOpen && isMobile();
-    const commonButtonClasses =
-        'text-neutral-400 z-10 absolute rounded-lg p-2 top-2.5 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50 cursor-pointer';
 
     return (
         <div
+            style={style}
             ref={threadRef}
             className={clsx(
                 'grow-1 relative flex h-full w-full max-w-full flex-col items-center justify-center',
                 hasMultipleMessages && 'overflow-y-scroll',
             )}
         >
-            {!hasMultipleMessages && (
-                <>
-                    <button
-                        className={clsx(
-                            `${commonButtonClasses} left-1`,
-                            isSidebarHidden && 'hidden sm:flex',
-                        )}
-                        onClick={handleSidebarToggle}
-                    >
-                        <Bars />
-                    </button>
-
-                    <button
-                        className={clsx(
-                            `${commonButtonClasses} right-1`,
-                            isSidebarHidden && 'hidden sm:flex',
-                        )}
-                        onClick={() => setIsConfigOpen(!isConfigOpen)}
-                    >
-                        <Settings />
-                    </button>
-                </>
-            )}
-
             <div className="flex h-full w-full flex-col">
                 {hasMultipleMessages ? (
                     messages.map((m, i) => {
@@ -102,7 +72,7 @@ export default function ChatThread() {
                         );
                     })
                 ) : (
-                    <ChatPlaceholder open={isConfigOpen} />
+                    <ChatPlaceholder />
                 )}
                 {/* Blank row at bottom. Better view of quick actions. */}
                 {hasMultipleMessages && <div className="min-h-[72px] w-full" />}

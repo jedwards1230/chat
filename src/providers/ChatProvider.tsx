@@ -34,6 +34,13 @@ export function ChatProvider({
     const [state, dispatch] = useReducer(chatReducer, {
         ...initialState,
         config: history ? history.config : initialState.config,
+        activeThread: {
+            ...initialState.activeThread,
+            agentConfig: {
+                ...initialState.activeThread.agentConfig,
+                ...(history ? history.config : initialState.config),
+            },
+        },
         threadList: history ? history.chatHistory : initialState.threadList,
         sideBarOpen: !isMobile,
     });

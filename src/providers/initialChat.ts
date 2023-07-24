@@ -10,7 +10,7 @@ const defaultConfig: Config = {
     systemMessage: systemMessage,
     topP: 1,
     N: 1,
-    maxTokens: 1024,
+    maxTokens: -1,
     frequencyPenalty: 0,
     presencePenalty: 0,
 };
@@ -49,6 +49,7 @@ const initialState: ChatState = {
     config: defaultConfig,
     pluginsEnabled: true,
     sideBarOpen: true,
+    chatSettingsOpen: false,
     configEditorOpen: false,
     shareModalOpen: false,
 };
