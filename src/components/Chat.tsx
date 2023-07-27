@@ -88,7 +88,7 @@ export default function Chat() {
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            const edgeDistance = 50;
+            const edgeDistance = 20;
 
             const handleTouchStart = (event: TouchEvent) => {
                 const touchX = event.touches[0].clientX;

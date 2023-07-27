@@ -56,18 +56,18 @@ export default function ChatThread({
                             return null;
                         }
                         const lastMessage = messages[i - 1];
+                        const input =
+                            m.role === 'function' &&
+                            lastMessage.function_call &&
+                            lastMessage.function_call.arguments
+                                ? lastMessage.function_call.arguments
+                                : undefined;
                         return (
                             <ChatBubble
                                 key={m.id}
                                 message={m}
                                 config={activeThread.agentConfig}
-                                input={
-                                    m.role === 'function' &&
-                                    lastMessage.function_call &&
-                                    lastMessage.function_call.arguments
-                                        ? lastMessage.function_call.arguments
-                                        : undefined
-                                }
+                                input={input}
                             />
                         );
                     })
