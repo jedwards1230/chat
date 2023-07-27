@@ -289,9 +289,13 @@ export async function getCloudData(): Promise<{
         return { config: null, threads: [] };
     }
 
-    const [config, threads] = await Promise.all([
+    const [config, threads] = await Promise.allSettled([
         getCloudConfig(userId),
         getChatThreadList(userId),
     ]);
-    return { config, threads };
+
+    return {
+        config: config.status === 'fulfilled' ? config.value : null,
+        threads: threads.status === 'fulfilled' ? threads.value : [],
+    };
 }
