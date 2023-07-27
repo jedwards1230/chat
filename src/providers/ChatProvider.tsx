@@ -97,7 +97,7 @@ export function ChatProvider({
                 updateActiveThread(newThread);
                 setIsNew(false);
             } else {
-                router.replace('/');
+                router.push('/');
                 setIsNew(true);
             }
         }

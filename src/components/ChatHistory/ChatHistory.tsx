@@ -68,7 +68,6 @@ export default function ChatHistory() {
             <div className="relative flex h-full w-full flex-col items-center justify-start gap-4 px-2">
                 <div className="flex w-full justify-between gap-x-2">
                     <Link
-                        replace={true}
                         onClick={newThread}
                         className="flex flex-1 justify-center rounded-lg border border-neutral-500 py-2 font-medium transition-colors hover:border-neutral-400 hover:bg-neutral-500 focus:bg-neutral-600 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700"
                         href="/"

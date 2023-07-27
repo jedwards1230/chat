@@ -32,7 +32,7 @@ export function createSubmitHandler(
     return async (e: React.FormEvent) => {
         e.preventDefault();
         if (state.input.trim() === '') return;
-        router.replace('/' + state.activeThread.id);
+        router.push('/' + state.activeThread.id);
 
         const upsertMessage = (newMessage: Message) => {
             setState((prevState) => {
@@ -294,7 +294,7 @@ export function removeThreadHandler(
             abortController: undefined,
         }));
         if (state.activeThread.id === id) {
-            router.replace('/');
+            router.push('/');
         }
     };
 }
@@ -313,7 +313,7 @@ export function removeAllThreadsHandler(
             botTyping: false,
             saved: true,
         }));
-        router.replace('/');
+        router.push('/');
     };
 }
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { PanInfo, motion } from 'framer-motion';
 
@@ -85,6 +85,22 @@ export default function Chat() {
             }
         }
     }
+
+    useEffect(() => {
+        if (typeof window !== undefined) {
+            const preventDefaultSwipe = (event: TouchEvent) => {
+                event.preventDefault();
+            };
+
+            window.addEventListener('touchmove', preventDefaultSwipe, {
+                passive: false,
+            });
+
+            return () => {
+                window.removeEventListener('touchmove', preventDefaultSwipe);
+            };
+        }
+    }, []);
 
     return (
         <>

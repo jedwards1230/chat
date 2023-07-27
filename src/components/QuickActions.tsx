@@ -21,7 +21,7 @@ export default function QuickActions() {
                 </button>
             )}
             {activeThread.messages.length > 1 && (
-                <Link href="/" replace={true}>
+                <Link href="/">
                     <button
                         className={clsx(
                             btn,
