@@ -2,14 +2,14 @@
 
 import Link from 'next/link';
 
-import { useChat, useChatDispatch } from '@/providers/ChatProvider';
+import { useChat } from '@/providers/ChatProvider';
 import Dialog from './Dialog';
 import { OpenNew } from '../Icons';
+import { useUI } from '@/providers/UIProvider';
 
 export default function ShareChat() {
     const { activeThread } = useChat();
-    const chatDispatch = useChatDispatch();
-
+    const { setShareModalOpen } = useUI();
     const shareUrl = `${window.location.origin}/share/${activeThread.id}`;
 
     const handleInputClick = (event: any) => {
@@ -17,14 +17,7 @@ export default function ShareChat() {
     };
 
     return (
-        <Dialog
-            callback={() =>
-                chatDispatch({
-                    type: 'SET_SHARE_MODAL_OPEN',
-                    payload: false,
-                })
-            }
-        >
+        <Dialog callback={() => setShareModalOpen(false)}>
             <div className="w-full text-center text-lg">
                 Share URL
                 <div className="mt-2 flex items-center justify-between gap-2">

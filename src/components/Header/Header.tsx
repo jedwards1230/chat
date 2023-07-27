@@ -1,17 +1,27 @@
 'use client';
 
-import { useChat, useChatDispatch } from '@/providers/ChatProvider';
+import { useChat } from '@/providers/ChatProvider';
 import { Bars, Settings, Share } from '../Icons';
 import clsx from 'clsx';
 import { isMobile } from '@/utils/client';
 import ModelSelector from './ModelSelector';
+import { useUI } from '@/providers/UIProvider';
 
 export default function Header() {
-    const { activeThread, sideBarOpen, chatSettingsOpen } = useChat();
-    const dispatch = useChatDispatch();
+    const { activeThread } = useChat();
+    const {
+        sideBarOpen,
+        setSideBarOpen,
+        chatSettingsOpen,
+        setChatSettingsOpen,
+    } = useUI();
 
     const handleSidebarToggle = () => {
-        dispatch({ type: 'SET_SIDEBAR_OPEN' });
+        setSideBarOpen(!sideBarOpen);
+    };
+
+    const handleChatSettingsToggle = () => {
+        setChatSettingsOpen(!chatSettingsOpen);
     };
 
     return (
@@ -60,12 +70,7 @@ export default function Header() {
                         'cursor-pointer px-1 text-neutral-400 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-50',
                         chatSettingsOpen && isMobile() && 'hidden sm:flex',
                     )}
-                    onClick={() =>
-                        dispatch({
-                            type: 'SET_CHATSETTINGS_OPEN',
-                            payload: !chatSettingsOpen,
-                        })
-                    }
+                    onClick={handleChatSettingsToggle}
                 >
                     <Settings />
                 </button>

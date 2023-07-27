@@ -3,15 +3,28 @@
 import clsx from 'clsx';
 import { useEffect, useRef } from 'react';
 
-import { useChat, useChatDispatch } from '@/providers/ChatProvider';
+import { useChat } from '@/providers/ChatProvider';
 import { shareChatThread } from '@/utils/server';
 import { Share } from '../Icons';
 import { isMobile } from '@/utils/client';
+import { useUI } from '@/providers/UIProvider';
 
 export default function ChatSettings() {
-    const { chatSettingsOpen, activeThread, pluginsEnabled } = useChat();
-    const dispatch = useChatDispatch();
+    const {
+        activeThread,
+        pluginsEnabled,
+        setPluginsEnabled,
+        toggleplugin,
+        setSystemMessage,
+        updateThreadConfig,
+    } = useChat();
+    const { chatSettingsOpen, setChatSettingsOpen, setShareModalOpen } =
+        useUI();
     const chatsettingsRef = useRef<HTMLDivElement>(null);
+
+    const togglePlugins = () => {
+        setPluginsEnabled(!pluginsEnabled);
+    };
 
     const availableTools: Tool[] = [
         'calculator',
@@ -50,15 +63,9 @@ export default function ChatSettings() {
     const handleShare = async () => {
         try {
             await shareChatThread(activeThread);
-            dispatch({
-                type: 'SET_SHARE_MODAL_OPEN',
-                payload: true,
-            });
+            setShareModalOpen(true);
             if (isMobile()) {
-                dispatch({
-                    type: 'SET_CHATSETTINGS_OPEN',
-                    payload: false,
-                });
+                setChatSettingsOpen(false);
             }
         } catch (error) {
             console.error(error);
@@ -74,10 +81,7 @@ export default function ChatSettings() {
                 !chatsettingsRef.current.contains(event.target)
             ) {
                 event.preventDefault();
-                dispatch({
-                    type: 'SET_CHATSETTINGS_OPEN',
-                    payload: false,
-                });
+                setChatSettingsOpen(false);
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
@@ -102,29 +106,21 @@ export default function ChatSettings() {
                     <label className="flex w-full flex-col justify-between gap-2 py-2 text-sm">
                         <span>Name</span>
                         <input
-                            className="w-full rounded-lg border p-2"
+                            className="w-full rounded-lg border bg-neutral-700 p-2"
                             type="text"
                             value={activeThread.agentConfig.name}
-                            onChange={(e) => {
-                                dispatch({
-                                    type: 'SET_SYSTEM_NAME',
-                                    payload: e.target.value,
-                                });
-                            }}
+                            onChange={(e) =>
+                                updateThreadConfig({ name: e.target.value })
+                            }
                         />
                     </label>
                     <label className="flex w-full flex-col justify-between gap-2 py-2 text-sm">
                         <span>System Message</span>
                         <input
-                            className="w-full rounded-lg border p-2"
+                            className="w-full rounded-lg border bg-neutral-700 p-2"
                             type="text"
                             value={activeThread.agentConfig.systemMessage}
-                            onChange={(e) => {
-                                dispatch({
-                                    type: 'SET_SYSTEM_MESSAGE',
-                                    payload: e.target.value,
-                                });
-                            }}
+                            onChange={(e) => setSystemMessage(e.target.value)}
                         />
                     </label>
                     <details className="w-full">
@@ -140,23 +136,17 @@ export default function ChatSettings() {
                         ))}
                     </details>
                     <div className="flex w-full flex-col gap-2">
-                        <div className="flex flex-col px-1">
+                        <label className="flex flex-col rounded px-1 hover:bg-neutral-500 dark:hover:bg-neutral-600">
                             <div className="flex items-center justify-between gap-4 dark:border-neutral-600">
-                                <div className="flex flex-col">
-                                    <div className="font-semibold ">
-                                        Plugins
-                                    </div>
+                                <div className="font-semibold text-neutral-100">
+                                    Plugins
                                 </div>
                                 <input
                                     type="checkbox"
                                     title="Toggle plugins"
                                     className="h-4 w-4 cursor-pointer"
                                     checked={pluginsEnabled}
-                                    onChange={() =>
-                                        dispatch({
-                                            type: 'TOGGLE_PLUGINS',
-                                        })
-                                    }
+                                    onChange={togglePlugins}
                                 />
                             </div>
                             {pluginsEnabled && (
@@ -165,7 +155,7 @@ export default function ChatSettings() {
                                     enabled
                                 </div>
                             )}
-                        </div>
+                        </label>
                         <div>
                             {pluginsEnabled &&
                                 availableTools.map((plugin) => {
@@ -176,7 +166,7 @@ export default function ChatSettings() {
                                     return (
                                         <label
                                             key={plugin}
-                                            className="flex w-full cursor-pointer items-center justify-between rounded p-1 text-sm hover:bg-neutral-200 dark:hover:bg-neutral-600"
+                                            className="flex w-full cursor-pointer items-center justify-between rounded p-1 text-sm hover:bg-neutral-500 dark:hover:bg-neutral-600"
                                         >
                                             <span className="capitalize">
                                                 {plugin}
@@ -185,12 +175,9 @@ export default function ChatSettings() {
                                                 className="rounded-lg border p-2"
                                                 type="checkbox"
                                                 checked={checked}
-                                                onChange={() => {
-                                                    dispatch({
-                                                        type: 'TOGGLE_PLUGIN',
-                                                        payload: plugin as Tool,
-                                                    });
-                                                }}
+                                                onChange={() =>
+                                                    toggleplugin(plugin)
+                                                }
                                             />
                                         </label>
                                     );

@@ -1,13 +1,13 @@
 'use client';
 
-import { useChat } from '@/providers/ChatProvider';
 import ConfigEditor from './ConfigEditor';
 import ShareChat from './ShareChat';
+import { useUI } from '@/providers/UIProvider';
 
 export default function Dialogs() {
-    const { configEditorOpen, shareModalOpen } = useChat();
+    const { configEditorOpen, shareModalOpen } = useUI();
     return (
-        <div className="h-full w-full transition-all">
+        <div className="fixed transition-all">
             {configEditorOpen && <ConfigEditor />}
             {shareModalOpen && <ShareChat />}
         </div>

@@ -38,7 +38,7 @@ export default function ChatThread({
         prevScrollHeight.current = threadEl.scrollHeight;
     }, [activeThread.messages]);
 
-    const hasMultipleMessages = activeThread.messages.length > 1;
+    const hasMultipleMessages = messages.length > 1;
 
     return (
         <div

@@ -131,24 +131,3 @@ export function parseStreamData(chunk: string): StreamData[] {
         return [];
     }
 }
-
-export function upsertMessage(
-    thread: ChatThread,
-    newMessage: Message,
-): ChatThread {
-    let foundMessage = false;
-    const messages = thread.messages.map((message) => {
-        if (message.id === newMessage.id) {
-            foundMessage = true;
-            return newMessage;
-        }
-        return message;
-    });
-    if (!foundMessage) messages.push(newMessage);
-
-    return {
-        ...thread,
-        lastModified: new Date(),
-        messages,
-    };
-}

@@ -1,72 +1,28 @@
-interface ChatState {
-    input: string;
+type ChatState = {
     activeThread: ChatThread;
-    threadList: ChatThread[];
-    editId: string | null;
-    sideBarOpen: boolean;
-    configEditorOpen: boolean;
-    chatSettingsOpen: boolean;
-    shareModalOpen: boolean;
-    pluginsEnabled: boolean;
+    threads: ChatThread[];
     config: Config;
     botTyping: boolean;
+    input: string;
+    editId: string | null;
+    pluginsEnabled: boolean;
     abortController?: AbortController;
-}
+    saved: boolean;
 
-type ChatAction =
-    /* Chat */
-    | { type: 'SET_BOT_TYPING'; payload?: AbortController }
-    | { type: 'SET_ACTIVE_THREAD'; payload: ChatThread }
-    | { type: 'CHANGE_TEMPERATURE'; payload: number }
-    | { type: 'SET_SYSTEM_MESSAGE'; payload: string }
-    | { type: 'SET_SYSTEM_NAME'; payload: string }
-    | { type: 'TOGGLE_PLUGINS'; payload?: boolean }
-    | { type: 'REMOVE_THREAD'; payload: string }
-    | { type: 'CHANGE_INPUT'; payload: string }
-    | { type: 'TOGGLE_PLUGIN'; payload: Tool }
-    | { type: 'CREATE_THREAD' }
-    | { type: 'CLEAR_HISTORY' }
-    | { type: 'CANCEL_EDIT' }
-    | {
-          type: 'EDIT_MESSAGE';
-          payload: {
-              threadId: string;
-              messageId: string;
-          };
-      }
-    | {
-          type: 'REMOVE_MESSAGE';
-          payload: {
-              threadId: string;
-              messageId: string;
-          };
-      }
-    | {
-          type: 'UPSERT_MESSAGE';
-          payload: {
-              threadId: string;
-              message: Message;
-          };
-      }
-    | {
-          type: 'UPSERT_TITLE';
-          payload: {
-              threadId: string;
-              title: string;
-          };
-      }
-    | {
-          type: 'CHANGE_MODEL';
-          payload: {
-              threadId: string;
-              model: Model;
-          };
-      }
-    /* Views */
-    | { type: 'SET_CONFIG_EDITOR_OPEN'; payload?: boolean }
-    | { type: 'SET_SIDEBAR_OPEN'; payload?: boolean }
-    | { type: 'SET_CHATSETTINGS_OPEN'; payload?: boolean }
-    | { type: 'SET_SHARE_MODAL_OPEN'; payload?: boolean }
-    /* Config */
-    | { type: 'INITIALIZE'; payload: SaveData }
-    | { type: 'UPDATE_CONFIG'; payload: Config };
+    abortRequest: () => void;
+    updateActiveThread: (thread: ChatThread) => void;
+    resetAbortController: () => void;
+    createThread: () => void;
+    toggleplugin: (plugin: Tool) => void;
+    setConfig: (config: Config) => void;
+    updateThreadConfig: (config: Partial<AgentConfig>) => void;
+    setSystemMessage: (message: string) => void;
+    editMessage: (messageId: string) => void;
+    removeMessage: (messageId: string) => void;
+    removeThread: (threadId: string) => void;
+    removeAllThreads: () => void;
+    setPluginsEnabled: (enabled: boolean) => void;
+    changeInput: (input: string) => void;
+    cancelEdit: () => void;
+    handleSubmit: (e: React.FormEvent) => void;
+};

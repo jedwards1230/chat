@@ -1,12 +1,10 @@
-import { redis } from '@/lib/redis';
 import { notFound } from 'next/navigation';
-
-import { SharedBubble } from '@/components/ChatThread/ChatBubble';
 import { Metadata } from 'next';
 
-type Props = {
-    params: { slug: string };
-};
+import { SharedBubble } from '@/components/ChatThread/ChatBubble';
+import { redis } from '@/lib/redis';
+
+type Props = { params: { slug: string } };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const shareData: ChatThread | null | undefined = await redis.get(

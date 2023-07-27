@@ -30,7 +30,7 @@ export default function ChatBubble({
                     : 'border-y dark:border-neutral-700',
             )}
         >
-            <div className="mx-auto flex w-full max-w-4xl gap-4 ">
+            <div className="mx-auto flex w-full max-w-4xl gap-2 md:gap-4">
                 <ProfilePicture message={messageInfo} />
                 <TextContent
                     message={messageInfo}

@@ -1,123 +1,138 @@
 'use client';
 
-import {
-    Dispatch,
-    createContext,
-    useContext,
-    useEffect,
-    useReducer,
-    useState,
-} from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 
-import { isMobile as iM } from '@/utils/client';
-import { chatReducer } from '@/providers/chatReducer';
+import {
+    abortRequestHandler,
+    cancelEditHandler,
+    changeInputHandler,
+    createSubmitHandler,
+    createThreadHandler,
+    editMessageHandler,
+    getInitialActiveThread,
+    removeMessageHandler,
+    removeThreadHandler,
+    removeAllThreadsHandler,
+    setConfigHandler,
+    setPluginsEnabledHandler,
+    setSystemMessageHandler,
+    togglePluginHandler,
+    updateActiveThreadHandler,
+    updateThreadConfigHandler,
+} from './ChatProviderUtils';
 import initialState from './initialChat';
-import { saveCloudHistory } from '@/utils/server';
-import { serializeSaveData } from '@/utils';
+import { saveThread } from '@/utils/server';
 
 const ChatContext = createContext<ChatState>(initialState);
-const ChatDispatchContext = createContext<Dispatch<ChatAction>>(() => {});
 
 export const useChat = () => useContext(ChatContext);
-export const useChatDispatch = () => useContext(ChatDispatchContext);
+
+type ChatProviderProps = {
+    children: React.ReactNode;
+    threadList: ChatThread[];
+    savedConfig?: Config | null;
+};
 
 export function ChatProvider({
     children,
-    history,
-}: {
-    children: React.ReactNode;
-    history: SaveData | null;
-}) {
-    const [checkedLocal, setCheckedLocal] = useState(false);
-    const [isMobile, setIsMobile] = useState(iM('md') || false);
+    threadList,
+    savedConfig,
+}: ChatProviderProps) {
+    const router = useRouter();
+    const params = useParams();
+    const threadId = params.root ? params.root[0] : undefined;
+    const [isNew, setIsNew] = useState<boolean>(threadId === undefined);
 
-    const [state, dispatch] = useReducer(chatReducer, {
+    const [state, setState] = useState<ChatState>({
         ...initialState,
-        config: history ? history.config : initialState.config,
-        activeThread: {
-            ...initialState.activeThread,
-            agentConfig: {
-                ...initialState.activeThread.agentConfig,
-                ...(history ? history.config : initialState.config),
-            },
-        },
-        threadList: history ? history.chatHistory : initialState.threadList,
-        sideBarOpen: !isMobile,
+        threads:
+            threadList.length === 0 ? [initialState.activeThread] : threadList,
+        input: initialState.input,
+        editId: initialState.editId,
+        pluginsEnabled: initialState.pluginsEnabled,
+        config: initialState.config,
+        botTyping: initialState.botTyping,
+        abortController: new AbortController(),
+        activeThread: getInitialActiveThread(savedConfig, threadId, threadList),
     });
 
-    // Effect to check stored chat history on component mount
+    // Event Handlers
+    const handleSubmit = createSubmitHandler(state, setState, router);
+    const createThread = createThreadHandler(state, setState);
+    const updateActiveThread = updateActiveThreadHandler(setState);
+
     useEffect(() => {
-        if (typeof window === 'undefined') return;
-
-        if (!history) {
-            const storedThreads = localStorage.getItem('chatHistory');
-            if (storedThreads) {
-                const saveData: SaveData = JSON.parse(storedThreads);
-                dispatch({
-                    type: 'INITIALIZE',
-                    payload: saveData,
-                });
-            }
+        if (!state.saved) {
+            saveThread(state.activeThread);
+            setState((prevState) => ({ ...prevState, saved: true }));
         }
-        setCheckedLocal(true);
+    }, [state.saved, state.activeThread]);
 
-        // responsive sidebar
-        const handleResize = () => {
-            if (isMobile && !iM('md')) {
-                dispatch({
-                    type: 'SET_SIDEBAR_OPEN',
-                    payload: false,
-                });
-                setIsMobile(true);
-            } else if (!iM('md')) {
-                dispatch({
-                    type: 'SET_SIDEBAR_OPEN',
-                    payload: true,
-                });
-                setIsMobile(false);
-            } else {
-                dispatch({
-                    type: 'SET_SIDEBAR_OPEN',
-                    payload: false,
-                });
-            }
-        };
-
-        window.addEventListener('resize', handleResize);
-
+    useEffect(() => {
         return () => {
-            window.removeEventListener('resize', handleResize);
-            // ensure that any pending requests are cancelled
             state.abortController?.abort();
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const saveHistory = async (saveData: SaveData) => {
-        try {
-            localStorage.setItem('chatHistory', serializeSaveData(saveData));
-            await saveCloudHistory(saveData);
-        } catch (error) {
-            console.error(error);
+    /* 
+        If threadId is undefined, create a new thread.
+        If threadId is defined, check if it exists in the threadList.
+            If it does, update the activeThread.
+            If it doesn't, redirect to the home page and create a new thread.
+
+        Since this checks every render and router.push and router.replace are asynchronous,
+        we need to keep track of whether the thread is new or not.
+    */
+    useEffect(() => {
+        if (!threadId) {
+            if (!isNew) {
+                createThread();
+                setIsNew(true);
+            }
+        } else if (state.activeThread.id !== threadId) {
+            const newThread = state.threads.find((t) => t.id === threadId);
+            if (newThread) {
+                updateActiveThread(newThread);
+                setIsNew(false);
+            } else {
+                router.replace('/');
+                setIsNew(true);
+            }
         }
+    }, [
+        createThread,
+        isNew,
+        router,
+        state.activeThread.id,
+        state.activeThread.messages.length,
+        state.input,
+        state.threads,
+        threadId,
+        updateActiveThread,
+    ]);
+
+    const value = {
+        ...state,
+        abortRequest: abortRequestHandler(state, setState),
+        toggleplugin: togglePluginHandler(state, setState),
+        setConfig: setConfigHandler(setState),
+        updateThreadConfig: updateThreadConfigHandler(setState),
+        setSystemMessage: setSystemMessageHandler(setState),
+        editMessage: editMessageHandler(state, setState),
+        removeMessage: removeMessageHandler(setState),
+        removeThread: removeThreadHandler(state, setState, router),
+        removeAllThreads: removeAllThreadsHandler(setState, router),
+        cancelEdit: cancelEditHandler(setState),
+        setPluginsEnabled: setPluginsEnabledHandler(setState),
+        changeInput: changeInputHandler(setState),
+        handleSubmit,
+        createThread,
+        updateActiveThread,
     };
 
-    // Effect to sync local storage with the chat thread list
-    useEffect(() => {
-        if (typeof window !== 'undefined' && checkedLocal && !state.botTyping) {
-            saveHistory({
-                config: state.config,
-                chatHistory: state.threadList,
-            });
-        }
-    }, [checkedLocal, state.botTyping, state.config, state.threadList]);
-
-    if (!checkedLocal) return null;
     return (
-        <ChatContext.Provider value={state}>
-            <ChatDispatchContext.Provider value={dispatch}>
-                {children}
-            </ChatDispatchContext.Provider>
-        </ChatContext.Provider>
+        <ChatContext.Provider value={value}>{children}</ChatContext.Provider>
     );
 }

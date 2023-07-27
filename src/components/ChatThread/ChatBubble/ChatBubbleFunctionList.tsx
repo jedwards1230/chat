@@ -1,12 +1,11 @@
 'use client';
 
 import { Clipboard, Edit, Reset, Trash } from '@/components/Icons';
-import { useChat, useChatDispatch } from '@/providers/ChatProvider';
+import { useChat } from '@/providers/ChatProvider';
 import ChatBubbleFunction from './ChatBubbleFunction';
 
 export function ChatBubbleFunctionList({ message }: { message: Message }) {
-    const { activeThread } = useChat();
-    const dispatch = useChatDispatch();
+    const { activeThread, editMessage, removeMessage } = useChat();
     const isSystem = message.role === 'system';
     const isUser = message.role === 'user';
 
@@ -17,15 +16,7 @@ export function ChatBubbleFunctionList({ message }: { message: Message }) {
                     icon={<Reset />}
                     color="green"
                     title={'Regenerate Message'}
-                    onClick={() =>
-                        dispatch({
-                            type: 'EDIT_MESSAGE',
-                            payload: {
-                                threadId: activeThread.id,
-                                messageId: message.id,
-                            },
-                        })
-                    }
+                    onClick={() => editMessage(message.id)}
                 />
             )}
             {!isSystem && (
@@ -33,15 +24,7 @@ export function ChatBubbleFunctionList({ message }: { message: Message }) {
                     icon={<Edit />}
                     color="blue"
                     title={'Edit Message'}
-                    onClick={() =>
-                        dispatch({
-                            type: 'EDIT_MESSAGE',
-                            payload: {
-                                threadId: activeThread.id,
-                                messageId: message.id,
-                            },
-                        })
-                    }
+                    onClick={() => editMessage(message.id)}
                 />
             )}
             {!isSystem && (
@@ -49,15 +32,7 @@ export function ChatBubbleFunctionList({ message }: { message: Message }) {
                     icon={<Trash />}
                     color="red"
                     title={'Delete Message'}
-                    onClick={() => {
-                        dispatch({
-                            type: 'REMOVE_MESSAGE',
-                            payload: {
-                                threadId: activeThread.id,
-                                messageId: message.id,
-                            },
-                        });
-                    }}
+                    onClick={() => removeMessage(message.id)}
                 />
             )}
             {!isSystem && (

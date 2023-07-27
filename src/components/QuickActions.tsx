@@ -1,11 +1,12 @@
 'use client';
 
-import { useChat, useChatDispatch } from '@/providers/ChatProvider';
+import { useChat } from '@/providers/ChatProvider';
 import clsx from 'clsx';
+import Link from 'next/link';
 
 export default function QuickActions() {
-    const { activeThread, botTyping, abortController } = useChat();
-    const dispatch = useChatDispatch();
+    const { activeThread, botTyping, abortController, abortRequest } =
+        useChat();
 
     const btn = 'px-3 py-1 rounded-full';
 
@@ -13,19 +14,23 @@ export default function QuickActions() {
         <div className="absolute inset-x-auto -top-12 flex w-full justify-center gap-2">
             {botTyping && abortController && (
                 <button
-                    onClick={() => abortController.abort()}
+                    onClick={abortRequest}
                     className={clsx(btn, 'bg-red-500 text-neutral-50')}
                 >
                     Stop
                 </button>
             )}
             {activeThread.messages.length > 1 && (
-                <button
-                    onClick={() => dispatch({ type: 'CREATE_THREAD' })}
-                    className={clsx(btn, 'bg-blue-500 text-neutral-50')}
-                >
-                    New Chat
-                </button>
+                <Link href="/" replace={true}>
+                    <button
+                        className={clsx(
+                            btn,
+                            'bg-blue-500 text-neutral-50 dark:hover:bg-blue-600',
+                        )}
+                    >
+                        New Chat
+                    </button>
+                </Link>
             )}
         </div>
     );

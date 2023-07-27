@@ -1,9 +1,10 @@
 'use client';
 
+import { Dispatch, SetStateAction } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { readStream, callTool, parseStreamData } from '@/utils/client/client';
-import { Dispatch } from 'react';
+
 import { prepareMessages } from '..';
+import { readStream, callTool, parseStreamData } from '../client';
 
 const MAX_LOOPS = 10;
 
@@ -18,32 +19,18 @@ export function createUserMsg(
     };
 }
 
-export function dispatchUserMsg(
-    userMsg: Message,
-    dispatch: Dispatch<ChatAction>,
-    state: ChatState,
-) {
-    dispatch({ type: 'CHANGE_INPUT', payload: '' });
-    dispatch({
-        type: 'UPSERT_MESSAGE',
-        payload: {
-            threadId: state.activeThread.id,
-            message: userMsg,
-        },
-    });
-}
-
 export async function fetchTitle(
-    state: ChatState,
-    dispatch: Dispatch<ChatAction>,
+    activeThread: ChatThread,
+    input: string,
+    callback: (title: string) => void,
 ) {
-    const l = state.activeThread.messages.length;
+    const l = activeThread.messages.length;
     if (l < 2 || l > 10) return;
 
-    const history = state.activeThread.messages.map(
+    const history = activeThread.messages.map(
         (msg) => msg.role + ': ' + msg.content,
     );
-    history.push('user: ' + state.input);
+    history.push('user: ' + input);
 
     const res = await fetch('/api/get_title', {
         method: 'POST',
@@ -71,13 +58,7 @@ export async function fetchTitle(
         const chunks = parseStreamData(chunk);
         const accumulatedResponse = chunks.reduce(reduceStreamData, '');
 
-        dispatch({
-            type: 'UPSERT_TITLE',
-            payload: {
-                threadId: state.activeThread.id,
-                title: accumulatedResponse,
-            },
-        });
+        callback(accumulatedResponse);
     };
 
     await readStream(res.body, streamCallback);
@@ -86,16 +67,21 @@ export async function fetchTitle(
 export const getChat = async (
     msgHistory: Message[],
     controller: AbortController,
+    activeThread: ChatThread,
+    pluginsEnabled: boolean,
     loops: number = 0,
-    state: ChatState,
-    dispatch: Dispatch<ChatAction>,
+    setState: Dispatch<SetStateAction<ChatState>>,
+    upsertMessage: (message: Message) => void,
 ) => {
     try {
         if (loops > MAX_LOOPS) {
             throw new Error('Too many loops');
         }
         const signal = controller.signal;
-        dispatch({ type: 'SET_BOT_TYPING', payload: controller });
+        setState((prevState) => ({
+            ...prevState,
+            abortController: controller,
+        }));
 
         const messages = prepareMessages(msgHistory);
 
@@ -103,12 +89,10 @@ export const getChat = async (
             method: 'POST',
             signal,
             body: JSON.stringify({
-                modelName: state.activeThread.agentConfig.model,
-                temperature: state.activeThread.agentConfig.temperature,
+                modelName: activeThread.agentConfig.model,
+                temperature: activeThread.agentConfig.temperature,
                 messages,
-                tools: state.pluginsEnabled
-                    ? state.activeThread.agentConfig.tools
-                    : [],
+                tools: pluginsEnabled ? activeThread.agentConfig.tools : [],
             }),
         });
 
@@ -126,7 +110,6 @@ export const getChat = async (
         const reduceStreamData = (acc: string, curr: StreamData) => {
             if (!curr || !curr.choices) {
                 if (curr && curr.error) {
-                    //console.log(curr.error);
                     error = JSON.stringify(curr.error);
                 }
                 return acc;
@@ -155,25 +138,23 @@ export const getChat = async (
             accumulatedResponse = chunks.reduce(reduceStreamData, '');
 
             if (!tool) {
-                const assistantMsg: Message = {
+                upsertMessage({
                     id: assistantId,
                     content: error || accumulatedResponse,
                     role: 'assistant',
-                };
-
-                dispatch({
-                    type: 'UPSERT_MESSAGE',
-                    payload: {
-                        threadId: state.activeThread.id,
-                        message: assistantMsg,
-                    },
                 });
             }
         };
 
         await readStream(response.body, streamCallback);
-
-        dispatch({ type: 'SET_BOT_TYPING' });
+        setState((prevState) => {
+            return {
+                ...prevState,
+                saved: false,
+                botTyping: false,
+                abortController: undefined,
+            };
+        });
 
         if (tool) {
             let input = '';
@@ -194,14 +175,7 @@ export const getChat = async (
                 },
             };
             msgHistory.push(assistantMsg);
-
-            dispatch({
-                type: 'UPSERT_MESSAGE',
-                payload: {
-                    threadId: state.activeThread.id,
-                    message: assistantMsg,
-                },
-            });
+            upsertMessage(assistantMsg);
 
             const res = await callTool(tool, input);
             if (!res) {
@@ -216,61 +190,27 @@ export const getChat = async (
             };
 
             msgHistory.push(functionMsg);
+            upsertMessage(functionMsg);
 
-            dispatch({
-                type: 'UPSERT_MESSAGE',
-                payload: {
-                    threadId: state.activeThread.id,
-                    message: functionMsg,
-                },
-            });
-
-            getChat(msgHistory, controller, loops + 1, state, dispatch);
+            getChat(
+                msgHistory,
+                controller,
+                activeThread,
+                pluginsEnabled,
+                loops + 1,
+                setState,
+                upsertMessage,
+            );
         }
     } catch (error: any) {
         if (error.name === 'AbortError') {
-            console.log('Fetch aborted');
+            //console.log('Fetch aborted');
         } else {
             console.error('Error:', error);
         }
-        dispatch({ type: 'SET_BOT_TYPING' });
+        setState((prevState) => ({
+            ...prevState,
+            abortController: undefined,
+        }));
     }
-};
-
-export const handleSubmit = (
-    e: React.FormEvent,
-    state: ChatState,
-    dispatch: Dispatch<ChatAction>,
-) => {
-    e.preventDefault();
-    if (state.input.length > 0) {
-        const userMsg: Message = createUserMsg(state.input, state.editId);
-        if (state.editId) {
-            dispatch({ type: 'CANCEL_EDIT' });
-        }
-        dispatchUserMsg(userMsg, dispatch, state);
-
-        const msgHistory = state.activeThread.messages;
-        if (state.editId) {
-            const editIndex = msgHistory.findIndex(
-                (msg) => msg.id === state.editId,
-            );
-            msgHistory[editIndex] = userMsg;
-        } else {
-            msgHistory.push(userMsg);
-        }
-
-        const controller = new AbortController();
-
-        getChat(msgHistory, controller, 0, state, dispatch);
-        fetchTitle(state, dispatch);
-    }
-};
-
-export const saveHistory = async (saveData: string) => {
-    // implementation
-};
-
-export const handleResize = () => {
-    // implementation
 };

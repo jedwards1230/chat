@@ -1,57 +1,51 @@
 'use client';
 
 import clsx from 'clsx';
+import Link from 'next/link';
 
-import { useChat, useChatDispatch } from '@/providers/ChatProvider';
+import { useChat } from '@/providers/ChatProvider';
 import { Chat, Trash } from '../Icons';
 import { isMobile } from '@/utils/client';
+import { deleteCloudThread } from '@/utils/server/server';
+import { useUI } from '@/providers/UIProvider';
 
 export default function ChatHistoryEntry({ entry }: { entry: ChatThread }) {
-    const { activeThread } = useChat();
-    const dispatch = useChatDispatch();
+    const { activeThread, removeThread } = useChat();
+    const { setSideBarOpen } = useUI();
 
     // Function to remove a thread and update the local storage
-    const removeThread = (e: any) => {
+    const remove = (e: any) => {
         e.stopPropagation();
-        dispatch({ type: 'REMOVE_THREAD', payload: entry.id });
+        removeThread(entry.id);
+        deleteCloudThread(entry.id);
     };
 
-    const setActive = () => {
-        dispatch({
-            type: 'SET_ACTIVE_THREAD',
-            payload: entry,
-        });
-        if (isMobile()) {
-            dispatch({
-                type: 'SET_SIDEBAR_OPEN',
-                payload: false,
-            });
-        }
+    const setActive = (e: any) => {
+        if (isMobile('md')) setSideBarOpen(false);
     };
 
+    if (entry.messages.length <= 1) return null;
     return (
-        <div
-            title={`threadId: ${entry.id}`}
-            onClick={setActive}
-            className={clsx(
-                'grid w-full max-w-full grid-cols-16 items-center justify-between gap-2 rounded-lg px-2 py-1',
-                entry.id === activeThread.id
-                    ? 'bg-neutral-400/70 dark:bg-neutral-600'
-                    : 'cursor-pointer hover:bg-neutral-600',
-            )}
-        >
-            <div className="col-span-2">
+        <div className="relative">
+            <Link
+                href={`/${entry.id}`}
+                replace={true}
+                onClick={setActive}
+                className={clsx(
+                    'flex w-full max-w-full items-center justify-between gap-2 rounded-lg px-2 py-1 transition-colors duration-300',
+                    entry.id === activeThread.id
+                        ? 'bg-neutral-400/70 dark:bg-neutral-600'
+                        : 'cursor-pointer hover:bg-neutral-500 focus:bg-neutral-600 peer-hover:bg-neutral-500 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 dark:peer-hover:bg-neutral-600',
+                )}
+            >
                 <Chat />
-            </div>
-            <div className="col-span-12 flex w-full flex-col gap-0 leading-tight">
-                <div className="line-clamp-1 text-sm">{entry.title}</div>
-                <div className="line-clamp-1 text-xs font-light">
-                    {entry.messages.length > 1 ? entry.messages[1].content : ''}
+                <div className="line-clamp-1 flex w-full gap-0 py-1.5 text-sm leading-tight">
+                    {entry.title}
                 </div>
-            </div>
+            </Link>
             <div
-                className="col-span-2 flex cursor-pointer select-none items-center justify-center rounded-full text-neutral-300 hover:text-neutral-50"
-                onClick={removeThread}
+                className="peer absolute right-0 top-0 z-50 col-span-2 mr-2 mt-2 flex cursor-pointer select-none items-center justify-center rounded-full text-neutral-300 hover:text-neutral-50"
+                onClick={remove}
                 title="Delete conversation"
             >
                 <Trash />

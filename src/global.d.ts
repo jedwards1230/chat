@@ -14,15 +14,6 @@ type Message = {
     };
 };
 
-interface SaveData {
-    chatHistory: ChatThread[];
-    config: Config;
-}
-
-interface ShareData {
-    thread: ChatThread;
-}
-
 interface Config {
     model: Model;
     temperature: number;
@@ -47,6 +38,15 @@ interface ChatThread {
     title: string;
     messages: Message[];
     agentConfig: AgentConfig;
+}
+
+interface SaveData {
+    chatHistory: ChatThread[];
+    config: Config;
+}
+
+interface ShareData {
+    thread: ChatThread;
 }
 
 type Choice = {

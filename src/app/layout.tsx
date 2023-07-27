@@ -4,7 +4,9 @@ import Providers from '@/providers';
 import { Metadata } from 'next';
 import { ClerkProvider, auth } from '@clerk/nextjs';
 import { Analytics } from '@vercel/analytics/react';
-import { getCloudHistory } from '@/utils/server';
+import { ChatProvider } from '@/providers/ChatProvider';
+import supabase from '@/lib/supabase';
+import { getCloudData } from '@/utils/server';
 
 const APP_NAME = 'Chat';
 const APP_DEFAULT_TITLE = 'Chat';
@@ -55,7 +57,21 @@ export default async function RootLayout({
     children: React.ReactNode;
 }) {
     const { userId } = auth();
-    const history = await getCloudHistory();
+
+    // check if userId in users table in supabase
+    const { data, error } = await supabase
+        .from('users')
+        .select('userid')
+        .eq('userid', userId);
+
+    if (data?.length === 0) {
+        // if not, add it
+        const { data, error } = await supabase
+            .from('users')
+            .insert([{ userid: userId }]);
+    }
+
+    const { config, threads } = await getCloudData();
 
     return (
         <ClerkProvider>
@@ -72,8 +88,15 @@ export default async function RootLayout({
                             </div>
                         }
                     >
-                        <Providers userId={userId} history={history}>
-                            {children}
+                        <Providers>
+                            <ChatProvider
+                                threadList={threads}
+                                savedConfig={config}
+                            >
+                                <div className="relative flex h-full w-full flex-col">
+                                    {children}
+                                </div>
+                            </ChatProvider>
                         </Providers>
                     </Suspense>
                     <Analytics />

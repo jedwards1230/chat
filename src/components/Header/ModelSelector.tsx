@@ -1,13 +1,11 @@
 'use client';
 
-import { useChat, useChatDispatch } from '@/providers/ChatProvider';
+import { useChat } from '@/providers/ChatProvider';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 
 export default function ModelSelector() {
-    const { activeThread } = useChat();
-    const dispatch = useChatDispatch();
-
+    const { activeThread, updateThreadConfig } = useChat();
     const activeModel = activeThread.agentConfig.model;
 
     return (
@@ -23,13 +21,7 @@ export default function ModelSelector() {
                                 : 'text-neutral-400 dark:text-neutral-400',
                         )}
                         onClick={() =>
-                            dispatch({
-                                type: 'CHANGE_MODEL',
-                                payload: {
-                                    model: 'gpt-3.5-turbo-16k',
-                                    threadId: activeThread.id,
-                                },
-                            })
+                            updateThreadConfig({ model: 'gpt-3.5-turbo-16k' })
                         }
                     >
                         GPT-3.5
@@ -42,15 +34,7 @@ export default function ModelSelector() {
                                 ? 'text-neutral-700 dark:text-white'
                                 : 'text-neutral-400 dark:text-neutral-400',
                         )}
-                        onClick={() =>
-                            dispatch({
-                                type: 'CHANGE_MODEL',
-                                payload: {
-                                    model: 'gpt-4',
-                                    threadId: activeThread.id,
-                                },
-                            })
-                        }
+                        onClick={() => updateThreadConfig({ model: 'gpt-4' })}
                     >
                         GPT-4
                     </button>

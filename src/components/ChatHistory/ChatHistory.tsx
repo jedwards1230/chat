@@ -1,39 +1,40 @@
 'use client';
 
 import { useEffect, useMemo, useRef } from 'react';
+import clsx from 'clsx';
+import Link from 'next/link';
 
-import { useChat, useChatDispatch } from '@/providers/ChatProvider';
+import { useChat } from '@/providers/ChatProvider';
 import ChatHistoryEntry from './ChatHistoryEntry';
 import { Settings } from '../Icons';
 import { isMobile } from '@/utils/client';
-import clsx from 'clsx';
+import { useUI } from '@/providers/UIProvider';
 
 export default function ChatHistory() {
-    const { threadList, sideBarOpen } = useChat();
-    const dispatch = useChatDispatch();
+    const { threads, createThread } = useChat();
+    const { sideBarOpen, setSideBarOpen, setConfigEditorOpen } = useUI();
     const sidebarRef = useRef<HTMLDivElement>(null);
 
-    const closeSidebar = () => {
-        dispatch({ type: 'SET_SIDEBAR_OPEN', payload: false });
+    const sortThread = (a: ChatThread, b: ChatThread) => {
+        return b.lastModified.getTime() - a.lastModified.getTime();
     };
 
+    const threadList = useMemo(() => threads.sort(sortThread), [threads]);
+
     const openConfig = (e: any) => {
-        dispatch({ type: 'SET_CONFIG_EDITOR_OPEN', payload: true });
-        if (isMobile()) dispatch({ type: 'SET_SIDEBAR_OPEN', payload: false });
+        setConfigEditorOpen(true);
+        if (isMobile()) setSideBarOpen(false);
     };
 
     const newThread = () => {
-        dispatch({ type: 'CREATE_THREAD' });
-        if (isMobile()) closeSidebar();
+        if (isMobile()) setSideBarOpen(false);
+        createThread();
     };
 
     useEffect(() => {
         if (sidebarRef.current) {
             const styles = window.getComputedStyle(sidebarRef.current);
-            dispatch({
-                type: 'SET_SIDEBAR_OPEN',
-                payload: styles.display === 'flex',
-            });
+            setSideBarOpen(styles.display === 'flex');
         }
 
         const handleClickOutside = (event: any) => {
@@ -44,7 +45,7 @@ export default function ChatHistory() {
                 !sidebarRef.current.contains(event.target)
             ) {
                 event.preventDefault();
-                closeSidebar();
+                setSideBarOpen(false);
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
@@ -56,15 +57,6 @@ export default function ChatHistory() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const sortThread = (a: ChatThread, b: ChatThread) => {
-        return b.lastModified.getTime() - a.lastModified.getTime();
-    };
-
-    const sortedThreadList = useMemo(
-        () => threadList.sort(sortThread),
-        [threadList],
-    );
-
     return (
         <div
             ref={sidebarRef}
@@ -75,14 +67,16 @@ export default function ChatHistory() {
         >
             <div className="relative flex h-full w-full flex-col items-center justify-start gap-4 px-2">
                 <div className="flex w-full justify-between gap-x-2">
-                    <button
-                        className="flex-1 rounded-lg border border-neutral-500 py-2 font-medium transition-colors hover:border-neutral-400 hover:bg-neutral-600 dark:hover:bg-neutral-700"
+                    <Link
+                        replace={true}
                         onClick={newThread}
+                        className="flex flex-1 justify-center rounded-lg border border-neutral-500 py-2 font-medium transition-colors hover:border-neutral-400 hover:bg-neutral-500 focus:bg-neutral-600 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700"
+                        href="/"
                     >
                         New Chat
-                    </button>
+                    </Link>
                     <button
-                        className="rounded-lg border border-neutral-500 p-2 font-semibold transition-colors hover:border-neutral-400 hover:bg-neutral-600 dark:hover:bg-neutral-700"
+                        className="rounded-lg border border-neutral-500 p-2 font-semibold transition-colors hover:border-neutral-400 hover:bg-neutral-500 focus:bg-neutral-600 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700"
                         onClick={openConfig}
                     >
                         <div className="scale-[85%]">
@@ -91,13 +85,12 @@ export default function ChatHistory() {
                     </button>
                 </div>
                 <div className="flex w-full flex-col gap-1 overflow-y-scroll">
-                    {sortedThreadList &&
-                        sortedThreadList.map((m, i) => (
-                            <ChatHistoryEntry
-                                key={`${i}-${m.messages.length}`}
-                                entry={m}
-                            />
-                        ))}
+                    {threadList.map((thread, i) => (
+                        <ChatHistoryEntry
+                            key={`${i}-${thread.id}`}
+                            entry={thread}
+                        />
+                    ))}
                 </div>
             </div>
         </div>

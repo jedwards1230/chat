@@ -1,8 +1,3 @@
-import {
-    getCloudHistory,
-    saveCloudHistory,
-    shareChatThread,
-    searchGoogle,
-} from './server';
+import { shareChatThread, getCloudData, saveThread } from './server';
 
-export { getCloudHistory, saveCloudHistory, shareChatThread, searchGoogle };
+export { shareChatThread, getCloudData, saveThread };
