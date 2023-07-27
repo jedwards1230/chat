@@ -86,17 +86,21 @@ export function ChatProvider({
         we need to keep track of whether the thread is new or not.
     */
     useEffect(() => {
+        console.log({ threadId, isNew, activeId: state.activeThread.id });
         if (!threadId) {
             if (!isNew) {
+                console.log('no threadId, creating new thread');
                 createThread();
                 setIsNew(true);
             }
         } else if (state.activeThread.id !== threadId) {
             const newThread = state.threads.find((t) => t.id === threadId);
             if (newThread) {
+                console.log('thread exists, updating active thread');
                 updateActiveThread(newThread);
                 setIsNew(false);
             } else {
+                console.log('thread does not exist, redirecting to home');
                 router.push('/');
                 setIsNew(true);
             }

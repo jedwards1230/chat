@@ -126,7 +126,7 @@ export default function Markdown({
                         {...props}
                         className={clsx(
                             className,
-                            'inline-block rounded border border-neutral-500 bg-neutral-100 px-1 tracking-wide transition-colors dark:bg-neutral-600',
+                            'inline-block rounded border border-neutral-500 bg-neutral-100 px-0.5 tracking-wide transition-colors dark:bg-neutral-600',
                         )}
                     >
                         <code className="whitespace-pre-wrap">{children}</code>
