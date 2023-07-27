@@ -34,7 +34,7 @@ export function createSubmitHandler(
     return async (e: FormEvent) => {
         e.preventDefault();
         if (state.input.trim() === '') return;
-        router.push('/' + state.activeThread.id);
+        router.replace('/' + state.activeThread.id);
 
         const upsertMessage = (newMessage: Message) => {
             setState((prevState) => {
