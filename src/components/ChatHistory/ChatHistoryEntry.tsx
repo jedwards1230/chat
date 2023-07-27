@@ -31,10 +31,10 @@ export default function ChatHistoryEntry({ entry }: { entry: ChatThread }) {
                 href={`/${entry.id}`}
                 onClick={setActive}
                 className={clsx(
-                    'flex w-full max-w-full items-center justify-between gap-2 rounded-lg px-2 py-1 transition-colors duration-300',
+                    'flex w-full max-w-full items-center justify-between gap-2 rounded-lg px-2 py-1 transition-colors duration-300 hover:bg-neutral-500 peer-hover:bg-neutral-500 dark:hover:bg-neutral-600 dark:peer-hover:bg-neutral-600',
                     entry.id === activeThread.id
-                        ? 'bg-neutral-400/70 dark:bg-neutral-600'
-                        : 'cursor-pointer hover:bg-neutral-500 focus:bg-neutral-600 peer-hover:bg-neutral-500 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 dark:peer-hover:bg-neutral-600',
+                        ? 'bg-neutral-500 dark:bg-neutral-600'
+                        : 'cursor-pointer focus:bg-neutral-600  dark:focus:bg-neutral-700',
                 )}
             >
                 <Chat />

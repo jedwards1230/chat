@@ -7,11 +7,13 @@ CREATE TABLE Users (
 -- Create chat thread table
 CREATE TABLE public.chat_threads (
     id character varying(255) NOT NULL,
+    user_id character varying(255),
     created timestamp without time zone NOT NULL,
     lastModified timestamp without time zone NOT NULL,
     title text NOT NULL,
     agentConfig json NOT NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    FOREIGN KEY (user_id) REFERENCES public.users(userid) ON DELETE CASCADE
 );
 
 -- Create message table
@@ -39,16 +41,7 @@ CREATE TABLE public.configs (
     frequencyPenalty numeric NOT NULL,
     presencePenalty numeric NOT NULL,
     PRIMARY KEY (user_id),
-    FOREIGN KEY (user_id) REFERENCES public.users(userid)
+    FOREIGN KEY (user_id) REFERENCES public.users(userid) ON DELETE CASCADE
 );
 
--- Create save data table
-CREATE TABLE public.save_data (
-    user_id character varying(255) NOT NULL,
-    chat_history_id character varying(255) NOT NULL,
-    config_id character varying(255) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES public.users(userid),
-    FOREIGN KEY (chat_history_id) REFERENCES public.chat_threads(id),
-    FOREIGN KEY (config_id) REFERENCES public.configs(user_id)
-);
 ```
