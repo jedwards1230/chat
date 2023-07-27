@@ -11,7 +11,7 @@ import { isMobile } from '@/utils/client';
 import { useUI } from '@/providers/UIProvider';
 
 export default function ChatHistory() {
-    const { threads, createThread } = useChat();
+    const { threads } = useChat();
     const { sideBarOpen, setSideBarOpen, setConfigEditorOpen } = useUI();
     const sidebarRef = useRef<HTMLDivElement>(null);
 
@@ -28,7 +28,6 @@ export default function ChatHistory() {
 
     const newThread = () => {
         if (isMobile()) setSideBarOpen(false);
-        createThread();
     };
 
     useEffect(() => {
