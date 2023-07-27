@@ -21,6 +21,10 @@ export function calculateRows(text: string, maxRows: number = 15) {
     return newlines > 0 ? Math.min(newlines + 1, maxRows) : 1;
 }
 
+export function sortThreadlist(a: ChatThread, b: ChatThread) {
+    return b.lastModified.getTime() - a.lastModified.getTime();
+}
+
 export function prepareMessages(
     messages: Message[],
 ): ChatCompletionRequestMessage[] {

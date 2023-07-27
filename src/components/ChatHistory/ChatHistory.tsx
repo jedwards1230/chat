@@ -4,22 +4,19 @@ import { useEffect, useMemo, useRef } from 'react';
 import clsx from 'clsx';
 import Link from 'next/link';
 
+import { useUI } from '@/providers/UIProvider';
 import { useChat } from '@/providers/ChatProvider';
 import ChatHistoryEntry from './ChatHistoryEntry';
-import { Settings } from '../Icons';
+import { sortThreadlist } from '@/utils';
 import { isMobile } from '@/utils/client';
-import { useUI } from '@/providers/UIProvider';
+import { Settings } from '../Icons';
 
 export default function ChatHistory() {
     const { threads } = useChat();
     const { sideBarOpen, setSideBarOpen, setConfigEditorOpen } = useUI();
     const sidebarRef = useRef<HTMLDivElement>(null);
 
-    const sortThread = (a: ChatThread, b: ChatThread) => {
-        return b.lastModified.getTime() - a.lastModified.getTime();
-    };
-
-    const threadList = useMemo(() => threads.sort(sortThread), [threads]);
+    const threadList = useMemo(() => threads.sort(sortThreadlist), [threads]);
 
     const openConfig = (e: any) => {
         setConfigEditorOpen(true);
@@ -74,6 +71,7 @@ export default function ChatHistory() {
                         New Chat
                     </Link>
                     <button
+                        name="config-editor-toggle"
                         className="rounded-lg border border-neutral-500 p-2 font-semibold transition-colors hover:border-neutral-400 hover:bg-neutral-500 focus:bg-neutral-600 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700"
                         onClick={openConfig}
                     >

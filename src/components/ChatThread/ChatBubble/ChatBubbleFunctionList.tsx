@@ -10,7 +10,7 @@ export function ChatBubbleFunctionList({ message }: { message: Message }) {
     const isUser = message.role === 'user';
 
     return (
-        <div className="absolute bottom-0 right-2 hidden gap-2 group-hover:flex">
+        <div className="absolute bottom-0 right-2 hidden gap-2 group-hover:flex sm:right-4 md:right-8 lg:right-16">
             {isUser && !isSystem && (
                 <ChatBubbleFunction
                     icon={<Reset />}

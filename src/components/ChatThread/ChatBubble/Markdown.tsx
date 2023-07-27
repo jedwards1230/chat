@@ -80,7 +80,7 @@ export default function Markdown({
                     return (
                         <div className="flex flex-col gap-2">
                             <div className="rounded-t-lg border border-neutral-600 bg-neutral-200 dark:bg-neutral-700">
-                                <div className="pb-1 pl-4 pt-2 text-sm">
+                                <div className="p-4 pb-1 pt-2 text-sm">
                                     {language ? language : 'code'}
                                 </div>
                                 <SyntaxHighlighter
@@ -102,7 +102,7 @@ export default function Markdown({
                                         btnClicked
                                             ? 'border-neutral-400 bg-neutral-50 text-green-500 hover:bg-neutral-100 dark:bg-neutral-500 dark:hover:bg-neutral-500'
                                             : 'border-neutral-500 bg-neutral-50 hover:bg-neutral-200 dark:bg-neutral-300 dark:text-neutral-900',
-                                        'flex h-8 w-20 justify-center rounded-full border px-2 py-1 text-sm font-medium tracking-tight active:bg-neutral-300 dark:active:bg-neutral-400',
+                                        'flex justify-center rounded-full border px-3 py-1 text-sm font-medium active:bg-neutral-300 dark:active:bg-neutral-400',
                                     )}
                                     onClick={() => {
                                         navigator.clipboard.writeText(
@@ -126,7 +126,7 @@ export default function Markdown({
                         {...props}
                         className={clsx(
                             className,
-                            'inline-block rounded border border-neutral-500 bg-neutral-100 px-0.5 tracking-wide transition-colors dark:bg-neutral-600',
+                            'inline-block rounded-sm bg-neutral-100 px-0.5 py-0 tracking-wide transition-colors dark:bg-neutral-600',
                         )}
                     >
                         <code className="whitespace-pre-wrap">{children}</code>

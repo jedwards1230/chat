@@ -9,7 +9,7 @@ export default function ProfilePicture({ message }: { message: Message }) {
         <div className="my-1 flex h-full items-start">
             <div
                 className={clsx(
-                    'flex h-8 w-8 select-none items-center justify-center overflow-hidden rounded border transition-colors dark:border-neutral-500/80',
+                    'flex h-8 w-8 select-none items-center justify-center overflow-hidden rounded border transition-colors dark:border-neutral-700',
                     message.role === 'user' &&
                         'bg-neutral-300 dark:bg-neutral-600',
                     message.role === 'assistant' &&
@@ -31,7 +31,7 @@ export default function ProfilePicture({ message }: { message: Message }) {
                         alt="You"
                         width={32}
                         height={32}
-                        className="border"
+                        className=""
                     />
                 ) : (
                     message.role[0].toUpperCase()

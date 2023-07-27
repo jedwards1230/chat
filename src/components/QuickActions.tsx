@@ -11,7 +11,7 @@ export default function QuickActions() {
     const btn = 'px-3 py-1 rounded-full';
 
     return (
-        <div className="absolute inset-x-auto -top-12 flex w-full justify-center gap-2">
+        <div className="absolute inset-x-auto -top-12 flex w-full justify-center gap-2 text-sm font-medium">
             {botTyping && (
                 <button
                     onClick={abortRequest}
