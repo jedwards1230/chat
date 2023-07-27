@@ -87,17 +87,24 @@ export default function Chat() {
     }
 
     useEffect(() => {
-        if (typeof window !== undefined) {
-            const preventDefaultSwipe = (event: TouchEvent) => {
-                event.preventDefault();
+        if (typeof window !== 'undefined') {
+            const edgeDistance = 50;
+
+            const handleTouchStart = (event: TouchEvent) => {
+                const touchX = event.touches[0].clientX;
+                const winWidth = window.innerWidth;
+
+                if (touchX < edgeDistance || touchX > winWidth - edgeDistance) {
+                    event.preventDefault();
+                }
             };
 
-            window.addEventListener('touchmove', preventDefaultSwipe, {
+            window.addEventListener('touchstart', handleTouchStart, {
                 passive: false,
             });
 
             return () => {
-                window.removeEventListener('touchmove', preventDefaultSwipe);
+                window.removeEventListener('touchstart', handleTouchStart);
             };
         }
     }, []);
