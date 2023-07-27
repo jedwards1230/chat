@@ -2,6 +2,8 @@
 
 ![Default Page](./screenshots/screenshot-0.png)
 
+![Chat Page](./screenshots/screenshot-1.png)
+
 ## Description
 
 Chat is a versatile AI chat application, leveraging OpenAI's ChatGPT to offer a dynamic chat experience. It serves as a platform where users can interact with an AI, customize its personality, and engage in meaningful conversation. Ideal for those seeking a virtual assistant, language practice, or simply an engaging conversation.
@@ -14,7 +16,6 @@ Chat comes with a range of features designed to enhance user experience:
 -   **Interactivity**: The AI can hold a conversation and use functions to perform tasks.
 -   **Fast Streaming**: Leverages Edge Functions for quick and seamless exchanges.
 -   **Share Chat**: Share your conversations with a generated link.
--   **Privacy First**: All data is stored locally in the browser.
 -   **Data Storage**: Securely stores data in Upstash KV Store.
 -   **OAuth Access**: Provides GitHub OAuth access via Clerk.dev.
 -   **Responsive Design**: Offers a responsive design with dark mode and PWA.
@@ -32,8 +33,8 @@ To install and run the application locally, follow these steps:
 
 We're constantly working on improving Chat with new features:
 
+-   **Character Presets**: Users can select from a range of preset characters.
 -   **User Prompt**: Users can edit and save custom prompts to the prompt list.
--   **Prompt Template**: Create a new chat with pre-defined in-context prompts.
 -   **Import/Export Chat**: Easily import or export chat data.
 
 ## Technologies Used
@@ -45,6 +46,7 @@ We're constantly working on improving Chat with new features:
 -   OpenAI API
 -   Clerk.dev (OAuth)
 -   Upstash KV Store
+-   Supabase (PostgreSQL)
 
 ## Contribution
 
