@@ -1,9 +1,11 @@
 'use client';
 
-import { createUserMsg, fetchTitle, getChat } from '@/utils/client';
-import initialState, { getDefaultThread } from './initialChat';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, FormEvent } from 'react';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';
+
+import initialState, { getDefaultThread } from './initialChat';
+import { createUserMsg, fetchTitle, getChat } from '@/utils/client';
+import { deleteMessage } from '@/utils/server';
 
 type ChatDispatch = Dispatch<SetStateAction<ChatState>>;
 
@@ -29,7 +31,7 @@ export function createSubmitHandler(
     setState: ChatDispatch,
     router: AppRouterInstance,
 ) {
-    return async (e: React.FormEvent) => {
+    return async (e: FormEvent) => {
         e.preventDefault();
         if (state.input.trim() === '') return;
         router.push('/' + state.activeThread.id);
@@ -124,12 +126,10 @@ export function createSubmitHandler(
             msgHistory.push(userMsg);
         }
 
-        const controller = new AbortController();
-
         await Promise.all([
             getChat(
                 msgHistory,
-                controller,
+                state.abortController,
                 state.activeThread,
                 state.pluginsEnabled,
                 0,
@@ -143,7 +143,7 @@ export function createSubmitHandler(
 
 export function createThreadHandler(state: ChatState, setState: ChatDispatch) {
     return () => {
-        state.abortController?.abort();
+        state.abortRequest();
 
         setState((prevState) => {
             const newThread = getDefaultThread(state.config);
@@ -152,7 +152,8 @@ export function createThreadHandler(state: ChatState, setState: ChatDispatch) {
                 activeThread: newThread,
                 threads: [...prevState.threads, newThread],
                 input: '',
-                abortController: undefined,
+                botTyping: false,
+                isNew: true,
             };
         });
     };
@@ -245,25 +246,24 @@ export function setSystemMessageHandler(setState: ChatDispatch) {
 
 export function editMessageHandler(state: ChatState, setState: ChatDispatch) {
     return (id: string) => {
-        try {
-            const msg = state.activeThread.messages.find(
-                (msg) => msg.id === id,
-            );
-            if (!msg) throw new Error('No message to edit');
-
-            setState((prevState) => ({
-                ...prevState,
-                editId: id,
-                input: msg.content,
-            }));
-        } catch (error) {
-            console.error(error);
+        const msg = state.activeThread.messages.find((msg) => msg.id === id);
+        if (!msg) {
+            console.error('No message to edit');
+            return;
         }
+
+        setState((prevState) => ({
+            ...prevState,
+            editId: id,
+            input: msg.content,
+            saved: false,
+        }));
     };
 }
 
 export function removeMessageHandler(setState: ChatDispatch) {
     return (id: string) => {
+        deleteMessage(id);
         setState((prevState) => ({
             ...prevState,
             saved: false,
@@ -287,14 +287,10 @@ export function removeThreadHandler(
         setState((prevState) => ({
             ...prevState,
             threads: prevState.threads.filter((thread) => thread.id !== id),
-            activeThread: getDefaultThread(state.config),
-            input: prevState.activeThread.id === id ? '' : prevState.input,
-            botTyping:
-                prevState.activeThread.id === id ? false : prevState.botTyping,
             saved: prevState.activeThread.id === id ? true : prevState.saved,
-            abortController: undefined,
         }));
         if (state.activeThread.id === id) {
+            state.createThread();
             router.push('/');
         }
     };
@@ -305,15 +301,16 @@ export function removeAllThreadsHandler(
     router: AppRouterInstance,
 ) {
     return () => {
-        setState((prevState) => ({
-            ...prevState,
-            threads: [],
-            activeThread: getDefaultThread(prevState.config),
-            input: '',
-            abortController: undefined,
-            botTyping: false,
-            saved: true,
-        }));
+        setState((prevState) => {
+            prevState.abortRequest();
+            return {
+                ...prevState,
+                threads: [],
+                activeThread: getDefaultThread(prevState.config),
+                input: '',
+                saved: true,
+            };
+        });
         router.push('/');
     };
 }
@@ -348,10 +345,9 @@ export function changeInputHandler(setState: ChatDispatch) {
 
 export function abortRequestHandler(state: ChatState, setState: ChatDispatch) {
     return () => {
-        state.abortController?.abort();
+        state.abortController.abort();
         setState((prevState) => ({
             ...prevState,
-            abortController: undefined,
             botTyping: false,
             saved: false,
         }));

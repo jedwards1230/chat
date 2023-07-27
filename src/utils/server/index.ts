@@ -1,3 +1,8 @@
-import { shareChatThread, getCloudData, saveThread } from './server';
+import {
+    shareChatThread,
+    getCloudData,
+    saveThread,
+    deleteMessage,
+} from './server';
 
-export { shareChatThread, getCloudData, saveThread };
+export { shareChatThread, getCloudData, saveThread, deleteMessage };

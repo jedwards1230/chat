@@ -77,11 +77,14 @@ export const getChat = async (
         if (loops > MAX_LOOPS) {
             throw new Error('Too many loops');
         }
+        setState((prevState) => {
+            return {
+                ...prevState,
+                isNew: false,
+                botTyping: true,
+            };
+        });
         const signal = controller.signal;
-        setState((prevState) => ({
-            ...prevState,
-            abortController: controller,
-        }));
 
         const messages = prepareMessages(msgHistory);
 
@@ -152,7 +155,6 @@ export const getChat = async (
                 ...prevState,
                 saved: false,
                 botTyping: false,
-                abortController: undefined,
             };
         });
 
@@ -210,7 +212,8 @@ export const getChat = async (
         }
         setState((prevState) => ({
             ...prevState,
-            abortController: undefined,
+            botTyping: false,
+            saved: false,
         }));
     }
 };

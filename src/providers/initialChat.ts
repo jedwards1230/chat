@@ -41,33 +41,32 @@ export function getDefaultThread(config: Config): ChatThread {
 const baseEntry = getDefaultThread(defaultConfig);
 
 const initialState: ChatState = {
+    input: '',
+    threads: [],
+    saved: true,
+    isNew: true,
+    editId: null,
+    botTyping: false,
+    pluginsEnabled: true,
+    config: defaultConfig,
+    activeThread: baseEntry,
+    abortController: new AbortController(),
+
+    setConfig: () => {},
+    cancelEdit: () => {},
+    changeInput: () => {},
+    editMessage: () => {},
     abortRequest: () => {},
     createThread: () => {},
-    activeThread: baseEntry,
-    editId: null,
-    editMessage: () => {},
-    removeMessage: () => {},
     removeThread: () => {},
+    toggleplugin: () => {},
+    removeMessage: () => {},
     removeAllThreads: () => {},
     setSystemMessage: () => {},
-    botTyping: false,
-    config: defaultConfig,
-    toggleplugin: () => {},
-    setConfig: () => {},
-    pluginsEnabled: true,
     setPluginsEnabled: () => {},
     updateThreadConfig: () => {},
-    saved: true,
-
-    threads: [],
     updateActiveThread: () => {},
-    input: '',
-    changeInput: () => {},
-    abortController: undefined,
-    resetAbortController: () => {},
-
     handleSubmit: () => Promise.resolve(),
-    cancelEdit: () => {},
 };
 
 export default initialState;

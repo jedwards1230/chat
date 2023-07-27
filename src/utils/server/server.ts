@@ -80,77 +80,19 @@ export async function saveThread(thread: ChatThread) {
     }
 }
 
-// Function to save a single message
-export async function saveMessage(message: Message, threadId: string) {
-    try {
-        const { userId } = auth();
-        if (!userId) {
-            throw new Error('No user id');
-        }
-
-        const { data, error } = await supabase.from('messages').upsert(
-            [
-                {
-                    id: message.id,
-                    chat_thread_id: threadId,
-                    content: message.content,
-                    role: message.role,
-                    created_at: message.createdAt,
-                    name: message.name,
-                    function_call: message.function_call,
-                },
-            ],
-            { onConflict: 'id' },
-        );
-
-        if (error) {
-            throw new Error(error.message);
-        }
-    } catch (error) {
-        console.log(error);
+export async function deleteMessage(messageId: string) {
+    const { userId } = auth();
+    if (!userId) {
+        throw new Error('No user id');
     }
-}
 
-// Function to save the title
-export async function saveTitle(threadId: string, title: string) {
-    try {
-        const { userId } = auth();
-        if (!userId) {
-            throw new Error('No user id');
-        }
+    const { data: messageData, error: messageError } = await supabase
+        .from('messages')
+        .delete()
+        .eq('id', messageId);
 
-        const { data, error } = await supabase
-            .from('chat_threads')
-            .update({ title })
-            .eq('id', threadId);
-
-        if (error) {
-            throw new Error(error.message);
-        }
-    } catch (error) {
-        console.log(error);
-    }
-}
-
-// Function to save the config
-export async function saveConfig(config: Config) {
-    try {
-        const { userId } = auth();
-        if (!userId) {
-            throw new Error('No user id');
-        }
-
-        const { data, error } = await supabase
-            .from('configs')
-            .upsert([{ ...config, user_id: userId }], {
-                onConflict: 'user_id',
-            });
-
-        if (error) {
-            throw new Error(error.message);
-        }
-    } catch (error) {
-        console.log(error);
+    if (messageError) {
+        throw new Error(messageError.message);
     }
 }
 
@@ -200,40 +142,6 @@ export async function getCloudConfig(userId: string): Promise<Config | null> {
     }
 
     return config;
-}
-
-export async function getChatThread(
-    userId: string,
-    threadId: string,
-): Promise<ChatThread> {
-    const { data: thread, error } = await supabase
-        .from('chat_threads')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('id', threadId)
-        .single();
-
-    if (error) {
-        throw new Error(error.message);
-    }
-
-    const { data: messages, error: messageError } = await supabase
-        .from('messages')
-        .select('*')
-        .eq('chat_thread_id', thread.id)
-        .order('message_order', { ascending: true });
-
-    if (messageError) {
-        throw new Error(messageError.message);
-    }
-
-    return {
-        ...thread,
-        created: new Date(thread.created),
-        lastModified: new Date(thread.lastModified),
-        messages,
-        agentConfig: JSON.parse(thread.agentConfig),
-    };
 }
 
 export async function getChatThreadList(userId: string): Promise<ChatThread[]> {

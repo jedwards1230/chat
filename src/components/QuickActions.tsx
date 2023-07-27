@@ -12,7 +12,7 @@ export default function QuickActions() {
 
     return (
         <div className="absolute inset-x-auto -top-12 flex w-full justify-center gap-2">
-            {botTyping && abortController && (
+            {botTyping && (
                 <button
                     onClick={abortRequest}
                     className={clsx(btn, 'bg-red-500 text-neutral-50')}

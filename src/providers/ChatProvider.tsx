@@ -28,17 +28,15 @@ const ChatContext = createContext<ChatState>(initialState);
 
 export const useChat = () => useContext(ChatContext);
 
-type ChatProviderProps = {
-    children: React.ReactNode;
-    threadList: ChatThread[];
-    savedConfig?: Config | null;
-};
-
 export function ChatProvider({
     children,
     threadList,
     savedConfig,
-}: ChatProviderProps) {
+}: {
+    children: React.ReactNode;
+    threadList: ChatThread[];
+    savedConfig?: Config | null;
+}) {
     const router = useRouter();
     const params = useParams();
     const threadId = params.root
@@ -46,25 +44,19 @@ export function ChatProvider({
             ? params.root[0]
             : undefined
         : undefined;
-    const [isNew, setIsNew] = useState<boolean>(threadId === undefined);
 
     const [state, setState] = useState<ChatState>({
         ...initialState,
+        isNew: threadId === undefined,
         threads:
             threadList.length === 0 ? [initialState.activeThread] : threadList,
-        input: initialState.input,
-        editId: initialState.editId,
-        pluginsEnabled: initialState.pluginsEnabled,
-        config: initialState.config,
-        botTyping: initialState.botTyping,
-        abortController: new AbortController(),
+        config: savedConfig || initialState.config,
         activeThread: getInitialActiveThread(savedConfig, threadId, threadList),
     });
 
-    // Event Handlers
-    const handleSubmit = createSubmitHandler(state, setState, router);
     const createThread = createThreadHandler(state, setState);
     const updateActiveThread = updateActiveThreadHandler(setState);
+    const abortRequest = abortRequestHandler(state, setState);
 
     useEffect(() => {
         if (!state.saved) {
@@ -75,65 +67,65 @@ export function ChatProvider({
 
     useEffect(() => {
         return () => {
-            state.abortController?.abort();
+            abortRequest();
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    /* 
-        If threadId is undefined, create a new thread.
-        If threadId is defined, check if it exists in the threadList.
-            If it does, update the activeThread.
-            If it doesn't, redirect to the home page and create a new thread.
-
-        Since this checks every render and router.push and router.replace are asynchronous,
-        we need to keep track of whether the thread is new or not.
-    */
     useEffect(() => {
         if (!threadId) {
-            if (!isNew) {
+            if (!state.isNew) {
                 createThread();
-                setIsNew(true);
+                setState((prevState) => ({
+                    ...prevState,
+                    isNew: true,
+                }));
             }
         } else if (state.activeThread.id !== threadId) {
             const newThread = state.threads.find((t) => t.id === threadId);
             if (newThread) {
                 updateActiveThread(newThread);
-                setIsNew(false);
+                setState((prevState) => ({
+                    ...prevState,
+                    isNew: false,
+                }));
             } else {
                 router.push('/');
-                setIsNew(true);
+                setState((prevState) => ({
+                    ...prevState,
+                    isNew: true,
+                }));
             }
         }
     }, [
-        createThread,
-        isNew,
         router,
+        threadId,
+        state.input,
+        state.isNew,
+        state.threads,
         state.activeThread.id,
         state.activeThread.messages.length,
-        state.input,
-        state.threads,
-        threadId,
+        createThread,
         updateActiveThread,
     ]);
 
     const value = {
         ...state,
-        abortRequest: abortRequestHandler(state, setState),
-        toggleplugin: togglePluginHandler(state, setState),
-        setConfig: setConfigHandler(setState),
-        updateThreadConfig: updateThreadConfigHandler(setState),
-        setSystemMessage: setSystemMessageHandler(setState),
-        editMessage: editMessageHandler(state, setState),
-        removeMessage: removeMessageHandler(setState),
-        removeThread: removeThreadHandler(state, setState, router),
-        removeAllThreads: removeAllThreadsHandler(setState, router),
-        cancelEdit: cancelEditHandler(setState),
-        setPluginsEnabled: setPluginsEnabledHandler(setState),
-        changeInput: changeInputHandler(setState),
-        handleSubmit,
+        abortRequest,
         createThread,
         updateActiveThread,
+        setConfig: setConfigHandler(setState),
+        cancelEdit: cancelEditHandler(setState),
+        changeInput: changeInputHandler(setState),
+        removeMessage: removeMessageHandler(setState),
+        editMessage: editMessageHandler(state, setState),
+        toggleplugin: togglePluginHandler(state, setState),
+        setSystemMessage: setSystemMessageHandler(setState),
+        setPluginsEnabled: setPluginsEnabledHandler(setState),
+        updateThreadConfig: updateThreadConfigHandler(setState),
+        removeThread: removeThreadHandler(state, setState, router),
+        handleSubmit: createSubmitHandler(state, setState, router),
+        removeAllThreads: removeAllThreadsHandler(setState, router),
     };
 
     return (

@@ -6,12 +6,18 @@ type ChatState = {
     input: string;
     editId: string | null;
     pluginsEnabled: boolean;
-    abortController?: AbortController;
+    abortController: AbortController;
     saved: boolean;
+    /**
+     * isNew is a state variable, set to true when a new thread is created due to absence of a threadId or non-existence of the threadId in state.threads
+     *
+     * It is set to false when an existing thread is made active based on the provided threadId
+     */
+    isNew: boolean;
 
+    /** Abort request, stop typing, request a save */
     abortRequest: () => void;
     updateActiveThread: (thread: ChatThread) => void;
-    resetAbortController: () => void;
     createThread: () => void;
     toggleplugin: (plugin: Tool) => void;
     setConfig: (config: Config) => void;
