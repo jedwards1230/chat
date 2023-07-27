@@ -7,6 +7,10 @@ if (!privateKey)
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 if (!url) throw new Error(`Expected env var NEXT_PUBLIC_SUPABASE_URL`);
 
-const supabase = createClient(url, privateKey);
+const supabase = createClient(url, privateKey, {
+    auth: {
+        persistSession: false,
+    },
+});
 
 export default supabase;
