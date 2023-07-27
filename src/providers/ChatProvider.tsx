@@ -41,7 +41,11 @@ export function ChatProvider({
 }: ChatProviderProps) {
     const router = useRouter();
     const params = useParams();
-    const threadId = params.root ? params.root[0] : undefined;
+    const threadId = params.root
+        ? params.root[0] !== 'index'
+            ? params.root[0]
+            : undefined
+        : undefined;
     const [isNew, setIsNew] = useState<boolean>(threadId === undefined);
 
     const [state, setState] = useState<ChatState>({
