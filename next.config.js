@@ -9,6 +9,7 @@ module.exports = withPWA({
     ...nextConfig,
     experimental: {
         serverActions: true,
+        webVitalsAttribution: ['CLS', 'LCP', 'FCP', 'FID', 'INP', 'TTFB'],
     },
     images: {
         remotePatterns: [
