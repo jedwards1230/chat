@@ -5,7 +5,7 @@ import { useChat } from '@/providers/ChatProvider';
 import ChatBubbleFunction from './ChatBubbleFunction';
 
 export function ChatBubbleFunctionList({ message }: { message: Message }) {
-    const { activeThread, editMessage, removeMessage } = useChat();
+    const { editMessage, removeMessage } = useChat();
     const isSystem = message.role === 'system';
     const isUser = message.role === 'user';
 

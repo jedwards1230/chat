@@ -266,6 +266,7 @@ export function removeMessageHandler(setState: ChatDispatch) {
     return (id: string) => {
         setState((prevState) => ({
             ...prevState,
+            saved: false,
             activeThread: {
                 ...prevState.activeThread,
                 messages: prevState.activeThread.messages.filter(
