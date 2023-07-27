@@ -90,7 +90,7 @@ export function ChatProvider({
                     isNew: false,
                 }));
             } else {
-                router.push('/');
+                router.replace('/');
                 setState((prevState) => ({
                     ...prevState,
                     isNew: true,

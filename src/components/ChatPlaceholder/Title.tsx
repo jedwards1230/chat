@@ -10,14 +10,14 @@ export default function Title() {
             <div className="text-center text-4xl font-medium">
                 {activeThread.agentConfig.name}
             </div>
-            <div className="flex gap-1 text-neutral-400">
-                System:
+            <label className="flex gap-1 text-neutral-400 dark:text-neutral-300">
+                <span>System:</span>
                 <textarea
                     value={activeThread.agentConfig.systemMessage}
                     onChange={(e) => setSystemMessage(e.target.value)}
-                    className="h-auto max-h-48 resize-none overflow-y-visible rounded border border-transparent bg-transparent italic text-neutral-500 focus:border-neutral-500 focus:outline-none"
+                    className="h-auto max-h-48 resize-none overflow-y-visible rounded border border-transparent bg-transparent italic text-neutral-500 focus:border-neutral-500 focus:outline-none dark:text-neutral-400"
                 />
-            </div>
+            </label>
         </div>
     );
 }

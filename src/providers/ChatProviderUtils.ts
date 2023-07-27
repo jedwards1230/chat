@@ -291,7 +291,7 @@ export function removeThreadHandler(
         }));
         if (state.activeThread.id === id) {
             state.createThread();
-            router.push('/');
+            router.replace('/');
         }
     };
 }
@@ -311,7 +311,7 @@ export function removeAllThreadsHandler(
                 saved: true,
             };
         });
-        router.push('/');
+        router.replace('/');
     };
 }
 
