@@ -59,7 +59,10 @@ export default function ChatSettings() {
         >
             <div className="flex h-full w-full flex-col pb-6 md:pb-0">
                 <div className="flex-1">
-                    <AgentSettings agent={activeThread.agentConfig} />
+                    <AgentSettings
+                        active={true}
+                        agent={activeThread.agentConfig}
+                    />
                 </div>
                 {activeThread.messages.length > 1 && (
                     <button

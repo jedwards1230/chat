@@ -26,7 +26,7 @@ export default function PersonalitySelector() {
             {activeCard !== undefined && (
                 <button
                     onClick={() => setActiveCard(undefined)}
-                    className="absolute left-6 top-5 text-neutral-500 hover:text-neutral-200"
+                    className="absolute left-6 top-5 text-neutral-400 hover:text-neutral-950 dark:text-neutral-500 dark:hover:text-neutral-200"
                 >
                     go back
                 </button>
@@ -99,8 +99,8 @@ function AgentCard({
                 className={clsx(
                     'flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full transition-colors ',
                     active
-                        ? 'hover:bg-green-600 dark:hover:bg-green-800'
-                        : 'hover:bg-neutral-500 dark:hover:bg-neutral-500',
+                        ? 'hover:bg-green-700 dark:hover:bg-green-800'
+                        : 'hover:bg-neutral-300 dark:hover:bg-neutral-500',
                 )}
             >
                 <PencilSquare />

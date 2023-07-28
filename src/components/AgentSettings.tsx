@@ -1,6 +1,7 @@
 'use client';
 
 import { useChat } from '@/providers/ChatProvider';
+import clsx from 'clsx';
 import { useState } from 'react';
 
 const availableTools: Tool[] = [
@@ -10,7 +11,13 @@ const availableTools: Tool[] = [
     'wikipedia-api',
 ];
 
-export default function AgentSettings({ agent }: { agent: AgentConfig }) {
+export default function AgentSettings({
+    agent,
+    active = false,
+}: {
+    agent: AgentConfig;
+    active?: boolean;
+}) {
     const { updateThreadConfig, setSystemMessage, activeThread } = useChat();
 
     const [name, setName] = useState(agent.name);
@@ -32,16 +39,25 @@ export default function AgentSettings({ agent }: { agent: AgentConfig }) {
 
     const onNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setName(e.target.value);
+        if (active) {
+            updateThreadConfig({ name: e.target.value });
+        }
     };
 
     const onSystemMessageChange = (
         e: React.ChangeEvent<HTMLTextAreaElement>,
     ) => {
         setSystem(e.target.value);
+        if (active) {
+            setSystemMessage(e.target.value);
+        }
     };
 
     const togglePlugins = () => {
         setToolsEnabled(!toolsEnabled);
+        if (active) {
+            updateThreadConfig({ toolsEnabled: !toolsEnabled });
+        }
     };
 
     const togglePlugin = (tool: Tool) => {
@@ -50,6 +66,9 @@ export default function AgentSettings({ agent }: { agent: AgentConfig }) {
             : [...tools, tool];
 
         setTools(newTools);
+        if (active) {
+            updateThreadConfig({ tools: newTools });
+        }
     };
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -84,7 +103,10 @@ export default function AgentSettings({ agent }: { agent: AgentConfig }) {
         <form onSubmit={handleSubmit} className="space-y-4">
             <div className="flex flex-col gap-2 px-4">
                 <input
-                    className="rounded border border-transparent bg-neutral-800 p-1 text-lg font-bold focus:border-neutral-500 focus:outline-none"
+                    className={clsx(
+                        'rounded border border-transparent p-1 text-lg font-bold focus:border-neutral-500 focus:outline-none dark:bg-neutral-800',
+                        active ? 'bg-neutral-800' : 'bg-neutral-200',
+                    )}
                     type="text"
                     placeholder="Agent Name"
                     required
@@ -92,7 +114,10 @@ export default function AgentSettings({ agent }: { agent: AgentConfig }) {
                     onChange={onNameChange}
                 />
                 <textarea
-                    className="rounded border border-transparent bg-neutral-800 p-1 font-medium focus:border-neutral-500 focus:outline-none"
+                    className={clsx(
+                        'rounded border border-transparent p-1 font-medium focus:border-neutral-500 focus:outline-none dark:bg-neutral-800',
+                        active ? 'bg-neutral-800' : 'bg-neutral-200',
+                    )}
                     placeholder="Agent System Message"
                     required
                     value={systemMessage}
@@ -101,9 +126,23 @@ export default function AgentSettings({ agent }: { agent: AgentConfig }) {
             </div>
             <div className="flex flex-col gap-4 rounded-md px-4">
                 <div className="flex w-full flex-col gap-2">
-                    <label className="flex flex-col rounded px-1 hover:bg-neutral-500 dark:hover:bg-neutral-600">
+                    <label
+                        className={clsx(
+                            'flex flex-col rounded px-1 dark:hover:bg-neutral-600',
+                            active
+                                ? 'hover:bg-neutral-500'
+                                : 'hover:bg-neutral-300',
+                        )}
+                    >
                         <div className="flex items-center justify-between gap-4 dark:border-neutral-600">
-                            <div className="font-semibold text-neutral-100">
+                            <div
+                                className={clsx(
+                                    'font-semibold dark:text-neutral-100',
+                                    active
+                                        ? 'text-neutral-100'
+                                        : 'text-neutral-950',
+                                )}
+                            >
                                 Plugins
                             </div>
                             <input
@@ -115,7 +154,14 @@ export default function AgentSettings({ agent }: { agent: AgentConfig }) {
                             />
                         </div>
                         {toolsEnabled && (
-                            <div className="text-xs text-neutral-600 dark:text-neutral-400">
+                            <div
+                                className={clsx(
+                                    'text-xs dark:text-neutral-400',
+                                    active
+                                        ? 'text-neutral-400'
+                                        : 'text-neutral-600',
+                                )}
+                            >
                                 {tools.length} enabled
                             </div>
                         )}
@@ -127,7 +173,12 @@ export default function AgentSettings({ agent }: { agent: AgentConfig }) {
                                 return (
                                     <label
                                         key={plugin}
-                                        className="flex w-full cursor-pointer items-center justify-between rounded p-1 text-sm hover:bg-neutral-500 dark:hover:bg-neutral-600"
+                                        className={clsx(
+                                            'flex w-full cursor-pointer items-center justify-between rounded p-1 text-sm dark:hover:bg-neutral-600',
+                                            active
+                                                ? 'hover:bg-neutral-500'
+                                                : 'hover:bg-neutral-300',
+                                        )}
                                     >
                                         <span className="capitalize">
                                             {plugin}
@@ -147,7 +198,14 @@ export default function AgentSettings({ agent }: { agent: AgentConfig }) {
                     )}
                 </div>
                 <details className="w-full">
-                    <summary className="cursor-pointer dark:hover:bg-neutral-700">
+                    <summary
+                        className={clsx(
+                            'cursor-pointer dark:hover:bg-neutral-700',
+                            active
+                                ? 'hover:bg-neutral-500'
+                                : 'hover:bg-neutral-300',
+                        )}
+                    >
                         Advanced
                     </summary>
                     {modelInfo.map((info) => {
@@ -155,7 +213,12 @@ export default function AgentSettings({ agent }: { agent: AgentConfig }) {
                         return (
                             <div
                                 key={k}
-                                className="flex w-full justify-between text-sm text-neutral-600 dark:text-neutral-400"
+                                className={clsx(
+                                    'flex w-full justify-between text-sm dark:text-neutral-400',
+                                    active
+                                        ? 'text-neutral-400'
+                                        : 'text-neutral-600',
+                                )}
                             >
                                 <div>{k}:</div>
                                 <div>{v}</div>
@@ -164,14 +227,16 @@ export default function AgentSettings({ agent }: { agent: AgentConfig }) {
                     })}
                 </details>
             </div>
-            <div className="flex w-full justify-end">
-                <button
-                    type="submit"
-                    className="rounded-md bg-neutral-500 px-3 py-2 transition-colors dark:bg-neutral-500 dark:hover:bg-neutral-600"
-                >
-                    Apply
-                </button>
-            </div>
+            {!active && (
+                <div className="flex w-full justify-end">
+                    <button
+                        type="submit"
+                        className="rounded-md bg-neutral-300 px-3 py-2 transition-colors hover:bg-neutral-400 focus:bg-neutral-500 dark:bg-neutral-500 dark:hover:bg-neutral-600"
+                    >
+                        Apply
+                    </button>
+                </div>
+            )}
         </form>
     );
 }
