@@ -4,6 +4,8 @@ import { Metadata } from 'next';
 import { SharedBubble } from '@/components/ChatThread/ChatBubble';
 import { redis } from '@/lib/redis';
 
+export const runtime = 'edge';
+
 type Props = { params: { slug: string } };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
