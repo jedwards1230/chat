@@ -221,13 +221,10 @@ export function updateThreadConfigHandler(setState: ChatDispatch) {
 
 export function setSystemMessageHandler(setState: ChatDispatch) {
     return (systemMessage: string) => {
-        setState((prevState) => ({
-            ...prevState,
-            lastModified: new Date(),
-            activeThread: {
+        setState((prevState) => {
+            const activeThread: ChatThread = {
                 ...prevState.activeThread,
                 lastModified: new Date(),
-                systemMessage,
                 agentConfig: {
                     ...prevState.activeThread.agentConfig,
                     systemMessage,
@@ -235,12 +232,21 @@ export function setSystemMessageHandler(setState: ChatDispatch) {
                 messages: [
                     {
                         ...prevState.activeThread.messages[0],
-                        message: systemMessage,
+                        content: systemMessage,
                     },
                     ...prevState.activeThread.messages.slice(1),
                 ],
-            },
-        }));
+            };
+
+            return {
+                ...prevState,
+                lastModified: new Date(),
+                activeThread,
+                threads: prevState.threads.map((thread) =>
+                    thread.id === activeThread.id ? activeThread : thread,
+                ),
+            };
+        });
     };
 }
 

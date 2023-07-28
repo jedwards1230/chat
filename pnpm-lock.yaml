@@ -51,8 +51,8 @@ dependencies:
     specifier: ^2.0.2
     version: 2.0.2
   framer-motion:
-    specifier: ^10.13.1
-    version: 10.13.1(react-dom@18.2.0)(react@18.2.0)
+    specifier: ^10.14.0
+    version: 10.14.0(react-dom@18.2.0)(react@18.2.0)
   langchain:
     specifier: ^0.0.118
     version: 0.0.118(@supabase/supabase-js@2.31.0)(@upstash/redis@1.22.0)(cheerio@1.0.0-rc.12)(encoding@0.1.13)
@@ -3742,8 +3742,8 @@ packages:
     resolution: {integrity: sha512-MhLuK+2gUcnZe8ZHlaaINnQLl0xRIGRfcGk2yl8xoQAfHrSsL3rYu6FCmBdkdbhc9EPlwyGHewaRsvwRMJtAlA==}
     dev: true
 
-  /framer-motion@10.13.1(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-uiKsaLEoySeln3eOPy8wUB3FkNtRRiVga5xJOkgs7C0sHVyvpJajXJFSoabt+emBojgnMQY0epnjl0ppoYPxkQ==}
+  /framer-motion@10.14.0(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-XMZCbki8+9+D9of6P0cFtGrSGItNvXUJqvGI8O5v5aSvprA3PNlcpgfLEfTIZ9woNuZtYv56dprktuQ+S2welw==}
     peerDependencies:
       react: ^18.0.0
       react-dom: ^18.0.0

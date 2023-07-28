@@ -5,12 +5,11 @@ import { useAuth, useUser } from '@clerk/nextjs';
 
 import Dialog from './Dialog';
 import { useChat } from '@/providers/ChatProvider';
-import { Select } from '../Forms';
 import { deleteAllCloudThreads } from '@/utils/server/server';
 import { useUI } from '@/providers/UIProvider';
 
 export default function ConfigEditor() {
-    const { config, setConfig, removeAllThreads } = useChat();
+    const { removeAllThreads, threads } = useChat();
     const { configEditorOpen, setConfigEditorOpen } = useUI();
     const { signOut } = useAuth();
     const { user } = useUser();
@@ -33,27 +32,6 @@ export default function ConfigEditor() {
             </div>
 
             <div className="flex flex-col gap-4">
-                {/* Default Model */}
-                <Select
-                    label="Default Model"
-                    value={config.model}
-                    options={[
-                        { label: 'gpt-3.5-turbo', value: 'gpt-3.5-turbo' },
-                        {
-                            label: 'gpt-3.5-turbo-16k',
-                            value: 'gpt-3.5-turbo-16k',
-                        },
-                        { label: 'gpt-4', value: 'gpt-4' },
-                        { label: 'gpt-4-0613', value: 'gpt-4-0613' },
-                    ]}
-                    onChange={(e) =>
-                        setConfig({
-                            ...config,
-                            model: e.target.value as Model,
-                        })
-                    }
-                />
-
                 {/* Credentials */}
                 <div>
                     <div className="text-xl font-medium">Credentials</div>
@@ -83,16 +61,16 @@ export default function ConfigEditor() {
                 <div>
                     <div className="text-xl font-medium">Data</div>
                     {/* TODO: count messages */}
-                    {/* <div className="flex gap-2">
-                        <div>{threadList.length} Chats</div>|
+                    <div className="flex gap-2">
+                        <div>{threads.length} Chats</div>|
                         <div>
-                            {threadList.reduce(
+                            {threads.reduce(
                                 (acc, thread) => acc + thread.messages.length,
                                 0,
                             )}{' '}
                             Messages
                         </div>
-                    </div> */}
+                    </div>
                     {/* <label className="flex w-full items-center justify-between py-2 text-base">
                         <button
                             onClick={clearAllLocal}

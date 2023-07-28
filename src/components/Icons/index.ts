@@ -3,6 +3,7 @@ import Chat from './Chat';
 import Check from './Check';
 import Clipboard from './Clipboard';
 import Edit from './Edit';
+import Ellipsis from './Ellipsis';
 import Information from './Information';
 import OpenNew from './OpenNew';
 import Reset from './Reset';
@@ -17,6 +18,7 @@ export {
     Check,
     Clipboard,
     Edit,
+    Ellipsis,
     Information,
     OpenNew,
     Reset,

@@ -24,7 +24,7 @@
         "eslint": "8.45.0",
         "eslint-config-next": "^13.4.12",
         "expr-eval": "^2.0.2",
-        "framer-motion": "^10.13.1",
+        "framer-motion": "^10.14.0",
         "langchain": "^0.0.118",
         "next": "13.4.12",
         "next-themes": "^0.2.1",

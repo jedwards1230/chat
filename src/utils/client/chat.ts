@@ -80,7 +80,6 @@ export const getChat = async (
         setState((prevState) => {
             return {
                 ...prevState,
-                isNew: false,
                 botTyping: true,
             };
         });
@@ -155,6 +154,7 @@ export const getChat = async (
                 ...prevState,
                 saved: false,
                 botTyping: false,
+                isNew: false,
             };
         });
 

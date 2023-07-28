@@ -8,6 +8,8 @@
 /public/sw*
 /public/workbox-*
 
+/supabase
+
 # testing
 /coverage
 

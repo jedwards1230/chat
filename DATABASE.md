@@ -29,19 +29,4 @@ CREATE TABLE public.messages (
     FOREIGN KEY (chat_thread_id) REFERENCES public.chat_threads(id) ON DELETE CASCADE
 );
 
--- Create config table
-CREATE TABLE public.configs (
-    user_id character varying(255) NOT NULL,
-    model character varying(255) NOT NULL,
-    temperature numeric NOT NULL,
-    systemMessage text NOT NULL,
-    topP numeric NOT NULL,
-    N integer NOT NULL,
-    maxTokens integer NOT NULL,
-    frequencyPenalty numeric NOT NULL,
-    presencePenalty numeric NOT NULL,
-    PRIMARY KEY (user_id),
-    FOREIGN KEY (user_id) REFERENCES public.users(userid) ON DELETE CASCADE
-);
-
 ```
