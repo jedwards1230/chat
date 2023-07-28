@@ -1,7 +1,7 @@
 'use client';
 
 import { useChat } from '@/providers/ChatProvider';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 const availableTools: Tool[] = [
     'calculator',
@@ -10,76 +10,37 @@ const availableTools: Tool[] = [
     'wikipedia-api',
 ];
 
-export default function AgentSettings({
-    activeThread,
-    agent,
-}: {
-    activeThread?: ChatThread;
-    agent: AgentConfig;
-}) {
-    const { updateThreadConfig, setSystemMessage } = useChat();
+export default function AgentSettings({ agent }: { agent: AgentConfig }) {
+    const { updateThreadConfig, setSystemMessage, activeThread } = useChat();
 
-    const [name, setName] = useState(
-        activeThread ? activeThread.agentConfig.name : agent.name,
-    );
-    const [systemMessage, setSystem] = useState(
-        activeThread
-            ? activeThread.agentConfig.systemMessage
-            : agent.systemMessage,
-    );
+    const [name, setName] = useState(agent.name);
+    const [systemMessage, setSystem] = useState(agent.systemMessage);
 
-    const [toolsEnabled, setToolsEnabled] = useState(
-        activeThread
-            ? activeThread.agentConfig.toolsEnabled
-            : agent.toolsEnabled,
-    );
-    const [tools, setTools] = useState(
-        activeThread ? activeThread.agentConfig.tools : agent.tools,
-    );
+    const [toolsEnabled, setToolsEnabled] = useState(agent.toolsEnabled);
+    const [tools, setTools] = useState(agent.tools);
 
-    const [temperature, setTemperature] = useState(
-        activeThread ? activeThread.agentConfig.temperature : agent.temperature,
-    );
-    const [topP, setTopP] = useState(
-        activeThread ? activeThread.agentConfig.topP : agent.topP,
-    );
-    const [N, setN] = useState(
-        activeThread ? activeThread.agentConfig.N : agent.N,
-    );
-    const [maxTokens, setMaxTokens] = useState(
-        activeThread ? activeThread.agentConfig.maxTokens : agent.maxTokens,
-    );
+    const [temperature, setTemperature] = useState(agent.temperature);
+    const [topP, setTopP] = useState(agent.topP);
+    const [N, setN] = useState(agent.N);
+    const [maxTokens, setMaxTokens] = useState(agent.maxTokens);
     const [frequencyPenalty, setFrequencyPenalty] = useState(
-        activeThread
-            ? activeThread.agentConfig.frequencyPenalty
-            : agent.frequencyPenalty,
+        agent.frequencyPenalty,
     );
     const [presencePenalty, setPresencePenalty] = useState(
-        activeThread
-            ? activeThread.agentConfig.presencePenalty
-            : agent.presencePenalty,
+        agent.presencePenalty,
     );
 
     const onNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (activeThread) {
-            updateThreadConfig({ name: e.target.value });
-        }
         setName(e.target.value);
     };
 
     const onSystemMessageChange = (
         e: React.ChangeEvent<HTMLTextAreaElement>,
     ) => {
-        if (activeThread) {
-            setSystemMessage(e.target.value);
-        }
         setSystem(e.target.value);
     };
 
     const togglePlugins = () => {
-        if (activeThread) {
-            updateThreadConfig({ toolsEnabled: !toolsEnabled });
-        }
         setToolsEnabled(!toolsEnabled);
     };
 
@@ -88,10 +49,26 @@ export default function AgentSettings({
             ? tools.filter((t) => t !== tool)
             : [...tools, tool];
 
-        if (activeThread) {
-            updateThreadConfig({ tools: newTools });
-        }
         setTools(newTools);
+    };
+
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (activeThread) {
+            setSystemMessage(systemMessage);
+            updateThreadConfig({
+                name,
+                systemMessage,
+                toolsEnabled,
+                tools,
+                temperature,
+                topP,
+                N,
+                maxTokens,
+                frequencyPenalty,
+                presencePenalty,
+            });
+        }
     };
 
     const modelInfo = [
@@ -103,23 +80,8 @@ export default function AgentSettings({
         { 'Presence Penalty': presencePenalty },
     ];
 
-    useEffect(() => {
-        if (activeThread) {
-            setName(activeThread.agentConfig.name);
-            setSystem(activeThread.agentConfig.systemMessage);
-            setToolsEnabled(activeThread.agentConfig.toolsEnabled);
-            setTools(activeThread.agentConfig.tools);
-            setTemperature(activeThread.agentConfig.temperature);
-            setTopP(activeThread.agentConfig.topP);
-            setN(activeThread.agentConfig.N);
-            setMaxTokens(activeThread.agentConfig.maxTokens);
-            setFrequencyPenalty(activeThread.agentConfig.frequencyPenalty);
-            setPresencePenalty(activeThread.agentConfig.presencePenalty);
-        }
-    }, [activeThread]);
-
     return (
-        <div className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
             <div className="flex flex-col gap-2 px-4">
                 <input
                     className="rounded border border-transparent bg-neutral-800 p-1 text-lg font-bold focus:border-neutral-500 focus:outline-none"
@@ -185,7 +147,9 @@ export default function AgentSettings({
                     )}
                 </div>
                 <details className="w-full">
-                    <summary className="cursor-pointer">Advanced</summary>
+                    <summary className="cursor-pointer dark:hover:bg-neutral-700">
+                        Advanced
+                    </summary>
                     {modelInfo.map((info) => {
                         const [k, v] = Object.entries(info)[0];
                         return (
@@ -200,6 +164,14 @@ export default function AgentSettings({
                     })}
                 </details>
             </div>
-        </div>
+            <div className="flex w-full justify-end">
+                <button
+                    type="submit"
+                    className="rounded-md bg-neutral-500 px-3 py-2 transition-colors dark:bg-neutral-500 dark:hover:bg-neutral-600"
+                >
+                    Apply
+                </button>
+            </div>
+        </form>
     );
 }

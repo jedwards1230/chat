@@ -4,34 +4,24 @@ import { useChat } from '@/providers/ChatProvider';
 import { useUI } from '@/providers/UIProvider';
 import Dialog from './Dialog';
 import { useState } from 'react';
-import { defaultAgents } from '@/providers/initialChat';
 import AgentSettings from '../AgentSettings';
 import clsx from 'clsx';
 import { PencilSquare } from '../Icons';
 
 export default function PersonalitySelector() {
-    const { activeThread, updateThreadConfig, setSystemMessage } = useChat();
-    const { personalitySelectorOpen, setPersonalitySelectorOpen } = useUI();
+    const { activeThread, characterList } = useChat();
+    const { characterSelectorOpen, setCharacterSelectorOpen } = useUI();
     const [activeCard, setActiveCard] = useState<string | undefined>(undefined);
 
-    const agents = defaultAgents;
-
     const closeDialog = () => {
-        setPersonalitySelectorOpen(false);
+        setCharacterSelectorOpen(false);
     };
 
-    const setActive = (agent: AgentConfig) => {
-        if (activeThread) {
-            updateThreadConfig(agent);
-            setSystemMessage(agent.systemMessage);
-        }
-    };
-
-    if (!personalitySelectorOpen) return null;
+    if (!characterSelectorOpen) return null;
     return (
         <Dialog callback={closeDialog}>
             <div className="w-full pb-4 text-center text-xl font-semibold">
-                Personality {activeCard === undefined ? 'Selector' : 'Editor'}
+                Character {activeCard === undefined ? 'Selector' : 'Editor'}
             </div>
             {activeCard !== undefined && (
                 <button
@@ -43,7 +33,7 @@ export default function PersonalitySelector() {
             )}
             {activeCard === undefined ? (
                 <div className="h-[450px] space-y-2 overflow-y-scroll">
-                    {agents.map((agent, i) => {
+                    {characterList.map((agent, i) => {
                         const active =
                             agent.name === activeThread.agentConfig.name;
                         return (
@@ -51,7 +41,6 @@ export default function PersonalitySelector() {
                                 key={'agent-config-' + i}
                                 agent={agent}
                                 active={active}
-                                setActive={() => setActive(agent)}
                                 edit={() => setActiveCard(agent.name)}
                             />
                         );
@@ -59,7 +48,11 @@ export default function PersonalitySelector() {
                 </div>
             ) : (
                 <AgentSettings
-                    agent={agents.find((agent) => agent.name === activeCard)!}
+                    agent={
+                        characterList.find(
+                            (agent) => agent.name === activeCard,
+                        )!
+                    }
                 />
             )}
         </Dialog>
@@ -69,14 +62,21 @@ export default function PersonalitySelector() {
 function AgentCard({
     agent,
     active,
-    setActive,
     edit,
 }: {
     agent: AgentConfig;
     active: boolean;
-    setActive: () => void;
     edit: () => void;
 }) {
+    const { activeThread, updateThreadConfig, setSystemMessage } = useChat();
+
+    const setActive = () => {
+        if (activeThread) {
+            updateThreadConfig(agent);
+            setSystemMessage(agent.systemMessage);
+        }
+    };
+
     return (
         <div
             onClick={setActive}

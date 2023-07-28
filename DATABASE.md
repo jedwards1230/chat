@@ -28,5 +28,4 @@ CREATE TABLE public.messages (
     PRIMARY KEY (id),
     FOREIGN KEY (chat_thread_id) REFERENCES public.chat_threads(id) ON DELETE CASCADE
 );
-
 ```

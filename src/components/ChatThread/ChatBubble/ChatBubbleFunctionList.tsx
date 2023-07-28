@@ -1,6 +1,6 @@
 'use client';
 
-import { Clipboard, Edit, Reset, Trash } from '@/components/Icons';
+import { Clipboard, PencilSquare, Reset, Trash } from '@/components/Icons';
 import { useChat } from '@/providers/ChatProvider';
 import ChatBubbleFunction from './ChatBubbleFunction';
 
@@ -21,7 +21,7 @@ export function ChatBubbleFunctionList({ message }: { message: Message }) {
             )}
             {!isSystem && (
                 <ChatBubbleFunction
-                    icon={<Edit />}
+                    icon={<PencilSquare />}
                     color="blue"
                     title={'Edit Message'}
                     onClick={() => editMessage(message.id)}

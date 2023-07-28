@@ -6,7 +6,7 @@ import { Ellipsis } from '../Icons';
 
 export default function Title() {
     const { activeThread } = useChat();
-    const { setPersonalitySelectorOpen } = useUI();
+    const { setCharacterSelectorOpen } = useUI();
 
     return (
         <div className="absolute inset-x-auto inset-y-auto flex h-full max-w-4xl flex-col items-center justify-center gap-2">
@@ -15,7 +15,7 @@ export default function Title() {
                     {activeThread.agentConfig.name}
                 </div>
                 <div
-                    onClick={() => setPersonalitySelectorOpen(true)}
+                    onClick={() => setCharacterSelectorOpen(true)}
                     className="cursor-pointer rounded-full p-0.5 hover:bg-neutral-200 dark:hover:bg-neutral-700"
                 >
                     <Ellipsis />

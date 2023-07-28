@@ -1,35 +1,7 @@
 'use client';
 
 import { v4 as uuidv4 } from 'uuid';
-
-const systemMessage = 'You are a helpful assistant.';
-
-export const defaultAgentConfig: AgentConfig = {
-    id: '',
-    name: 'Chat',
-    tools: ['search', 'wikipedia-api'],
-    toolsEnabled: true,
-    model: 'gpt-4',
-    temperature: 0.7,
-    systemMessage: systemMessage,
-    topP: 1,
-    N: 1,
-    maxTokens: -1,
-    frequencyPenalty: 0,
-    presencePenalty: 0,
-};
-
-const softwareDeveloperAgentConfig: AgentConfig = {
-    ...defaultAgentConfig,
-    name: 'Software Developer',
-    systemMessage:
-        'You are a senior software developer. You write clean, commented, efficient code.',
-};
-
-export const defaultAgents: AgentConfig[] = [
-    defaultAgentConfig,
-    softwareDeveloperAgentConfig,
-];
+import { defaultAgentConfig, defaultAgents } from './characters';
 
 export function getDefaultThread(config: AgentConfig): ChatThread {
     return {
@@ -59,6 +31,7 @@ const initialState: ChatState = {
     botTyping: false,
     config: defaultAgentConfig,
     activeThread: baseEntry,
+    characterList: defaultAgents,
     abortController: new AbortController(),
 
     setConfig: () => {},

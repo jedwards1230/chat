@@ -1,17 +1,16 @@
 'use client';
 
 import ConfigEditor from './ConfigEditor';
-import PersonalitySelector from './PersonalitySelector';
+import CharacterSelector from './CharacterSelector';
 import ShareChat from './ShareChat';
 import { useUI } from '@/providers/UIProvider';
 
 export default function Dialogs() {
-    const { configEditorOpen, shareModalOpen, personalitySelectorOpen } =
-        useUI();
+    const { configEditorOpen, shareModalOpen, characterSelectorOpen } = useUI();
 
     const ActiveDialog = () => {
-        if (personalitySelectorOpen) {
-            return <PersonalitySelector />;
+        if (characterSelectorOpen) {
+            return <CharacterSelector />;
         }
 
         if (configEditorOpen) {
