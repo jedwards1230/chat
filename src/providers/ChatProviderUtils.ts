@@ -131,7 +131,6 @@ export function createSubmitHandler(
                 msgHistory,
                 state.abortController,
                 state.activeThread,
-                state.pluginsEnabled,
                 0,
                 setState,
                 upsertMessage,

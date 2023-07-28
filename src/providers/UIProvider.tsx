@@ -11,6 +11,8 @@ type ModalState = {
     setConfigEditorOpen: (open: boolean) => void;
     shareModalOpen: boolean;
     setShareModalOpen: (open: boolean) => void;
+    personalitySelectorOpen: boolean;
+    setPersonalitySelectorOpen: (open: boolean) => void;
 };
 
 const initialState: ModalState = {
@@ -22,6 +24,8 @@ const initialState: ModalState = {
     setConfigEditorOpen: () => {},
     shareModalOpen: false,
     setShareModalOpen: () => {},
+    personalitySelectorOpen: false,
+    setPersonalitySelectorOpen: () => {},
 };
 
 const UIContext = createContext<ModalState>(initialState);
@@ -39,6 +43,9 @@ export function UIProvider({ children }: { children: React.ReactNode }) {
     );
     const [shareModalOpen, setShareModalOpen] = useState(
         initialState.shareModalOpen,
+    );
+    const [personalitySelectorOpen, setPersonalitySelectorOpen] = useState(
+        initialState.personalitySelectorOpen,
     );
 
     const handleResize = () => {
@@ -73,6 +80,8 @@ export function UIProvider({ children }: { children: React.ReactNode }) {
                 setConfigEditorOpen,
                 shareModalOpen,
                 setShareModalOpen,
+                personalitySelectorOpen,
+                setPersonalitySelectorOpen,
             }}
         >
             {children}

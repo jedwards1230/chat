@@ -34,7 +34,7 @@ export default function Dialog({
             <div
                 ref={ref}
                 className={clsx(
-                    'w-full max-w-md rounded-lg border bg-neutral-50 p-4 transition-all dark:border-neutral-500 dark:bg-neutral-800 sm:px-6',
+                    'relative w-full max-w-md rounded-lg border bg-neutral-50 p-4 transition-all dark:border-neutral-500 dark:bg-neutral-800 sm:px-6',
                     className,
                 )}
             >

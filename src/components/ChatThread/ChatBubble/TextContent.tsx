@@ -57,7 +57,7 @@ export default function TextContent({
             <div className="flex w-full flex-col justify-start rounded text-xs text-neutral-400 dark:text-neutral-500">
                 <div>Model: {config.model}</div>
                 <div>System Message: {message.content}</div>
-                {config.tools.length > 0 && (
+                {config.toolsEnabled && config.tools.length > 0 && (
                     <div className="capitalize">
                         Plugins: {config.tools.join(' | ')}
                     </div>

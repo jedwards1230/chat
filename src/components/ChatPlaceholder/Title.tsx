@@ -1,23 +1,26 @@
 'use client';
 
 import { useChat } from '@/providers/ChatProvider';
+import { useUI } from '@/providers/UIProvider';
+import { Ellipsis } from '../Icons';
 
 export default function Title() {
-    const { activeThread, setSystemMessage } = useChat();
+    const { activeThread } = useChat();
+    const { setPersonalitySelectorOpen } = useUI();
 
     return (
-        <div className="absolute inset-x-auto inset-y-auto flex h-full flex-col items-center justify-center gap-2">
-            <div className="text-center text-4xl font-medium">
-                {activeThread.agentConfig.name}
+        <div className="absolute inset-x-auto inset-y-auto flex h-full max-w-4xl flex-col items-center justify-center gap-2">
+            <div className="-mr-8 flex items-center gap-4">
+                <div className="text-center text-4xl font-medium dark:text-neutral-300">
+                    {activeThread.agentConfig.name}
+                </div>
+                <div
+                    onClick={() => setPersonalitySelectorOpen(true)}
+                    className="cursor-pointer rounded-full p-0.5 hover:bg-neutral-200 dark:hover:bg-neutral-700"
+                >
+                    <Ellipsis />
+                </div>
             </div>
-            <label className="flex gap-1 text-neutral-400 dark:text-neutral-300">
-                <span>System:</span>
-                <textarea
-                    value={activeThread.agentConfig.systemMessage}
-                    onChange={(e) => setSystemMessage(e.target.value)}
-                    className="h-auto max-h-48 resize-none overflow-y-visible rounded border border-transparent bg-transparent italic text-neutral-500 focus:border-neutral-500 focus:outline-none dark:text-neutral-400"
-                />
-            </label>
         </div>
     );
 }

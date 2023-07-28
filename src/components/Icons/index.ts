@@ -6,6 +6,7 @@ import Edit from './Edit';
 import Ellipsis from './Ellipsis';
 import Information from './Information';
 import OpenNew from './OpenNew';
+import PencilSquare from './PencilSquare';
 import Reset from './Reset';
 import Settings from './Settings';
 import Share from './Share';
@@ -21,6 +22,7 @@ export {
     Ellipsis,
     Information,
     OpenNew,
+    PencilSquare,
     Reset,
     Settings,
     Share,

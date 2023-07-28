@@ -5,7 +5,6 @@ type ChatState = {
     botTyping: boolean;
     input: string;
     editId: string | null;
-    pluginsEnabled: boolean;
     abortController: AbortController;
     saved: boolean;
     /**

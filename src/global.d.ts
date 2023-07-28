@@ -29,6 +29,7 @@ interface AgentConfig extends Config {
     id: string;
     name: string;
     tools: Tool[];
+    toolsEnabled: boolean;
 }
 
 interface ChatThread {

@@ -68,7 +68,6 @@ export const getChat = async (
     msgHistory: Message[],
     controller: AbortController,
     activeThread: ChatThread,
-    pluginsEnabled: boolean,
     loops: number = 0,
     setState: Dispatch<SetStateAction<ChatState>>,
     upsertMessage: (message: Message) => void,
@@ -94,7 +93,9 @@ export const getChat = async (
                 modelName: activeThread.agentConfig.model,
                 temperature: activeThread.agentConfig.temperature,
                 messages,
-                tools: pluginsEnabled ? activeThread.agentConfig.tools : [],
+                tools: activeThread.agentConfig.toolsEnabled
+                    ? activeThread.agentConfig.tools
+                    : [],
             }),
         });
 
@@ -198,7 +199,6 @@ export const getChat = async (
                 msgHistory,
                 controller,
                 activeThread,
-                pluginsEnabled,
                 loops + 1,
                 setState,
                 upsertMessage,

@@ -15,6 +15,24 @@ const defaultConfig: Config = {
     presencePenalty: 0,
 };
 
+export const defaultAgentConfig: AgentConfig = {
+    ...defaultConfig,
+    id: '',
+    name: 'Chat',
+    tools: ['search', 'wikipedia-api'],
+    toolsEnabled: true,
+};
+
+export const defaultAgents: AgentConfig[] = [
+    defaultAgentConfig,
+    {
+        ...defaultAgentConfig,
+        name: 'Software Developer',
+        systemMessage:
+            'You are a senior software developer. You write clean, commented, efficient code.',
+    },
+];
+
 export function getDefaultThread(config: Config): ChatThread {
     return {
         id: uuidv4(),
@@ -29,11 +47,8 @@ export function getDefaultThread(config: Config): ChatThread {
             },
         ],
         agentConfig: {
-            ...defaultConfig,
+            ...defaultAgentConfig,
             ...config,
-            id: '',
-            name: 'Chat',
-            tools: ['search', 'wikipedia-api'],
         },
     };
 }
@@ -47,7 +62,6 @@ const initialState: ChatState = {
     isNew: true,
     editId: null,
     botTyping: false,
-    pluginsEnabled: true,
     config: defaultConfig,
     activeThread: baseEntry,
     abortController: new AbortController(),
