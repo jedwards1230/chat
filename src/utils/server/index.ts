@@ -1,8 +1,8 @@
 import {
     shareChatThread,
-    getCloudData,
+    getChatThreadList,
     saveThread,
     deleteMessage,
 } from './server';
 
-export { shareChatThread, getCloudData, saveThread, deleteMessage };
+export { shareChatThread, getChatThreadList, saveThread, deleteMessage };

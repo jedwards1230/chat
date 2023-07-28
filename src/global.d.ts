@@ -14,7 +14,11 @@ type Message = {
     };
 };
 
-interface Config {
+interface AgentConfig {
+    id: string;
+    name: string;
+    tools: Tool[];
+    toolsEnabled: boolean;
     model: Model;
     temperature: number;
     systemMessage: string;
@@ -23,13 +27,6 @@ interface Config {
     maxTokens: number;
     frequencyPenalty: number;
     presencePenalty: number;
-}
-
-interface AgentConfig extends Config {
-    id: string;
-    name: string;
-    tools: Tool[];
-    toolsEnabled: boolean;
 }
 
 interface ChatThread {
@@ -43,7 +40,16 @@ interface ChatThread {
 
 interface SaveData {
     chatHistory: ChatThread[];
-    config: Config;
+    config: {
+        model: Model;
+        temperature: number;
+        systemMessage: string;
+        topP: number;
+        N: number;
+        maxTokens: number;
+        frequencyPenalty: number;
+        presencePenalty: number;
+    };
 }
 
 interface ShareData {

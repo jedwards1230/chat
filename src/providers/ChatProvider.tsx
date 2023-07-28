@@ -35,7 +35,7 @@ export function ChatProvider({
 }: {
     children: React.ReactNode;
     threadList: ChatThread[];
-    savedConfig?: Config | null;
+    savedConfig?: AgentConfig | null;
 }) {
     const router = useRouter();
     const params = useParams();

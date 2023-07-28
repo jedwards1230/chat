@@ -6,7 +6,7 @@ import { ClerkProvider, auth } from '@clerk/nextjs';
 import { Analytics } from '@vercel/analytics/react';
 import { ChatProvider } from '@/providers/ChatProvider';
 import supabase from '@/lib/supabase';
-import { getCloudData } from '@/utils/server';
+import { getChatThreadList } from '@/utils/server';
 
 const APP_NAME = 'Chat';
 const APP_DEFAULT_TITLE = 'Chat';
@@ -71,7 +71,7 @@ export default async function RootLayout({
             .insert([{ userid: userId }]);
     }
 
-    const { config, threads } = await getCloudData();
+    const threads = await getChatThreadList(userId!);
 
     return (
         <ClerkProvider>
@@ -89,10 +89,7 @@ export default async function RootLayout({
                         }
                     >
                         <Providers>
-                            <ChatProvider
-                                threadList={threads}
-                                savedConfig={config}
-                            >
+                            <ChatProvider threadList={threads}>
                                 <div className="relative flex h-full w-full flex-col">
                                     {children}
                                 </div>

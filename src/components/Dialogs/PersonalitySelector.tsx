@@ -10,7 +10,7 @@ import clsx from 'clsx';
 import { PencilSquare } from '../Icons';
 
 export default function PersonalitySelector() {
-    const { activeThread, updateThreadConfig } = useChat();
+    const { activeThread, updateThreadConfig, setSystemMessage } = useChat();
     const { personalitySelectorOpen, setPersonalitySelectorOpen } = useUI();
     const [activeCard, setActiveCard] = useState<string | undefined>(undefined);
 
@@ -23,6 +23,7 @@ export default function PersonalitySelector() {
     const setActive = (agent: AgentConfig) => {
         if (activeThread) {
             updateThreadConfig(agent);
+            setSystemMessage(agent.systemMessage);
         }
     };
 

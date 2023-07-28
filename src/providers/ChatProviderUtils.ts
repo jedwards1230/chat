@@ -10,7 +10,7 @@ import { deleteMessage } from '@/utils/server';
 type ChatDispatch = Dispatch<SetStateAction<ChatState>>;
 
 export function getInitialActiveThread(
-    savedConfig: Config | null | undefined,
+    savedConfig: AgentConfig | null | undefined,
     activeId: string | null | undefined,
     threadList: ChatThread[],
 ) {
@@ -187,7 +187,7 @@ export function togglePluginHandler(state: ChatState, setState: ChatDispatch) {
 }
 
 export function setConfigHandler(setState: ChatDispatch) {
-    return (newConfig: Config) => {
+    return (newConfig: AgentConfig) => {
         setState((prevState) => ({
             ...prevState,
             config: newConfig,

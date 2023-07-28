@@ -130,20 +130,6 @@ export async function deleteAllCloudThreads() {
     }
 }
 
-export async function getCloudConfig(userId: string): Promise<Config | null> {
-    const { data: config, error } = await supabase
-        .from('configs')
-        .select('*')
-        .eq('user_id', userId)
-        .single();
-
-    if (error) {
-        throw new Error(error.message);
-    }
-
-    return config;
-}
-
 export async function getChatThreadList(userId: string): Promise<ChatThread[]> {
     const { data: threads, error } = await supabase
         .from('chat_threads')
@@ -186,24 +172,4 @@ export async function getChatThreadList(userId: string): Promise<ChatThread[]> {
             };
         })
         .filter(Boolean);
-}
-
-export async function getCloudData(): Promise<{
-    config: Config | null;
-    threads: ChatThread[];
-}> {
-    const { userId } = auth();
-    if (!userId) {
-        return { config: null, threads: [] };
-    }
-
-    const [config, threads] = await Promise.allSettled([
-        getCloudConfig(userId),
-        getChatThreadList(userId),
-    ]);
-
-    return {
-        config: config.status === 'fulfilled' ? config.value : null,
-        threads: threads.status === 'fulfilled' ? threads.value : [],
-    };
 }

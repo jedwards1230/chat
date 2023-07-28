@@ -1,7 +1,7 @@
 type ChatState = {
     activeThread: ChatThread;
     threads: ChatThread[];
-    config: Config;
+    config: AgentConfig;
     botTyping: boolean;
     input: string;
     editId: string | null;
@@ -19,7 +19,7 @@ type ChatState = {
     updateActiveThread: (thread: ChatThread) => void;
     createThread: () => void;
     toggleplugin: (plugin: Tool) => void;
-    setConfig: (config: Config) => void;
+    setConfig: (config: AgentConfig) => void;
     updateThreadConfig: (config: Partial<AgentConfig>) => void;
     setSystemMessage: (message: string) => void;
     editMessage: (messageId: string) => void;
