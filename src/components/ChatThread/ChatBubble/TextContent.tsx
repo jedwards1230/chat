@@ -35,7 +35,10 @@ export default function TextContent({
                     <div className="inline-block align-middle">
                         {message.name}:
                     </div>{' '}
-                    <div className="inline-block overflow-x-scroll align-middle">
+                    <div
+                        title={inputDisplay}
+                        className="inline-block overflow-x-scroll align-middle"
+                    >
                         <Markdown content={inputDisplay} />
                     </div>
                 </summary>

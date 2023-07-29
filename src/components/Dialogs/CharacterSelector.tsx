@@ -83,7 +83,7 @@ function AgentCard({
             className={clsx(
                 'flex cursor-pointer items-center justify-between rounded-lg py-2 pl-4 pr-6 shadow transition-colors',
                 active
-                    ? 'bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700'
+                    ? 'bg-green-400 hover:bg-green-500 dark:bg-green-600 dark:hover:bg-green-700'
                     : 'bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-700 dark:hover:bg-neutral-600',
             )}
         >
@@ -99,7 +99,7 @@ function AgentCard({
                 className={clsx(
                     'flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full transition-colors ',
                     active
-                        ? 'hover:bg-green-700 dark:hover:bg-green-800'
+                        ? 'hover:bg-green-600 dark:hover:bg-green-800'
                         : 'hover:bg-neutral-300 dark:hover:bg-neutral-500',
                 )}
             >

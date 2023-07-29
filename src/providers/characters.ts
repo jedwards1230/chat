@@ -27,8 +27,19 @@ const chefAgentConfig: AgentConfig = {
         'You are a professional chef, you cook and prepare meals in a variety of cuisines, and provide advice on cooking techniques and ingredients.',
 };
 
+const researchAssistantAgentConfig: AgentConfig = {
+    ...defaultAgentConfig,
+    name: 'Research Assistant',
+    systemMessage:
+        'You are a research assistant. ' +
+        'You use wikipedia and the web browser to find information requested by the user.' +
+        'Always remember to cite your sources and use markdown to format your answers.',
+    tools: ['search', 'wikipedia-api', 'web-browser'],
+};
+
 export const defaultAgents: AgentConfig[] = [
     defaultAgentConfig,
     softwareDeveloperAgentConfig,
     chefAgentConfig,
+    researchAssistantAgentConfig,
 ];

@@ -106,7 +106,7 @@ export class WebBrowser implements CustomTool {
     }
 
     name: Tool = 'web-browser';
-    description = `useful for when you need to find something on or summarize a webpage. Input should be a valid http URL including protocol and a task representing what you want to find on the page. If a task is given, specific data from the webpage will be returned.`;
+    description = `useful for when you need to find something on or summarize a webpage. input should be a valid http URL including protocol. Task is optional and represents what you want to find on the page. If task is not provided, a brief summary of the webpage will be returned. If a task is given, specific data from the webpage will be returned.`;
     parameters = {
         type: 'object',
         properties: {
@@ -117,10 +117,10 @@ export class WebBrowser implements CustomTool {
             task: {
                 type: 'string',
                 description:
-                    'What you want to find on the page. Specific data from the page will be returned based on the task.',
+                    'Optional. What you want to find on the page. If not provided, a summary of the page will be returned.',
             },
         },
-        required: ['url', 'task'],
+        required: ['url'],
     };
 }
 
