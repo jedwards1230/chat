@@ -12,11 +12,17 @@ import { isMobile } from '@/utils/client';
 import { Settings } from '../Icons';
 
 export default function ChatHistory() {
-    const { threads } = useChat();
+    const { activeThread, threads } = useChat();
     const { sideBarOpen, setSideBarOpen, setConfigEditorOpen } = useUI();
     const sidebarRef = useRef<HTMLDivElement>(null);
 
-    const threadList = useMemo(() => threads.sort(sortThreadlist), [threads]);
+    const threadList = useMemo(
+        () => threads.sort(sortThreadlist),
+        // TODO: This is a hack to force a rerender when the active thread changes
+        // Do this at a higher level. not here.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [threads, activeThread],
+    );
 
     const openConfig = (e: any) => {
         setConfigEditorOpen(true);

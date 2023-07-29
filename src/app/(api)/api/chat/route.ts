@@ -1,12 +1,10 @@
-import { ChatCompletionRequestMessage } from 'openai-edge';
-import { ChatOpenAI } from 'langchain/chat_models/openai';
-import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
+import {
+    ChatCompletionFunctions,
+    ChatCompletionRequestMessage,
+} from 'openai-edge';
 
 import { openai } from '@/lib/openai';
-import { Calculator } from '@/tools/calculator';
-import { Search } from '@/tools/search';
-import { WebBrowser } from '@/tools/webBrowser';
-import { WikipediaQueryRun } from '@/tools/wikipedia';
+import { Calculator, Search, WebBrowser, WikipediaQueryRun } from '@/tools/';
 
 export const runtime = 'edge';
 
@@ -30,31 +28,28 @@ export async function POST(request: Request) {
         });
     }
 
-    let functions;
+    const formatTool = (tool: Tool) => {
+        const serialize = (obj: CustomTool) => ({
+            name: obj.name,
+            description: obj.description,
+            parameters: obj.parameters,
+        });
+
+        switch (tool) {
+            case 'calculator':
+                return serialize(Calculator);
+            case 'search':
+                return serialize(Search);
+            case 'web-browser':
+                return serialize(WebBrowser);
+            case 'wikipedia-api':
+                return serialize(WikipediaQueryRun);
+        }
+    };
+
+    let functions: ChatCompletionFunctions[] | undefined;
     if (tools && tools.length > 0) {
-        functions = tools
-            .map((tool) => {
-                switch (tool) {
-                    case 'calculator':
-                        return new Calculator();
-                    case 'search':
-                        return new Search();
-                    case 'web-browser':
-                        const model = new ChatOpenAI({
-                            temperature: 0,
-                            modelName: 'gpt-3.5-turbo-16k',
-                        });
-                        const embeddings = new OpenAIEmbeddings();
-                        return new WebBrowser({ model, embeddings });
-                    case 'wikipedia-api':
-                        return new WikipediaQueryRun();
-                }
-            })
-            .map((tool) => ({
-                name: tool.name,
-                description: tool.description,
-                parameters: tool.parameters,
-            }));
+        functions = tools.map((tool) => formatTool(tool));
     }
 
     try {

@@ -1,5 +1,5 @@
 export class Search implements CustomTool {
-    name = 'search';
+    name: Tool = 'search';
     description =
         'custom search engine. useful for when you need to answer questions about current events.' +
         'input should be a single search query. outputs a JSON array of results.';
@@ -70,3 +70,7 @@ export class Search implements CustomTool {
         }
     }
 }
+
+const search = new Search();
+
+export default search;

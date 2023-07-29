@@ -1,11 +1,5 @@
-import { ChatOpenAI } from 'langchain/chat_models/openai';
-import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
+import { Calculator, Search, WebBrowser, WikipediaQueryRun } from '@/tools/';
 import { NextResponse } from 'next/server';
-
-import { Calculator } from '@/tools/calculator';
-import { Search } from '@/tools/search';
-import { WebBrowser } from '@/tools/webBrowser';
-import { WikipediaQueryRun } from '@/tools/wikipedia';
 
 export const runtime = 'edge';
 
@@ -34,21 +28,16 @@ export async function POST(request: Request) {
     let result = '';
     switch (tool) {
         case 'calculator':
-            result = new Calculator().call(input);
+            result = Calculator.call(input);
             break;
         case 'search':
-            result = await new Search().call(input);
+            result = await Search.call(input);
             break;
         case 'web-browser':
-            const model = new ChatOpenAI({
-                temperature: 0.3,
-                modelName: 'gpt-3.5-turbo-16k',
-            });
-            const embeddings = new OpenAIEmbeddings();
-            result = await new WebBrowser({ model, embeddings }).call(input);
+            result = await WebBrowser.call(input);
             break;
         case 'wikipedia-api':
-            result = await new WikipediaQueryRun().call(input);
+            result = await WikipediaQueryRun.call(input);
             break;
         default:
             return new Response('Invalid tool', {

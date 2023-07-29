@@ -1,17 +1,15 @@
 import * as cheerio from 'cheerio';
 import { BaseLanguageModel } from 'langchain/dist/base_language';
-import {
-    CallbackManager,
-    CallbackManagerForToolRun,
-} from 'langchain/dist/callbacks/manager';
 import { Embeddings } from 'langchain/embeddings';
 import {
     TextSplitter,
     RecursiveCharacterTextSplitter,
 } from 'langchain/text_splitter';
 import { Document } from 'langchain/document';
-import { ToolParams, Tool } from 'langchain/tools';
+import { ToolParams } from 'langchain/tools';
 import { MemoryVectorStore } from 'langchain/vectorstores/memory';
+import { ChatOpenAI } from 'langchain/chat_models/openai';
+import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
 
 type Headers = Record<string, any>;
 
@@ -29,20 +27,11 @@ const DEFAULT_HEADERS: Headers = {
 };
 
 export interface WebBrowserArgs extends ToolParams {
-    model: BaseLanguageModel;
-
-    embeddings: Embeddings;
-
     headers?: Headers;
-
     textSplitter?: TextSplitter;
 }
 
-export class WebBrowser extends Tool {
-    get lc_namespace() {
-        return [...super.lc_namespace, 'webbrowser'];
-    }
-
+export class WebBrowser implements CustomTool {
     private model: BaseLanguageModel;
 
     private embeddings: Embeddings;
@@ -51,8 +40,12 @@ export class WebBrowser extends Tool {
 
     private textSplitter: TextSplitter;
 
-    constructor({ model, headers, embeddings, textSplitter }: WebBrowserArgs) {
-        super(...arguments);
+    constructor({ headers, textSplitter }: WebBrowserArgs) {
+        const model = new ChatOpenAI({
+            temperature: 0.3,
+            modelName: 'gpt-3.5-turbo-16k',
+        });
+        const embeddings = new OpenAIEmbeddings();
 
         this.model = model;
         this.embeddings = embeddings;
@@ -65,8 +58,7 @@ export class WebBrowser extends Tool {
             });
     }
 
-    /** @ignore */
-    async _call(inputs: string) {
+    async call(inputs: string) {
         const { url, task } = JSON.parse(inputs);
         const doSummary = !task;
 
@@ -113,10 +105,8 @@ export class WebBrowser extends Tool {
         return this.model.predict(input);
     }
 
-    name = 'web-browser';
-
-    description = `useful for when you need to find something on or summarize a webpage. input should be a valid http URL including protocol. Task is optional and represents what you want to find on the page. If task is not provided, a brief summary of the webpage will be returned. If a task is given, specific data from the webpage will be returned.`;
-
+    name: Tool = 'web-browser';
+    description = `useful for when you need to find something on or summarize a webpage. Input should be a valid http URL including protocol and a task representing what you want to find on the page. If a task is given, specific data from the webpage will be returned.`;
     parameters = {
         type: 'object',
         properties: {
@@ -127,10 +117,10 @@ export class WebBrowser extends Tool {
             task: {
                 type: 'string',
                 description:
-                    'Optional. What you want to find on the page. If not provided, a summary of the page will be returned.',
+                    'What you want to find on the page. Specific data from the page will be returned based on the task.',
             },
         },
-        required: ['url'],
+        required: ['url', 'task'],
     };
 }
 
@@ -200,3 +190,7 @@ async function getHtml(baseUrl: string, headers: Headers) {
 
     return await response.text();
 }
+
+const tool = new WebBrowser({});
+
+export default tool;

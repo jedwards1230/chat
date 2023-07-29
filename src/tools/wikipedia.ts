@@ -1,5 +1,3 @@
-import { Tool } from 'langchain/tools';
-
 export interface WikipediaQueryRunParams {
     topKResults?: number;
     maxDocContentLength?: number;
@@ -33,8 +31,8 @@ interface PageResult {
     };
 }
 
-export class WikipediaQueryRun extends Tool {
-    name = 'wikipedia-api';
+export class WikipediaQueryRun implements CustomTool {
+    name: Tool = 'wikipedia-api';
 
     description =
         'A tool for interacting with and fetching data from the Wikipedia API.';
@@ -58,15 +56,13 @@ export class WikipediaQueryRun extends Tool {
     protected baseUrl = 'https://en.wikipedia.org/w/api.php';
 
     constructor(params: WikipediaQueryRunParams = {}) {
-        super();
-
         this.topKResults = params.topKResults ?? this.topKResults;
         this.maxDocContentLength =
             params.maxDocContentLength ?? this.maxDocContentLength;
         this.baseUrl = params.baseUrl ?? this.baseUrl;
     }
 
-    async _call(query: string): Promise<string> {
+    async call(query: string): Promise<string> {
         const searchResults = await this._fetchSearchResults(query);
         const summaries: string[] = [];
 
@@ -150,3 +146,7 @@ export class WikipediaQueryRun extends Tool {
         return pages[pageId];
     }
 }
+
+const wikipediaQueryRun = new WikipediaQueryRun();
+
+export default wikipediaQueryRun;

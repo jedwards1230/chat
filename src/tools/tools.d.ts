@@ -1,7 +1,7 @@
 type Tool = 'calculator' | 'search' | 'web-browser' | 'wikipedia-api';
 
 type CustomTool = {
-    name: string;
+    name: Tool;
     description: string;
     parameters: {
         type: string;

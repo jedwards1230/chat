@@ -1,7 +1,7 @@
 import { Parser } from 'expr-eval';
 
 export class Calculator implements CustomTool {
-    name = 'calculator';
+    name: Tool = 'calculator';
     description = `Useful for getting the result of a math expression. The input to this tool should be a valid mathematical expression that could be executed by a simple calculator.`;
     parameters = {
         type: 'object',
@@ -22,3 +22,7 @@ export class Calculator implements CustomTool {
         }
     }
 }
+
+const tool = new Calculator();
+
+export default tool;
