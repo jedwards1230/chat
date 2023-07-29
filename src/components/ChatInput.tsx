@@ -6,10 +6,20 @@ import { motion } from 'framer-motion';
 import QuickActions from './QuickActions';
 import { isMobile } from '@/utils/client';
 import { calculateRows } from '@/utils';
+import { useEffect, useRef, useState } from 'react';
 
 export default function ChatInput() {
-    const state = useChat();
-    const { input, editId, changeInput, handleSubmit, cancelEdit } = state;
+    const {
+        activeThread,
+        input,
+        editId,
+        changeInput,
+        handleSubmit,
+        cancelEdit,
+    } = useChat();
+
+    const [activeId, setActiveId] = useState<string>(activeThread.id);
+    const inputRef = useRef<HTMLTextAreaElement>(null);
 
     const rows = calculateRows(input);
 
@@ -26,6 +36,13 @@ export default function ChatInput() {
         }
     };
 
+    useEffect(() => {
+        if (activeThread.id !== activeId) {
+            setActiveId(activeThread.id);
+            inputRef.current?.focus();
+        }
+    }, [activeId, activeThread.id]);
+
     return (
         <div className="relative w-full">
             <QuickActions />
@@ -37,9 +54,10 @@ export default function ChatInput() {
                 )}
             >
                 <motion.textarea
+                    ref={inputRef}
                     placeholder="Say something..."
                     value={input}
-                    autoFocus
+                    onClick={(e) => e.stopPropagation()}
                     rows={rows}
                     onChange={handleInputChange}
                     onKeyDown={onKeyDownHandler}
