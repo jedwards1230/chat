@@ -2,7 +2,7 @@
 
 import { useChat } from '@/providers/ChatProvider';
 import clsx from 'clsx';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const availableTools: Tool[] = [
     'calculator',
@@ -98,6 +98,21 @@ export default function AgentSettings({
         { 'Frequency Penalty': frequencyPenalty },
         { 'Presence Penalty': presencePenalty },
     ];
+
+    useEffect(() => {
+        if (active) {
+            setName(activeThread.agentConfig.name);
+            setSystem(activeThread.agentConfig.systemMessage);
+            setToolsEnabled(activeThread.agentConfig.toolsEnabled);
+            setTools(activeThread.agentConfig.tools);
+            setTemperature(activeThread.agentConfig.temperature);
+            setTopP(activeThread.agentConfig.topP);
+            setN(activeThread.agentConfig.N);
+            setMaxTokens(activeThread.agentConfig.maxTokens);
+            setFrequencyPenalty(activeThread.agentConfig.frequencyPenalty);
+            setPresencePenalty(activeThread.agentConfig.presencePenalty);
+        }
+    }, [active, activeThread]);
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">

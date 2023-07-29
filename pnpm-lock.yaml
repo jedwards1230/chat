@@ -54,8 +54,8 @@ dependencies:
     specifier: ^10.15.0
     version: 10.15.0(react-dom@18.2.0)(react@18.2.0)
   langchain:
-    specifier: ^0.0.118
-    version: 0.0.118(@supabase/supabase-js@2.31.0)(@upstash/redis@1.22.0)(cheerio@1.0.0-rc.12)(encoding@0.1.13)
+    specifier: ^0.0.119
+    version: 0.0.119(@supabase/supabase-js@2.31.0)(@upstash/redis@1.22.0)(cheerio@1.0.0-rc.12)(encoding@0.1.13)
   next:
     specifier: 13.4.12
     version: 13.4.12(@babel/core@7.22.5)(@opentelemetry/api@1.4.1)(react-dom@18.2.0)(react@18.2.0)
@@ -4471,8 +4471,8 @@ packages:
     engines: {node: '>=6'}
     dev: false
 
-  /langchain@0.0.118(@supabase/supabase-js@2.31.0)(@upstash/redis@1.22.0)(cheerio@1.0.0-rc.12)(encoding@0.1.13):
-    resolution: {integrity: sha512-MzadedGsgvF5Rf+S94o+mY2Gkf5QEQFjLrCsaKcKeOREMJZ2GTszPlkDpwLWwe5MVugY1DhtC2c4gI13R+WtTw==}
+  /langchain@0.0.119(@supabase/supabase-js@2.31.0)(@upstash/redis@1.22.0)(cheerio@1.0.0-rc.12)(encoding@0.1.13):
+    resolution: {integrity: sha512-LIABHsHgtTVW6IqRofpdcThnPwqlTdak+vfC6moewg871qiSPQlA31mh3CMEvXAJ6HU+jzJz05uqO1BPEGgYYA==}
     engines: {node: '>=18'}
     peerDependencies:
       '@aws-sdk/client-dynamodb': ^3.310.0
@@ -4481,6 +4481,7 @@ packages:
       '@aws-sdk/client-s3': ^3.310.0
       '@aws-sdk/client-sagemaker-runtime': ^3.310.0
       '@aws-sdk/client-sfn': ^3.310.0
+      '@azure/storage-blob': ^12.15.0
       '@clickhouse/client': ^0.0.14
       '@elastic/elasticsearch': ^8.4.0
       '@getmetal/metal-sdk': '*'
@@ -4547,6 +4548,8 @@ packages:
       '@aws-sdk/client-sagemaker-runtime':
         optional: true
       '@aws-sdk/client-sfn':
+        optional: true
+      '@azure/storage-blob':
         optional: true
       '@clickhouse/client':
         optional: true
