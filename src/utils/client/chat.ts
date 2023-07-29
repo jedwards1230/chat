@@ -162,8 +162,12 @@ export const getChat = async (
         if (tool) {
             let input = '';
             try {
-                const cleaned = JSON.parse(toolInput);
-                input = cleaned.input;
+                if (tool !== 'web-browser') {
+                    const cleaned = JSON.parse(toolInput);
+                    input = cleaned.input;
+                } else {
+                    input = toolInput;
+                }
             } catch (err) {
                 input = toolInput;
             }

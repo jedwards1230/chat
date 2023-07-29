@@ -21,14 +21,9 @@ export default function TextContent({
 
         let inputDisplay = input;
         if (message.name === 'web-browser' && input) {
-            // parse this string into two
-            // `https://nextjs.org/docs/pages/building-your-application/upgrading/version-13, ""`
-            // `https://nextjs.org/docs/app/building-your-application/upgrading/version-13, "Node.js"`
-            const [url, text] = input.split(', ');
-            if (text && text !== `""`) {
-                inputDisplay = `[${text}](${url})`;
-            } else if (url.slice(-1) === ',') {
-                inputDisplay = url.slice(0, -1);
+            const { url, task } = JSON.parse(input);
+            if (task) {
+                inputDisplay = `[${task}](${url})`;
             } else {
                 inputDisplay = url;
             }
