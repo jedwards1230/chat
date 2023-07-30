@@ -6,6 +6,7 @@ type ChatState = {
     input: string;
     editId: string | null;
     abortController: AbortController;
+    /** Setting this to false will trigger a save */
     saved: boolean;
     characterList: AgentConfig[];
     /**

@@ -58,6 +58,7 @@ export function ChatProvider({
     const updateActiveThread = updateActiveThreadHandler(setState);
     const abortRequest = abortRequestHandler(state, setState);
 
+    // Save thread when it is updated
     useEffect(() => {
         if (!state.saved) {
             saveThread(state.activeThread);
@@ -72,6 +73,7 @@ export function ChatProvider({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    // Update active thread when threadId changes
     useEffect(() => {
         if (!threadId) {
             if (!state.isNew) {
