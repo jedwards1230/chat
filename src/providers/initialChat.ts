@@ -48,6 +48,7 @@ const initialState: ChatState = {
     updateThreadConfig: () => {},
     updateActiveThread: () => {},
     handleSubmit: () => Promise.resolve(),
+    saveCharacter: () => Promise.resolve(),
 };
 
 export default initialState;

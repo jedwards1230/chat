@@ -1,6 +1,7 @@
 'use client';
 
 import { useChat } from '@/providers/ChatProvider';
+import { defaultAgentConfig } from '@/providers/characters';
 import clsx from 'clsx';
 import { useEffect, useState } from 'react';
 
@@ -15,104 +16,68 @@ export default function AgentSettings({
     agent,
     active = false,
 }: {
-    agent: AgentConfig;
+    agent?: AgentConfig;
     active?: boolean;
 }) {
-    const { updateThreadConfig, setSystemMessage, activeThread } = useChat();
+    const {
+        updateThreadConfig,
+        setSystemMessage,
+        saveCharacter,
+        activeThread,
+    } = useChat();
 
-    const [name, setName] = useState(agent.name);
-    const [systemMessage, setSystem] = useState(agent.systemMessage);
-
-    const [toolsEnabled, setToolsEnabled] = useState(agent.toolsEnabled);
-    const [tools, setTools] = useState(agent.tools);
-
-    const [temperature, setTemperature] = useState(agent.temperature);
-    const [topP, setTopP] = useState(agent.topP);
-    const [N, setN] = useState(agent.N);
-    const [maxTokens, setMaxTokens] = useState(agent.maxTokens);
-    const [frequencyPenalty, setFrequencyPenalty] = useState(
-        agent.frequencyPenalty,
-    );
-    const [presencePenalty, setPresencePenalty] = useState(
-        agent.presencePenalty,
+    const [isNew, setIsNew] = useState(agent === undefined);
+    const [config, setConfig] = useState(
+        agent !== undefined
+            ? agent
+            : {
+                  ...defaultAgentConfig,
+                  name: 'New Character',
+              },
     );
 
-    const onNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setName(e.target.value);
-        if (active) {
-            updateThreadConfig({ name: e.target.value });
-        }
-    };
-
-    const onSystemMessageChange = (
-        e: React.ChangeEvent<HTMLTextAreaElement>,
+    const onFieldChange = (
+        field: keyof AgentConfig,
+        value: string | number | boolean,
     ) => {
-        setSystem(e.target.value);
-        if (active) {
-            setSystemMessage(e.target.value);
-        }
-    };
-
-    const togglePlugins = () => {
-        setToolsEnabled(!toolsEnabled);
-        if (active) {
-            updateThreadConfig({ toolsEnabled: !toolsEnabled });
+        setConfig({ ...config, [field]: value });
+        if (!isNew && active) {
+            saveCharacter(config);
+            updateThreadConfig({ [field]: value });
         }
     };
 
     const togglePlugin = (tool: Tool) => {
-        const newTools = tools.includes(tool)
-            ? tools.filter((t) => t !== tool)
-            : [...tools, tool];
+        const newTools = config.tools.includes(tool)
+            ? config.tools.filter((t) => t !== tool)
+            : [...config.tools, tool];
 
-        setTools(newTools);
-        if (active) {
-            updateThreadConfig({ tools: newTools });
-        }
+        setConfig({ ...config, tools: newTools });
     };
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (activeThread) {
-            setSystemMessage(systemMessage);
-            updateThreadConfig({
-                name,
-                systemMessage,
-                toolsEnabled,
-                tools,
-                temperature,
-                topP,
-                N,
-                maxTokens,
-                frequencyPenalty,
-                presencePenalty,
-            });
+            setSystemMessage(config.systemMessage);
+            updateThreadConfig(config);
         }
+        saveCharacter(config);
     };
 
     const modelInfo = [
-        { Temperature: temperature },
-        { 'Top P': topP },
-        { N: N },
-        { 'Max Tokens': maxTokens },
-        { 'Frequency Penalty': frequencyPenalty },
-        { 'Presence Penalty': presencePenalty },
+        { Temperature: config.temperature },
+        { 'Top P': config.topP },
+        { N: config.N },
+        { 'Max Tokens': config.maxTokens },
+        { 'Frequency Penalty': config.frequencyPenalty },
+        { 'Presence Penalty': config.presencePenalty },
     ];
 
     useEffect(() => {
-        if (active) {
-            setName(activeThread.agentConfig.name);
-            setSystem(activeThread.agentConfig.systemMessage);
-            setToolsEnabled(activeThread.agentConfig.toolsEnabled);
-            setTools(activeThread.agentConfig.tools);
-            setTemperature(activeThread.agentConfig.temperature);
-            setTopP(activeThread.agentConfig.topP);
-            setN(activeThread.agentConfig.N);
-            setMaxTokens(activeThread.agentConfig.maxTokens);
-            setFrequencyPenalty(activeThread.agentConfig.frequencyPenalty);
-            setPresencePenalty(activeThread.agentConfig.presencePenalty);
+        if (!isNew && active) {
+            setConfig(activeThread.agentConfig);
         }
-    }, [active, activeThread]);
+    }, [active, activeThread, isNew]);
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -125,8 +90,8 @@ export default function AgentSettings({
                     type="text"
                     placeholder="Agent Name"
                     required
-                    value={name}
-                    onChange={onNameChange}
+                    value={config.name}
+                    onChange={(e) => onFieldChange('name', e.target.value)}
                 />
                 <textarea
                     className={clsx(
@@ -135,8 +100,10 @@ export default function AgentSettings({
                     )}
                     placeholder="Agent System Message"
                     required
-                    value={systemMessage}
-                    onChange={onSystemMessageChange}
+                    value={config.systemMessage}
+                    onChange={(e) =>
+                        onFieldChange('systemMessage', e.target.value)
+                    }
                 />
             </div>
             <div className="flex flex-col gap-4 rounded-md px-4">
@@ -164,11 +131,16 @@ export default function AgentSettings({
                                 type="checkbox"
                                 title="Toggle plugins"
                                 className="h-4 w-4 cursor-pointer"
-                                checked={toolsEnabled}
-                                onChange={togglePlugins}
+                                checked={config.toolsEnabled}
+                                onChange={(e) =>
+                                    onFieldChange(
+                                        'toolsEnabled',
+                                        e.target.checked,
+                                    )
+                                }
                             />
                         </div>
-                        {toolsEnabled && (
+                        {config.toolsEnabled && (
                             <div
                                 className={clsx(
                                     'text-xs dark:text-neutral-400',
@@ -177,14 +149,14 @@ export default function AgentSettings({
                                         : 'text-neutral-600',
                                 )}
                             >
-                                {tools.length} enabled
+                                {config.tools.length} enabled
                             </div>
                         )}
                     </label>
-                    {toolsEnabled && (
+                    {config.toolsEnabled && (
                         <div>
                             {availableTools.map((plugin) => {
-                                const checked = tools.includes(plugin);
+                                const checked = config.tools.includes(plugin);
                                 return (
                                     <label
                                         key={plugin}
@@ -248,7 +220,7 @@ export default function AgentSettings({
                         type="submit"
                         className="rounded-md bg-neutral-300 px-3 py-2 transition-colors hover:bg-neutral-400 focus:bg-neutral-500 dark:bg-neutral-500 dark:hover:bg-neutral-600"
                     >
-                        Apply
+                        {!isNew ? 'Update' : 'Create'}
                     </button>
                 </div>
             )}

@@ -20,19 +20,29 @@ export default function PersonalitySelector() {
     if (!characterSelectorOpen) return null;
     return (
         <Dialog callback={closeDialog}>
-            <div className="w-full pb-4 text-center text-xl font-semibold">
-                Character {activeCard === undefined ? 'Selector' : 'Editor'}
+            <div>
+                {activeCard !== undefined && (
+                    <button
+                        onClick={() => setActiveCard(undefined)}
+                        className="absolute left-6 top-5 text-neutral-400 hover:text-neutral-950 dark:text-neutral-500 dark:hover:text-neutral-200"
+                    >
+                        go back
+                    </button>
+                )}
+                <div className="flex-1 pb-4 text-center text-xl font-semibold">
+                    Character {activeCard === undefined ? 'Selector' : 'Editor'}
+                </div>
+                {activeCard === undefined && (
+                    <button
+                        onClick={() => setActiveCard('New Character')}
+                        className="absolute right-6 top-4 rounded-md border px-2 py-1 text-neutral-400 hover:border-neutral-950 hover:text-neutral-950 dark:text-neutral-500 dark:hover:text-neutral-200"
+                    >
+                        + New
+                    </button>
+                )}
             </div>
-            {activeCard !== undefined && (
-                <button
-                    onClick={() => setActiveCard(undefined)}
-                    className="absolute left-6 top-5 text-neutral-400 hover:text-neutral-950 dark:text-neutral-500 dark:hover:text-neutral-200"
-                >
-                    go back
-                </button>
-            )}
             {activeCard === undefined ? (
-                <div className="h-[450px] space-y-2 overflow-y-scroll">
+                <div className="max-h-[80vh] space-y-2 overflow-y-scroll">
                     {characterList.map((agent, i) => {
                         const active =
                             agent.name === activeThread.agentConfig.name;
@@ -48,11 +58,9 @@ export default function PersonalitySelector() {
                 </div>
             ) : (
                 <AgentSettings
-                    agent={
-                        characterList.find(
-                            (agent) => agent.name === activeCard,
-                        )!
-                    }
+                    agent={characterList.find(
+                        (agent) => agent.name === activeCard,
+                    )}
                 />
             )}
         </Dialog>

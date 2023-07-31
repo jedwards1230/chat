@@ -5,7 +5,7 @@ import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';
 
 import initialState, { getDefaultThread } from './initialChat';
 import { createUserMsg, fetchTitle, getChat } from '@/utils/client';
-import { deleteMessage } from '@/utils/server';
+import { deleteMessage, saveCharacter } from '@/utils/server';
 
 type ChatDispatch = Dispatch<SetStateAction<ChatState>>;
 
@@ -358,6 +358,17 @@ export function abortRequestHandler(state: ChatState, setState: ChatDispatch) {
             ...prevState,
             botTyping: false,
             saved: false,
+        }));
+    };
+}
+
+export function saveCharacterHandler(setState: ChatDispatch) {
+    return async (character: AgentConfig) => {
+        saveCharacter(character);
+        setState((prevState) => ({
+            ...prevState,
+            saved: false,
+            characterList: [...prevState.characterList, character],
         }));
     };
 }

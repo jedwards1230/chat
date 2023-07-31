@@ -20,6 +20,7 @@ import {
     togglePluginHandler,
     updateActiveThreadHandler,
     updateThreadConfigHandler,
+    saveCharacterHandler,
 } from './ChatProviderUtils';
 import initialState from './initialChat';
 import { saveThread, saveCharacterList } from '@/utils/server';
@@ -69,13 +70,12 @@ export function ChatProvider({
         if (!state.saved) {
             try {
                 saveThread(state.activeThread);
-                saveCharacterList(state.characterList);
                 setState((prevState) => ({ ...prevState, saved: true }));
             } catch (err) {
                 console.error(err);
             }
         }
-    }, [state.saved, state.activeThread, state.characterList]);
+    }, [state.saved, state.activeThread]);
 
     useEffect(() => {
         if (!characters) {
@@ -129,7 +129,7 @@ export function ChatProvider({
         updateActiveThread,
     ]);
 
-    const value = {
+    const value: ChatState = {
         ...state,
         abortRequest,
         createThread,
@@ -137,6 +137,7 @@ export function ChatProvider({
         setConfig: setConfigHandler(setState),
         cancelEdit: cancelEditHandler(setState),
         changeInput: changeInputHandler(setState),
+        saveCharacter: saveCharacterHandler(setState),
         removeMessage: removeMessageHandler(setState),
         editMessage: editMessageHandler(state, setState),
         toggleplugin: togglePluginHandler(state, setState),

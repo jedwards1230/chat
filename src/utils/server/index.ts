@@ -3,6 +3,7 @@ import {
     getChatThreadList,
     getAgentConfigs,
     saveThread,
+    saveCharacter,
     saveCharacterList,
     deleteMessage,
 } from './server';
@@ -12,6 +13,7 @@ export {
     getChatThreadList,
     getAgentConfigs,
     saveThread,
+    saveCharacter,
     saveCharacterList,
     deleteMessage,
 };

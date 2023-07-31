@@ -22,6 +22,7 @@ type ChatState = {
     createThread: () => void;
     toggleplugin: (plugin: Tool) => void;
     setConfig: (config: AgentConfig) => void;
+    saveCharacter: (character: AgentConfig) => Promise<void>;
     updateThreadConfig: (config: Partial<AgentConfig>) => void;
     setSystemMessage: (message: string) => void;
     editMessage: (messageId: string) => void;
