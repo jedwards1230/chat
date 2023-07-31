@@ -8,6 +8,8 @@ import { ChatProvider } from '@/providers/ChatProvider';
 import supabase from '@/lib/supabase';
 import { getChatThreadList, getAgentConfigs } from '@/utils/server';
 
+export const runtime = 'edge';
+
 const APP_NAME = 'Chat';
 const APP_DEFAULT_TITLE = 'Chat';
 const APP_TITLE_TEMPLATE = 'Chat | %s';
