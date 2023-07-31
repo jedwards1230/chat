@@ -90,19 +90,7 @@ export async function callTool(tool: Tool, input: string) {
         );
     }
 
-    const json: string = await res.json();
-
-    if (tool === 'search') {
-        const searchResults: SearchResult[] = JSON.parse(json);
-
-        const listItems = searchResults.map((result) => {
-            return `Title: ${result.title}\nURL: ${result.url}\nSnippet: ${result.snippet}`;
-        });
-        const markdown = listItems.join('\n\n');
-        return markdown;
-    }
-
-    return json;
+    return (await res.json()) as string;
 }
 
 export function parseStreamData(chunk: string): StreamData[] {

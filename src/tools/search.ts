@@ -63,7 +63,10 @@ export class Search implements CustomTool {
     async call(input: string) {
         try {
             const results = await this.searchGoogle(input);
-            return JSON.stringify(results);
+            const listItems = results.map((result) => {
+                return `Title: ${result.title}\nURL: ${result.url}\nSnippet: ${result.snippet}`;
+            });
+            return listItems.join('\n\n');
         } catch (error) {
             console.error(error);
             return "I don't know how to do that.";
