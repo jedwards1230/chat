@@ -38,8 +38,8 @@ export function prepareMessages(
         return {
             role: msg.role,
             content: msg.content,
-            name: msg.name,
-            function_call: msg.function_call,
+            ...(msg.name && { name: msg.name }),
+            ...(msg.function_call && { function_call: msg.function_call }),
         };
     });
 }

@@ -95,11 +95,6 @@ export async function callTool(tool: Tool, input: string) {
     if (tool === 'search') {
         const searchResults: SearchResult[] = JSON.parse(json);
 
-        const analyzedResultsPromises = searchResults.map(
-            async (result) => await analyzeSingleResult(result, input, true),
-        );
-        await Promise.allSettled(analyzedResultsPromises);
-
         const listItems = searchResults.map((result) => {
             return `Title: ${result.title}\nURL: ${result.url}\nSnippet: ${result.snippet}`;
         });
