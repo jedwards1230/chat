@@ -140,8 +140,20 @@ export async function getChat(
         const streamCallback = (chunk: string) => {
             toolInput = '';
 
-            const chunks = parseStreamData(chunk);
-            accumulatedResponse = chunks.reduce(reduceStreamData, '');
+            try {
+                const err: {
+                    error: {
+                        code: null;
+                        message: string;
+                        param: null;
+                        type: string;
+                    };
+                } = JSON.parse(chunk);
+                accumulatedResponse = `ERROR: ${err.error.message}`;
+            } catch (err) {
+                const chunks = parseStreamData(chunk);
+                accumulatedResponse = chunks.reduce(reduceStreamData, '');
+            }
 
             if (!tool) {
                 upsertMessage({
