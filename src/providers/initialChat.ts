@@ -29,7 +29,6 @@ const initialState: ChatState = {
     isNew: true,
     editId: null,
     botTyping: false,
-    config: defaultAgentConfig,
     activeThread: baseEntry,
     characterList: defaultAgents,
     abortController: new AbortController(),

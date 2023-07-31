@@ -10,7 +10,7 @@ import { deleteMessage } from '@/utils/server';
 type ChatDispatch = Dispatch<SetStateAction<ChatState>>;
 
 export function getInitialActiveThread(
-    savedConfig: AgentConfig | null | undefined,
+    savedConfig: AgentConfig,
     activeId: string | null | undefined,
     threadList: ChatThread[],
 ) {
@@ -18,10 +18,7 @@ export function getInitialActiveThread(
     return (
         requestedThread || {
             ...initialState.activeThread,
-            agentConfig: {
-                ...initialState.activeThread.agentConfig,
-                ...(savedConfig ? savedConfig : initialState.config),
-            },
+            ...(savedConfig || initialState.activeThread.agentConfig),
         }
     );
 }
@@ -145,7 +142,7 @@ export function createThreadHandler(state: ChatState, setState: ChatDispatch) {
         state.abortRequest();
 
         setState((prevState) => {
-            const newThread = getDefaultThread(state.config);
+            const newThread = getDefaultThread(state.activeThread.agentConfig);
             return {
                 ...prevState,
                 activeThread: newThread,
@@ -160,11 +157,15 @@ export function createThreadHandler(state: ChatState, setState: ChatDispatch) {
 
 export function updateActiveThreadHandler(setState: ChatDispatch) {
     return (newThread?: ChatThread) => {
-        setState((prevState) => ({
-            ...prevState,
-            activeThread: newThread || getDefaultThread(prevState.config),
-            input: '',
-        }));
+        setState((prevState) => {
+            return {
+                ...prevState,
+                activeThread:
+                    newThread ||
+                    getDefaultThread(prevState.activeThread.agentConfig),
+                input: '',
+            };
+        });
     };
 }
 
@@ -311,7 +312,9 @@ export function removeAllThreadsHandler(
             return {
                 ...prevState,
                 threads: [],
-                activeThread: getDefaultThread(prevState.config),
+                activeThread: getDefaultThread(
+                    prevState.activeThread.agentConfig,
+                ),
                 input: '',
                 saved: true,
             };

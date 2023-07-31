@@ -32,12 +32,10 @@ export function ChatProvider({
     children,
     threadList,
     characters,
-    savedConfig,
 }: {
     children: React.ReactNode;
     threadList: ChatThread[];
     characters: AgentConfig[] | null;
-    savedConfig?: AgentConfig | null;
 }) {
     const router = useRouter();
     const params = useParams();
@@ -47,14 +45,19 @@ export function ChatProvider({
             : undefined
         : undefined;
 
+    const characterList = characters || initialState.characterList;
+    const threads =
+        threadList.length === 0 ? [initialState.activeThread] : threadList;
     const [state, setState] = useState<ChatState>({
         ...initialState,
+        characterList,
+        threads,
         isNew: threadId === undefined,
-        threads:
-            threadList.length === 0 ? [initialState.activeThread] : threadList,
-        config: savedConfig || initialState.config,
-        activeThread: getInitialActiveThread(savedConfig, threadId, threadList),
-        characterList: characters || initialState.characterList,
+        activeThread: getInitialActiveThread(
+            characterList[0],
+            threadId,
+            threadList,
+        ),
     });
 
     const createThread = createThreadHandler(state, setState);

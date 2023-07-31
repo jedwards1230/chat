@@ -1,7 +1,6 @@
 type ChatState = {
     activeThread: ChatThread;
     threads: ChatThread[];
-    config: AgentConfig;
     botTyping: boolean;
     input: string;
     editId: string | null;
