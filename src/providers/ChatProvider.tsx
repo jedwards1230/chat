@@ -22,7 +22,7 @@ import {
     updateThreadConfigHandler,
 } from './ChatProviderUtils';
 import initialState from './initialChat';
-import { saveThread } from '@/utils/server';
+import { saveThread, saveCharacterList } from '@/utils/server';
 
 const ChatContext = createContext<ChatState>(initialState);
 
@@ -31,10 +31,12 @@ export const useChat = () => useContext(ChatContext);
 export function ChatProvider({
     children,
     threadList,
+    characters,
     savedConfig,
 }: {
     children: React.ReactNode;
     threadList: ChatThread[];
+    characters: AgentConfig[] | null;
     savedConfig?: AgentConfig | null;
 }) {
     const router = useRouter();
@@ -52,6 +54,7 @@ export function ChatProvider({
             threadList.length === 0 ? [initialState.activeThread] : threadList,
         config: savedConfig || initialState.config,
         activeThread: getInitialActiveThread(savedConfig, threadId, threadList),
+        characterList: characters || initialState.characterList,
     });
 
     const createThread = createThreadHandler(state, setState);
@@ -61,12 +64,24 @@ export function ChatProvider({
     // Save thread when it is updated
     useEffect(() => {
         if (!state.saved) {
-            saveThread(state.activeThread);
-            setState((prevState) => ({ ...prevState, saved: true }));
+            try {
+                saveThread(state.activeThread);
+                saveCharacterList(state.characterList);
+                setState((prevState) => ({ ...prevState, saved: true }));
+            } catch (err) {
+                console.error(err);
+            }
         }
-    }, [state.saved, state.activeThread]);
+    }, [state.saved, state.activeThread, state.characterList]);
 
     useEffect(() => {
+        if (!characters) {
+            try {
+                saveCharacterList(state.characterList);
+            } catch (err) {
+                console.error(err);
+            }
+        }
         return () => {
             abortRequest();
         };

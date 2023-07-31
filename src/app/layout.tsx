@@ -6,7 +6,7 @@ import { ClerkProvider, auth } from '@clerk/nextjs';
 import { Analytics } from '@vercel/analytics/react';
 import { ChatProvider } from '@/providers/ChatProvider';
 import supabase from '@/lib/supabase';
-import { getChatThreadList } from '@/utils/server';
+import { getChatThreadList, getAgentConfigs } from '@/utils/server';
 
 const APP_NAME = 'Chat';
 const APP_DEFAULT_TITLE = 'Chat';
@@ -58,20 +58,31 @@ export default async function RootLayout({
 }) {
     const { userId } = auth();
 
-    // check if userId in users table in supabase
     const { data, error } = await supabase
         .from('users')
         .select('userid')
         .eq('userid', userId);
 
     if (data?.length === 0) {
-        // if not, add it
         const { data, error } = await supabase
             .from('users')
             .insert([{ userid: userId }]);
     }
 
-    const threads = await getChatThreadList(userId!);
+    const [threads, characterList] = await Promise.allSettled([
+        getChatThreadList(userId!),
+        getAgentConfigs(userId!),
+    ]);
+
+    const threadList =
+        threads.status === 'fulfilled' && threads.value.length > 0
+            ? threads.value
+            : [];
+
+    const characters =
+        characterList.status === 'fulfilled' && characterList.value.length > 0
+            ? characterList.value
+            : null;
 
     return (
         <ClerkProvider>
@@ -89,7 +100,10 @@ export default async function RootLayout({
                         }
                     >
                         <Providers>
-                            <ChatProvider threadList={threads}>
+                            <ChatProvider
+                                threadList={threadList}
+                                characters={characters}
+                            >
                                 <div className="relative flex h-full w-full flex-col">
                                     {children}
                                 </div>

@@ -70,10 +70,10 @@ export async function analyzeSingleResult(
         }
 
         const context: string = await res.json();
-        clearTimeout(timeout); // Clear the timeout if the fetch request completes within the timeout period
+        clearTimeout(timeout);
         return context;
     } catch (error) {
-        clearTimeout(timeout); // Clear the timeout if an error occurs
+        clearTimeout(timeout);
         throw error;
     }
 }

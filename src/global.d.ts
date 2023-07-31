@@ -15,7 +15,7 @@ type Message = {
 };
 
 interface AgentConfig {
-    id: string;
+    id?: string;
     name: string;
     tools: Tool[];
     toolsEnabled: boolean;

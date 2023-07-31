@@ -26,6 +26,26 @@ export async function shareChatThread(thread: ChatThread) {
     }
 }
 
+export async function saveCharacterList(characters: AgentConfig[]) {
+    const { userId } = auth();
+    if (!userId) {
+        throw new Error('No user id');
+    }
+
+    const { data, error } = await supabase.from('agent_config').upsert(
+        characters.map((character) => ({
+            ...character,
+            user_id: userId,
+            tools: JSON.stringify(character.tools),
+        })),
+        { onConflict: 'id' },
+    );
+
+    if (error) {
+        throw new Error(error.message);
+    }
+}
+
 export async function saveThread(thread: ChatThread) {
     if (thread.messages.length === 0) return;
 
@@ -172,4 +192,22 @@ export async function getChatThreadList(userId: string): Promise<ChatThread[]> {
             };
         })
         .filter(Boolean);
+}
+
+export async function getAgentConfigs(userId: string): Promise<AgentConfig[]> {
+    const { data: configs, error } = await supabase
+        .from('agent_config')
+        .select('*')
+        .eq('user_id', userId);
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    return configs.map((config: any) => {
+        return {
+            ...config,
+            tools: JSON.parse(config.tools),
+        };
+    });
 }

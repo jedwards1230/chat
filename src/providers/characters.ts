@@ -1,5 +1,4 @@
 export const defaultAgentConfig: AgentConfig = {
-    id: '',
     name: 'Chat',
     tools: ['search', 'wikipedia-api'],
     toolsEnabled: true,
