@@ -174,6 +174,22 @@ export async function deleteAllCloudThreads() {
     }
 }
 
+export async function deleteAllDBCharacters() {
+    const { userId } = auth();
+    if (!userId) {
+        throw new Error('No user id');
+    }
+
+    const { data: characterData, error: characterError } = await supabase
+        .from('agent_config')
+        .delete()
+        .eq('user_id', userId);
+
+    if (characterError) {
+        throw new Error(characterError.message);
+    }
+}
+
 export async function getChatThreadList(userId: string): Promise<ChatThread[]> {
     const { data: threads, error } = await supabase
         .from('chat_threads')

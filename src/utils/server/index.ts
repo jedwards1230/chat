@@ -6,6 +6,8 @@ import {
     saveCharacter,
     saveCharacterList,
     deleteMessage,
+    deleteAllCloudThreads,
+    deleteAllDBCharacters,
 } from './server';
 
 export {
@@ -16,4 +18,6 @@ export {
     saveCharacter,
     saveCharacterList,
     deleteMessage,
+    deleteAllCloudThreads,
+    deleteAllDBCharacters,
 };

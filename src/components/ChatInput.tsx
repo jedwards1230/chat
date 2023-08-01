@@ -49,7 +49,7 @@ export default function ChatInput() {
             <form
                 onSubmit={handleSubmit}
                 className={clsx(
-                    'flex w-full items-end justify-center gap-2 justify-self-end border-t border-neutral-300 px-4 pb-8 pt-2 shadow-xl transition-all dark:border-0 dark:border-neutral-600 dark:shadow-none sm:pb-4',
+                    'flex w-full items-end justify-center gap-2 justify-self-end border-t border-neutral-300 px-4 pb-8 pt-4 shadow-xl transition-all dark:border-0 dark:border-neutral-600 dark:shadow-none sm:pb-4',
                     editId && 'flex-col',
                 )}
             >
@@ -61,7 +61,7 @@ export default function ChatInput() {
                     rows={rows}
                     onChange={handleInputChange}
                     onKeyDown={onKeyDownHandler}
-                    className="w-full flex-1 rounded border-2 border-neutral-200 p-2 transition-colors focus:border-blue-500 focus:outline-none dark:border-neutral-500 dark:bg-neutral-700"
+                    className="w-full flex-1 rounded border-2 border-neutral-200 px-2 py-1.5 transition-colors focus:border-blue-500 focus:outline-none dark:border-neutral-600 dark:bg-neutral-800"
                 />
                 {input &&
                     (editId ? (

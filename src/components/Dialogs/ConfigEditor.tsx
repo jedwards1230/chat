@@ -3,10 +3,10 @@
 import Image from 'next/image';
 import { useAuth, useUser } from '@clerk/nextjs';
 
-import Dialog from './Dialog';
 import { useChat } from '@/providers/ChatProvider';
-import { deleteAllCloudThreads } from '@/utils/server/server';
 import { useUI } from '@/providers/UIProvider';
+import { deleteAllCloudThreads, deleteAllDBCharacters } from '@/utils/server';
+import Dialog from './Dialog';
 
 export default function ConfigEditor() {
     const { removeAllThreads, threads } = useChat();
@@ -20,11 +20,12 @@ export default function ConfigEditor() {
 
     const clearAllCloud = async () => {
         await deleteAllCloudThreads();
+        await deleteAllDBCharacters();
         removeAllThreads();
         closeConfigEditor();
     };
 
-    if (!configEditorOpen || !user) return null;
+    if (!user) return null;
     return (
         <Dialog callback={closeConfigEditor}>
             <div className="w-full pb-4 text-center text-xl font-semibold">
