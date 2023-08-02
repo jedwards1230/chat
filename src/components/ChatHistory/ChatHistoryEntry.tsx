@@ -6,8 +6,8 @@ import Link from 'next/link';
 import { useChat } from '@/providers/ChatProvider';
 import { Chat, Trash } from '../Icons';
 import { isMobile } from '@/utils/client';
-import { deleteCloudThread } from '@/utils/server/server';
 import { useUI } from '@/providers/UIProvider';
+import { deleteThreadById } from '@/utils/server/supabase';
 
 export default function ChatHistoryEntry({ entry }: { entry: ChatThread }) {
     const { activeThread, removeThread } = useChat();
@@ -17,7 +17,7 @@ export default function ChatHistoryEntry({ entry }: { entry: ChatThread }) {
     const remove = (e: any) => {
         e.stopPropagation();
         removeThread(entry.id);
-        deleteCloudThread(entry.id);
+        deleteThreadById(entry.id);
     };
 
     const setActive = (e: any) => {

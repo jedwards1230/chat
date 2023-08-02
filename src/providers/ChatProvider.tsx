@@ -23,20 +23,22 @@ import {
     saveCharacterHandler,
 } from './ChatProviderUtils';
 import initialState from './initialChat';
-import { saveThread, saveCharacterList } from '@/utils/server';
+import { upsertThread } from '@/utils/server/supabase';
 
 const ChatContext = createContext<ChatState>(initialState);
 
 export const useChat = () => useContext(ChatContext);
 
 export function ChatProvider({
+    userId,
     children,
     threadList,
-    characters,
+    characterList,
 }: {
+    userId: string | null;
     children: React.ReactNode;
     threadList: ChatThread[];
-    characters: AgentConfig[] | null;
+    characterList: AgentConfig[];
 }) {
     const router = useRouter();
     const params = useParams();
@@ -46,13 +48,10 @@ export function ChatProvider({
             : undefined
         : undefined;
 
-    const characterList = characters || initialState.characterList;
-    const threads =
-        threadList.length === 0 ? [initialState.activeThread] : threadList;
     const [state, setState] = useState<ChatState>({
         ...initialState,
         characterList,
-        threads,
+        threads: threadList,
         isNew: threadId === undefined,
         activeThread: getInitialActiveThread(
             characterList[0],
@@ -67,32 +66,22 @@ export function ChatProvider({
 
     // Save thread when it is updated
     useEffect(() => {
+        if (!userId) return;
+
         if (!state.saved) {
             try {
-                saveThread(state.activeThread);
+                upsertThread(state.activeThread);
                 setState((prevState) => ({ ...prevState, saved: true }));
             } catch (err) {
                 console.error(err);
             }
         }
-    }, [state.saved, state.activeThread]);
-
-    useEffect(() => {
-        if (!characters) {
-            try {
-                saveCharacterList(state.characterList);
-            } catch (err) {
-                console.error(err);
-            }
-        }
-        return () => {
-            abortRequest();
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [state.saved, state.activeThread, userId]);
 
     // Update active thread when threadId changes
     useEffect(() => {
+        if (!userId) return;
+
         if (!threadId) {
             if (!state.isNew) {
                 createThread();
@@ -118,6 +107,7 @@ export function ChatProvider({
             }
         }
     }, [
+        userId,
         router,
         threadId,
         state.input,

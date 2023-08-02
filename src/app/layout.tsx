@@ -6,8 +6,12 @@ import { Analytics } from '@vercel/analytics/react';
 import './globals.css';
 import Providers from '@/providers';
 import { ChatProvider } from '@/providers/ChatProvider';
-import supabase from '@/lib/supabase';
-import { getChatThreadList, getAgentConfigs } from '@/utils/server';
+import supabase from '@/lib/supabase.server';
+import initialState from '@/providers/initialChat';
+import {
+    getCharacterListByUserId,
+    getThreadListByUserId,
+} from '@/utils/server/supabase';
 
 export const runtime = 'edge';
 
@@ -77,19 +81,19 @@ export default async function RootLayout({
     }
 
     const [threads, characterList] = await Promise.allSettled([
-        getChatThreadList(userId!),
-        getAgentConfigs(userId!),
+        getThreadListByUserId(userId!),
+        getCharacterListByUserId(userId!),
     ]);
 
     const threadList =
         threads.status === 'fulfilled' && threads.value.length > 0
             ? threads.value
-            : [];
+            : [initialState.activeThread];
 
     const characters =
         characterList.status === 'fulfilled' && characterList.value.length > 0
             ? characterList.value
-            : null;
+            : initialState.characterList;
 
     return (
         <ClerkProvider>
@@ -108,8 +112,9 @@ export default async function RootLayout({
                     >
                         <Providers>
                             <ChatProvider
+                                userId={userId}
                                 threadList={threadList}
-                                characters={characters}
+                                characterList={characters}
                             >
                                 <div className="relative flex h-full w-full flex-col">
                                     {children}

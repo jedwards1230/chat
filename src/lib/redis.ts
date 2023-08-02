@@ -7,7 +7,9 @@ if (!url || !token) {
     throw new Error('UPSTASH_URL and UPSTASH_SECRET must be provided');
 }
 
-export const redis = new Redis({
+const redis = new Redis({
     url,
     token,
 });
+
+export default redis;

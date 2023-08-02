@@ -5,7 +5,7 @@ import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';
 
 import initialState, { getDefaultThread } from './initialChat';
 import { createUserMsg, fetchTitle, getChat } from '@/utils/client';
-import { deleteMessage, saveCharacter } from '@/utils/server';
+import { deleteMessageById, upsertCharacter } from '@/utils/server/supabase';
 
 type ChatDispatch = Dispatch<SetStateAction<ChatState>>;
 
@@ -271,7 +271,7 @@ export function editMessageHandler(state: ChatState, setState: ChatDispatch) {
 
 export function removeMessageHandler(setState: ChatDispatch) {
     return (id: string) => {
-        deleteMessage(id);
+        deleteMessageById(id);
         setState((prevState) => ({
             ...prevState,
             saved: false,
@@ -366,7 +366,7 @@ export function abortRequestHandler(state: ChatState, setState: ChatDispatch) {
 
 export function saveCharacterHandler(setState: ChatDispatch) {
     return async (character: AgentConfig) => {
-        saveCharacter(character);
+        upsertCharacter(character);
         setState((prevState) => ({
             ...prevState,
             saved: false,

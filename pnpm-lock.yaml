@@ -57,8 +57,8 @@ dependencies:
     specifier: ^10.15.0
     version: 10.15.0(react-dom@18.2.0)(react@18.2.0)
   langchain:
-    specifier: ^0.0.120
-    version: 0.0.120(@supabase/supabase-js@2.31.0)(@upstash/redis@1.22.0)(cheerio@1.0.0-rc.12)(encoding@0.1.13)
+    specifier: ^0.0.121
+    version: 0.0.121(@supabase/supabase-js@2.31.0)(@upstash/redis@1.22.0)(cheerio@1.0.0-rc.12)(encoding@0.1.13)
   next:
     specifier: 13.4.12
     version: 13.4.12(@babel/core@7.22.5)(@opentelemetry/api@1.4.1)(react-dom@18.2.0)(react@18.2.0)
@@ -4481,8 +4481,8 @@ packages:
     engines: {node: '>=6'}
     dev: false
 
-  /langchain@0.0.120(@supabase/supabase-js@2.31.0)(@upstash/redis@1.22.0)(cheerio@1.0.0-rc.12)(encoding@0.1.13):
-    resolution: {integrity: sha512-QDtoluHiyZnOWsweb3b7rW9ULj2HzGJqgWhxaGviwnA3SrE1om9BMKCY5eI0NMIL/dd5MutenGGlD+VGL0MVWA==}
+  /langchain@0.0.121(@supabase/supabase-js@2.31.0)(@upstash/redis@1.22.0)(cheerio@1.0.0-rc.12)(encoding@0.1.13):
+    resolution: {integrity: sha512-3zhrBZTONTcNuReeVzq2SPns+B8ZtXdagwyUvoy9h0jtMmBH5PTM+IIGjw9qM3fjkO06DbZPwuelqmVNmdQHKg==}
     engines: {node: '>=18'}
     peerDependencies:
       '@aws-sdk/client-dynamodb': ^3.310.0
@@ -4683,7 +4683,7 @@ packages:
       js-tiktoken: 1.0.7
       js-yaml: 4.1.0
       jsonpointer: 5.0.1
-      langsmith: 0.0.11
+      langsmith: 0.0.17
       ml-distance: 4.0.1
       object-hash: 3.0.0
       openai: 3.3.0
@@ -4700,8 +4700,8 @@ packages:
       - supports-color
     dev: false
 
-  /langsmith@0.0.11:
-    resolution: {integrity: sha512-4JTYIog+l3DncDZ9qcHILWYRUz8aI3tfF5arLAKg1k3U7Ivk9SXaYJqF8HPHeCrFxwHeY66NdPc7DqLUKCyoHQ==}
+  /langsmith@0.0.17:
+    resolution: {integrity: sha512-K9AmQSd84Uvbdej1pIzxiybTN4cGZkSpDuR3RK1QqkWA2sFpN169AkhQsxUMPP6gnJZ3ThwFLFQqClJi1PcX2A==}
     hasBin: true
     dependencies:
       '@types/uuid': 9.0.2

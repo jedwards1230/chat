@@ -14,7 +14,7 @@ export default function ModelSelector() {
                 <div className="group relative flex flex-row gap-4">
                     <button
                         className={clsx(
-                            'z-10 w-32 flex-1 rounded-lg px-4 py-2 text-center font-medium',
+                            'w-32 flex-1 rounded-lg px-4 py-2 text-center font-medium',
                             activeModel === 'gpt-3.5-turbo-16k' ||
                                 activeModel === 'gpt-3.5-turbo'
                                 ? 'text-neutral-700 dark:text-white'
@@ -28,7 +28,7 @@ export default function ModelSelector() {
                     </button>
                     <button
                         className={clsx(
-                            'z-10 w-32 flex-1 rounded-lg px-4 py-2 text-center font-medium',
+                            'w-32 flex-1 rounded-lg px-4 py-2 text-center font-medium',
                             activeModel === 'gpt-4' ||
                                 activeModel === 'gpt-4-0613'
                                 ? 'text-neutral-700 dark:text-white'

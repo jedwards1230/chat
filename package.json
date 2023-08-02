@@ -26,7 +26,7 @@
         "expr-eval": "^2.0.2",
         "fast-xml-parser": "^4.2.7",
         "framer-motion": "^10.15.0",
-        "langchain": "^0.0.120",
+        "langchain": "^0.0.121",
         "next": "13.4.12",
         "next-themes": "^0.2.1",
         "openai-edge": "^1.2.2",

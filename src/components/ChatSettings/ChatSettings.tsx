@@ -4,11 +4,11 @@ import clsx from 'clsx';
 import { useEffect, useRef } from 'react';
 
 import { useChat } from '@/providers/ChatProvider';
-import { shareChatThread } from '@/utils/server';
 import { Share } from '../Icons';
 import { isMobile } from '@/utils/client';
 import { useUI } from '@/providers/UIProvider';
 import AgentSettings from '../AgentSettings';
+import { shareThread } from '@/utils/server/redis';
 
 export default function ChatSettings() {
     const { activeThread } = useChat();
@@ -18,7 +18,7 @@ export default function ChatSettings() {
 
     const handleShare = async () => {
         try {
-            await shareChatThread(activeThread);
+            await shareThread(activeThread);
             setShareModalOpen(true);
             if (isMobile()) {
                 setChatSettingsOpen(false);

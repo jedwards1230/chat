@@ -5,8 +5,8 @@ import { useAuth, useUser } from '@clerk/nextjs';
 
 import { useChat } from '@/providers/ChatProvider';
 import { useUI } from '@/providers/UIProvider';
-import { deleteAllCloudThreads, deleteAllDBCharacters } from '@/utils/server';
 import Dialog from './Dialog';
+import { deleteAllThreads, deleteAllCharacters } from '@/utils/server/supabase';
 
 export default function ConfigEditor() {
     const { removeAllThreads, threads, characterList } = useChat();
@@ -19,19 +19,19 @@ export default function ConfigEditor() {
     };
 
     const clearAllChatThreads = async () => {
-        await deleteAllCloudThreads();
+        await deleteAllThreads();
         removeAllThreads();
         closeConfigEditor();
     };
 
     const clearAllCharacters = async () => {
-        await deleteAllDBCharacters();
+        await deleteAllCharacters();
         closeConfigEditor();
     };
 
     const clearAllCloud = async () => {
-        await deleteAllCloudThreads();
-        await deleteAllDBCharacters();
+        await deleteAllThreads();
+        await deleteAllCharacters();
         removeAllThreads();
         closeConfigEditor();
     };

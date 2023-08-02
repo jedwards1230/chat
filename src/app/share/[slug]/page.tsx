@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 
 import { SharedBubble } from '@/components/ChatThread/ChatBubble';
-import { redis } from '@/lib/redis';
+import redis from '@/lib/redis';
 
 export const runtime = 'edge';
 

@@ -6,7 +6,7 @@ import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
 import { SupabaseVectorStore } from 'langchain/vectorstores/supabase';
 import { MemoryVectorStore } from 'langchain/vectorstores/memory';
 
-import supabase from '@/lib/supabase';
+import supabase from '@/lib/supabase.server';
 
 export const runtime = 'edge';
 
