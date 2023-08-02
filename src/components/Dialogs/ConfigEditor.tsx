@@ -62,7 +62,7 @@ export default function ConfigEditor() {
                     </div>
 
                     <button
-                        className="w-full rounded border border-red-500 py-2 text-center hover:bg-red-700"
+                        className="w-full rounded border border-red-500 py-2 text-center hover:bg-red-600 hover:text-neutral-50"
                         onClick={() => signOut()}
                     >
                         Sign Out
@@ -93,7 +93,7 @@ export default function ConfigEditor() {
                     <label className="flex w-full items-center justify-between py-2 text-base">
                         <button
                             onClick={clearAllChatThreads}
-                            className="w-full rounded border border-red-500 py-1.5 text-neutral-50 hover:bg-red-600 dark:border-red-500/80 dark:hover:bg-red-700"
+                            className="w-full rounded border border-red-500 py-1.5 hover:bg-red-600 hover:text-neutral-50 dark:border-red-500/80 dark:text-neutral-50 dark:hover:bg-red-700"
                         >
                             Clear ALL Cloud Chat Threads
                         </button>
@@ -101,7 +101,7 @@ export default function ConfigEditor() {
                     <label className="flex w-full items-center justify-between py-2 text-base">
                         <button
                             onClick={clearAllCharacters}
-                            className="w-full rounded border border-red-500 py-1.5 text-neutral-50 hover:bg-red-600 dark:border-red-500/80 dark:hover:bg-red-700"
+                            className="w-full rounded border border-red-500 py-1.5 hover:bg-red-600 hover:text-neutral-50 dark:border-red-500/80 dark:text-neutral-50 dark:hover:bg-red-700"
                         >
                             Clear ALL Cloud Characters
                         </button>
