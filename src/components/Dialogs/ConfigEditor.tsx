@@ -9,13 +9,24 @@ import { deleteAllCloudThreads, deleteAllDBCharacters } from '@/utils/server';
 import Dialog from './Dialog';
 
 export default function ConfigEditor() {
-    const { removeAllThreads, threads } = useChat();
-    const { configEditorOpen, setConfigEditorOpen } = useUI();
+    const { removeAllThreads, threads, characterList } = useChat();
+    const { setConfigEditorOpen } = useUI();
     const { signOut } = useAuth();
     const { user } = useUser();
 
     const closeConfigEditor = () => {
         setConfigEditorOpen(false);
+    };
+
+    const clearAllChatThreads = async () => {
+        await deleteAllCloudThreads();
+        removeAllThreads();
+        closeConfigEditor();
+    };
+
+    const clearAllCharacters = async () => {
+        await deleteAllDBCharacters();
+        closeConfigEditor();
     };
 
     const clearAllCloud = async () => {
@@ -51,7 +62,7 @@ export default function ConfigEditor() {
                     </div>
 
                     <button
-                        className="roudned-lg w-full border border-red-500 py-2 text-center hover:bg-red-500/80"
+                        className="w-full rounded border border-red-500 py-2 text-center hover:bg-red-700"
                         onClick={() => signOut()}
                     >
                         Sign Out
@@ -71,21 +82,36 @@ export default function ConfigEditor() {
                             )}{' '}
                             Messages
                         </div>
+                        |
+                        <div>
+                            {characterList.length}{' '}
+                            {characterList.length === 1
+                                ? 'Character'
+                                : 'Characters'}
+                        </div>
                     </div>
-                    {/* <label className="flex w-full items-center justify-between py-2 text-base">
+                    <label className="flex w-full items-center justify-between py-2 text-base">
                         <button
-                            onClick={clearAllLocal}
-                            className="w-full rounded bg-red-500 py-1.5 text-neutral-50 hover:bg-red-600 dark:bg-red-500/80 dark:hover:bg-red-700"
+                            onClick={clearAllChatThreads}
+                            className="w-full rounded border border-red-500 py-1.5 text-neutral-50 hover:bg-red-600 dark:border-red-500/80 dark:hover:bg-red-700"
                         >
-                            Clear Local Storage
+                            Clear ALL Cloud Chat Threads
                         </button>
-                    </label> */}
+                    </label>
+                    <label className="flex w-full items-center justify-between py-2 text-base">
+                        <button
+                            onClick={clearAllCharacters}
+                            className="w-full rounded border border-red-500 py-1.5 text-neutral-50 hover:bg-red-600 dark:border-red-500/80 dark:hover:bg-red-700"
+                        >
+                            Clear ALL Cloud Characters
+                        </button>
+                    </label>
                     <label className="flex w-full items-center justify-between py-2 text-base">
                         <button
                             onClick={clearAllCloud}
                             className="w-full rounded bg-red-500 py-1.5 text-neutral-50 hover:bg-red-600 dark:bg-red-500/80 dark:hover:bg-red-700"
                         >
-                            Clear Cloud Storage
+                            Clear ALL Cloud Data
                         </button>
                     </label>
                 </div>
