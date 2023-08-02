@@ -8,7 +8,6 @@ import Providers from '@/providers';
 import { ChatProvider } from '@/providers/ChatProvider';
 import supabase from '@/lib/supabase';
 import { getChatThreadList, getAgentConfigs } from '@/utils/server';
-import { openGraphImage } from './shared-metadata';
 
 export const runtime = 'edge';
 
@@ -37,7 +36,7 @@ export const metadata: Metadata = {
         telephone: false,
     },
     openGraph: {
-        ...openGraphImage,
+        url: '/api/og',
         type: 'website',
         siteName: APP_NAME,
         title: {

@@ -48,7 +48,7 @@ export async function GET() {
                         whiteSpace: 'pre-wrap',
                     }}
                 >
-                    <b>Justin Edwards</b>
+                    <b>Chat UI</b>
                 </div>
             </div>
         ),
