@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 
 import { SharedBubble } from '@/components/ChatThread/ChatBubble';
 import { redis } from '@/lib/redis';
+import { openGraphImage } from '@/app/shared-metadata';
 
 export const runtime = 'edge';
 
@@ -20,6 +21,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     return {
         title: shareData.title,
+        openGraph: {
+            ...openGraphImage,
+            title: shareData.title,
+        },
     };
 }
 
