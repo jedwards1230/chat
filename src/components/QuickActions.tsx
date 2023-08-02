@@ -5,8 +5,7 @@ import clsx from 'clsx';
 import Link from 'next/link';
 
 export default function QuickActions() {
-    const { activeThread, botTyping, abortController, abortRequest } =
-        useChat();
+    const { activeThread, botTyping, abortRequest, createThread } = useChat();
 
     const btn = 'px-3 py-1 rounded-full';
 
@@ -23,6 +22,7 @@ export default function QuickActions() {
             {activeThread.messages.length > 1 && (
                 <Link href="/">
                     <button
+                        onClick={() => createThread()}
                         className={clsx(
                             btn,
                             'bg-blue-500 text-neutral-50 dark:hover:bg-blue-600',
