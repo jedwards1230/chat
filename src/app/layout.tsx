@@ -37,6 +37,7 @@ export const metadata: Metadata = {
     },
     openGraph: {
         url: '/api/og',
+        images: ['/api/og'],
         type: 'website',
         siteName: APP_NAME,
         title: {
