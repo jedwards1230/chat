@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import clsx from 'clsx';
 import Link from 'next/link';
 
@@ -15,6 +15,7 @@ export default function ChatHistory() {
     const { activeThread, threads } = useChat();
     const { sideBarOpen, setSideBarOpen, setConfigEditorOpen } = useUI();
     const sidebarRef = useRef<HTMLDivElement>(null);
+    const [mounted, setMounted] = useState(false);
 
     const threadList = useMemo(
         () => threads.sort(sortThreadlist),
@@ -34,9 +35,10 @@ export default function ChatHistory() {
     };
 
     useEffect(() => {
+        setMounted(true);
         if (sidebarRef.current) {
             const styles = window.getComputedStyle(sidebarRef.current);
-            setSideBarOpen(styles.display === 'flex');
+            setSideBarOpen(styles.display !== 'none');
         }
 
         const handleClickOutside = (event: any) => {
@@ -63,7 +65,8 @@ export default function ChatHistory() {
         <div
             ref={sidebarRef}
             className={clsx(
-                'fixed z-30 h-full w-72 min-w-[270px] max-w-xs border-r bg-neutral-800 py-2 text-neutral-100 transition-all dark:border-neutral-500 sm:z-auto lg:inset-y-0 lg:flex',
+                'fixed z-30 h-full w-72 min-w-[270px] max-w-xs border-r bg-neutral-800 py-2 text-neutral-100 transition-all dark:border-neutral-500 sm:z-auto md:flex lg:inset-y-0',
+                !mounted && 'hidden',
                 sideBarOpen ? '-translate-x-0' : '-translate-x-full',
             )}
         >

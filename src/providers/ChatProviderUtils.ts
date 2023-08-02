@@ -104,11 +104,13 @@ export function createSubmitHandler(
         };
 
         const userMsg: Message = createUserMsg(state.input, state.editId);
+        const controller = new AbortController();
 
         setState((prevState) => ({
             ...prevState,
             input: '',
             botTyping: true,
+            abortController: controller,
             editId: prevState.editId ? null : prevState.editId,
         }));
         upsertMessage(userMsg);
@@ -126,7 +128,7 @@ export function createSubmitHandler(
         await Promise.all([
             getChat(
                 msgHistory,
-                state.abortController,
+                controller,
                 state.activeThread,
                 0,
                 setState,
