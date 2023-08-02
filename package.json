@@ -24,6 +24,7 @@
         "eslint": "8.46.0",
         "eslint-config-next": "^13.4.12",
         "expr-eval": "^2.0.2",
+        "fast-xml-parser": "^4.2.7",
         "framer-motion": "^10.15.0",
         "langchain": "^0.0.120",
         "next": "13.4.12",
@@ -38,6 +39,7 @@
         "uuid": "^9.0.0"
     },
     "devDependencies": {
+        "@cloudflare/next-on-pages": "^1.5.0",
         "@types/react-syntax-highlighter": "^15.5.7",
         "@types/uuid": "^9.0.2",
         "autoprefixer": "^10.4.14",
