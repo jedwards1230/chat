@@ -86,29 +86,6 @@ export default function Chat() {
         }
     }
 
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            const edgeDistance = 20;
-
-            const handleTouchStart = (event: TouchEvent) => {
-                const touchX = event.touches[0].clientX;
-                const winWidth = window.innerWidth;
-
-                if (touchX < edgeDistance || touchX > winWidth - edgeDistance) {
-                    event.preventDefault();
-                }
-            };
-
-            window.addEventListener('touchstart', handleTouchStart, {
-                passive: false,
-            });
-
-            return () => {
-                window.removeEventListener('touchstart', handleTouchStart);
-            };
-        }
-    }, []);
-
     return (
         <>
             <div className="flex h-full w-full">

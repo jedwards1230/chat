@@ -57,7 +57,7 @@ export default function ChatInput() {
                     ref={inputRef}
                     placeholder="Say something..."
                     value={input}
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => inputRef.current?.focus()}
                     rows={rows}
                     onChange={handleInputChange}
                     onKeyDown={onKeyDownHandler}

@@ -155,8 +155,8 @@ export function createSubmitHandler(
 
 export function createThreadHandler(state: ChatState, setState: ChatDispatch) {
     return () => {
+        state.abortController?.abort();
         setState((prevState) => {
-            prevState.abortRequest();
             const newThread = getDefaultThread(state.activeThread.agentConfig);
             return {
                 ...prevState,

@@ -86,12 +86,8 @@ export default async function RootLayout({
 
     return (
         <ClerkProvider>
-            <html
-                lang="en"
-                className="overflow-hidden"
-                suppressHydrationWarning={true}
-            >
-                <body className="overflow-hidden bg-neutral-100 transition-colors dark:bg-neutral-900 dark:text-neutral-100">
+            <html lang="en" suppressHydrationWarning={true}>
+                <body className="bg-neutral-100 transition-colors dark:bg-neutral-900 dark:text-neutral-100">
                     <Suspense
                         fallback={
                             <div className="flex h-full w-full items-center justify-center">

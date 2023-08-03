@@ -28,6 +28,7 @@ export default function ChatHistoryEntry({ entry }: { entry: ChatThread }) {
     return (
         <div className="relative">
             <Link
+                replace={true}
                 href={`/${entry.id}`}
                 onClick={setActive}
                 className={clsx(

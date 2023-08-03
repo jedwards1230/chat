@@ -16,7 +16,7 @@ export default function ChatHistory() {
     const { userId } = useAuth();
     const [mounted, setMounted] = useState(false);
     const sidebarRef = useRef<HTMLDivElement>(null);
-    const { activeThread, threads, openAiApiKey } = useChat();
+    const { activeThread, threads, openAiApiKey, createThread } = useChat();
     const {
         sideBarOpen,
         setSideBarOpen,
@@ -39,6 +39,7 @@ export default function ChatHistory() {
     };
 
     const newThread = () => {
+        createThread();
         if (isMobile()) setSideBarOpen(false);
     };
 
@@ -82,6 +83,7 @@ export default function ChatHistory() {
                 {/* Header Buttons */}
                 <div className="flex w-full justify-between gap-x-2">
                     <Link
+                        replace={true}
                         onClick={newThread}
                         className="flex flex-1 justify-center rounded-lg border border-neutral-500 py-2 font-medium transition-colors hover:border-neutral-400 hover:bg-neutral-500 focus:bg-neutral-600 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700"
                         href="/"
