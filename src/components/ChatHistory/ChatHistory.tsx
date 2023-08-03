@@ -104,9 +104,9 @@ export default function ChatHistory() {
                         <button
                             title={
                                 openAiApiKey
-                                    ? userId
-                                        ? 'Using Cloud Key (currently set by EnvVar. Ignoring Local Key)'
-                                        : 'Using Local Key'
+                                    ? 'Using Local Key'
+                                    : userId
+                                    ? 'Using Cloud Key (currently set by EnvVar. Ignoring Local Key)'
                                     : 'Invalid OpenAI API Key'
                             }
                             onClick={() => setOpenAIKeyOpen(true)}
