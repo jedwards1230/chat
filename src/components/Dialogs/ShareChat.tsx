@@ -6,6 +6,7 @@ import { useChat } from '@/providers/ChatProvider';
 import Dialog from './Dialog';
 import { OpenNew } from '../Icons';
 import { useUI } from '@/providers/UIProvider';
+import Input from '../Forms/Input';
 
 export default function ShareChat() {
     const { activeThread } = useChat();
@@ -21,10 +22,9 @@ export default function ShareChat() {
             <div className="w-full text-center text-lg">
                 Share URL
                 <div className="mt-2 flex items-center justify-between gap-2">
-                    <input
-                        type="text"
-                        readOnly
-                        className="w-full rounded-lg border px-2 py-1 focus:outline-none"
+                    <Input
+                        readOnly={true}
+                        className="w-full px-2 py-1"
                         value={shareUrl}
                         onClick={handleInputClick}
                         onTouchStart={handleInputClick}

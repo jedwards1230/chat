@@ -146,7 +146,3 @@ export class WikipediaQueryRun implements CustomTool {
         return pages[pageId];
     }
 }
-
-const wikipediaQueryRun = new WikipediaQueryRun();
-
-export default wikipediaQueryRun;

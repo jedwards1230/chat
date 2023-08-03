@@ -35,7 +35,7 @@ export default function PersonalitySelector() {
                 {activeCard === undefined && (
                     <button
                         onClick={() => setActiveCard('New Character')}
-                        className="absolute right-6 top-4 rounded-md border px-2 py-1 text-neutral-400 hover:border-neutral-950 hover:text-neutral-950 dark:text-neutral-500 dark:hover:text-neutral-200"
+                        className="absolute right-6 top-4 rounded-md border px-2 py-1 text-neutral-400 hover:border-neutral-950 hover:text-neutral-950 dark:text-neutral-500 dark:hover:border-neutral-300 dark:hover:text-neutral-200"
                     >
                         + New
                     </button>

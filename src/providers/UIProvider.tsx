@@ -1,4 +1,11 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import {
+    Dispatch,
+    SetStateAction,
+    createContext,
+    useContext,
+    useEffect,
+    useState,
+} from 'react';
 
 import { isMobile as iM } from '@/utils/client';
 
@@ -13,6 +20,10 @@ type ModalState = {
     setShareModalOpen: (open: boolean) => void;
     characterSelectorOpen: boolean;
     setCharacterSelectorOpen: (open: boolean) => void;
+    openAIKeyOpen: boolean;
+    setOpenAIKeyOpen: Dispatch<SetStateAction<boolean>>;
+    signInOpen: boolean;
+    setSignInOpen: Dispatch<SetStateAction<boolean>>;
 };
 
 const initialState: ModalState = {
@@ -26,6 +37,10 @@ const initialState: ModalState = {
     setShareModalOpen: () => {},
     characterSelectorOpen: false,
     setCharacterSelectorOpen: () => {},
+    openAIKeyOpen: false,
+    setOpenAIKeyOpen: () => {},
+    signInOpen: false,
+    setSignInOpen: () => {},
 };
 
 const UIContext = createContext<ModalState>(initialState);
@@ -44,9 +59,13 @@ export function UIProvider({ children }: { children: React.ReactNode }) {
     const [shareModalOpen, setShareModalOpen] = useState(
         initialState.shareModalOpen,
     );
-    const [personalitySelectorOpen, setPersonalitySelectorOpen] = useState(
+    const [characterSelectorOpen, setCharacterSelectorOpen] = useState(
         initialState.characterSelectorOpen,
     );
+    const [openAIKeyOpen, setOpenAIKeyOpen] = useState(
+        initialState.openAIKeyOpen,
+    );
+    const [signInOpen, setSignInOpen] = useState(initialState.signInOpen);
 
     const handleResize = () => {
         if (isMobile && !iM('md')) {
@@ -80,8 +99,12 @@ export function UIProvider({ children }: { children: React.ReactNode }) {
                 setConfigEditorOpen,
                 shareModalOpen,
                 setShareModalOpen,
-                characterSelectorOpen: personalitySelectorOpen,
-                setCharacterSelectorOpen: setPersonalitySelectorOpen,
+                characterSelectorOpen,
+                setCharacterSelectorOpen,
+                openAIKeyOpen,
+                setOpenAIKeyOpen,
+                signInOpen,
+                setSignInOpen,
             }}
         >
             {children}

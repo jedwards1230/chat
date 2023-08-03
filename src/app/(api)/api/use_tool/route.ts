@@ -28,16 +28,16 @@ export async function POST(request: Request) {
     let result = '';
     switch (tool) {
         case 'calculator':
-            result = Calculator.call(input);
+            result = new Calculator().call(input);
             break;
         case 'search':
-            result = await Search.call(input);
+            result = await new Search().call(input);
             break;
         case 'web-browser':
-            result = await WebBrowser.call(input);
+            result = await new WebBrowser({}).call(input);
             break;
         case 'wikipedia-api':
-            result = await WikipediaQueryRun.call(input);
+            result = await new WikipediaQueryRun().call(input);
             break;
         default:
             return new Response('Invalid tool', {

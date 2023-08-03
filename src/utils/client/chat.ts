@@ -3,8 +3,8 @@
 import { Dispatch, SetStateAction } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
-import { prepareMessages } from '..';
 import { readStream, callTool, parseStreamData } from '../client';
+import { getChatStream, getTitleStream } from '../server/chat';
 
 const MAX_LOOPS = 10;
 
@@ -27,31 +27,25 @@ export function createUserMsg(
  * @param {ChatThread} activeThread - The active thread of the chatbot.
  * @param {string} input - The input text to fetch the title for.
  * @param {(title: string) => void} callback - The callback function to be called with the fetched title.
+ * @param {string} userId - The user ID to be used for the request.
+ * @param {string} openAiApiKey - The OpenAI API key to be used for the request.
  */
-export async function fetchTitle(
+export async function getTitle(
     activeThread: ChatThread,
     input: string,
     callback: (title: string) => void,
+    userId?: string | null,
+    openAiApiKey?: string,
 ) {
     const l = activeThread.messages.length;
     if (l < 2 || l > 10) return;
 
-    // Prepare the chat history
-    const history = activeThread.messages.map(
-        (msg) => msg.role + ': ' + msg.content,
+    const stream = await requestTitleStream(
+        activeThread.messages,
+        input,
+        userId,
+        openAiApiKey,
     );
-    history.push('user: ' + input);
-
-    // Send POST request to the '/api/get_title' endpoint
-    const res = await fetch('/api/get_title', {
-        method: 'POST',
-        body: JSON.stringify({
-            history: history.join('\n'),
-        }),
-    });
-    if (!res.body) {
-        throw new Error('No response body from /api/get_title');
-    }
 
     // Function to reduce the response stream data
     const reduceStreamData = (acc: string, curr: StreamData) => {
@@ -76,7 +70,7 @@ export async function fetchTitle(
     };
 
     // Read the response stream
-    await readStream(res.body, streamCallback);
+    await readStream(stream!, streamCallback);
 }
 
 /**
@@ -90,6 +84,8 @@ export async function fetchTitle(
  * @param {number} loops - The number of recursive calls made to this function. Default is 0.
  * @param {Dispatch<SetStateAction<ChatState>>} setState - The state setter function from the useState React Hook.
  * @param {(message: Message) => void} upsertMessage - Function to add a new message or update an existing one.
+ * @param {string} userId - The user ID to use for the request.
+ * @param {string} apiKey - The API key to use for the request.
  */
 export async function getChat(
     msgHistory: Message[],
@@ -98,6 +94,8 @@ export async function getChat(
     loops: number = 0,
     setState: Dispatch<SetStateAction<ChatState>>,
     upsertMessage: (message: Message) => void,
+    userId?: string | null,
+    apiKey?: string,
 ) {
     try {
         if (loops > MAX_LOOPS) {
@@ -174,6 +172,8 @@ export async function getChat(
             activeThread,
             controller.signal,
             msgHistory,
+            userId,
+            apiKey,
         );
 
         // Read the response stream
@@ -197,6 +197,8 @@ export async function getChat(
                 activeThread,
                 setState,
                 loops + 1,
+                userId,
+                apiKey,
             );
         } else {
             setState((prevState) => {
@@ -212,7 +214,7 @@ export async function getChat(
         if (error.name === 'AbortError') {
             //console.log('Fetch aborted');
         } else {
-            console.error('Error:', error);
+            //console.error('Error:', error);
         }
         setState((prevState) => ({
             ...prevState,
@@ -222,30 +224,67 @@ export async function getChat(
     }
 }
 
+async function requestTitleStream(
+    msgHistory: Message[],
+    input: string,
+    userId?: string | null,
+    apiKey?: string,
+) {
+    // Prepare the chat history
+    const history = msgHistory.map((msg) => msg.role + ': ' + msg.content);
+    history.push('user: ' + input);
+    const historyStr = history.join('\n');
+
+    if (userId && !apiKey) {
+        // user server-side key
+        const res = await fetch('/api/get_title', {
+            method: 'POST',
+            body: JSON.stringify({
+                history: historyStr,
+            }),
+        });
+        if (!res.body) {
+            throw new Error('No response body from /api/get_title');
+        }
+
+        return res.body;
+    } else if (apiKey) {
+        // use client-side key
+        return await getTitleStream(historyStr, apiKey);
+    }
+
+    throw new Error('No API key or user ID');
+}
+
 async function requestChatStream(
     activeThread: ChatThread,
     signal: AbortSignal,
     msgHistory: Message[],
+    userId?: string | null,
+    apiKey?: string,
 ) {
-    const messages = prepareMessages(msgHistory);
-    const response = await fetch('/api/chat', {
-        method: 'POST',
-        signal,
-        body: JSON.stringify({
-            modelName: activeThread.agentConfig.model,
-            temperature: activeThread.agentConfig.temperature,
-            messages,
-            tools: activeThread.agentConfig.toolsEnabled
-                ? activeThread.agentConfig.tools
-                : [],
-        }),
-    });
+    if (userId && !apiKey) {
+        // use server-side key
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            signal,
+            body: JSON.stringify({
+                activeThread,
+                msgHistory,
+            }),
+        });
 
-    if (!response.body) {
-        throw new Error('No response body from /api/chat');
+        if (!response.body) {
+            throw new Error('No response body from /api/chat');
+        }
+
+        return response.body;
+    } else if (apiKey) {
+        // use client-side key
+        return await getChatStream(activeThread, msgHistory, signal, apiKey);
     }
 
-    return response.body;
+    throw new Error('No API key or user ID');
 }
 
 async function getToolData(
@@ -257,6 +296,8 @@ async function getToolData(
     activeThread: ChatThread,
     setState: Dispatch<SetStateAction<ChatState>>,
     loops: number = 0,
+    userId?: string | null,
+    apiKey?: string,
 ) {
     let input = '';
     try {
@@ -308,5 +349,7 @@ async function getToolData(
         loops,
         setState,
         upsertMessage,
+        userId,
+        apiKey,
     );
 }

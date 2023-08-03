@@ -73,7 +73,3 @@ export class Search implements CustomTool {
         }
     }
 }
-
-const search = new Search();
-
-export default search;

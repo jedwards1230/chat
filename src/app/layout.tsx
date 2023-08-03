@@ -7,7 +7,6 @@ import './globals.css';
 import Providers from '@/providers';
 import { ChatProvider } from '@/providers/ChatProvider';
 import supabase from '@/lib/supabase.server';
-import initialState from '@/providers/initialChat';
 import {
     getCharacterListByUserId,
     getThreadListByUserId,
@@ -80,20 +79,10 @@ export default async function RootLayout({
             .insert([{ userid: userId }]);
     }
 
-    const [threads, characterList] = await Promise.allSettled([
+    const [threads, characterList] = await Promise.all([
         getThreadListByUserId(userId!),
         getCharacterListByUserId(userId!),
     ]);
-
-    const threadList =
-        threads.status === 'fulfilled' && threads.value.length > 0
-            ? threads.value
-            : [initialState.activeThread];
-
-    const characters =
-        characterList.status === 'fulfilled' && characterList.value.length > 0
-            ? characterList.value
-            : initialState.characterList;
 
     return (
         <ClerkProvider>
@@ -112,9 +101,8 @@ export default async function RootLayout({
                     >
                         <Providers>
                             <ChatProvider
-                                userId={userId}
-                                threadList={threadList}
-                                characterList={characters}
+                                threadList={threads}
+                                characterList={characterList}
                             >
                                 <div className="relative flex h-full w-full flex-col">
                                     {children}

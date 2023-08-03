@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { useAuth } from '@clerk/nextjs';
 
 import {
     abortRequestHandler,
@@ -21,25 +22,32 @@ import {
     updateActiveThreadHandler,
     updateThreadConfigHandler,
     saveCharacterHandler,
+    setOpenAiApiKeyHandler,
 } from './ChatProviderUtils';
+import { useUI } from './UIProvider';
 import initialState from './initialChat';
 import { upsertThread } from '@/utils/server/supabase';
+import {
+    getLocalCharacterList,
+    getLocalOpenAiKey,
+    getLocalThreadList,
+    setLocalThreadList,
+} from '@/utils/client/storage';
 
 const ChatContext = createContext<ChatState>(initialState);
 
 export const useChat = () => useContext(ChatContext);
 
 export function ChatProvider({
-    userId,
     children,
     threadList,
     characterList,
 }: {
-    userId: string | null;
     children: React.ReactNode;
     threadList: ChatThread[];
     characterList: AgentConfig[];
 }) {
+    const { userId } = useAuth();
     const router = useRouter();
     const params = useParams();
     const threadId = params.root
@@ -47,6 +55,8 @@ export function ChatProvider({
             ? params.root[0]
             : undefined
         : undefined;
+
+    const { setOpenAIKeyOpen } = useUI();
 
     const [state, setState] = useState<ChatState>({
         ...initialState,
@@ -62,26 +72,46 @@ export function ChatProvider({
 
     const createThread = createThreadHandler(state, setState);
     const updateActiveThread = updateActiveThreadHandler(setState);
+    const setOpenAiApiKey = setOpenAiApiKeyHandler(setState);
     const abortRequest = abortRequestHandler(state, setState);
+
+    useEffect(() => {
+        // Load OpenAI API key from local storage
+        const key = getLocalOpenAiKey();
+        if (key) {
+            setOpenAiApiKey(key);
+        }
+
+        // Load threads from local storage if not connected to db
+        setState((prevState) => ({
+            ...prevState,
+            saved: false,
+            threads: mergeThreads(prevState.threads, getLocalThreadList()),
+            characterList: mergeCharacters(
+                prevState.characterList,
+                getLocalCharacterList(),
+            ),
+        }));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     // Save thread when it is updated
     useEffect(() => {
-        if (!userId) return;
-
         if (!state.saved) {
             try {
-                upsertThread(state.activeThread);
+                if (userId) upsertThread(state.activeThread);
+                if (window !== undefined) {
+                    setLocalThreadList(state.threads);
+                }
                 setState((prevState) => ({ ...prevState, saved: true }));
             } catch (err) {
                 console.error(err);
             }
         }
-    }, [state.saved, state.activeThread, userId]);
+    }, [state.saved, state.activeThread, userId, state.threads]);
 
     // Update active thread when threadId changes
     useEffect(() => {
-        if (!userId) return;
-
         if (!threadId) {
             if (!state.isNew) {
                 createThread();
@@ -107,7 +137,6 @@ export function ChatProvider({
             }
         }
     }, [
-        userId,
         router,
         threadId,
         state.input,
@@ -123,6 +152,7 @@ export function ChatProvider({
         ...state,
         abortRequest,
         createThread,
+        setOpenAiApiKey,
         updateActiveThread,
         setConfig: setConfigHandler(setState),
         cancelEdit: cancelEditHandler(setState),
@@ -135,11 +165,66 @@ export function ChatProvider({
         setPluginsEnabled: setPluginsEnabledHandler(setState),
         updateThreadConfig: updateThreadConfigHandler(setState),
         removeThread: removeThreadHandler(state, setState, router),
-        handleSubmit: createSubmitHandler(state, setState, router),
         removeAllThreads: removeAllThreadsHandler(setState, router),
+        handleSubmit: createSubmitHandler(
+            state,
+            setState,
+            router,
+            setOpenAIKeyOpen,
+            userId,
+        ),
     };
 
     return (
         <ChatContext.Provider value={value}>{children}</ChatContext.Provider>
     );
+}
+
+function mergeThreads(
+    oldThreads: ChatThread[],
+    newThreads: ChatThread[],
+): ChatThread[] {
+    const threadMap = new Map<string, ChatThread>();
+
+    // Add the old threads to the map
+    oldThreads.forEach((thread) => {
+        threadMap.set(thread.id, thread);
+    });
+
+    // Add the new threads to the map, replacing the old ones if the new one is more recent
+    newThreads.forEach((thread) => {
+        const existingThread = threadMap.get(thread.id);
+        if (
+            !existingThread ||
+            existingThread.lastModified < thread.lastModified
+        ) {
+            threadMap.set(thread.id, thread);
+        }
+    });
+
+    // Convert the map values back to an array
+    return Array.from(threadMap.values());
+}
+
+function mergeCharacters(oldCharacters: any[], newCharacters: any[]): any[] {
+    const characterMap = new Map<string, any>();
+
+    // Add the old characters to the map
+    oldCharacters.forEach((character) => {
+        characterMap.set(character.id, character);
+    });
+
+    // Add the new characters to the map, replacing the old ones if the new one is more recent
+    newCharacters.forEach((character) => {
+        const existingCharacter = characterMap.get(character.id);
+        if (
+            !existingCharacter ||
+            existingCharacter.lastModified < character.lastModified
+        ) {
+            characterMap.set(character.id, character);
+        }
+    });
+
+    // Convert the map values back to an array
+    return Array.from(characterMap.values());
 }

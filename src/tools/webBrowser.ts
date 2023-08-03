@@ -29,6 +29,7 @@ const DEFAULT_HEADERS: Headers = {
 export interface WebBrowserArgs extends ToolParams {
     headers?: Headers;
     textSplitter?: TextSplitter;
+    apiKey?: string;
 }
 
 export class WebBrowser implements CustomTool {
@@ -40,10 +41,11 @@ export class WebBrowser implements CustomTool {
 
     private textSplitter: TextSplitter;
 
-    constructor({ headers, textSplitter }: WebBrowserArgs) {
+    constructor({ headers, textSplitter, apiKey }: WebBrowserArgs) {
         const model = new ChatOpenAI({
             temperature: 0.3,
             modelName: 'gpt-3.5-turbo-16k',
+            openAIApiKey: process.env.OPENAI_API_KEY || apiKey,
         });
         const embeddings = new OpenAIEmbeddings();
 
@@ -190,7 +192,3 @@ async function getHtml(baseUrl: string, headers: Headers) {
 
     return await response.text();
 }
-
-const tool = new WebBrowser({});
-
-export default tool;

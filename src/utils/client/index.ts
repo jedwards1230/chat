@@ -1,10 +1,10 @@
 import { readStream, callTool, parseStreamData, isMobile } from './client';
 
-import { createUserMsg, fetchTitle, getChat } from './chat';
+import { createUserMsg, getTitle, getChat } from './chat';
 
 export {
     createUserMsg,
-    fetchTitle,
+    getTitle,
     getChat,
     readStream,
     callTool,

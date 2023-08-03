@@ -3,6 +3,7 @@
 import resolveConfig from 'tailwindcss/resolveConfig';
 
 import tailwindConfig from '../../../tailwind.config.js';
+import { Configuration, OpenAIApi } from 'openai-edge';
 
 export const fullConfig = resolveConfig(tailwindConfig);
 
@@ -113,4 +114,23 @@ export function parseStreamData(chunk: string): StreamData[] {
         console.log(chunk);
         return [];
     }
+}
+
+export async function validateOpenAIKey(key: string) {
+    if (!key) {
+        throw new Error('No OpenAI key provided');
+    }
+
+    if (key.slice(0, 2) !== 'sk') {
+        throw new Error('Invalid OpenAI key');
+    }
+
+    const configuration = new Configuration({ apiKey: key });
+    const openai = new OpenAIApi(configuration);
+    const isValid = await openai.listModels();
+    if (!isValid.ok) {
+        throw new Error('Invalid API key');
+    }
+
+    return true;
 }

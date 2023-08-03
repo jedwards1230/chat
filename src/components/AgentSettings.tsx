@@ -1,9 +1,11 @@
 'use client';
 
-import { useChat } from '@/providers/ChatProvider';
-import { defaultAgentConfig } from '@/providers/characters';
 import clsx from 'clsx';
 import { useEffect, useState } from 'react';
+
+import { useChat } from '@/providers/ChatProvider';
+import { defaultAgentConfig } from '@/providers/characters';
+import Input from './Forms/Input';
 
 const availableTools: Tool[] = [
     'calculator',
@@ -82,12 +84,11 @@ export default function AgentSettings({
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
             <div className="flex flex-col gap-2 px-4">
-                <input
+                <Input
                     className={clsx(
-                        'rounded border border-transparent p-1 text-lg font-bold focus:border-neutral-500 focus:outline-none dark:bg-neutral-800',
+                        'border-transparent p-1 text-lg font-bold focus:border-neutral-500 dark:bg-neutral-800',
                         active ? 'bg-neutral-800' : 'bg-neutral-200',
                     )}
-                    type="text"
                     placeholder="Agent Name"
                     required
                     value={config.name}

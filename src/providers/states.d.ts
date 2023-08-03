@@ -15,6 +15,7 @@ type ChatState = {
      * It is set to false when an existing thread is made active based on the provided threadId
      */
     isNew: boolean;
+    openAiApiKey?: string;
 
     /** Abort request, stop typing, request a save */
     abortRequest: () => void;
@@ -34,4 +35,5 @@ type ChatState = {
     changeInput: (input: string) => void;
     cancelEdit: () => void;
     handleSubmit: (e: React.FormEvent) => void;
+    setOpenAiApiKey: (key?: string) => void;
 };

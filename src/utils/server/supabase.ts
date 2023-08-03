@@ -3,6 +3,7 @@
 import { auth } from '@clerk/nextjs';
 
 import supabase from '@/lib/supabase.server';
+import initialState from '@/providers/initialChat';
 
 /* 
 Threads
@@ -32,8 +33,8 @@ export async function getThreadListByUserId(
         throw new Error(messageError.message);
     }
 
-    return threads
-        .map((thread: any) => {
+    const threadList = threads
+        .map((thread: ChatThread) => {
             const messages = allMessages.filter(
                 (message: any) => message.chat_thread_id === thread.id,
             );
@@ -47,10 +48,12 @@ export async function getThreadListByUserId(
                 created: new Date(thread.created),
                 lastModified: new Date(thread.lastModified),
                 messages,
-                agentConfig: JSON.parse(thread.agentConfig),
+                agentConfig: JSON.parse(thread.agentConfig as any),
             };
         })
-        .filter(Boolean);
+        .filter(Boolean) as ChatThread[];
+
+    return threadList.length > 0 ? threadList : initialState.threads;
 }
 
 export async function upsertThread(thread: ChatThread) {
@@ -154,12 +157,16 @@ export async function getCharacterListByUserId(
         throw new Error(error.message);
     }
 
-    return configs.map((config: any) => {
+    const characterList: AgentConfig[] = configs.map((config: any) => {
         return {
             ...config,
             tools: JSON.parse(config.tools),
         };
     });
+
+    return characterList.length > 0
+        ? characterList
+        : initialState.characterList;
 }
 
 export async function upsertCharacter(character: AgentConfig) {

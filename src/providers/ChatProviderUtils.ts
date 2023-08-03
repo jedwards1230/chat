@@ -4,7 +4,7 @@ import { Dispatch, SetStateAction, FormEvent } from 'react';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';
 
 import initialState, { getDefaultThread } from './initialChat';
-import { createUserMsg, fetchTitle, getChat } from '@/utils/client';
+import { createUserMsg, getTitle, getChat } from '@/utils/client';
 import { deleteMessageById, upsertCharacter } from '@/utils/server/supabase';
 
 type ChatDispatch = Dispatch<SetStateAction<ChatState>>;
@@ -27,10 +27,16 @@ export function createSubmitHandler(
     state: ChatState,
     setState: ChatDispatch,
     router: AppRouterInstance,
+    setOpenAIKeyOpen: Dispatch<SetStateAction<boolean>>,
+    userId?: string | null,
 ) {
     return async (e: FormEvent) => {
         e.preventDefault();
         if (state.input.trim() === '') return;
+        if (!state.openAiApiKey && !userId) {
+            return setOpenAIKeyOpen(true);
+        }
+
         router.replace('/' + state.activeThread.id);
 
         const upsertMessage = (newMessage: Message) => {
@@ -133,8 +139,16 @@ export function createSubmitHandler(
                 0,
                 setState,
                 upsertMessage,
+                userId,
+                state.openAiApiKey,
             ),
-            fetchTitle(state.activeThread, state.input, upsertTitle),
+            getTitle(
+                state.activeThread,
+                state.input,
+                upsertTitle,
+                userId,
+                state.openAiApiKey,
+            ),
         ]);
     };
 }
@@ -370,6 +384,15 @@ export function saveCharacterHandler(setState: ChatDispatch) {
             ...prevState,
             saved: false,
             characterList: [...prevState.characterList, character],
+        }));
+    };
+}
+
+export function setOpenAiApiKeyHandler(setState: ChatDispatch) {
+    return (openAiApiKey?: string) => {
+        setState((prevState) => ({
+            ...prevState,
+            openAiApiKey,
         }));
     };
 }

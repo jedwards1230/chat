@@ -22,7 +22,3 @@ export class Calculator implements CustomTool {
         }
     }
 }
-
-const tool = new Calculator();
-
-export default tool;

@@ -4,8 +4,10 @@ import Check from './Check';
 import Clipboard from './Clipboard';
 import Ellipsis from './Ellipsis';
 import Information from './Information';
+import Key from './Key';
 import OpenNew from './OpenNew';
 import PencilSquare from './PencilSquare';
+import Person from './Person';
 import Reset from './Reset';
 import Settings from './Settings';
 import Share from './Share';
@@ -19,8 +21,10 @@ export {
     Clipboard,
     Ellipsis,
     Information,
+    Key,
     OpenNew,
     PencilSquare,
+    Person,
     Reset,
     Settings,
     Share,

@@ -3,19 +3,27 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import clsx from 'clsx';
 import Link from 'next/link';
+import { useAuth } from '@clerk/nextjs';
 
 import { useUI } from '@/providers/UIProvider';
 import { useChat } from '@/providers/ChatProvider';
 import ChatHistoryEntry from './ChatHistoryEntry';
 import { sortThreadlist } from '@/utils';
 import { isMobile } from '@/utils/client';
-import { Settings } from '../Icons';
+import { Key, Person, Settings } from '../Icons';
 
 export default function ChatHistory() {
-    const { activeThread, threads } = useChat();
-    const { sideBarOpen, setSideBarOpen, setConfigEditorOpen } = useUI();
-    const sidebarRef = useRef<HTMLDivElement>(null);
+    const { userId } = useAuth();
     const [mounted, setMounted] = useState(false);
+    const sidebarRef = useRef<HTMLDivElement>(null);
+    const { activeThread, threads, openAiApiKey } = useChat();
+    const {
+        sideBarOpen,
+        setSideBarOpen,
+        setConfigEditorOpen,
+        setSignInOpen,
+        setOpenAIKeyOpen,
+    } = useUI();
 
     const threadList = useMemo(
         () => threads.sort(sortThreadlist),
@@ -71,6 +79,7 @@ export default function ChatHistory() {
             )}
         >
             <div className="relative flex h-full w-full flex-col items-center justify-start gap-4 px-2">
+                {/* Header Buttons */}
                 <div className="flex w-full justify-between gap-x-2">
                     <Link
                         onClick={newThread}
@@ -79,23 +88,61 @@ export default function ChatHistory() {
                     >
                         New Chat
                     </Link>
-                    <button
-                        name="config-editor-toggle"
-                        className="rounded-lg border border-neutral-500 p-2 font-semibold transition-colors hover:border-neutral-400 hover:bg-neutral-500 focus:bg-neutral-600 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700"
-                        onClick={openConfig}
-                    >
-                        <div className="scale-[85%]">
-                            <Settings />
-                        </div>
-                    </button>
                 </div>
-                <div className="flex w-full flex-col gap-1 overflow-y-scroll">
+                {/* Chat History */}
+                <div className="flex w-full flex-1 flex-col gap-1 overflow-y-scroll">
                     {threadList.map((thread, i) => (
                         <ChatHistoryEntry
                             key={`${i}-${thread.id}`}
                             entry={thread}
                         />
                     ))}
+                </div>
+                {/* Footer Buttons */}
+                <div className="flex w-full justify-between gap-x-2 pb-6 pl-2 text-sm md:pb-2 md:pl-0">
+                    <div className="flex gap-x-2">
+                        <button
+                            title={
+                                openAiApiKey
+                                    ? 'Valid OpenAI API Key'
+                                    : 'Invalid OpenAI API Key'
+                            }
+                            onClick={() => setOpenAIKeyOpen(true)}
+                            className={clsx(
+                                'rounded-lg border border-neutral-500 p-2 transition-colors hover:border-neutral-400 hover:bg-neutral-500 focus:bg-neutral-600 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700',
+                                openAiApiKey
+                                    ? 'text-neutral-300'
+                                    : 'text-red-600',
+                            )}
+                        >
+                            <Key />
+                        </button>
+                        <button
+                            title={!userId ? 'Signed Out' : 'Signed In'}
+                            onClick={() => {
+                                if (!userId) {
+                                    setSignInOpen(true);
+                                }
+                            }}
+                            className={clsx(
+                                'rounded-lg border border-neutral-500 p-2 transition-colors hover:border-neutral-400 hover:bg-neutral-500 focus:bg-neutral-600 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700',
+                                userId
+                                    ? 'text-neutral-300'
+                                    : 'text-neutral-600',
+                            )}
+                        >
+                            <Person />
+                        </button>
+                    </div>
+                    <button
+                        name="config-editor-toggle"
+                        className="rounded-lg border border-neutral-500 p-2 transition-colors hover:border-neutral-400 hover:bg-neutral-500 focus:bg-neutral-600 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700"
+                        onClick={openConfig}
+                    >
+                        <div className="scale-[85%]">
+                            <Settings />
+                        </div>
+                    </button>
                 </div>
             </div>
         </div>
