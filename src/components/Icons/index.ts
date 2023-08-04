@@ -9,6 +9,7 @@ import OpenNew from './OpenNew';
 import PencilSquare from './PencilSquare';
 import Person from './Person';
 import Reset from './Reset';
+import Send from './Send';
 import Settings from './Settings';
 import Share from './Share';
 import Trash from './Trash';
@@ -26,6 +27,7 @@ export {
     PencilSquare,
     Person,
     Reset,
+    Send,
     Settings,
     Share,
     Trash,

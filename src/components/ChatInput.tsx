@@ -1,12 +1,14 @@
 'use client';
 
-import { useChat } from '@/providers/ChatProvider';
+import { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
+
+import { useChat } from '@/providers/ChatProvider';
 import QuickActions from './QuickActions';
 import { isMobile } from '@/utils/client';
 import { calculateRows } from '@/utils';
-import { useEffect, useRef, useState } from 'react';
+import { Send } from './Icons';
 
 export default function ChatInput() {
     const {
@@ -53,46 +55,48 @@ export default function ChatInput() {
                     editId && 'flex-col',
                 )}
             >
-                <motion.textarea
-                    ref={inputRef}
-                    placeholder="Say something..."
-                    value={input}
-                    onClick={(e) => inputRef.current?.focus()}
-                    rows={rows}
-                    onChange={handleInputChange}
-                    onKeyDown={onKeyDownHandler}
-                    className="w-full flex-1 rounded border-2 border-neutral-200 px-2 py-1.5 transition-colors focus:border-blue-500 focus:outline-none dark:border-neutral-600 dark:bg-neutral-800"
-                />
-                {input &&
-                    (editId ? (
-                        <div className="flex gap-4">
-                            <button
-                                className="rounded-lg border border-transparent bg-blue-500 px-6 py-1.5 text-neutral-50 transition-colors hover:bg-blue-400 focus:border-blue-500 focus:bg-blue-400 focus:outline-none dark:bg-blue-500 dark:hover:bg-blue-400"
-                                onClick={handleSubmit}
-                            >
-                                Update and Regenerate
-                            </button>
-                            <button
+                <div className="relative w-full max-w-4xl">
+                    <motion.textarea
+                        ref={inputRef}
+                        placeholder="Say something..."
+                        value={input}
+                        onClick={(e) => inputRef.current?.focus()}
+                        rows={rows}
+                        onChange={handleInputChange}
+                        onKeyDown={onKeyDownHandler}
+                        className="w-full flex-1 resize-none rounded-lg border-2 border-neutral-200 py-4 pl-2 pr-24 shadow transition-colors focus:border-blue-500 focus:outline-none dark:border-neutral-600 dark:bg-neutral-800"
+                    />
+                    {input &&
+                        (editId ? (
+                            <div className="flex justify-between gap-4 pt-2">
+                                <button
+                                    className="rounded-lg border border-transparent bg-blue-500 px-6 py-1.5 text-neutral-50 transition-colors hover:bg-blue-400 focus:border-blue-500 focus:bg-blue-400 focus:outline-none dark:bg-blue-500 dark:hover:bg-blue-400"
+                                    onClick={handleSubmit}
+                                >
+                                    Update and Regenerate
+                                </button>
+                                {/* <button
                                 className="rounded-lg border border-transparent bg-green-500 px-6 py-1.5 text-neutral-50 transition-colors hover:bg-green-400 focus:border-green-500 focus:bg-green-400 focus:outline-none dark:bg-green-500 dark:hover:bg-green-400"
                                 onClick={handleSubmit}
                             >
                                 Replace Only
-                            </button>
+                            </button> */}
+                                <button
+                                    className="rounded-lg border border-transparent bg-neutral-300 px-6 py-1.5 transition-colors hover:bg-neutral-400 focus:border-blue-500 focus:bg-neutral-400 focus:outline-none dark:bg-neutral-500 dark:hover:bg-neutral-400"
+                                    onClick={cancelEdit}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        ) : (
                             <button
-                                className="rounded-lg border border-transparent bg-neutral-300 px-6 py-1.5 transition-colors hover:bg-neutral-400 focus:border-blue-500 focus:bg-neutral-400 focus:outline-none dark:bg-neutral-500 dark:hover:bg-neutral-400"
-                                onClick={cancelEdit}
+                                className="absolute bottom-2 right-2 rounded border border-transparent bg-blue-500 p-1 text-neutral-50 transition-colors hover:bg-blue-400 focus:border-blue-500 focus:bg-blue-400 focus:outline-none dark:bg-blue-500 dark:hover:bg-blue-400"
+                                type="submit"
                             >
-                                Cancel
+                                <Send />
                             </button>
-                        </div>
-                    ) : (
-                        <button
-                            className="rounded-lg border border-transparent bg-blue-500 px-4 py-1.5 text-neutral-50 transition-colors hover:bg-blue-400 focus:border-blue-500 focus:bg-blue-400 focus:outline-none dark:bg-blue-500 dark:hover:bg-blue-400 md:px-6"
-                            type="submit"
-                        >
-                            Send
-                        </button>
-                    ))}
+                        ))}
+                </div>
             </form>
         </div>
     );
