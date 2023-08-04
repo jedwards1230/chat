@@ -90,7 +90,7 @@ export default function ChatInput() {
                             </div>
                         ) : (
                             <button
-                                className="absolute bottom-2 right-2 rounded border border-transparent bg-blue-500 p-1 text-neutral-50 transition-colors hover:bg-blue-400 focus:border-blue-500 focus:bg-blue-400 focus:outline-none dark:bg-blue-500 dark:hover:bg-blue-400"
+                                className="absolute bottom-4 right-2 rounded border border-transparent bg-blue-500 p-1 text-neutral-50 transition-colors hover:bg-blue-400 focus:border-blue-500 focus:bg-blue-400 focus:outline-none dark:bg-blue-500 dark:hover:bg-blue-400"
                                 type="submit"
                             >
                                 <Send />
