@@ -42,6 +42,11 @@ export default function ChatHistory() {
         if (isMobile()) setSideBarOpen(false);
     };
 
+    const openAIOpen = () => {
+        setOpenAIKeyOpen(true);
+        if (isMobile()) setSideBarOpen(false);
+    };
+
     useEffect(() => {
         setMounted(true);
         if (sidebarRef.current) {
@@ -110,7 +115,7 @@ export default function ChatHistory() {
                                     ? 'Using Local Key'
                                     : 'Invalid OpenAI API Key'
                             }
-                            onClick={() => setOpenAIKeyOpen(true)}
+                            onClick={openAIOpen}
                             className={clsx(
                                 'rounded-lg border border-neutral-500 p-2 transition-colors hover:border-neutral-400 hover:bg-neutral-500 focus:bg-neutral-600 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700',
                                 userId
