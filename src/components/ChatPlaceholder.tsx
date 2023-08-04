@@ -2,9 +2,17 @@
 
 import { useChat } from '@/providers/ChatProvider';
 import { useUI } from '@/providers/UIProvider';
-import { Ellipsis } from '../Icons';
+import { Ellipsis } from './Icons';
 
-export default function Title() {
+export default function ChatPlaceholder() {
+    return (
+        <div className="relative flex h-full w-full select-none flex-col items-center justify-start gap-8 py-2">
+            <Title />
+        </div>
+    );
+}
+
+function Title() {
     const { activeThread } = useChat();
     const { setCharacterSelectorOpen } = useUI();
 

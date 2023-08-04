@@ -52,7 +52,7 @@ export default function TextContent({
     const SystemContent = () => {
         if (!config) return null;
         return (
-            <div className="flex w-full flex-col justify-start rounded text-xs text-neutral-400 dark:text-neutral-400">
+            <div className="flex w-full flex-col justify-start rounded text-sm text-neutral-400 dark:text-neutral-400">
                 <div>Model: {config.model}</div>
                 <div>System Message: {message.content}</div>
                 {config.toolsEnabled && config.tools.length > 0 && (

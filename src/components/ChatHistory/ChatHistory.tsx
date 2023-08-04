@@ -21,7 +21,6 @@ export default function ChatHistory() {
         sideBarOpen,
         setSideBarOpen,
         setConfigEditorOpen,
-        setSignInOpen,
         setOpenAIKeyOpen,
     } = useUI();
 
@@ -105,39 +104,23 @@ export default function ChatHistory() {
                     <div className="flex gap-x-2">
                         <button
                             title={
-                                openAiApiKey
-                                    ? 'Using Local Key'
-                                    : userId
+                                userId
                                     ? 'Using Cloud Key (currently set by EnvVar. Ignoring Local Key)'
+                                    : openAiApiKey
+                                    ? 'Using Local Key'
                                     : 'Invalid OpenAI API Key'
                             }
                             onClick={() => setOpenAIKeyOpen(true)}
                             className={clsx(
                                 'rounded-lg border border-neutral-500 p-2 transition-colors hover:border-neutral-400 hover:bg-neutral-500 focus:bg-neutral-600 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700',
-                                openAiApiKey
-                                    ? 'text-neutral-300'
-                                    : userId
+                                userId
                                     ? 'text-green-600'
+                                    : openAiApiKey
+                                    ? 'text-neutral-300'
                                     : 'text-red-600',
                             )}
                         >
-                            <Key />
-                        </button>
-                        <button
-                            title={!userId ? 'Signed Out' : 'Signed In'}
-                            onClick={() => {
-                                if (!userId) {
-                                    setSignInOpen(true);
-                                }
-                            }}
-                            className={clsx(
-                                'rounded-lg border border-neutral-500 p-2 transition-colors hover:border-neutral-400 hover:bg-neutral-500 focus:bg-neutral-600 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700',
-                                userId
-                                    ? 'text-neutral-300'
-                                    : 'text-neutral-600',
-                            )}
-                        >
-                            <Person />
+                            {userId ? <Person /> : <Key />}
                         </button>
                     </div>
                     <button

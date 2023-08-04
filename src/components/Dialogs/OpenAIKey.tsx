@@ -11,17 +11,79 @@ import {
     deleteLocalOpenAiKey,
     setLocalOpenAiKey,
 } from '@/utils/client/storage';
+import { useAuth } from '@clerk/nextjs';
 
 export default function OpenAIKey() {
-    const { openAiApiKey, setOpenAiApiKey } = useChat();
     const { setOpenAIKeyOpen } = useUI();
-    const [apiKey, setKey] = useState(openAiApiKey || '');
-    const [error, setError] = useState<string | null>(null);
-    const [validating, setValidating] = useState(false);
 
     const close = () => {
         setOpenAIKeyOpen(false);
     };
+
+    return (
+        <Dialog callback={close} size="lg">
+            <div className="flex flex-col items-center gap-2">
+                <div className="text-xl">
+                    An OpenAI API key is required to use this application.
+                </div>
+                <div>
+                    <div>Your key can be used in 3 ways:</div>
+                    <ul className="w-full list-inside pl-4">
+                        <li>
+                            <strong>Client Side</strong> : Store your key in
+                            local storage and call the API directly from the
+                            browser.
+                        </li>
+                        <li>
+                            <strong>Hybrid</strong>: Store your key in the
+                            database (Supabase) and fetch your key when you
+                            verify with 0Auth. (Not yet implemented)
+                        </li>
+                        <li>
+                            <strong>Server Side</strong>: Deploy this
+                            application yourself and use Environment Variables
+                            to store your key. View the{' '}
+                            <Link
+                                className="text-blue-500 hover:underline"
+                                href={process.env.REPO_URL || '#'}
+                                target="_blank"
+                            >
+                                Github
+                            </Link>{' '}
+                            repo for instructions on how to deploy with your own
+                            server-side keys.
+                        </li>
+                    </ul>
+                </div>
+                <ClientSideKey />
+                <HybridKey />
+            </div>
+        </Dialog>
+    );
+}
+
+function HybridKey() {
+    const { userId } = useAuth();
+    return (
+        <form className="flex w-full flex-col gap-2 pt-2">
+            <div className="text-lg">Database</div>
+            {userId ? (
+                <div>DB Config coming...</div>
+            ) : (
+                <div>
+                    Must be signed in to enable this feature (feature not yet
+                    implemented)
+                </div>
+            )}
+        </form>
+    );
+}
+
+function ClientSideKey() {
+    const { openAiApiKey, setOpenAiApiKey } = useChat();
+    const [apiKey, setKey] = useState(openAiApiKey || '');
+    const [validating, setValidating] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -39,59 +101,51 @@ export default function OpenAIKey() {
     };
 
     return (
-        <Dialog callback={close}>
-            <div className="flex flex-col items-center gap-2">
-                An OpenAI API key is required to use this application.
-                <form
-                    onSubmit={handleSubmit}
-                    className="flex w-full gap-2 pt-2"
-                >
-                    <Input
-                        className="w-full p-1"
-                        value={apiKey}
-                        type="password"
-                        placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-                        onChange={(e) => setKey(e.target.value)}
-                    />
-                    <button
-                        onClick={() => {
-                            setKey('');
-                            deleteLocalOpenAiKey();
-                            setOpenAiApiKey();
-                        }}
-                        title="Delete"
-                        disabled={validating}
-                        className="scale-90 rounded bg-red-500 p-1 text-neutral-50 transition-colors hover:bg-red-600 disabled:bg-neutral-500"
-                    >
-                        <XMark />
-                    </button>
-                    <button
-                        type="submit"
-                        title="Save"
-                        disabled={validating}
-                        className="scale-90 rounded bg-green-500 p-1 text-neutral-50 transition-colors hover:bg-green-600 disabled:bg-neutral-500"
-                    >
-                        <Check />
-                    </button>
-                </form>
-                {error && <div className="text-sm text-red-500">{error}</div>}
+        <form
+            onSubmit={handleSubmit}
+            className="flex w-full flex-col gap-2 pt-2"
+        >
+            <div className="flex items-center gap-2">
+                <div className="text-lg">OpenAI API Key</div>
                 <Link
                     target="_blank"
                     title="Get API Key from OpenAI"
                     className="text-sm text-blue-500 hover:underline"
                     href="https://platform.openai.com/account/api-keys"
                 >
-                    Get OpenAI API Key
+                    Get Key
                 </Link>
-                <div className="text-center text-xs text-neutral-500">
-                    This will only be stored client-side and only used when
-                    making calls to OpenAI
-                </div>
-                <div className="text-center text-xs text-neutral-500">
-                    There will eventually be an option for storing the key in a
-                    cloud db (Auth with Clerk and DB with Supabase for now).
-                </div>
             </div>
-        </Dialog>
+            <div className="flex w-full gap-2">
+                <Input
+                    className="w-full p-1"
+                    value={apiKey}
+                    type="password"
+                    placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                    onChange={(e) => setKey(e.target.value)}
+                />
+                <button
+                    onClick={() => {
+                        setKey('');
+                        deleteLocalOpenAiKey();
+                        setOpenAiApiKey();
+                    }}
+                    title="Delete"
+                    disabled={validating}
+                    className="scale-90 rounded bg-red-500 p-1 text-neutral-50 transition-colors hover:bg-red-600 disabled:bg-neutral-500"
+                >
+                    <XMark />
+                </button>
+                <button
+                    type="submit"
+                    title="Save"
+                    disabled={validating}
+                    className="scale-90 rounded bg-green-500 p-1 text-neutral-50 transition-colors hover:bg-green-600 disabled:bg-neutral-500"
+                >
+                    <Check />
+                </button>
+                {error && <div className="text-sm text-red-500">{error}</div>}
+            </div>
+        </form>
     );
 }

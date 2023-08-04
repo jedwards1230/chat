@@ -19,13 +19,7 @@ import {
 } from '@/utils/client/storage';
 
 export default function ConfigEditor() {
-    const {
-        removeAllThreads,
-        threads,
-        characterList,
-        openAiApiKey,
-        setOpenAiApiKey,
-    } = useChat();
+    const { openAiApiKey, setOpenAiApiKey } = useChat();
     const { setConfigEditorOpen } = useUI();
     const { signOut } = useAuth();
     const { user } = useUser();
@@ -58,44 +52,8 @@ export default function ConfigEditor() {
         await updateOpenAipiKey(apiKey);
     };
 
-    const clearAllLocalChatThreads = () => {
-        deleteAllLocalThreadList();
-        removeAllThreads();
-        closeConfigEditor();
-    };
-
-    const clearAllLocalCharacters = () => {
-        deleteAllLocalCharacterList();
-        closeConfigEditor();
-    };
-
-    const clearAllLocal = () => {
-        deleteAllLocalThreadList();
-        deleteAllLocalCharacterList();
-        removeAllThreads();
-        closeConfigEditor();
-    };
-
-    const clearAllCloudChatThreads = async () => {
-        await deleteAllThreads();
-        removeAllThreads();
-        closeConfigEditor();
-    };
-
-    const clearAllCloudCharacters = async () => {
-        await deleteAllCharacters();
-        closeConfigEditor();
-    };
-
-    const clearAllCloud = async () => {
-        await deleteAllThreads();
-        await deleteAllCharacters();
-        removeAllThreads();
-        closeConfigEditor();
-    };
-
     return (
-        <Dialog callback={closeConfigEditor}>
+        <Dialog callback={closeConfigEditor} size="lg">
             <div className="w-full pb-4 text-center text-xl font-semibold">
                 App Settings
             </div>
@@ -171,90 +129,144 @@ export default function ConfigEditor() {
                     </form>
                 </div>
 
-                {/* Data */}
-                <div>
-                    <div className="text-xl font-medium">Data</div>
-
-                    <div className="flex gap-2">
-                        <div>{threads.length} Chats</div>|
-                        <div>
-                            {threads.reduce(
-                                (acc, thread) => acc + thread.messages.length,
-                                0,
-                            )}{' '}
-                            Messages
-                        </div>
-                        |
-                        <div>
-                            {characterList.length}{' '}
-                            {characterList.length === 1
-                                ? 'Character'
-                                : 'Characters'}
-                        </div>
-                    </div>
+                <GeneralData />
+                <div className="flex w-full flex-wrap gap-4 whitespace-nowrap">
+                    <LocalData />
+                    {user && <CloudData />}
                 </div>
-
-                {/* Local Data */}
-                <div>
-                    <div className="text-xl font-medium">Local Data</div>
-
-                    <label className="flex w-full items-center justify-between py-2 text-base">
-                        <button
-                            onClick={clearAllLocalChatThreads}
-                            className="w-full rounded border border-red-500 py-1.5 hover:bg-red-600 hover:text-neutral-50 dark:border-red-500/80 dark:text-neutral-50 dark:hover:bg-red-700"
-                        >
-                            Clear ALL Local Chat Threads
-                        </button>
-                    </label>
-                    <label className="flex w-full items-center justify-between py-2 text-base">
-                        <button
-                            onClick={clearAllLocalCharacters}
-                            className="w-full rounded border border-red-500 py-1.5 hover:bg-red-600 hover:text-neutral-50 dark:border-red-500/80 dark:text-neutral-50 dark:hover:bg-red-700"
-                        >
-                            Clear ALL Local Characters
-                        </button>
-                    </label>
-                    <label className="flex w-full items-center justify-between py-2 text-base">
-                        <button
-                            onClick={clearAllLocal}
-                            className="w-full rounded bg-red-500 py-1.5 text-neutral-50 hover:bg-red-600 dark:bg-red-500/80 dark:hover:bg-red-700"
-                        >
-                            Clear ALL Local Data
-                        </button>
-                    </label>
-                </div>
-
-                {/* Cloud Data */}
-                {user && (
-                    <div>
-                        <div className="text-xl font-medium">Cloud Data</div>
-                        <label className="flex w-full items-center justify-between py-2 text-base">
-                            <button
-                                onClick={clearAllCloudChatThreads}
-                                className="w-full rounded border border-red-500 py-1.5 hover:bg-red-600 hover:text-neutral-50 dark:border-red-500/80 dark:text-neutral-50 dark:hover:bg-red-700"
-                            >
-                                Clear ALL Cloud Chat Threads
-                            </button>
-                        </label>
-                        <label className="flex w-full items-center justify-between py-2 text-base">
-                            <button
-                                onClick={clearAllCloudCharacters}
-                                className="w-full rounded border border-red-500 py-1.5 hover:bg-red-600 hover:text-neutral-50 dark:border-red-500/80 dark:text-neutral-50 dark:hover:bg-red-700"
-                            >
-                                Clear ALL Cloud Characters
-                            </button>
-                        </label>
-                        <label className="flex w-full items-center justify-between py-2 text-base">
-                            <button
-                                onClick={clearAllCloud}
-                                className="w-full rounded bg-red-500 py-1.5 text-neutral-50 hover:bg-red-600 dark:bg-red-500/80 dark:hover:bg-red-700"
-                            >
-                                Clear ALL Cloud Data
-                            </button>
-                        </label>
-                    </div>
-                )}
             </div>
         </Dialog>
+    );
+}
+
+function GeneralData() {
+    const { threads, characterList } = useChat();
+    return (
+        <div>
+            <div className="text-xl font-medium">Data</div>
+
+            <div className="flex gap-2">
+                <div>{threads.length} Chats</div>|
+                <div>
+                    {threads.reduce(
+                        (acc, thread) => acc + thread.messages.length,
+                        0,
+                    )}{' '}
+                    Messages
+                </div>
+                |
+                <div>
+                    {characterList.length}{' '}
+                    {characterList.length === 1 ? 'Character' : 'Characters'}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function LocalData() {
+    const { removeAllThreads } = useChat();
+    const { setConfigEditorOpen } = useUI();
+
+    const clearAllLocalChatThreads = () => {
+        deleteAllLocalThreadList();
+        removeAllThreads();
+        setConfigEditorOpen(false);
+    };
+
+    const clearAllLocalCharacters = () => {
+        deleteAllLocalCharacterList();
+        setConfigEditorOpen(false);
+    };
+
+    const clearAllLocal = () => {
+        deleteAllLocalThreadList();
+        deleteAllLocalCharacterList();
+        removeAllThreads();
+        setConfigEditorOpen(false);
+    };
+
+    return (
+        <div className="flex flex-1 flex-col justify-between">
+            <div className="text-xl font-medium">Local Data</div>
+
+            <label className="flex w-full items-center justify-between py-2 text-base">
+                <button
+                    onClick={clearAllLocalChatThreads}
+                    className="w-full rounded border border-red-500 px-2 py-1.5 hover:bg-red-600 hover:text-neutral-50 dark:border-red-500/80 dark:text-neutral-50 dark:hover:bg-red-700"
+                >
+                    Clear Local Chat Threads
+                </button>
+            </label>
+            <label className="flex w-full items-center justify-between py-2 text-base">
+                <button
+                    onClick={clearAllLocalCharacters}
+                    className="w-full rounded border border-red-500 px-2 py-1.5 hover:bg-red-600 hover:text-neutral-50 dark:border-red-500/80 dark:text-neutral-50 dark:hover:bg-red-700"
+                >
+                    Clear Local Characters
+                </button>
+            </label>
+            <label className="flex w-full items-center justify-between py-2 text-base">
+                <button
+                    onClick={clearAllLocal}
+                    className="w-full rounded bg-red-500 px-2 py-1.5 text-neutral-50 hover:bg-red-600 dark:bg-red-500/80 dark:hover:bg-red-700"
+                >
+                    Clear Local Data
+                </button>
+            </label>
+        </div>
+    );
+}
+
+function CloudData() {
+    const { removeAllThreads } = useChat();
+    const { setConfigEditorOpen } = useUI();
+
+    const clearAllCloudChatThreads = async () => {
+        await deleteAllThreads();
+        removeAllThreads();
+        setConfigEditorOpen(false);
+    };
+
+    const clearAllCloudCharacters = async () => {
+        await deleteAllCharacters();
+        setConfigEditorOpen(false);
+    };
+
+    const clearAllCloud = async () => {
+        await deleteAllThreads();
+        await deleteAllCharacters();
+        removeAllThreads();
+        setConfigEditorOpen(false);
+    };
+
+    return (
+        <div className="flex flex-1 flex-col justify-between">
+            <div className="text-xl font-medium">Cloud Data</div>
+            <label className="flex w-full items-center justify-between py-2 text-base">
+                <button
+                    onClick={clearAllCloudChatThreads}
+                    className="w-full rounded border border-red-500 px-2 py-1.5 hover:bg-red-600 hover:text-neutral-50 dark:border-red-500/80 dark:text-neutral-50 dark:hover:bg-red-700"
+                >
+                    Clear Cloud Chat Threads
+                </button>
+            </label>
+            <label className="flex w-full items-center justify-between py-2 text-base">
+                <button
+                    onClick={clearAllCloudCharacters}
+                    className="w-full rounded border border-red-500 px-2 py-1.5 hover:bg-red-600 hover:text-neutral-50 dark:border-red-500/80 dark:text-neutral-50 dark:hover:bg-red-700"
+                >
+                    Clear Cloud Characters
+                </button>
+            </label>
+            <label className="flex w-full items-center justify-between py-2 text-base">
+                <button
+                    onClick={clearAllCloud}
+                    className="w-full rounded bg-red-500 px-2 py-1.5 text-neutral-50 hover:bg-red-600 dark:bg-red-500/80 dark:hover:bg-red-700"
+                >
+                    Clear Cloud Data
+                </button>
+            </label>
+        </div>
     );
 }

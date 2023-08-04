@@ -7,11 +7,13 @@ export default function Dialog({
     children,
     className,
     hideCard,
+    size = 'md',
     callback,
 }: {
     children: React.ReactNode;
     className?: string;
     hideCard?: boolean;
+    size?: 'sm' | 'md' | 'lg';
     callback?: () => void;
 }) {
     const ref = useRef<HTMLDivElement>(null);
@@ -40,9 +42,12 @@ export default function Dialog({
             <div
                 ref={ref}
                 className={clsx(
-                    !hideCard
-                        ? 'relative max-w-lg rounded-lg border bg-neutral-50 p-4 transition-all dark:border-neutral-500 dark:bg-neutral-800 sm:px-6'
-                        : 'relative max-w-lg',
+                    'relative',
+                    size === 'sm' && 'max-w-lg',
+                    size === 'md' && 'max-w-xl',
+                    size === 'lg' && 'max-w-2xl',
+                    !hideCard &&
+                        'rounded-lg border bg-neutral-50 p-4 transition-all dark:border-neutral-500 dark:bg-neutral-800 sm:px-6',
                     className,
                 )}
             >
