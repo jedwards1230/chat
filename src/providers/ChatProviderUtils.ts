@@ -39,10 +39,7 @@ export function createSubmitHandler(
         }
 
         router.replace('/' + state.activeThread.id);
-        va.track('Submitted Message', {
-            threadId: state.activeThread.id,
-            message: state.input,
-        });
+        va.track('Submitted Message', { threadId: state.activeThread.id });
 
         const upsertMessage = (newMessage: Message) => {
             setState((prevState) => {
