@@ -2,6 +2,7 @@
 
 import clsx from 'clsx';
 import Link from 'next/link';
+import { useAuth } from '@clerk/nextjs';
 
 import { useChat } from '@/providers/ChatProvider';
 import { Chat, Trash } from '../Icons';
@@ -12,12 +13,13 @@ import { deleteThreadById } from '@/utils/server/supabase';
 export default function ChatHistoryEntry({ entry }: { entry: ChatThread }) {
     const { activeThread, removeThread } = useChat();
     const { setSideBarOpen } = useUI();
+    const { userId } = useAuth();
 
     // Function to remove a thread and update the local storage
     const remove = (e: any) => {
         e.stopPropagation();
         removeThread(entry.id);
-        deleteThreadById(entry.id);
+        if (userId) deleteThreadById(entry.id);
     };
 
     const setActive = (e: any) => {

@@ -16,7 +16,7 @@ export default function ChatHistory() {
     const { userId } = useAuth();
     const [mounted, setMounted] = useState(false);
     const sidebarRef = useRef<HTMLDivElement>(null);
-    const { activeThread, threads, openAiApiKey, createThread } = useChat();
+    const { activeThread, threads, openAiApiKey } = useChat();
     const {
         sideBarOpen,
         setSideBarOpen,
@@ -38,7 +38,6 @@ export default function ChatHistory() {
     };
 
     const newThread = () => {
-        createThread();
         if (isMobile()) setSideBarOpen(false);
     };
 

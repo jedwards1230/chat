@@ -5,12 +5,10 @@ import clsx from 'clsx';
 import Link from 'next/link';
 
 export default function QuickActions() {
-    const { activeThread, botTyping, abortRequest, createThread } = useChat();
+    const { activeThread, botTyping, abortRequest } = useChat();
 
     const btn = 'px-3 py-1 rounded-full';
-    const hidden = activeThread.messages.length <= 1 || !botTyping;
 
-    if (hidden) return null;
     return (
         <div className="absolute inset-x-0 -top-10 flex justify-center gap-2 text-sm font-medium">
             {botTyping && (
@@ -24,7 +22,6 @@ export default function QuickActions() {
             {activeThread.messages.length > 1 && (
                 <Link replace={true} href="/">
                     <button
-                        onClick={() => createThread()}
                         className={clsx(
                             btn,
                             'bg-blue-500 text-neutral-50 dark:hover:bg-blue-600',

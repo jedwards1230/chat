@@ -27,6 +27,7 @@ import {
 import { useUI } from './UIProvider';
 import initialState from './initialChat';
 import { upsertThread } from '@/utils/server/supabase';
+import { mergeThreads, mergeCharacters } from '@/utils';
 import {
     getLocalCharacterList,
     getLocalOpenAiKey,
@@ -115,10 +116,6 @@ export function ChatProvider({
         if (!threadId) {
             if (!state.isNew) {
                 createThread();
-                setState((prevState) => ({
-                    ...prevState,
-                    isNew: true,
-                }));
             }
         } else if (state.activeThread.id !== threadId) {
             const newThread = state.threads.find((t) => t.id === threadId);
@@ -178,53 +175,4 @@ export function ChatProvider({
     return (
         <ChatContext.Provider value={value}>{children}</ChatContext.Provider>
     );
-}
-
-function mergeThreads(
-    oldThreads: ChatThread[],
-    newThreads: ChatThread[],
-): ChatThread[] {
-    const threadMap = new Map<string, ChatThread>();
-
-    // Add the old threads to the map
-    oldThreads.forEach((thread) => {
-        threadMap.set(thread.id, thread);
-    });
-
-    // Add the new threads to the map, replacing the old ones if the new one is more recent
-    newThreads.forEach((thread) => {
-        const existingThread = threadMap.get(thread.id);
-        if (
-            !existingThread ||
-            existingThread.lastModified < thread.lastModified
-        ) {
-            threadMap.set(thread.id, thread);
-        }
-    });
-
-    // Convert the map values back to an array
-    return Array.from(threadMap.values());
-}
-
-function mergeCharacters(oldCharacters: any[], newCharacters: any[]): any[] {
-    const characterMap = new Map<string, any>();
-
-    // Add the old characters to the map
-    oldCharacters.forEach((character) => {
-        characterMap.set(character.name, character);
-    });
-
-    // Add the new characters to the map, replacing the old ones if the new one is more recent
-    newCharacters.forEach((character) => {
-        const existingCharacter = characterMap.get(character.id);
-        if (
-            !existingCharacter ||
-            existingCharacter.lastModified < character.lastModified
-        ) {
-            characterMap.set(character.name, character);
-        }
-    });
-
-    // Convert the map values back to an array
-    return Array.from(characterMap.values());
 }
