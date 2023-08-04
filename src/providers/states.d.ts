@@ -8,12 +8,6 @@ type ChatState = {
     /** Setting this to false will trigger a save */
     saved: boolean;
     characterList: AgentConfig[];
-    /**
-     * TODO: do i still need this?
-     * isNew is a state variable, set to true when a new thread is created due to absence of a threadId or non-existence of the threadId in state.threads
-     *
-     * It is set to false when an existing thread is made active based on the provided threadId
-     */
     isNew: boolean;
     openAiApiKey?: string;
 

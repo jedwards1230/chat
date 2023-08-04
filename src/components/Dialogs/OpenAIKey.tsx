@@ -36,8 +36,9 @@ export default function OpenAIKey() {
                         </li>
                         <li>
                             <strong>Hybrid</strong>: Store your key in the
-                            database (Supabase) and fetch your key when you
-                            verify with 0Auth. (Not yet implemented)
+                            database (powered by Supabase) and fetch your key
+                            when you verify with OAuth (powered by Clerk). (Not
+                            yet implemented)
                         </li>
                         <li>
                             <strong>Server Side</strong>: Deploy this
