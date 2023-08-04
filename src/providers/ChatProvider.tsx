@@ -211,7 +211,7 @@ function mergeCharacters(oldCharacters: any[], newCharacters: any[]): any[] {
 
     // Add the old characters to the map
     oldCharacters.forEach((character) => {
-        characterMap.set(character.id, character);
+        characterMap.set(character.name, character);
     });
 
     // Add the new characters to the map, replacing the old ones if the new one is more recent
@@ -221,7 +221,7 @@ function mergeCharacters(oldCharacters: any[], newCharacters: any[]): any[] {
             !existingCharacter ||
             existingCharacter.lastModified < character.lastModified
         ) {
-            characterMap.set(character.id, character);
+            characterMap.set(character.name, character);
         }
     });
 
