@@ -30,7 +30,7 @@ export default function OpenAIKey() {
                     <div>Your key can be used in 3 ways:</div>
                     <ul className="w-full list-inside pl-4">
                         <li>
-                            <strong>Client Side</strong> : Store your key in
+                            <strong>Client Side</strong>: Store your key in
                             local storage and call the API directly from the
                             browser.
                         </li>
@@ -80,6 +80,7 @@ function HybridKey() {
 }
 
 function ClientSideKey() {
+    const { setOpenAIKeyOpen } = useUI();
     const { openAiApiKey, setOpenAiApiKey } = useChat();
     const [apiKey, setKey] = useState(openAiApiKey || '');
     const [validating, setValidating] = useState(false);
@@ -93,7 +94,7 @@ function ClientSideKey() {
             setError(null);
             setOpenAiApiKey(apiKey);
             setLocalOpenAiKey(apiKey);
-            close();
+            setOpenAIKeyOpen(false);
         } catch (err: any) {
             setError(err.message);
         }
