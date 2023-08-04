@@ -1,5 +1,7 @@
 'use client';
 
+import va from '@vercel/analytics';
+
 import initialState from '@/providers/initialChat';
 
 export function getLocalCharacterList() {
@@ -40,6 +42,7 @@ export function getLocalOpenAiKey() {
 
 export function setLocalOpenAiKey(key: string) {
     window.localStorage.setItem('openai-api-key', key);
+    va.track('Saved OpenAI API Key to Local Storage');
 }
 
 export function deleteLocalOpenAiKey() {
