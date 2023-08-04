@@ -45,7 +45,7 @@ export default function OpenAIKey() {
                             to store your key. View the{' '}
                             <Link
                                 className="text-blue-500 hover:underline"
-                                href={process.env.REPO_URL || '#'}
+                                href={process.env.NEXT_PUBLIC_REPO_URL || '#'}
                                 target="_blank"
                             >
                                 Github
