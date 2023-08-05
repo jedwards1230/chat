@@ -16,8 +16,8 @@ Chat comes with a range of features designed to enhance user experience:
 -   **Interactivity**: The AI can hold a conversation and use functions to perform tasks.
 -   **Fast Streaming**: Leverages Edge Functions for quick and seamless exchanges.
 -   **Share Chat**: Share your conversations with a generated link.
--   **Data Storage**: Securely stores data in Upstash KV Store.
--   **OAuth Access**: Provides GitHub OAuth access via Clerk.dev.
+-   **Data Storage**: Securely stores data in Supabase database.
+-   **OAuth Access**: Provides GitHub OAuth access via Clerk.com.
 -   **Responsive Design**: Offers a responsive design with dark mode and PWA.
 
 ## Installation
@@ -27,14 +27,15 @@ To install and run the application locally, follow these steps:
 1. Clone the repository to your local machine.
 2. Navigate to the project directory.
 3. Run `pnpm i` to install the necessary packages.
-4. Run `npm run dev` to start the application.
+4. Use the `example.env` file to create a `.env.local` file.
+5. Run `npm run dev` to start the application.
 
 ## Roadmap
 
 We're constantly working on improving Chat with new features:
 
 -   **Character Presets**: Users can select from a range of preset characters.
--   **User Prompt**: Users can edit and save custom prompts to the prompt list.
+-   **User Info**: Users can store information about themselves for use in all chats.
 -   **Import/Export Chat**: Easily import or export chat data.
 
 ## Technologies Used
@@ -44,7 +45,7 @@ We're constantly working on improving Chat with new features:
 -   TypeScript
 -   Tailwind CSS
 -   OpenAI API
--   Clerk.dev (OAuth)
+-   Clerk.com (OAuth)
 -   Upstash KV Store
 -   Supabase (PostgreSQL)
 
