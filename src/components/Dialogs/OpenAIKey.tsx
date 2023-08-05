@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { useAuth } from '@clerk/nextjs';
 
 import Dialog from './Dialog';
 import { useUI } from '@/providers/UIProvider';
@@ -11,7 +12,6 @@ import {
     deleteLocalOpenAiKey,
     setLocalOpenAiKey,
 } from '@/utils/client/storage';
-import { useAuth } from '@clerk/nextjs';
 
 export default function OpenAIKey() {
     const { setOpenAIKeyOpen } = useUI();
@@ -28,7 +28,7 @@ export default function OpenAIKey() {
                 </div>
                 <div>
                     <div>Your key can be used in 3 ways:</div>
-                    <ul className="w-full list-inside pl-4">
+                    <ul className="w-full pl-4 list-inside">
                         <li>
                             <strong>Client Side</strong>: Store your key in
                             local storage and call the API directly from the
@@ -64,19 +64,46 @@ export default function OpenAIKey() {
 }
 
 function HybridKey() {
-    const { userId } = useAuth();
+    const { userId, signOut } = useAuth();
+    const { setSignInOpen } = useUI();
+
     return (
-        <form className="flex w-full flex-col gap-2 pt-2">
-            <div className="text-lg">Database</div>
+        <div className="flex flex-col w-full gap-2 pt-2">
+            <div className="flex items-center gap-2">
+                <div className="text-lg">Database</div>
+                {userId ? (
+                    <button
+                        onClick={() => {
+                            try {
+                                signOut();
+                            } catch (err) {
+                                console.error(err);
+                            }
+                        }}
+                        className="text-sm text-blue-500 hover:underline"
+                    >
+                        Sign Out
+                    </button>
+                ) : (
+                    <button
+                        onClick={() => setSignInOpen(true)}
+                        className="text-sm text-blue-500 hover:underline"
+                    >
+                        Sign In
+                    </button>
+                )}
+            </div>
             {userId ? (
                 <div>DB Config coming...</div>
             ) : (
-                <div>
-                    Must be signed in to enable this feature (feature not yet
-                    implemented)
-                </div>
+                <>
+                    <div>
+                        Must be signed in to enable this feature (feature not
+                        yet implemented)
+                    </div>
+                </>
             )}
-        </form>
+        </div>
     );
 }
 
@@ -105,7 +132,7 @@ function ClientSideKey() {
     return (
         <form
             onSubmit={handleSubmit}
-            className="flex w-full flex-col gap-2 pt-2"
+            className="flex flex-col w-full gap-2 pt-2"
         >
             <div className="flex items-center gap-2">
                 <div className="text-lg">OpenAI API Key</div>
@@ -134,7 +161,7 @@ function ClientSideKey() {
                     }}
                     title="Delete"
                     disabled={validating}
-                    className="scale-90 rounded bg-red-500 p-1 text-neutral-50 transition-colors hover:bg-red-600 disabled:bg-neutral-500"
+                    className="p-1 transition-colors scale-90 bg-red-500 rounded text-neutral-50 hover:bg-red-600 disabled:bg-neutral-500"
                 >
                     <XMark />
                 </button>
@@ -142,7 +169,7 @@ function ClientSideKey() {
                     type="submit"
                     title="Save"
                     disabled={validating}
-                    className="scale-90 rounded bg-green-500 p-1 text-neutral-50 transition-colors hover:bg-green-600 disabled:bg-neutral-500"
+                    className="p-1 transition-colors scale-90 bg-green-500 rounded text-neutral-50 hover:bg-green-600 disabled:bg-neutral-500"
                 >
                     <Check />
                 </button>
