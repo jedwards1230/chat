@@ -1,7 +1,7 @@
 'use client';
 
 import { useChat } from '@/providers/ChatProvider';
-import { Bars, Settings, Share } from '../Icons';
+import { Bars, Information } from '../Icons';
 import clsx from 'clsx';
 import { isMobile } from '@/utils/client';
 import ModelSelector from './ModelSelector';
@@ -33,7 +33,7 @@ export default function Header() {
                     : 'border-transparent bg-transparent',
             )}
         >
-            <div className="col-span-1 flex items-center justify-start">
+            <div className="flex items-center justify-start col-span-1">
                 <button
                     name="sidebar-toggle"
                     className={clsx(
@@ -53,7 +53,7 @@ export default function Header() {
             >
                 {activeThread.messages.length > 1 ? (
                     <>
-                        <p className="line-clamp-1 font-semibold">
+                        <p className="font-semibold line-clamp-1">
                             {activeThread.title}
                         </p>
                         <p className="text-sm font-light text-neutral-500">
@@ -65,7 +65,7 @@ export default function Header() {
                     <ModelSelector />
                 )}
             </div>
-            <div className="col-span-1 flex items-center justify-end">
+            <div className="flex items-center justify-end col-span-1">
                 <button
                     name="chat-settings-toggle"
                     className={clsx(
@@ -74,7 +74,7 @@ export default function Header() {
                     )}
                     onClick={handleChatSettingsToggle}
                 >
-                    <Settings />
+                    <Information />
                 </button>
             </div>
         </div>

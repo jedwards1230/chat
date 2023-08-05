@@ -9,8 +9,8 @@ type Message = {
     createdAt?: Date;
     name?: Tool;
     function_call?: {
-        name?: string;
-        arguments?: string;
+        name: string;
+        arguments: string;
     };
 };
 

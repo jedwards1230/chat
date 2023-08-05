@@ -64,7 +64,7 @@ export default function ChatInput() {
                         rows={rows}
                         onChange={handleInputChange}
                         onKeyDown={onKeyDownHandler}
-                        className="w-full flex-1 resize-none rounded-lg border-2 border-neutral-200 py-4 pl-2 pr-24 shadow transition-colors focus:border-blue-500 focus:outline-none dark:border-neutral-600 dark:bg-neutral-800"
+                        className="flex-1 w-full py-4 pl-2 pr-24 transition-colors border-2 rounded-md shadow resize-none border-neutral-200 focus:border-blue-500 focus:outline-none dark:border-neutral-600 dark:bg-neutral-800"
                     />
                     {input &&
                         (editId ? (
@@ -90,7 +90,7 @@ export default function ChatInput() {
                             </div>
                         ) : (
                             <button
-                                className="absolute bottom-4 right-2 rounded border border-transparent bg-blue-500 p-1 text-neutral-50 transition-colors hover:bg-blue-400 focus:border-blue-500 focus:bg-blue-400 focus:outline-none dark:bg-blue-500 dark:hover:bg-blue-400"
+                                className="absolute p-1 transition-colors bg-blue-500 border border-transparent rounded-lg bottom-4 right-2 text-neutral-50 hover:bg-blue-400 focus:border-blue-500 focus:bg-blue-400 focus:outline-none dark:bg-blue-500 dark:hover:bg-blue-400"
                                 type="submit"
                             >
                                 <Send />

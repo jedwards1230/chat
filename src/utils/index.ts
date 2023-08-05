@@ -1,4 +1,4 @@
-import type { ChatCompletionRequestMessage } from 'openai-edge';
+import { CreateChatCompletionRequestMessage } from 'openai/resources/chat';
 
 export function serializeSaveData(saveData: SaveData | ShareData): string {
     if ('thread' in saveData) {
@@ -27,7 +27,7 @@ export function sortThreadlist(a: ChatThread, b: ChatThread) {
 
 export function prepareMessages(
     messages: Message[],
-): ChatCompletionRequestMessage[] {
+): CreateChatCompletionRequestMessage[] {
     return messages.map((msg) => {
         if (msg.role === 'system') {
             return {

@@ -1,21 +1,22 @@
-import { ChatCompletionFunctions, Configuration, OpenAIApi } from 'openai-edge';
+import OpenAI from 'openai';
 
 import { Calculator, Search, WebBrowser, WikipediaQueryRun } from '@/tools';
 import { prepareMessages } from '..';
+import { CompletionCreateParams } from 'openai/resources/chat';
 
 const SERVER_KEY = process.env.OPENAI_API_KEY;
 
 export function getOpenAiClient(key?: string) {
-    const configuration = new Configuration({
+    return new OpenAI({
         apiKey: SERVER_KEY || key,
+        dangerouslyAllowBrowser: key ? true : false,
     });
-    return new OpenAIApi(configuration);
 }
 
 export async function getTitleStream(history: string, key?: string) {
     try {
         const openai = getOpenAiClient(key);
-        const completion = await openai.createChatCompletion({
+        const completion = await openai.chat.completions.create({
             model: 'gpt-3.5-turbo-16k',
             messages: [
                 {
@@ -35,11 +36,13 @@ export async function getTitleStream(history: string, key?: string) {
             stream: true,
         });
 
-        if (!completion.body) {
+        const stream = completion.toReadableStream();
+
+        if (!stream) {
             throw new Error('No response body from /api/chat');
         }
 
-        return completion.body;
+        return stream;
     } catch (err) {
         console.error(err);
         return new ReadableStream({
@@ -82,7 +85,7 @@ export async function getChatStream(
         }
     };
 
-    let functions: ChatCompletionFunctions[] | undefined;
+    let functions: CompletionCreateParams.Function[] | undefined;
     if (tools && tools.length > 0) {
         functions = tools.map((tool) => formatTool(tool));
     }
@@ -90,7 +93,7 @@ export async function getChatStream(
     try {
         const openai = getOpenAiClient(key);
 
-        const completion = await openai.createChatCompletion(
+        const completion = await openai.chat.completions.create(
             {
                 model: modelName,
                 messages,
@@ -111,11 +114,13 @@ export async function getChatStream(
             },
         );
 
-        if (!completion.body) {
+        const stream = completion.toReadableStream();
+
+        if (!stream) {
             throw new Error('No response body from /api/chat');
         }
 
-        return completion.body;
+        return stream;
     } catch (err) {
         console.error(err);
         return new ReadableStream({

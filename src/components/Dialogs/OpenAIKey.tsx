@@ -173,8 +173,8 @@ function ClientSideKey() {
                 >
                     <Check />
                 </button>
-                {error && <div className="text-sm text-red-500">{error}</div>}
             </div>
+            {error && <div className="text-sm text-red-500">{error}</div>}
         </form>
     );
 }

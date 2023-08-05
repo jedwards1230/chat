@@ -1,9 +1,9 @@
 'use client';
 
 import resolveConfig from 'tailwindcss/resolveConfig';
+import OpenAI from 'openai';
 
 import tailwindConfig from '../../../tailwind.config.js';
-import { Configuration, OpenAIApi } from 'openai-edge';
 
 export const fullConfig = resolveConfig(tailwindConfig);
 
@@ -116,21 +116,23 @@ export function parseStreamData(chunk: string): StreamData[] {
     }
 }
 
-export async function validateOpenAIKey(key: string) {
-    if (!key) {
+export async function validateOpenAIKey(apiKey: string) {
+    if (!apiKey) {
         throw new Error('No OpenAI key provided');
     }
 
-    if (key.slice(0, 2) !== 'sk') {
+    if (apiKey.slice(0, 2) !== 'sk') {
         throw new Error('Invalid OpenAI key');
     }
 
-    const configuration = new Configuration({ apiKey: key });
-    const openai = new OpenAIApi(configuration);
-    const isValid = await openai.listModels();
-    if (!isValid.ok) {
-        throw new Error('Invalid API key');
-    }
+    const openai = new OpenAI({
+        dangerouslyAllowBrowser: true,
+        apiKey,
+    });
+    const modelListData = await openai.models.list();
 
-    return true;
+    if (modelListData && modelListData.data && modelListData.data.length > 0) {
+        return true;
+    }
+    return false;
 }
