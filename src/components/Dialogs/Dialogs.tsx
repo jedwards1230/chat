@@ -19,12 +19,12 @@ export default function Dialogs() {
     } = useUI();
 
     const ActiveDialog = () => {
-        if (openAIKeyOpen) {
-            return <OpenAIKey />;
-        }
-
         if (signInOpen && !userId) {
             return <SignIn />;
+        }
+
+        if (openAIKeyOpen) {
+            return <OpenAIKey />;
         }
 
         if (characterSelectorOpen) {

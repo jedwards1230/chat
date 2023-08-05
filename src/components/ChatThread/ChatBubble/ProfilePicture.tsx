@@ -25,9 +25,9 @@ export default function ProfilePicture({ message }: { message: Message }) {
                         : 'Function'
                 }
             >
-                {message.role === 'user' && user?.profileImageUrl ? (
+                {message.role === 'user' && user?.imageUrl ? (
                     <Image
-                        src={user.profileImageUrl}
+                        src={user.imageUrl}
                         alt="You"
                         width={32}
                         height={32}

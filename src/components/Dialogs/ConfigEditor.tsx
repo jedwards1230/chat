@@ -73,7 +73,7 @@ export default function ConfigEditor() {
                                         <div>{user.id}</div>
                                     </div>
                                     <Image
-                                        src={user.profileImageUrl}
+                                        src={user.imageUrl}
                                         alt="You"
                                         width={64}
                                         height={64}
