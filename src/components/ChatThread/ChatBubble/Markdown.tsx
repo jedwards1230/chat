@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { useMemo, useState } from 'react';
 import { SpecialComponents } from 'react-markdown/lib/ast-to-react';
 import { NormalComponents } from 'react-markdown/lib/complex-types';
-import { PrismAsync as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vs } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { useTheme } from 'next-themes';
