@@ -46,7 +46,6 @@ We're constantly working on improving Chat with new features:
 -   Tailwind CSS
 -   OpenAI API
 -   Clerk.com (OAuth)
--   Upstash KV Store
 -   Supabase (PostgreSQL)
 
 ## Contribution
