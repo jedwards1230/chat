@@ -143,8 +143,94 @@ export async function deleteAllThreads() {
 }
 
 /* 
+Shared Threads
+*/
+export async function shareThread(thread: ChatThread) {
+    const { userId } = auth();
+    if (!userId) {
+        throw new Error('No user id');
+    }
+
+    const { data: threadData, error: threadError } = await supabase
+        .from('shared_chat_threads')
+        .upsert(
+            [
+                {
+                    id: thread.id,
+                    user_id: userId,
+                    original_thread_id: thread.id,
+                    created: thread.created,
+                    lastModified: thread.lastModified,
+                    title: thread.title,
+                    agentConfig: thread.agentConfig,
+                },
+            ],
+            { onConflict: 'id' },
+        );
+
+    if (threadError) {
+        throw new Error(`Error sharing chat thread: ${threadError.message}`);
+    }
+
+    const { data: messageData, error: messageError } = await supabase
+        .from('shared_messages')
+        .upsert(
+            thread.messages.map(
+                (message) => ({
+                    id: message.id,
+                    shared_thread_id: thread.id,
+                    content: message.content,
+                    role: message.role,
+                    created_at: message.createdAt,
+                    name: message.name,
+                    function_call: message.function_call,
+                }),
+                { onConflict: 'id' },
+            ),
+        );
+
+    if (messageError) {
+        throw new Error(`Error sharing chat messages: ${messageError.message}`);
+    }
+
+    return { thread: threadData, messages: messageData };
+}
+
+/* 
 Characters
 */
+
+// get single thread by id plus all messages
+export async function getSharedThreadById(
+    threadId: string,
+): Promise<ChatThread> {
+    const { data: thread, error } = await supabase
+        .from('shared_chat_threads')
+        .select('*')
+        .eq('id', threadId);
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    const { data: messages, error: messageError } = await supabase
+        .from('shared_messages')
+        .select('*')
+        .eq('shared_thread_id', threadId)
+        .order('message_order', { ascending: true });
+
+    if (messageError) {
+        throw new Error(messageError.message);
+    }
+
+    return {
+        ...thread[0],
+        created: new Date(thread[0].created),
+        lastModified: new Date(thread[0].lastModified),
+        messages,
+    };
+}
+
 export async function getCharacterListByUserId(
     userId: string,
 ): Promise<AgentConfig[]> {

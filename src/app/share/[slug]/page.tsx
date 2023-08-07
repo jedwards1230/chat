@@ -2,15 +2,15 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 
 import { SharedBubble } from '@/components/ChatThread/ChatBubble';
-import redis from '@/lib/redis';
+import { getSharedThreadById } from '@/utils/server/supabase';
 
 export const runtime = 'edge';
 
 type Props = { params: { slug: string } };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-    const shareData: ChatThread | null | undefined = await redis.get(
-        'share_' + params.slug,
+    const shareData: ChatThread | null | undefined = await getSharedThreadById(
+        params.slug,
     );
     if (!shareData) {
         return {
@@ -28,19 +28,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function Page({ params }: Props) {
-    const shareData: ChatThread | null | undefined = await redis.get(
-        'share_' + params.slug,
+    const thread: ChatThread | null | undefined = await getSharedThreadById(
+        params.slug,
     );
-    if (!shareData) {
+    if (!thread) {
         notFound();
     }
-
-    const thread: ChatThread = {
-        ...shareData,
-        created: new Date(shareData.created),
-        lastModified: new Date(shareData.lastModified),
-        messages: JSON.parse(shareData.messages as any),
-    };
 
     return (
         <div className="flex h-full w-full flex-col overflow-hidden transition-all">
@@ -54,7 +47,7 @@ export default async function Page({ params }: Props) {
                         <SharedBubble
                             key={m.id}
                             message={m}
-                            config={shareData.agentConfig}
+                            config={thread.agentConfig}
                             input={
                                 m.role === 'function' &&
                                 lastMessage.function_call &&

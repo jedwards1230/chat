@@ -26,9 +26,6 @@ dependencies:
   '@types/react-dom':
     specifier: 18.2.7
     version: 18.2.7
-  '@upstash/redis':
-    specifier: ^1.22.0
-    version: 1.22.0(encoding@0.1.13)
   '@vercel/analytics':
     specifier: ^1.0.1
     version: 1.0.1
@@ -58,7 +55,7 @@ dependencies:
     version: 10.15.1(react-dom@18.2.0)(react@18.2.0)
   langchain:
     specifier: ^0.0.124
-    version: 0.0.124(@supabase/supabase-js@2.32.0)(@upstash/redis@1.22.0)(cheerio@1.0.0-rc.12)(encoding@0.1.13)
+    version: 0.0.124(@supabase/supabase-js@2.32.0)(cheerio@1.0.0-rc.12)(encoding@0.1.13)
   next:
     specifier: 13.4.13
     version: 13.4.13(@babel/core@7.22.5)(@opentelemetry/api@1.4.1)(react-dom@18.2.0)(react@18.2.0)
@@ -2137,14 +2134,6 @@ packages:
     dependencies:
       '@typescript-eslint/types': 5.60.1
       eslint-visitor-keys: 3.4.2
-    dev: false
-
-  /@upstash/redis@1.22.0(encoding@0.1.13):
-    resolution: {integrity: sha512-sXoJDoEqqik0HbrNE7yRWckOySEFsoBxfRdCgOqkc0w6py19ZZG50SpGkDDEUXSnBqP8VgGYXhWAiBpqxrt5oA==}
-    dependencies:
-      isomorphic-fetch: 3.0.0(encoding@0.1.13)
-    transitivePeerDependencies:
-      - encoding
     dev: false
 
   /@vercel/analytics@1.0.1:
@@ -4338,15 +4327,6 @@ packages:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
     dev: false
 
-  /isomorphic-fetch@3.0.0(encoding@0.1.13):
-    resolution: {integrity: sha512-qvUtwJ3j6qwsF3jLxkZ72qCgjMysPzDfeV240JHiGZsANBYd+EEuu35v7dfrJ9Up0Ak07D7GGSkGhCHTqg/5wA==}
-    dependencies:
-      node-fetch: 2.6.11(encoding@0.1.13)
-      whatwg-fetch: 3.6.2
-    transitivePeerDependencies:
-      - encoding
-    dev: false
-
   /jake@10.8.7:
     resolution: {integrity: sha512-ZDi3aP+fG/LchyBzUM804VjddnwfSfsdeYkwt8NcbKRvo4rFkjhs456iLFn3k2ZUWvNe4i48WACDbza8fhq2+w==}
     engines: {node: '>=10'}
@@ -4475,7 +4455,7 @@ packages:
     engines: {node: '>=6'}
     dev: false
 
-  /langchain@0.0.124(@supabase/supabase-js@2.32.0)(@upstash/redis@1.22.0)(cheerio@1.0.0-rc.12)(encoding@0.1.13):
+  /langchain@0.0.124(@supabase/supabase-js@2.32.0)(cheerio@1.0.0-rc.12)(encoding@0.1.13):
     resolution: {integrity: sha512-TabvP1G47qe8UJKhgx+r2ezNwB9w6t247gl5EYli5rJ46cCQncAA9Ubtk5KGT9iu1wDOcT2Zx7r6Mm5PM/jeQA==}
     engines: {node: '>=18'}
     peerDependencies:
@@ -4669,7 +4649,6 @@ packages:
     dependencies:
       '@anthropic-ai/sdk': 0.5.7(encoding@0.1.13)
       '@supabase/supabase-js': 2.32.0(encoding@0.1.13)
-      '@upstash/redis': 1.22.0(encoding@0.1.13)
       ansi-styles: 5.2.0
       binary-extensions: 2.2.0
       camelcase: 6.3.0
@@ -5399,19 +5378,6 @@ packages:
 
   /node-fetch-native@1.0.1:
     resolution: {integrity: sha512-VzW+TAk2wE4X9maiKMlT+GsPU4OMmR1U9CrHSmd3DFLn2IcZ9VJ6M6BBugGfYUnPCLSYxXdZy17M0BEJyhUTwg==}
-    dev: false
-
-  /node-fetch@2.6.11(encoding@0.1.13):
-    resolution: {integrity: sha512-4I6pdBY1EthSqDmJkiNk3JIT8cswwR9nfeW/cPdUagJYEQG7R95WRH74wpz7ma8Gh/9dI9FP+OU+0E4FvtA55w==}
-    engines: {node: 4.x || >=6.0.0}
-    peerDependencies:
-      encoding: ^0.1.0
-    peerDependenciesMeta:
-      encoding:
-        optional: true
-    dependencies:
-      encoding: 0.1.13
-      whatwg-url: 5.0.0
     dev: false
 
   /node-fetch@2.6.12(encoding@0.1.13):
@@ -7031,10 +6997,6 @@ packages:
       yaeti: 0.0.6
     transitivePeerDependencies:
       - supports-color
-    dev: false
-
-  /whatwg-fetch@3.6.2:
-    resolution: {integrity: sha512-bJlen0FcuU/0EMLrdbJ7zOnW6ITZLrZMIarMUVmdKtsGvZna8vxKYaexICWPfZ8qwf9fzNq+UEIZrnSaApt6RA==}
     dev: false
 
   /whatwg-url@5.0.0:

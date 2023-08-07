@@ -8,7 +8,7 @@ import { Share } from '../Icons';
 import { isMobile } from '@/utils/client';
 import { useUI } from '@/providers/UIProvider';
 import AgentSettings from '../AgentSettings';
-import { shareThread } from '@/utils/server/redis';
+import { shareThread } from '@/utils/server/supabase';
 
 export default function ChatSettings() {
     const { activeThread } = useChat();
