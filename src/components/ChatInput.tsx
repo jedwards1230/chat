@@ -51,7 +51,7 @@ export default function ChatInput() {
             <form
                 onSubmit={handleSubmit}
                 className={clsx(
-                    'flex w-full items-end justify-center gap-2 justify-self-end border-t border-neutral-300 px-4 pb-8 pt-4 shadow-xl transition-all dark:border-0 dark:border-neutral-600 dark:shadow-none sm:pb-4',
+                    'flex w-full items-end justify-center gap-2 justify-self-end border-t border-neutral-300 px-4 pb-8 pt-4 shadow-xl transition-all dark:border-0 dark:border-neutral-600 dark:shadow-none sm:pb-4 md:pb-2 md:pt-2',
                     editId && 'flex-col',
                 )}
             >
@@ -64,38 +64,42 @@ export default function ChatInput() {
                         rows={rows}
                         onChange={handleInputChange}
                         onKeyDown={onKeyDownHandler}
-                        className="flex-1 w-full py-4 pl-2 pr-24 transition-colors border-2 rounded-md shadow resize-none border-neutral-200 focus:border-blue-500 focus:outline-none dark:border-neutral-600 dark:bg-neutral-800"
+                        className="w-full flex-1 resize-none rounded-lg border-2 border-neutral-200 py-4 pl-2 pr-24 shadow transition-colors focus:border-blue-500 focus:outline-none dark:border-neutral-600 dark:bg-neutral-800"
                     />
-                    {input &&
-                        (editId ? (
-                            <div className="flex justify-between gap-4 pt-2">
-                                <button
-                                    className="rounded-lg border border-transparent bg-blue-500 px-6 py-1.5 text-neutral-50 transition-colors hover:bg-blue-400 focus:border-blue-500 focus:bg-blue-400 focus:outline-none dark:bg-blue-500 dark:hover:bg-blue-400"
-                                    onClick={handleSubmit}
-                                >
-                                    Update and Regenerate
-                                </button>
-                                {/* <button
+                    {editId ? (
+                        <div className="flex justify-between gap-4 pt-2">
+                            <button
+                                className="rounded-lg border border-transparent bg-blue-500 px-6 py-1.5 text-neutral-50 transition-colors hover:bg-blue-400 focus:border-blue-500 focus:bg-blue-400 focus:outline-none dark:bg-blue-500 dark:hover:bg-blue-400"
+                                onClick={handleSubmit}
+                            >
+                                Update and Regenerate
+                            </button>
+                            {/* <button
                                 className="rounded-lg border border-transparent bg-green-500 px-6 py-1.5 text-neutral-50 transition-colors hover:bg-green-400 focus:border-green-500 focus:bg-green-400 focus:outline-none dark:bg-green-500 dark:hover:bg-green-400"
                                 onClick={handleSubmit}
                             >
                                 Replace Only
                             </button> */}
-                                <button
-                                    className="rounded-lg border border-transparent bg-neutral-300 px-6 py-1.5 transition-colors hover:bg-neutral-400 focus:border-blue-500 focus:bg-neutral-400 focus:outline-none dark:bg-neutral-500 dark:hover:bg-neutral-400"
-                                    onClick={cancelEdit}
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        ) : (
                             <button
-                                className="absolute p-1 transition-colors bg-blue-500 border border-transparent rounded-lg bottom-4 right-2 text-neutral-50 hover:bg-blue-400 focus:border-blue-500 focus:bg-blue-400 focus:outline-none dark:bg-blue-500 dark:hover:bg-blue-400"
-                                type="submit"
+                                className="rounded-lg border border-transparent bg-neutral-300 px-6 py-1.5 transition-colors hover:bg-neutral-400 focus:border-blue-500 focus:bg-neutral-400 focus:outline-none dark:bg-neutral-500 dark:hover:bg-neutral-400"
+                                onClick={cancelEdit}
                             >
-                                <Send />
+                                Cancel
                             </button>
-                        ))}
+                        </div>
+                    ) : (
+                        <button
+                            className={clsx(
+                                'absolute bottom-4 right-2 rounded-lg border border-transparent p-1 text-neutral-50 transition-colors focus:outline-none dark:bg-blue-500 dark:hover:bg-blue-400',
+                                input.length > 0
+                                    ? 'cursor-pointer bg-blue-500 hover:bg-blue-400 focus:border-blue-500 focus:bg-blue-400'
+                                    : 'cursor-default text-neutral-600',
+                            )}
+                            type="submit"
+                        >
+                            <Send />
+                        </button>
+                    )}
                 </div>
             </form>
         </div>

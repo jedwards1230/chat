@@ -9,12 +9,14 @@ import { isMobile } from '@/utils/client';
 import { useUI } from '@/providers/UIProvider';
 import AgentSettings from '../AgentSettings';
 import { shareThread } from '@/utils/server/supabase';
+import { useAuth } from '@clerk/nextjs';
 
 export default function ChatSettings() {
+    const { userId } = useAuth();
     const { activeThread } = useChat();
+    const chatsettingsRef = useRef<HTMLDivElement>(null);
     const { chatSettingsOpen, setChatSettingsOpen, setShareModalOpen } =
         useUI();
-    const chatsettingsRef = useRef<HTMLDivElement>(null);
 
     const handleShare = async () => {
         try {
@@ -64,7 +66,7 @@ export default function ChatSettings() {
                         agent={activeThread.agentConfig}
                     />
                 </div>
-                {activeThread.messages.length > 1 && (
+                {userId && activeThread.messages.length > 1 && (
                     <button
                         className="mx-2 flex items-center justify-center rounded-lg border border-neutral-500 py-2 font-medium transition-colors hover:border-neutral-400 hover:bg-neutral-600 dark:hover:bg-neutral-700"
                         onClick={handleShare}
