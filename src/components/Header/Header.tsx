@@ -33,27 +33,22 @@ export default function Header() {
                     : 'border-transparent bg-transparent',
             )}
         >
-            <div className="flex items-center justify-start col-span-1">
+            <div className="col-span-1 flex items-center justify-start">
                 <button
                     name="sidebar-toggle"
                     className={clsx(
                         'cursor-pointer px-1 text-neutral-400 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-50',
-                        sideBarOpen && isMobile() && 'hidden sm:flex',
+                        sideBarOpen && 'hidden sm:block',
                     )}
                     onClick={handleSidebarToggle}
                 >
                     <Bars />
                 </button>
             </div>
-            <div
-                className={clsx(
-                    'col-span-10 text-center',
-                    sideBarOpen && isMobile() && 'col-start-2 sm:col-start-1',
-                )}
-            >
+            <div className="col-span-10 text-center">
                 {activeThread.messages.length > 1 ? (
                     <>
-                        <p className="font-semibold line-clamp-1">
+                        <p className="line-clamp-1 font-semibold">
                             {activeThread.title}
                         </p>
                         <p className="text-sm font-light text-neutral-500">
@@ -65,12 +60,12 @@ export default function Header() {
                     <ModelSelector />
                 )}
             </div>
-            <div className="flex items-center justify-end col-span-1">
+            <div className="col-span-1 flex items-center justify-end">
                 <button
                     name="chat-settings-toggle"
                     className={clsx(
                         'cursor-pointer px-1 text-neutral-400 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-50',
-                        chatSettingsOpen && isMobile() && 'hidden sm:flex',
+                        chatSettingsOpen && isMobile() && 'hidden sm:block',
                     )}
                     onClick={handleChatSettingsToggle}
                 >
