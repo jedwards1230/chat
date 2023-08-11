@@ -50,10 +50,7 @@ export default function ChatInput() {
             <QuickActions />
             <form
                 onSubmit={handleSubmit}
-                className={clsx(
-                    'flex w-full items-end justify-center gap-2 justify-self-end border-t border-neutral-300 px-4 pb-8 pt-4 shadow-xl transition-all dark:border-0 dark:border-neutral-600 dark:shadow-none sm:pb-4 md:pb-2 md:pt-2',
-                    editId && 'flex-col',
-                )}
+                className="flex w-full items-end justify-center gap-2 justify-self-end border-t border-neutral-300 px-4 pb-8 pt-4 shadow-xl transition-all dark:border-0 dark:border-neutral-600 dark:shadow-none sm:pb-4 md:pb-2 md:pt-2"
             >
                 <div className="relative w-full max-w-4xl">
                     <motion.textarea
