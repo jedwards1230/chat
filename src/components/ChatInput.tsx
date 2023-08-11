@@ -50,7 +50,7 @@ export default function ChatInput() {
             <QuickActions />
             <form
                 onSubmit={handleSubmit}
-                className="flex w-full items-end justify-center gap-2 justify-self-end border-t border-neutral-300 px-4 pb-8 pt-4 shadow-xl transition-all dark:border-0 dark:border-neutral-600 dark:shadow-none sm:pb-4 md:pb-2 md:pt-2"
+                className="flex w-full items-end justify-center gap-2 justify-self-end border-t border-neutral-300 px-4 pb-6 pt-4 shadow-xl transition-all dark:border-0 dark:border-neutral-600 dark:shadow-none sm:pb-4 md:pb-2 md:pt-2"
             >
                 <div className="relative w-full max-w-4xl">
                     <motion.textarea
@@ -87,7 +87,7 @@ export default function ChatInput() {
                     ) : (
                         <button
                             className={clsx(
-                                'absolute bottom-4 right-2 rounded-lg border border-transparent p-1 text-neutral-50 transition-colors focus:outline-none dark:bg-blue-500 dark:hover:bg-blue-400',
+                                'absolute bottom-4 right-3 rounded-lg border border-transparent p-1 text-neutral-50 transition-colors focus:outline-none dark:bg-blue-500 dark:hover:bg-blue-400 sm:bottom-4 sm:right-2',
                                 input.length > 0
                                     ? 'cursor-pointer bg-blue-500 hover:bg-blue-400 focus:border-blue-500 focus:bg-blue-400'
                                     : 'cursor-default text-neutral-600',

@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useState } from 'react';
 import clsx from 'clsx';
 import { PanInfo, motion } from 'framer-motion';
 

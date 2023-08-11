@@ -36,10 +36,7 @@ export default function Header() {
             <div className="col-span-1 flex items-center justify-start">
                 <button
                     name="sidebar-toggle"
-                    className={clsx(
-                        'cursor-pointer px-1 text-neutral-400 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-50',
-                        sideBarOpen && 'hidden sm:block',
-                    )}
+                    className="cursor-pointer px-1 text-neutral-400 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-50"
                     onClick={handleSidebarToggle}
                 >
                     <Bars />
@@ -63,10 +60,7 @@ export default function Header() {
             <div className="col-span-1 flex items-center justify-end">
                 <button
                     name="chat-settings-toggle"
-                    className={clsx(
-                        'cursor-pointer px-1 text-neutral-400 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-50',
-                        chatSettingsOpen && isMobile() && 'hidden sm:block',
-                    )}
+                    className="cursor-pointer px-1 text-neutral-400 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-50"
                     onClick={handleChatSettingsToggle}
                 >
                     <Information />
