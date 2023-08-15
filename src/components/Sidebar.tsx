@@ -7,18 +7,21 @@ export default function Sidebar({
     children,
     className,
     translate,
+    pos,
 }: {
     close: () => void;
     children: React.ReactNode;
     className?: string;
     translate: string;
+    pos: 'left' | 'right';
 }) {
     return (
         <ResponsiveWrapper
             close={close}
             translate={translate}
             className={clsx(
-                'fixed z-20 h-full w-72 border-r bg-neutral-800 py-2 text-neutral-100 transition-all dark:border-neutral-500 md:flex lg:inset-y-0',
+                'fixed z-20 h-full w-72 bg-neutral-800 py-2 text-neutral-100 transition-all dark:border-neutral-500 md:flex lg:inset-y-0',
+                pos === 'left' ? 'border-r' : 'border-l',
                 className,
             )}
         >

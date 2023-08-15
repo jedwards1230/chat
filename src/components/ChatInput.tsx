@@ -61,7 +61,7 @@ export default function ChatInput() {
                         rows={rows}
                         onChange={handleInputChange}
                         onKeyDown={onKeyDownHandler}
-                        className="w-full flex-1 resize-none rounded-lg border-2 border-neutral-200 py-4 pl-2 pr-24 shadow transition-colors focus:border-blue-500 focus:outline-none dark:border-neutral-600 dark:bg-neutral-800"
+                        className="w-full flex-1 resize-none rounded-lg border-2 border-neutral-200 py-2 pl-2 pr-24 shadow transition-colors focus:border-blue-500 focus:outline-none dark:border-neutral-600 dark:bg-neutral-800"
                     />
                     {editId ? (
                         <div className="flex justify-between gap-4 pt-2">
@@ -87,9 +87,9 @@ export default function ChatInput() {
                     ) : (
                         <button
                             className={clsx(
-                                'absolute bottom-4 right-3 rounded-lg border border-transparent p-1 text-neutral-50 transition-colors focus:outline-none dark:bg-blue-500 dark:hover:bg-blue-400 sm:bottom-4 sm:right-2',
+                                'absolute bottom-3 right-3 rounded-lg border border-transparent p-1 text-neutral-50 transition-colors focus:outline-none',
                                 input.length > 0
-                                    ? 'cursor-pointer bg-blue-500 hover:bg-blue-400 focus:border-blue-500 focus:bg-blue-400'
+                                    ? 'cursor-pointer bg-blue-500 hover:bg-blue-400 focus:border-blue-500 focus:bg-blue-400 dark:bg-blue-500 dark:hover:bg-blue-400'
                                     : 'cursor-default text-neutral-600',
                             )}
                             type="submit"

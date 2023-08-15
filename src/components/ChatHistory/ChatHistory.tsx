@@ -53,6 +53,7 @@ export default function ChatHistory() {
 
     return (
         <Sidebar
+            pos="left"
             close={() => setSideBarOpen(false)}
             className={clsx('px-2', !mounted && 'hidden')}
             translate={sideBarOpen ? '-translate-x-0' : '-translate-x-full'}
@@ -80,7 +81,7 @@ export default function ChatHistory() {
                 </div>
             </Suspense>
             {/* Footer Buttons */}
-            <div className="flex w-full justify-between gap-x-2 pb-5 pl-2 text-sm md:pb-2 md:pl-0">
+            <div className="flex w-full justify-between gap-x-2 pb-3 pl-2 text-sm md:pb-1 md:pl-0">
                 <div className="flex gap-x-2">
                     <button
                         title={

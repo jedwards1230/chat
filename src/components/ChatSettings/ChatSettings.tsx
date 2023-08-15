@@ -30,11 +30,12 @@ export default function ChatSettings() {
 
     return (
         <Sidebar
+            pos="right"
             close={() => setChatSettingsOpen(false)}
             className="right-0"
             translate={chatSettingsOpen ? 'translate-x-0' : 'translate-x-full'}
         >
-            <div className="flex h-full w-full flex-col pb-5 md:pb-2">
+            <div className="flex h-full w-full flex-col pb-3 md:pb-1">
                 <div className="flex-1">
                     <AgentSettings
                         active={true}
