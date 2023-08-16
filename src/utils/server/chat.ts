@@ -1,8 +1,9 @@
 import OpenAI from 'openai';
+import { CompletionCreateParams } from 'openai/resources/chat';
+import { Stream } from 'openai/streaming';
 
 import { Calculator, Search, WebBrowser, WikipediaQueryRun } from '@/tools';
 import { prepareMessages } from '..';
-import { CompletionCreateParams } from 'openai/resources/chat';
 
 const SERVER_KEY = process.env.OPENAI_API_KEY;
 
@@ -10,6 +11,39 @@ export function getOpenAiClient(key?: string) {
     return new OpenAI({
         apiKey: SERVER_KEY || key,
         dangerouslyAllowBrowser: key ? true : false,
+    });
+}
+
+function toReadableStream(
+    stream: Stream<OpenAI.Chat.Completions.ChatCompletionChunk>,
+): ReadableStream {
+    let iter: AsyncIterator<OpenAI.Chat.Completions.ChatCompletionChunk>;
+    const encoder = new TextEncoder();
+
+    return new ReadableStream({
+        async start() {
+            iter = stream[Symbol.asyncIterator]();
+        },
+        async pull(ctrl) {
+            try {
+                const { value, done } = await iter.next();
+                if (done) return ctrl.close();
+
+                const str =
+                    typeof value === 'string'
+                        ? value
+                        : // Add a newline after JSON to make it easier to parse newline-separated JSON on the frontend.
+                          JSON.stringify(value) + '\n';
+                const bytes = encoder.encode(str);
+
+                ctrl.enqueue(bytes);
+            } catch (err) {
+                ctrl.error(err);
+            }
+        },
+        async cancel() {
+            await iter.return?.();
+        },
     });
 }
 
@@ -36,7 +70,7 @@ export async function getTitleStream(history: string, key?: string) {
             stream: true,
         });
 
-        const stream = completion.toReadableStream();
+        const stream = toReadableStream(completion);
 
         if (!stream) {
             throw new Error('No response body from /api/chat');
@@ -114,7 +148,7 @@ export async function getChatStream(
             },
         );
 
-        const stream = completion.toReadableStream();
+        const stream = toReadableStream(completion);
 
         if (!stream) {
             throw new Error('No response body from /api/chat');
