@@ -4,8 +4,6 @@ import { Metadata } from 'next';
 import { SharedBubble } from '@/components/ChatThread/ChatBubble';
 import { getSharedThreadById } from '@/utils/server/supabase';
 
-export const runtime = 'edge';
-
 type Props = { params: { slug: string } };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

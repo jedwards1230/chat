@@ -12,8 +12,6 @@ import {
     getThreadListByUserId,
 } from '@/utils/server/supabase';
 
-export const runtime = 'edge';
-
 const APP_NAME = 'Chat';
 const APP_DEFAULT_TITLE = 'Chat';
 const APP_TITLE_TEMPLATE = 'Chat | %s';
