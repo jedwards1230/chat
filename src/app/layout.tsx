@@ -85,6 +85,13 @@ export default async function RootLayout({
     return (
         <ClerkProvider>
             <html lang="en" suppressHydrationWarning={true}>
+                <head>
+                    <script
+                        defer
+                        data-domain="chat.jedwards.cc"
+                        src="https://plausible.io/js/script.js"
+                    ></script>
+                </head>
                 <body className="bg-neutral-100 transition-colors dark:bg-neutral-900 dark:text-neutral-100">
                     <Suspense
                         fallback={
