@@ -26,9 +26,6 @@ dependencies:
   '@types/react-dom':
     specifier: 18.2.7
     version: 18.2.7
-  '@vercel/analytics':
-    specifier: ^1.0.2
-    version: 1.0.2
   cheerio:
     specifier: 1.0.0-rc.12
     version: 1.0.0-rc.12
@@ -2137,10 +2134,6 @@ packages:
     dependencies:
       '@typescript-eslint/types': 5.60.1
       eslint-visitor-keys: 3.4.3
-    dev: false
-
-  /@vercel/analytics@1.0.2:
-    resolution: {integrity: sha512-BZFxVrv24VbNNl5xMxqUojQIegEeXMI6rX3rg1uVLYUEXsuKNBSAEQf4BWEcjQDp/8aYJOj6m8V4PUA3x/cxgg==}
     dev: false
 
   /@webassemblyjs/ast@1.11.6:

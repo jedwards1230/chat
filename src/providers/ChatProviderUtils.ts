@@ -1,7 +1,6 @@
 'use client';
 
 import { Dispatch, SetStateAction, FormEvent } from 'react';
-import va from '@vercel/analytics';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';
 
 import initialState, { getDefaultThread } from './initialChat';
@@ -47,7 +46,6 @@ export function createSubmitHandler(
         }
 
         router.replace('/?c=' + state.activeThread.id);
-        va.track('Submitted Message', { threadId: state.activeThread.id });
         plausible('Submitted Message', {
             props: { threadId: state.activeThread.id },
         });

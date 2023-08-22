@@ -129,7 +129,7 @@ function ClientSideKey() {
             setOpenAiApiKey(apiKey);
             setLocalOpenAiKey(apiKey);
             setOpenAIKeyOpen(false);
-            plausible('SetLocalKey');
+            plausible('Set Local Key');
         } catch (err: any) {
             setError(err.message);
         }

@@ -1,7 +1,6 @@
 import { Suspense } from 'react';
 import { Metadata } from 'next';
 import { ClerkProvider, auth } from '@clerk/nextjs';
-import { Analytics } from '@vercel/analytics/react';
 import PlausibleProvider from 'next-plausible';
 
 import './globals.css';
@@ -111,7 +110,6 @@ export default async function RootLayout({
                             </ChatProvider>
                         </Providers>
                     </Suspense>
-                    <Analytics />
                 </body>
             </html>
         </ClerkProvider>

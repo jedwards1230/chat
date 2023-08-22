@@ -16,7 +16,6 @@
         "@types/node": "20.5.1",
         "@types/react": "18.2.20",
         "@types/react-dom": "18.2.7",
-        "@vercel/analytics": "^1.0.2",
         "cheerio": "1.0.0-rc.12",
         "clsx": "^2.0.0",
         "encoding": "^0.1.13",
