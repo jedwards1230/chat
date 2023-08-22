@@ -109,25 +109,25 @@ export function ChatProvider({
 
     // Update active thread when threadId changes
     useEffect(() => {
+        if (state.activeThread.id === threadId) return;
         if (!threadId) {
-            if (!state.isNew) {
-                createThread();
-            }
-        } else if (state.activeThread.id !== threadId) {
-            const newThread = state.threads.find((t) => t.id === threadId);
-            if (newThread) {
-                updateActiveThread(newThread);
-                setState((prevState) => ({
-                    ...prevState,
-                    isNew: false,
-                }));
-            } else {
-                router.replace('/');
-                setState((prevState) => ({
-                    ...prevState,
-                    isNew: true,
-                }));
-            }
+            if (!state.isNew) createThread();
+            return;
+        }
+
+        const newThread = state.threads.find((t) => t.id === threadId);
+        if (newThread) {
+            updateActiveThread(newThread);
+            setState((prevState) => ({
+                ...prevState,
+                isNew: false,
+            }));
+        } else {
+            router.replace('/');
+            setState((prevState) => ({
+                ...prevState,
+                isNew: true,
+            }));
         }
     }, [
         router,
