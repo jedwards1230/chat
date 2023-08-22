@@ -51,11 +51,11 @@ dependencies:
     specifier: ^4.2.7
     version: 4.2.7
   framer-motion:
-    specifier: ^10.16.0
-    version: 10.16.0(react-dom@18.2.0)(react@18.2.0)
+    specifier: ^10.16.1
+    version: 10.16.1(react-dom@18.2.0)(react@18.2.0)
   langchain:
-    specifier: ^0.0.131
-    version: 0.0.131(@supabase/supabase-js@2.32.0)(cheerio@1.0.0-rc.12)(encoding@0.1.13)
+    specifier: ^0.0.132
+    version: 0.0.132(@supabase/supabase-js@2.32.0)(cheerio@1.0.0-rc.12)(encoding@0.1.13)
   next:
     specifier: 13.4.19
     version: 13.4.19(@babel/core@7.22.5)(@opentelemetry/api@1.4.1)(react-dom@18.2.0)(react@18.2.0)
@@ -63,8 +63,8 @@ dependencies:
     specifier: ^0.2.1
     version: 0.2.1(next@13.4.19)(react-dom@18.2.0)(react@18.2.0)
   openai:
-    specifier: 4.0.0
-    version: 4.0.0(encoding@0.1.13)
+    specifier: 4.0.1
+    version: 4.0.1(encoding@0.1.13)
   react:
     specifier: ^18.2.0
     version: 18.2.0
@@ -3756,8 +3756,8 @@ packages:
     resolution: {integrity: sha512-MhLuK+2gUcnZe8ZHlaaINnQLl0xRIGRfcGk2yl8xoQAfHrSsL3rYu6FCmBdkdbhc9EPlwyGHewaRsvwRMJtAlA==}
     dev: true
 
-  /framer-motion@10.16.0(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-R+88Mkr/1dr7XHjacwptfJyrywRzQ1HZX3YSZtN4tFMBq1O8GGCbDEv31Nf/H08o0hUXLC87GkxsR/1bZgwXfw==}
+  /framer-motion@10.16.1(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-K6TXr5mZtitC/dxQCBdg7xzdN0d5IAIrlaqCPKtIQVdzVPGC0qBuJKXggHX1vjnP5gPOFwB1KbCCTWcnFc3kWg==}
     peerDependencies:
       react: ^18.0.0
       react-dom: ^18.0.0
@@ -4470,8 +4470,8 @@ packages:
     engines: {node: '>=6'}
     dev: false
 
-  /langchain@0.0.131(@supabase/supabase-js@2.32.0)(cheerio@1.0.0-rc.12)(encoding@0.1.13):
-    resolution: {integrity: sha512-7SDDiixSjcxOb9IUEL1DIwzsPMA508z/VFT6+X29dZ1bsNlna60pue1962VtHJOS5rqWVjztrV2WNWgUwisDyw==}
+  /langchain@0.0.132(@supabase/supabase-js@2.32.0)(cheerio@1.0.0-rc.12)(encoding@0.1.13):
+    resolution: {integrity: sha512-gXnuiAhsQQqXheKQiaSmFa9s3S/Yhkkb9OCytu04OE0ecttvVvfjjqIoNVS9vor8V7kRUgYPKHJsMz2UFDoJNw==}
     engines: {node: '>=18'}
     peerDependencies:
       '@aws-crypto/sha256-js': ^5.0.0
@@ -5584,8 +5584,8 @@ packages:
       - debug
     dev: false
 
-  /openai@4.0.0(encoding@0.1.13):
-    resolution: {integrity: sha512-UHv70gIw20pxu9tiUueE9iS+4U4eTGiTgQr+zlJ5aX4oj6LUUp+7mBn0xAqilawftwUB/biohPth2vcZFmoNYw==}
+  /openai@4.0.1(encoding@0.1.13):
+    resolution: {integrity: sha512-UanMv/kCD/ylgOdBrkkRgkoFXdfENrXYWNvYdvPttXZaEJmRVY9MZSknlkWYH7iPMX6tTcz6szbI2d3O04UFag==}
     hasBin: true
     dependencies:
       '@types/node': 18.16.19
