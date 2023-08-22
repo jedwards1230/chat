@@ -23,8 +23,8 @@ module.exports = withPWA({
     },
 });
 
-module.exports = withPlausibleProxy()(
-    withPWA({
+module.exports = withPWA(
+    withPlausibleProxy()({
         experimental: {
             serverActions: true,
             webVitalsAttribution: ['CLS', 'LCP', 'FCP', 'FID', 'INP', 'TTFB'],
