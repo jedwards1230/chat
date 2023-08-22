@@ -6,6 +6,7 @@ import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';
 import initialState, { getDefaultThread } from './initialChat';
 import { createUserMsg, getTitle, getChat } from '@/utils/client';
 import { deleteMessageById, upsertCharacter } from '@/utils/server/supabase';
+import { sortThreadlist } from '@/utils';
 
 type ChatDispatch = Dispatch<SetStateAction<ChatState>>;
 
@@ -83,7 +84,7 @@ export function createSubmitHandler(
                 return {
                     ...prevState,
                     activeThread,
-                    threads,
+                    threads: threads.sort(sortThreadlist),
                 };
             });
         };
@@ -115,7 +116,7 @@ export function createSubmitHandler(
                 return {
                     ...prevState,
                     activeThread,
-                    threads,
+                    threads: threads.sort(sortThreadlist),
                 };
             });
         };
