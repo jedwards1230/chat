@@ -6,7 +6,7 @@ export default function NotFound() {
             <h2 className="text-6xl font-medium">Not Found</h2>
             <p className="text-xl">
                 Go{' '}
-                <Link replace={true} className="text-blue-500" href="/">
+                <Link className="text-blue-500" href="/">
                     Home
                 </Link>
             </p>
