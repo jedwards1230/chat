@@ -12,6 +12,7 @@ import {
     deleteLocalOpenAiKey,
     setLocalOpenAiKey,
 } from '@/utils/client/storage';
+import { usePlausible } from 'next-plausible';
 
 export default function OpenAIKey() {
     const { setOpenAIKeyOpen } = useUI();
@@ -64,6 +65,7 @@ export default function OpenAIKey() {
 }
 
 function HybridKey() {
+    const plausible = usePlausible();
     const { userId, signOut } = useAuth();
     const { setSignInOpen } = useUI();
 
@@ -86,7 +88,10 @@ function HybridKey() {
                     </button>
                 ) : (
                     <button
-                        onClick={() => setSignInOpen(true)}
+                        onClick={() => {
+                            setSignInOpen(true);
+                            plausible('SignIn');
+                        }}
                         className="text-sm text-blue-500 hover:underline"
                     >
                         Sign In
@@ -108,6 +113,8 @@ function HybridKey() {
 }
 
 function ClientSideKey() {
+    const plausible = usePlausible();
+
     const { setOpenAIKeyOpen } = useUI();
     const { openAiApiKey, setOpenAiApiKey } = useChat();
     const [apiKey, setKey] = useState(openAiApiKey || '');
@@ -123,6 +130,7 @@ function ClientSideKey() {
             setOpenAiApiKey(apiKey);
             setLocalOpenAiKey(apiKey);
             setOpenAIKeyOpen(false);
+            plausible('SetLocalKey');
         } catch (err: any) {
             setError(err.message);
         }

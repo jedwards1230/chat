@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import { Metadata } from 'next';
 import { ClerkProvider, auth } from '@clerk/nextjs';
 import { Analytics } from '@vercel/analytics/react';
+import PlausibleProvider from 'next-plausible';
 
 import './globals.css';
 import Providers from '@/providers';
@@ -86,11 +87,10 @@ export default async function RootLayout({
         <ClerkProvider>
             <html lang="en" suppressHydrationWarning={true}>
                 <head>
-                    <script
-                        defer
-                        data-domain="chat.jedwards.cc"
-                        src="https://plausible.io/js/script.js"
-                    ></script>
+                    <PlausibleProvider
+                        domain="chat.jedwards.cc"
+                        trackOutboundLinks={true}
+                    />
                 </head>
                 <body className="bg-neutral-100 transition-colors dark:bg-neutral-900 dark:text-neutral-100">
                     <Suspense

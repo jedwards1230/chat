@@ -27,7 +27,7 @@ import {
 import { useUI } from './UIProvider';
 import initialState from './initialChat';
 import { upsertThread } from '@/utils/server/supabase';
-import { mergeThreads, mergeCharacters } from '@/utils';
+import { mergeThreads, mergeCharacters, sortThreadlist } from '@/utils';
 import {
     getLocalCharacterList,
     getLocalOpenAiKey,
@@ -58,7 +58,7 @@ export function ChatProvider({
     const [state, setState] = useState<ChatState>({
         ...initialState,
         characterList,
-        threads: threadList,
+        threads: threadList.sort(sortThreadlist),
         isNew: threadId === undefined,
         activeThread: getInitialActiveThread(
             characterList[0],

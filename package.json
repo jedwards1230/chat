@@ -27,6 +27,7 @@
         "framer-motion": "^10.16.1",
         "langchain": "^0.0.132",
         "next": "13.4.19",
+        "next-plausible": "^3.11.1",
         "next-themes": "^0.2.1",
         "openai": "4.0.1",
         "react": "^18.2.0",
