@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@clerk/nextjs';
 
 import {
@@ -50,12 +50,8 @@ export function ChatProvider({
 }) {
     const { userId } = useAuth();
     const router = useRouter();
-    const params = useParams();
-    const threadId = params.root
-        ? params.root[0] !== 'index'
-            ? params.root[0]
-            : undefined
-        : undefined;
+    const params = useSearchParams();
+    const threadId = params.get('c');
 
     const { setOpenAIKeyOpen } = useUI();
 

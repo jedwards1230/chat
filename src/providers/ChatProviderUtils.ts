@@ -38,7 +38,7 @@ export function createSubmitHandler(
             return setOpenAIKeyOpen(true);
         }
 
-        router.replace('/' + state.activeThread.id);
+        router.replace('/?c=' + state.activeThread.id);
         va.track('Submitted Message', { threadId: state.activeThread.id });
 
         const upsertMessage = (newMessage: Message) => {

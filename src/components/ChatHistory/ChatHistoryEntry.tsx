@@ -31,7 +31,7 @@ export default function ChatHistoryEntry({ entry }: { entry: ChatThread }) {
         <div className="relative">
             <Link
                 replace={true}
-                href={`/${entry.id}`}
+                href={`/?c=${entry.id}`}
                 onClick={setActive}
                 className={clsx(
                     'flex w-full max-w-full items-center gap-2 rounded-lg px-2 py-1 transition-colors duration-100 hover:bg-neutral-500 peer-hover:bg-neutral-500 dark:hover:bg-neutral-600 dark:peer-hover:bg-neutral-600',
