@@ -56,14 +56,14 @@ export async function getTitleStream(history: string, key?: string) {
                 {
                     role: 'system',
                     content:
-                        'You generate a brief chat title based on provided chat messages. ' +
+                        'Generate a brief title based on provided chat messages. ' +
                         'Provide only the string for the title. No quotes or labels are necessary.' +
                         'There should only be one subject in the title. ' +
                         'Max length is 20 characters. ',
                 },
                 {
                     role: 'user',
-                    content: 'Messages Start:\n' + history + '\nMessages End',
+                    content: history,
                 },
             ],
             temperature: 0.1,

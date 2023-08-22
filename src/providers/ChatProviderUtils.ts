@@ -24,15 +24,17 @@ export function getInitialActiveThread(
     );
 }
 
+type PlausibleHook = (
+    eventName: string,
+    {
+        props: { threadId, usedCloudKey },
+    }: {
+        props: { threadId: string; usedCloudKey: boolean };
+    },
+) => any;
+
 export function createSubmitHandler(
-    plausible: (
-        eventName: string,
-        {
-            props: { threadId, usedCloudKey },
-        }: {
-            props: { threadId: string; usedCloudKey: boolean };
-        },
-    ) => any,
+    plausible: PlausibleHook,
     state: ChatState,
     setState: ChatDispatch,
     router: AppRouterInstance,
@@ -146,25 +148,28 @@ export function createSubmitHandler(
             msgHistory.push(userMsg);
         }
 
-        await Promise.all([
-            getChat(
-                msgHistory,
-                controller,
-                state.activeThread,
-                0,
-                setState,
-                upsertMessage,
-                userId,
-                state.openAiApiKey,
-            ),
+        // Fetch chat
+        await getChat(
+            msgHistory,
+            controller,
+            state.activeThread,
+            0,
+            setState,
+            upsertMessage,
+            userId,
+            state.openAiApiKey,
+        );
+
+        // Fetch title only if it's an initial message
+        if (state.isNew) {
             getTitle(
                 state.activeThread,
                 state.input,
                 upsertTitle,
                 userId,
                 state.openAiApiKey,
-            ),
-        ]);
+            );
+        }
     };
 }
 
