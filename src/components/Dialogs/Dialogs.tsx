@@ -43,7 +43,7 @@ export default function Dialogs() {
     };
 
     return (
-        <div className="fixed transition-all">
+        <div className="fixed z-50 transition-all">
             <ActiveDialog />
         </div>
     );
