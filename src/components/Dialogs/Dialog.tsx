@@ -13,7 +13,7 @@ export default function Dialog({
     children: React.ReactNode;
     className?: string;
     hideCard?: boolean;
-    size?: 'sm' | 'md' | 'lg';
+    size?: 'sm' | 'md' | 'lg' | 'xl';
     callback?: () => void;
 }) {
     const ref = useRef<HTMLDivElement>(null);
@@ -46,6 +46,7 @@ export default function Dialog({
                     size === 'sm' && 'max-w-lg',
                     size === 'md' && 'max-w-xl',
                     size === 'lg' && 'max-w-2xl',
+                    size === 'xl' && 'max-w-3xl',
                     !hideCard &&
                         'rounded-lg border bg-neutral-50 p-4 transition-all dark:border-neutral-500 dark:bg-neutral-800 sm:px-6',
                     className,

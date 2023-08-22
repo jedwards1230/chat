@@ -11,7 +11,9 @@ import { PencilSquare } from '../Icons';
 export default function PersonalitySelector() {
     const { activeThread, characterList } = useChat();
     const { characterSelectorOpen, setCharacterSelectorOpen } = useUI();
-    const [activeCard, setActiveCard] = useState<string | undefined>(undefined);
+    const [activeCard, setActiveCard] = useState<string | undefined>(
+        activeThread.agentConfig.name,
+    );
 
     const closeDialog = () => {
         setCharacterSelectorOpen(false);
@@ -19,29 +21,29 @@ export default function PersonalitySelector() {
 
     if (!characterSelectorOpen) return null;
     return (
-        <Dialog callback={closeDialog}>
-            <div>
-                {activeCard !== undefined && (
+        <Dialog size="xl" callback={closeDialog}>
+            <div className="grid w-full grid-cols-12 pb-4">
+                {activeCard !== undefined ? (
                     <button
                         onClick={() => setActiveCard(undefined)}
-                        className="absolute left-6 top-5 text-neutral-400 hover:text-neutral-950 dark:text-neutral-500 dark:hover:text-neutral-200"
+                        className="col-span-2 py-1 text-neutral-400 hover:text-neutral-950 dark:text-neutral-500 dark:hover:text-neutral-200 md:hidden"
                     >
                         go back
                     </button>
+                ) : (
+                    <div className="col-span-2" />
                 )}
-                <div className="flex-1 pb-4 text-center text-xl font-semibold">
+                <div className="col-span-8 col-start-3 flex-1 text-center text-xl font-semibold">
                     Character {activeCard === undefined ? 'Selector' : 'Editor'}
                 </div>
-                {activeCard === undefined && (
-                    <button
-                        onClick={() => setActiveCard('New Character')}
-                        className="absolute right-6 top-4 rounded-md border px-2 py-1 text-neutral-400 hover:border-neutral-950 hover:text-neutral-950 dark:text-neutral-500 dark:hover:border-neutral-300 dark:hover:text-neutral-200"
-                    >
-                        + New
-                    </button>
-                )}
+                <button
+                    onClick={() => setActiveCard('New Character')}
+                    className="col-span-2 rounded-md py-1 text-neutral-400 hover:text-neutral-950 dark:text-neutral-500 dark:hover:text-neutral-200"
+                >
+                    + New
+                </button>
             </div>
-            {activeCard === undefined ? (
+            <div className="hidden md:flex">
                 <div className="max-h-[80vh] space-y-2 overflow-y-scroll">
                     {characterList.map((agent, i) => {
                         const active =
@@ -56,13 +58,37 @@ export default function PersonalitySelector() {
                         );
                     })}
                 </div>
-            ) : (
                 <AgentSettings
+                    key={activeCard}
                     agent={characterList.find(
                         (agent) => agent.name === activeCard,
                     )}
                 />
-            )}
+            </div>
+            <div className="flex md:hidden">
+                {activeCard === undefined ? (
+                    <div className="max-h-[80vh] space-y-2 overflow-y-scroll">
+                        {characterList.map((agent, i) => {
+                            const active =
+                                agent.name === activeThread.agentConfig.name;
+                            return (
+                                <AgentCard
+                                    key={'agent-config-' + i}
+                                    agent={agent}
+                                    active={active}
+                                    edit={() => setActiveCard(agent.name)}
+                                />
+                            );
+                        })}
+                    </div>
+                ) : (
+                    <AgentSettings
+                        agent={characterList.find(
+                            (agent) => agent.name === activeCard,
+                        )}
+                    />
+                )}
+            </div>
         </Dialog>
     );
 }
@@ -87,17 +113,29 @@ function AgentCard({
 
     return (
         <div
-            onClick={setActive}
             className={clsx(
-                'flex cursor-pointer items-center justify-between rounded-lg py-2 pl-4 pr-6 shadow transition-colors',
+                'flex cursor-pointer items-center justify-between rounded-lg shadow transition-colors',
                 active
                     ? 'bg-green-400 hover:bg-green-500 dark:bg-green-600 dark:hover:bg-green-700'
-                    : 'bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-700 dark:hover:bg-neutral-600',
+                    : 'hover:bg-neutral-200 dark:hover:bg-neutral-600',
             )}
         >
-            <div>
-                <h2 className="text-lg font-bold">{agent.name}</h2>
+            <div
+                onClick={setActive}
+                className="h-full w-full px-2 py-1 md:hidden"
+            >
+                <h2 className="text-lg font-medium">{agent.name}</h2>
                 <p>{agent.systemMessage}</p>
+            </div>
+            <div
+                onClick={(e) => {
+                    e.stopPropagation();
+                    setActive();
+                    edit();
+                }}
+                className="hidden h-full w-full flex-col px-2 py-1 md:flex"
+            >
+                {agent.name}
             </div>
             <div
                 onClick={(e) => {
@@ -105,7 +143,7 @@ function AgentCard({
                     edit();
                 }}
                 className={clsx(
-                    'flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full transition-colors ',
+                    'flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full transition-colors md:hidden ',
                     active
                         ? 'hover:bg-green-600 dark:hover:bg-green-800'
                         : 'hover:bg-neutral-300 dark:hover:bg-neutral-500',
