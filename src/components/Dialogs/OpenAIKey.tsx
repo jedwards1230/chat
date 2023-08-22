@@ -114,7 +114,6 @@ function HybridKey() {
 
 function ClientSideKey() {
     const plausible = usePlausible();
-
     const { setOpenAIKeyOpen } = useUI();
     const { openAiApiKey, setOpenAiApiKey } = useChat();
     const [apiKey, setKey] = useState(openAiApiKey || '');

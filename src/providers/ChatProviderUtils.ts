@@ -25,6 +25,14 @@ export function getInitialActiveThread(
 }
 
 export function createSubmitHandler(
+    plausible: (
+        eventName: string,
+        {
+            props: { threadId },
+        }: {
+            props: { threadId: string };
+        },
+    ) => any,
     state: ChatState,
     setState: ChatDispatch,
     router: AppRouterInstance,
@@ -40,6 +48,9 @@ export function createSubmitHandler(
 
         router.replace('/?c=' + state.activeThread.id);
         va.track('Submitted Message', { threadId: state.activeThread.id });
+        plausible('Submitted Message', {
+            props: { threadId: state.activeThread.id },
+        });
 
         const upsertMessage = (newMessage: Message) => {
             setState((prevState) => {

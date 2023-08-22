@@ -34,6 +34,7 @@ import {
     getLocalThreadList,
     setLocalThreadList,
 } from '@/utils/client/storage';
+import { usePlausible } from 'next-plausible';
 
 const ChatContext = createContext<ChatState>(initialState);
 
@@ -48,6 +49,7 @@ export function ChatProvider({
     threadList: ChatThread[];
     characterList: AgentConfig[];
 }) {
+    const plausible = usePlausible();
     const { userId } = useAuth();
     const router = useRouter();
     const params = useSearchParams();
@@ -160,6 +162,7 @@ export function ChatProvider({
         removeThread: removeThreadHandler(state, setState, router),
         removeAllThreads: removeAllThreadsHandler(setState, router),
         handleSubmit: createSubmitHandler(
+            plausible,
             state,
             setState,
             router,
