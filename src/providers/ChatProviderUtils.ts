@@ -28,9 +28,9 @@ export function createSubmitHandler(
     plausible: (
         eventName: string,
         {
-            props: { threadId },
+            props: { threadId, usedCloudKey },
         }: {
-            props: { threadId: string };
+            props: { threadId: string; usedCloudKey: boolean };
         },
     ) => any,
     state: ChatState,
@@ -48,7 +48,10 @@ export function createSubmitHandler(
 
         router.replace('/?c=' + state.activeThread.id);
         plausible('Submitted Message', {
-            props: { threadId: state.activeThread.id },
+            props: {
+                threadId: state.activeThread.id,
+                usedCloudKey: !!state.openAiApiKey,
+            },
         });
 
         const upsertMessage = (newMessage: Message) => {
