@@ -7,10 +7,10 @@ import Link from 'next/link';
 export default function QuickActions() {
     const { activeThread, botTyping, abortRequest } = useChat();
 
-    const btn = 'px-3 py-1 rounded-full';
+    const btn = 'px-3 py-1.5 rounded';
 
     return (
-        <div className="absolute inset-x-0 -top-10 flex justify-center gap-2 text-sm font-medium">
+        <div className="absolute inset-x-0 -top-10 flex justify-end gap-2 px-5 text-sm font-medium">
             {botTyping && (
                 <button
                     onClick={abortRequest}
@@ -20,16 +20,18 @@ export default function QuickActions() {
                 </button>
             )}
             {activeThread.messages.length > 1 && (
-                <Link replace={true} href="/">
-                    <button
-                        className={clsx(
-                            btn,
-                            'bg-blue-500 text-neutral-50 dark:hover:bg-blue-600',
-                        )}
-                    >
-                        New Chat
-                    </button>
-                </Link>
+                <>
+                    <Link replace={true} href="/">
+                        <button
+                            className={clsx(
+                                btn,
+                                'bg-blue-500 text-neutral-50 hover:bg-blue-400',
+                            )}
+                        >
+                            New Chat
+                        </button>
+                    </Link>
+                </>
             )}
         </div>
     );
