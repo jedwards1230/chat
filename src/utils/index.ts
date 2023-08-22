@@ -67,7 +67,7 @@ export function mergeThreads(
     });
 
     // Convert the map values back to an array
-    return Array.from(threadMap.values());
+    return Array.from(threadMap.values()).sort(sortThreadlist);
 }
 
 export function mergeCharacters(
