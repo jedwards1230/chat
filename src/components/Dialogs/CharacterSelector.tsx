@@ -8,12 +8,7 @@ import AgentSettings from '../AgentSettings';
 import clsx from 'clsx';
 
 export default function PersonalitySelector() {
-    const {
-        activeThread,
-        characterList,
-        updateThreadConfig,
-        setSystemMessage,
-    } = useChat();
+    const { activeThread, characterList } = useChat();
     const { characterSelectorOpen, setCharacterSelectorOpen } = useUI();
     const [activeCard, setActiveCard] = useState<string | undefined>(
         activeThread.agentConfig.name,
@@ -38,42 +33,6 @@ export default function PersonalitySelector() {
                 </button>
             </div>
             <div className="flex w-full flex-col gap-4 md:flex-row md:gap-2">
-                <select
-                    className="hidden flex-1 rounded px-1 py-2 text-lg md:hidden"
-                    onChange={(e) => {
-                        const agent = characterList.find(
-                            (agent) => agent.name === e.target.value,
-                        );
-                        if (agent) {
-                            updateThreadConfig(agent);
-                            setSystemMessage(agent.systemMessage);
-                        }
-                    }}
-                >
-                    {activeCard === undefined ||
-                        (activeCard === 'New Character' && (
-                            <option
-                                key={'agent-config-New'}
-                                value="New Character"
-                                selected={true}
-                            >
-                                New Character
-                            </option>
-                        ))}
-                    {characterList.map((agent, i) => {
-                        const active =
-                            agent.name === activeThread.agentConfig.name;
-                        return (
-                            <option
-                                key={'agent-config-' + i}
-                                value={agent.name}
-                                selected={active}
-                            >
-                                {agent.name}
-                            </option>
-                        );
-                    })}
-                </select>
                 <div className="flex max-h-[80vh] w-full gap-2 overflow-y-scroll md:w-2/5 md:flex-col">
                     {characterList.map((agent, i) => {
                         const active =
