@@ -82,8 +82,8 @@ export default function AgentSettings({
     }, [active, activeThread, isNew]);
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="flex flex-col gap-2 px-4">
+        <form onSubmit={handleSubmit} className="w-full space-y-4">
+            <div className="flex flex-col gap-2">
                 <Input
                     className={clsx(
                         'border-transparent p-1 text-lg font-bold focus:border-neutral-500 dark:bg-neutral-800',
@@ -96,7 +96,7 @@ export default function AgentSettings({
                 />
                 <textarea
                     className={clsx(
-                        'rounded border border-transparent p-1 font-medium focus:border-neutral-500 focus:outline-none dark:bg-neutral-800',
+                        'rounded border border-transparent p-1 font-medium transition-colors focus:border-neutral-500 focus:outline-none dark:bg-neutral-800',
                         active ? 'bg-neutral-800' : 'bg-neutral-200',
                     )}
                     placeholder="Agent System Message"
@@ -107,11 +107,11 @@ export default function AgentSettings({
                     }
                 />
             </div>
-            <div className="flex flex-col gap-4 rounded-md px-4">
+            <div className="flex flex-col gap-4 rounded-md">
                 <div className="flex w-full flex-col gap-2">
                     <label
                         className={clsx(
-                            'flex flex-col rounded px-1 dark:hover:bg-neutral-600',
+                            'flex flex-col rounded px-1 transition-colors dark:hover:bg-neutral-600',
                             active
                                 ? 'hover:bg-neutral-500'
                                 : 'hover:bg-neutral-300',
@@ -120,7 +120,7 @@ export default function AgentSettings({
                         <div className="flex items-center justify-between gap-4 dark:border-neutral-600">
                             <div
                                 className={clsx(
-                                    'font-semibold dark:text-neutral-100',
+                                    'font-semibold transition-colors dark:text-neutral-100',
                                     active
                                         ? 'text-neutral-100'
                                         : 'text-neutral-950',
@@ -144,7 +144,7 @@ export default function AgentSettings({
                         {config.toolsEnabled && (
                             <div
                                 className={clsx(
-                                    'text-xs dark:text-neutral-400',
+                                    'text-xs transition-colors dark:text-neutral-400',
                                     active
                                         ? 'text-neutral-400'
                                         : 'text-neutral-600',

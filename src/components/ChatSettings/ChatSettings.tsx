@@ -36,7 +36,7 @@ export default function ChatSettings() {
             translate={chatSettingsOpen ? 'translate-x-0' : 'translate-x-full'}
         >
             <div className="flex h-full w-full flex-col pb-3 md:pb-1">
-                <div className="flex-1">
+                <div className="flex-1 px-2">
                     <AgentSettings
                         active={true}
                         agent={activeThread.agentConfig}

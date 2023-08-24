@@ -19,7 +19,7 @@ function Title() {
     return (
         <div className="absolute inset-x-auto inset-y-auto flex h-full max-w-4xl flex-col items-center justify-center gap-2">
             <div className="flex items-center gap-4 md:-mr-8">
-                <div className="text-center text-4xl font-medium dark:text-neutral-300">
+                <div className="text-center text-3xl font-medium dark:text-neutral-300 sm:text-4xl">
                     {activeThread.agentConfig.name}
                 </div>
                 <div

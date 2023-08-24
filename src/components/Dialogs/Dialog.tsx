@@ -42,7 +42,7 @@ export default function Dialog({
             <div
                 ref={ref}
                 className={clsx(
-                    'relative',
+                    'relative w-[90%] sm:w-full',
                     size === 'sm' && 'max-w-lg',
                     size === 'md' && 'max-w-xl',
                     size === 'lg' && 'max-w-2xl',

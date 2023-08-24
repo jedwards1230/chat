@@ -9,7 +9,12 @@ import clsx from 'clsx';
 import { PencilSquare } from '../Icons';
 
 export default function PersonalitySelector() {
-    const { activeThread, characterList } = useChat();
+    const {
+        activeThread,
+        characterList,
+        updateThreadConfig,
+        setSystemMessage,
+    } = useChat();
     const { characterSelectorOpen, setCharacterSelectorOpen } = useUI();
     const [activeCard, setActiveCard] = useState<string | undefined>(
         activeThread.agentConfig.name,
@@ -23,16 +28,6 @@ export default function PersonalitySelector() {
     return (
         <Dialog size="xl" callback={closeDialog}>
             <div className="grid w-full grid-cols-12 pb-4">
-                {activeCard !== undefined ? (
-                    <button
-                        onClick={() => setActiveCard(undefined)}
-                        className="col-span-2 py-1 text-neutral-400 hover:text-neutral-950 dark:text-neutral-500 dark:hover:text-neutral-200 md:hidden"
-                    >
-                        go back
-                    </button>
-                ) : (
-                    <div className="col-span-2" />
-                )}
                 <div className="col-span-8 col-start-3 flex-1 text-center text-xl font-semibold">
                     Character {activeCard === undefined ? 'Selector' : 'Editor'}
                 </div>
@@ -43,8 +38,44 @@ export default function PersonalitySelector() {
                     + New
                 </button>
             </div>
-            <div className="hidden md:flex">
-                <div className="max-h-[80vh] space-y-2 overflow-y-scroll">
+            <div className="flex w-full flex-col gap-4 md:flex-row md:gap-2">
+                <select
+                    className="flex-1 rounded px-1 py-2 text-lg md:hidden"
+                    onChange={(e) => {
+                        const agent = characterList.find(
+                            (agent) => agent.name === e.target.value,
+                        );
+                        if (agent) {
+                            updateThreadConfig(agent);
+                            setSystemMessage(agent.systemMessage);
+                        }
+                    }}
+                >
+                    {activeCard === undefined ||
+                        (activeCard === 'New Character' && (
+                            <option
+                                key={'agent-config-New'}
+                                value="New Character"
+                                selected={true}
+                            >
+                                New Character
+                            </option>
+                        ))}
+                    {characterList.map((agent, i) => {
+                        const active =
+                            agent.name === activeThread.agentConfig.name;
+                        return (
+                            <option
+                                key={'agent-config-' + i}
+                                value={agent.name}
+                                selected={active}
+                            >
+                                {agent.name}
+                            </option>
+                        );
+                    })}
+                </select>
+                <div className="hidden max-h-[80vh] w-2/5 space-y-2 overflow-y-scroll md:block">
                     {characterList.map((agent, i) => {
                         const active =
                             agent.name === activeThread.agentConfig.name;
@@ -64,30 +95,6 @@ export default function PersonalitySelector() {
                         (agent) => agent.name === activeCard,
                     )}
                 />
-            </div>
-            <div className="flex md:hidden">
-                {activeCard === undefined ? (
-                    <div className="max-h-[80vh] space-y-2 overflow-y-scroll">
-                        {characterList.map((agent, i) => {
-                            const active =
-                                agent.name === activeThread.agentConfig.name;
-                            return (
-                                <AgentCard
-                                    key={'agent-config-' + i}
-                                    agent={agent}
-                                    active={active}
-                                    edit={() => setActiveCard(agent.name)}
-                                />
-                            );
-                        })}
-                    </div>
-                ) : (
-                    <AgentSettings
-                        agent={characterList.find(
-                            (agent) => agent.name === activeCard,
-                        )}
-                    />
-                )}
             </div>
         </Dialog>
     );
