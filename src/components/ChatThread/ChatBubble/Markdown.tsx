@@ -155,7 +155,10 @@ export default function Markdown({
             ul: ({ node, depth, ordered, ...props }) => (
                 <ul
                     {...props}
-                    className="inline-block list-outside list-disc"
+                    className={clsx(
+                        'inline-block list-outside list-disc',
+                        depth > 1 && 'ml-4',
+                    )}
                 />
             ),
             a: ({ node, ...props }) => (
