@@ -6,63 +6,58 @@ export default function Sidebar({
     close,
     children,
     className,
-    translate,
+    open,
     pos,
 }: {
     close: () => void;
     children: React.ReactNode;
     className?: string;
-    translate: string;
+    open: boolean;
     pos: 'left' | 'right';
-}) {
-    return (
-        <ResponsiveWrapper
-            close={close}
-            translate={translate}
-            className={clsx(
-                'fixed z-20 h-full w-72 bg-neutral-800 py-2 text-neutral-100 transition-all dark:border-neutral-500 md:flex lg:inset-y-0',
-                pos === 'left' ? 'border-r' : 'border-l',
-                className,
-            )}
-        >
-            <div className="relative flex h-full w-full flex-col items-center justify-start gap-4 pb-2 md:pb-0">
-                {children}
-            </div>
-        </ResponsiveWrapper>
-    );
-}
-
-function ResponsiveWrapper({
-    close,
-    children,
-    className,
-    translate,
-}: {
-    close: () => void;
-    children: React.ReactNode;
-    className: string;
-    translate: string;
 }) {
     return (
         <>
             {/* Desktop */}
-            <div className={clsx('hidden md:block', className, translate)}>
-                {children}
+            <div
+                className={clsx(
+                    'fixed hidden h-full w-72 bg-accent py-2 text-accent-foreground transition-all dark:border-neutral-500 md:flex lg:inset-y-0',
+                    pos === 'left' ? 'left-0 border-r' : 'right-0 border-l',
+                    open
+                        ? 'translate-x-0'
+                        : pos === 'left'
+                        ? '-translate-x-full'
+                        : 'translate-x-full',
+                    className,
+                )}
+            >
+                <div className="relative flex h-full w-full flex-col items-center justify-start gap-4 pb-2 md:pb-0">
+                    {children}
+                </div>
             </div>
             {/* Mobile */}
             <div
                 onClick={(e) => {
                     e.stopPropagation();
                     e.preventDefault();
-                    console.log('clicked');
                     close();
                 }}
                 className={clsx(
-                    'fixed z-10 h-full w-full transition-all md:hidden',
-                    translate,
+                    'fixed z-10 h-screen w-screen transition-all md:hidden',
+                    open
+                        ? 'translate-x-0'
+                        : pos === 'left'
+                        ? '-translate-x-full'
+                        : 'translate-x-full',
                 )}
             >
-                <div onClick={(e) => e.stopPropagation()} className={className}>
+                <div
+                    onClick={(e) => e.stopPropagation()}
+                    className={clsx(
+                        'absolute flex h-screen w-full max-w-[80%] flex-col bg-accent p-2 text-accent-foreground',
+                        pos === 'left' ? 'left-0 border-r' : 'right-0 border-l',
+                        className,
+                    )}
+                >
                     {children}
                 </div>
             </div>

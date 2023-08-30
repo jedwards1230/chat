@@ -89,36 +89,28 @@ export default function Chat() {
     return (
         <>
             <div className="flex h-full w-full">
-                <Suspense fallback={null}>
-                    <ChatHistory />
-                </Suspense>
-                <Suspense fallback={null}>
-                    <motion.div
-                        onPanStart={onPanStart}
-                        onPanEnd={onPanEnd}
-                        onPan={onPan}
-                        className={clsx(
-                            'flex h-full w-full flex-col overflow-hidden transition-all',
-                            sideBarOpen ? 'sm:pl-72' : 'lg:pl-0',
-                            chatSettingsOpen ? 'lg:pr-72' : 'lg:pr-0',
-                            botTyping && 'cursor-wait',
-                        )}
-                    >
-                        <Header />
-                        <ChatThread
-                            activeThread={activeThread}
-                            style={{
-                                pointerEvents: swipeInProgress
-                                    ? 'none'
-                                    : 'auto',
-                            }}
-                        />
-                        <ChatInput />
-                    </motion.div>
-                </Suspense>
-                <Suspense fallback={null}>
-                    <ChatSettings />
-                </Suspense>
+                <ChatHistory />
+                <motion.div
+                    onPanStart={onPanStart}
+                    onPanEnd={onPanEnd}
+                    onPan={onPan}
+                    className={clsx(
+                        'flex h-full w-full flex-col overflow-hidden transition-all',
+                        sideBarOpen ? 'sm:pl-72' : 'lg:pl-0',
+                        chatSettingsOpen ? 'lg:pr-72' : 'lg:pr-0',
+                        botTyping && 'cursor-wait',
+                    )}
+                >
+                    <Header />
+                    <ChatThread
+                        activeThread={activeThread}
+                        style={{
+                            pointerEvents: swipeInProgress ? 'none' : 'auto',
+                        }}
+                    />
+                    <ChatInput />
+                </motion.div>
+                <ChatSettings />
             </div>
             <Dialogs />
         </>

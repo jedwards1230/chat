@@ -5,7 +5,7 @@ import { UIProvider } from './UIProvider';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
     return (
-        <ThemeProvider>
+        <ThemeProvider attribute="class">
             <UIProvider>{children}</UIProvider>
         </ThemeProvider>
     );

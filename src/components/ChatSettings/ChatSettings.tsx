@@ -32,8 +32,7 @@ export default function ChatSettings() {
         <Sidebar
             pos="right"
             close={() => setChatSettingsOpen(false)}
-            className="right-0"
-            translate={chatSettingsOpen ? 'translate-x-0' : 'translate-x-full'}
+            open={chatSettingsOpen}
         >
             <div className="flex h-full w-full flex-col pb-3 md:pb-1">
                 <div className="flex-1 px-2">

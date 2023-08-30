@@ -1,4 +1,3 @@
-import { Suspense } from 'react';
 import { Metadata } from 'next';
 import { ClerkProvider, auth } from '@clerk/nextjs';
 import PlausibleProvider from 'next-plausible';
@@ -93,25 +92,17 @@ export default async function RootLayout({
                         trackOutboundLinks={true}
                     />
                 </head>
-                <body className="bg-neutral-100 transition-colors dark:bg-neutral-900 dark:text-neutral-100">
-                    <Suspense
-                        fallback={
-                            <div className="flex h-full w-full items-center justify-center">
-                                <p>Loading...</p>
+                <body className="h-screen w-screen overflow-hidden transition-colors">
+                    <Providers>
+                        <ChatProvider
+                            threadList={threads}
+                            characterList={characterList}
+                        >
+                            <div className="relative flex h-full w-full flex-col">
+                                {children}
                             </div>
-                        }
-                    >
-                        <Providers>
-                            <ChatProvider
-                                threadList={threads}
-                                characterList={characterList}
-                            >
-                                <div className="relative flex h-full w-full flex-col">
-                                    {children}
-                                </div>
-                            </ChatProvider>
-                        </Providers>
-                    </Suspense>
+                        </ChatProvider>
+                    </Providers>
                 </body>
             </html>
         </ClerkProvider>
