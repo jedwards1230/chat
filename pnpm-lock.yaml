@@ -57,14 +57,14 @@ dependencies:
     specifier: ^4.2.7
     version: 4.2.7
   framer-motion:
-    specifier: ^10.16.1
-    version: 10.16.1(react-dom@18.2.0)(react@18.2.0)
+    specifier: ^10.16.2
+    version: 10.16.2(react-dom@18.2.0)(react@18.2.0)
   langchain:
-    specifier: ^0.0.137
-    version: 0.0.137(@supabase/supabase-js@2.33.1)(cheerio@1.0.0-rc.12)(encoding@0.1.13)
+    specifier: ^0.0.138
+    version: 0.0.138(@supabase/supabase-js@2.33.1)(cheerio@1.0.0-rc.12)(encoding@0.1.13)
   lucide-react:
-    specifier: ^0.271.0
-    version: 0.271.0(react@18.2.0)
+    specifier: ^0.274.0
+    version: 0.274.0(react@18.2.0)
   next:
     specifier: 13.4.19
     version: 13.4.19(@babel/core@7.22.10)(@opentelemetry/api@1.4.1)(react-dom@18.2.0)(react@18.2.0)
@@ -110,8 +110,8 @@ devDependencies:
     specifier: ^15.5.7
     version: 15.5.7
   '@types/uuid':
-    specifier: ^9.0.2
-    version: 9.0.2
+    specifier: ^9.0.3
+    version: 9.0.3
   autoprefixer:
     specifier: ^10.4.15
     version: 10.4.15(postcss@8.4.29)
@@ -122,8 +122,8 @@ devDependencies:
     specifier: 3.0.3
     version: 3.0.3
   prettier-plugin-tailwindcss:
-    specifier: 0.5.3
-    version: 0.5.3(prettier@3.0.3)
+    specifier: 0.5.4
+    version: 0.5.4(prettier@3.0.3)
   tailwindcss:
     specifier: ^3.3.3
     version: 3.3.3
@@ -2512,8 +2512,8 @@ packages:
     resolution: {integrity: sha512-cputDpIbFgLUaGQn6Vqg3/YsJwxUwHLO13v3i5ouxT4lat0khip9AEWxtERujXV9wxIB1EyF97BSJFt6vpdI8g==}
     dev: false
 
-  /@types/uuid@9.0.2:
-    resolution: {integrity: sha512-kNnC1GFBLuhImSnV7w4njQkUiJi0ZXUycu1rUaouPqiKlXkh77JKgdRnTAp1x5eBwcIwbtI+3otwzuIDEuDoxQ==}
+  /@types/uuid@9.0.3:
+    resolution: {integrity: sha512-taHQQH/3ZyI3zP8M/puluDEIEvtQHVYcC6y3N8ijFtAd28+Ey/G4sg1u2gB01S8MwybLOKAp9/yCMu/uR5l3Ug==}
 
   /@types/websocket@1.0.5:
     resolution: {integrity: sha512-NbsqiNX9CnEfC1Z0Vf4mE1SgAJ07JnRYcNex7AJ9zAVzmiGHmjKFEk7O4TJIsgv2B1sLEb6owKFZrACwdYngsQ==}
@@ -4167,8 +4167,8 @@ packages:
     resolution: {integrity: sha512-/KxoyCnPM0GwYI4NN0Iag38Tqt+od3/mLuguepLgCAKPn0ZhC544nssAW0tG2/00zXEYl9W+7hwAIpLHo6Oc7Q==}
     dev: true
 
-  /framer-motion@10.16.1(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-K6TXr5mZtitC/dxQCBdg7xzdN0d5IAIrlaqCPKtIQVdzVPGC0qBuJKXggHX1vjnP5gPOFwB1KbCCTWcnFc3kWg==}
+  /framer-motion@10.16.2(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-aY6L9YMvqMWtfOQptaUvvr8dp97jskXY5UYLQM0vOPxKeERrG/Z034EIQZ/52u7MeCT0HlCQy3/l0HdUZCB9Tw==}
     peerDependencies:
       react: ^18.0.0
       react-dom: ^18.0.0
@@ -4880,8 +4880,8 @@ packages:
     engines: {node: '>=6'}
     dev: false
 
-  /langchain@0.0.137(@supabase/supabase-js@2.33.1)(cheerio@1.0.0-rc.12)(encoding@0.1.13):
-    resolution: {integrity: sha512-jJ/34ZYjMkqeYCFiYKFSKjBscqul4eZyuj9h2Uw2JWZi9Wz2dMd/4qlgWTYx4nxm0QrW2mRlxP+yei6A3u6+Zw==}
+  /langchain@0.0.138(@supabase/supabase-js@2.33.1)(cheerio@1.0.0-rc.12)(encoding@0.1.13):
+    resolution: {integrity: sha512-1TlrsK7yeGJitZn3r+gyCewveuaDK+g36u5ARuwdxHWYsW432w0Emy+lgW2SWkAjwvyZEvyaBuyvmjJKuSD8VQ==}
     engines: {node: '>=18'}
     peerDependencies:
       '@aws-crypto/sha256-js': ^5.0.0
@@ -4898,7 +4898,7 @@ packages:
       '@clickhouse/client': ^0.0.14
       '@elastic/elasticsearch': ^8.4.0
       '@getmetal/metal-sdk': '*'
-      '@getzep/zep-js': ^0.6.3
+      '@getzep/zep-js': ^0.7.0
       '@gomomento/sdk': ^1.23.0
       '@google-ai/generativelanguage': ^0.2.1
       '@google-cloud/storage': ^6.10.1
@@ -5149,7 +5149,7 @@ packages:
     resolution: {integrity: sha512-TecBjdgYGMxNaWp2L2X0OVgu8lge2WeQ5UpDXluwF3x+kH/WHFVSuR1RCuP+k2628GSVFvXxVIyXvzrHYxrZSw==}
     hasBin: true
     dependencies:
-      '@types/uuid': 9.0.2
+      '@types/uuid': 9.0.3
       commander: 10.0.1
       p-queue: 6.6.2
       p-retry: 4.6.2
@@ -5251,8 +5251,8 @@ packages:
       yallist: 4.0.0
     dev: false
 
-  /lucide-react@0.271.0(react@18.2.0):
-    resolution: {integrity: sha512-oc3/6m7gg/5E9FsX0F7t7DOuBiafsLTwg5/f0hJUJYePbmLmCXpZj1OESilmaUSwXGztawV7V12ZXBfAb8wRAA==}
+  /lucide-react@0.274.0(react@18.2.0):
+    resolution: {integrity: sha512-qiWcojRXEwDiSimMX1+arnxha+ROJzZjJaVvCC0rsG6a9pUPjZePXSq7em4ZKMp0NDm1hyzPNkM7UaWC3LU2AA==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0
     dependencies:
@@ -6230,8 +6230,8 @@ packages:
     engines: {node: '>= 0.8.0'}
     dev: false
 
-  /prettier-plugin-tailwindcss@0.5.3(prettier@3.0.3):
-    resolution: {integrity: sha512-M5K80V21yM+CTm/FEFYRv9/9LyInYbCSXpIoPAKMm8zy89IOwdiA2e4JVbcO7tvRtAQWz32zdj7/WKcsmFyAVg==}
+  /prettier-plugin-tailwindcss@0.5.4(prettier@3.0.3):
+    resolution: {integrity: sha512-QZzzB1bID6qPsKHTeA9qPo1APmmxfFrA5DD3LQ+vbTmAnY40eJI7t9Q1ocqel2EKMWNPLJqdTDWZj1hKYgqSgg==}
     engines: {node: '>=14.21.3'}
     peerDependencies:
       '@ianvs/prettier-plugin-sort-imports': '*'
