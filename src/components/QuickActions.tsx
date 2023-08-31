@@ -10,11 +10,11 @@ export default function QuickActions() {
     const btn = 'px-3 py-1.5 rounded';
 
     return (
-        <div className="absolute inset-x-0 -top-10 flex justify-end gap-2 px-5 text-sm font-medium">
+        <div className="absolute inset-x-0 flex justify-end gap-2 px-5 text-sm font-medium text-background dark:text-foreground -top-10">
             {botTyping && (
                 <button
                     onClick={abortRequest}
-                    className={clsx(btn, 'bg-red-500 text-neutral-50')}
+                    className={clsx(btn, 'bg-red-500')}
                 >
                     Stop
                 </button>
@@ -25,7 +25,7 @@ export default function QuickActions() {
                         <button
                             className={clsx(
                                 btn,
-                                'bg-blue-500 text-neutral-50 hover:bg-blue-400',
+                                'bg-blue-500 hover:bg-blue-400',
                             )}
                         >
                             New Chat

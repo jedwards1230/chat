@@ -92,13 +92,13 @@ export default async function RootLayout({
                         trackOutboundLinks={true}
                     />
                 </head>
-                <body className="h-screen w-screen overflow-hidden transition-colors">
+                <body className="w-screen h-screen overflow-hidden transition-colors bg-background text-foreground">
                     <Providers>
                         <ChatProvider
                             threadList={threads}
                             characterList={characterList}
                         >
-                            <div className="relative flex h-full w-full flex-col">
+                            <div className="relative flex flex-col w-full h-full">
                                 {children}
                             </div>
                         </ChatProvider>

@@ -20,7 +20,7 @@ export default function Sidebar({
             {/* Desktop */}
             <div
                 className={clsx(
-                    'fixed hidden h-full w-72 bg-accent py-2 text-accent-foreground transition-all dark:border-neutral-500 md:flex lg:inset-y-0',
+                    'fixed hidden h-full w-72 bg-accent py-2 text-accent-foreground transition-all dark:border-border md:flex lg:inset-y-0',
                     pos === 'left' ? 'left-0 border-r' : 'right-0 border-l',
                     open
                         ? 'translate-x-0'
@@ -30,7 +30,7 @@ export default function Sidebar({
                     className,
                 )}
             >
-                <div className="relative flex h-full w-full flex-col items-center justify-start gap-4 pb-2 md:pb-0">
+                <div className="relative flex flex-col items-center justify-start w-full h-full gap-4 pb-2 md:pb-0">
                     {children}
                 </div>
             </div>

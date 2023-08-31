@@ -86,8 +86,8 @@ export default function AgentSettings({
             <div className="flex flex-col gap-2">
                 <Input
                     className={clsx(
-                        'border-transparent p-1 text-lg font-bold focus:border-neutral-500 dark:bg-neutral-800',
-                        active ? 'bg-neutral-800' : 'bg-neutral-200',
+                        'border-border p-1 text-lg font-bold focus:border-border',
+                        active ? 'bg-accent' : 'bg-inherit',
                     )}
                     placeholder="Agent Name"
                     required
@@ -96,8 +96,8 @@ export default function AgentSettings({
                 />
                 <textarea
                     className={clsx(
-                        'rounded border border-transparent p-1 font-medium transition-colors focus:border-neutral-500 focus:outline-none dark:bg-neutral-800',
-                        active ? 'bg-neutral-800' : 'bg-neutral-200',
+                        'rounded border border-border p-1 font-medium transition-colors focus:border-neutral-500 focus:outline-none',
+                        active ? 'bg-accent' : 'bg-inherit',
                     )}
                     placeholder="Agent System Message"
                     required
@@ -108,7 +108,7 @@ export default function AgentSettings({
                 />
             </div>
             <div className="flex flex-col gap-4 rounded-md">
-                <div className="flex w-full flex-col gap-2">
+                <div className="flex flex-col w-full gap-2">
                     <label
                         className={clsx(
                             'flex flex-col rounded px-1 transition-colors dark:hover:bg-neutral-600',
@@ -131,7 +131,7 @@ export default function AgentSettings({
                             <input
                                 type="checkbox"
                                 title="Toggle plugins"
-                                className="h-4 w-4 cursor-pointer"
+                                className="w-4 h-4 cursor-pointer"
                                 checked={config.toolsEnabled}
                                 onChange={(e) =>
                                     onFieldChange(
@@ -172,7 +172,7 @@ export default function AgentSettings({
                                             {plugin}
                                         </span>
                                         <input
-                                            className="rounded-lg border p-2"
+                                            className="p-2 border rounded-lg"
                                             type="checkbox"
                                             checked={checked}
                                             onChange={() =>
@@ -216,10 +216,10 @@ export default function AgentSettings({
                 </details>
             </div>
             {!active && (
-                <div className="flex w-full justify-end">
+                <div className="flex justify-end w-full">
                     <button
                         type="submit"
-                        className="rounded-md bg-neutral-300 px-3 py-2 transition-colors hover:bg-neutral-400 focus:bg-neutral-500 dark:bg-neutral-500 dark:hover:bg-neutral-600"
+                        className="px-3 py-2 transition-colors rounded-md bg-neutral-300 hover:bg-neutral-400 focus:bg-neutral-500 dark:bg-neutral-500 dark:hover:bg-neutral-600"
                     >
                         {!isNew ? 'Update' : 'Create'}
                     </button>

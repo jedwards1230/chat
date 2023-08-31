@@ -16,6 +16,9 @@
         --primary: 0 0% 30%;
         --primary-foreground: 0 0% 100%;
 
+        --blue-primary: 217 91% 60%;
+        --blue-primary-foreground: 224 71% 45%;
+
         --secondary: 220 0% 90%;
         --secondary-foreground: 0 0% 9%;
 
@@ -48,6 +51,9 @@
         --primary: 0 0% 30%;
         --primary-foreground: 0 0% 100%;
 
+        --blue-primary: 217 91% 60%;
+        --blue-primary-foreground: 224 64% 33%;
+
         --secondary: 0 0% 14.9%;
         --secondary-foreground: 0 0% 98%;
 
@@ -60,7 +66,7 @@
         --destructive: 0 62.8% 30.6%;
         --destructive-foreground: 0 0% 98%;
 
-        --border: 0 0% 80%;
+        --border: 0 0% 50%;
         --input: 0 0% 89.8%;
         --ring: 0 0% 83.1%;
     }

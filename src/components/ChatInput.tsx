@@ -50,7 +50,7 @@ export default function ChatInput() {
             <QuickActions />
             <form
                 onSubmit={handleSubmit}
-                className="flex w-full items-end justify-center gap-2 justify-self-end border-t border-neutral-300 px-4 pb-6 pt-4 shadow-xl transition-all dark:border-0 dark:border-neutral-600 dark:shadow-none sm:pb-4 md:pb-2 md:pt-2"
+                className="flex items-end justify-center w-full gap-2 px-4 pt-4 pb-6 transition-all border-t shadow-xl justify-self-end border-border dark:shadow-none sm:pb-4 md:pb-2 md:pt-2"
             >
                 <div className="relative w-full max-w-4xl">
                     <motion.textarea
@@ -61,12 +61,12 @@ export default function ChatInput() {
                         rows={rows}
                         onChange={handleInputChange}
                         onKeyDown={onKeyDownHandler}
-                        className="w-full flex-1 resize-none rounded-lg border-2 border-neutral-200 py-2 pl-2 pr-24 shadow transition-colors focus:border-blue-500 focus:outline-none dark:border-neutral-600 dark:bg-neutral-800"
+                        className="flex-1 w-full py-2 pl-2 pr-24 transition-colors border-2 rounded-lg shadow resize-none bg-background dark:bg-accent border-border focus:border-blue-primary focus:outline-none"
                     />
                     {editId ? (
                         <div className="flex justify-between gap-4 pt-2">
                             <button
-                                className="rounded-lg border border-transparent bg-blue-500 px-6 py-1.5 text-neutral-50 transition-colors hover:bg-blue-400 focus:border-blue-500 focus:bg-blue-400 focus:outline-none dark:bg-blue-500 dark:hover:bg-blue-400"
+                                className="rounded-lg border border-transparent bg-blue-500 px-6 py-1.5 transition-colors hover:bg-blue-400 focus:border-blue-500 focus:bg-blue-400 focus:outline-none dark:bg-blue-500 dark:hover:bg-blue-400"
                                 onClick={handleSubmit}
                             >
                                 Update and Regenerate
@@ -87,10 +87,10 @@ export default function ChatInput() {
                     ) : (
                         <button
                             className={clsx(
-                                'absolute bottom-3 right-3 rounded-lg border border-transparent p-1 text-neutral-50 transition-colors focus:outline-none',
+                                'absolute bottom-3 right-3 rounded-lg border border-transparent p-1 transition-colors focus:outline-none',
                                 input.length > 0
-                                    ? 'cursor-pointer bg-blue-500 hover:bg-blue-400 focus:border-blue-500 focus:bg-blue-400 dark:bg-blue-500 dark:hover:bg-blue-400'
-                                    : 'cursor-default text-neutral-600',
+                                    ? 'cursor-pointer text-background bg-blue-500 hover:bg-blue-400 focus:border-blue-500 focus:bg-blue-400 dark:bg-blue-500 dark:hover:bg-blue-400'
+                                    : 'cursor-default text-foreground',
                             )}
                             type="submit"
                         >

@@ -54,7 +54,7 @@ export default function ChatHistory() {
                 </Button>
             </Link>
             {/* Chat History */}
-            <div className="flex w-full flex-1 flex-col gap-1 overflow-y-scroll pt-4">
+            <div className="flex flex-col flex-1 w-full gap-1 pt-2 overflow-y-scroll">
                 {threadList.map((thread, i) => (
                     <ChatHistoryEntry
                         key={`${i}-${thread.id}`}
@@ -63,7 +63,7 @@ export default function ChatHistory() {
                 ))}
             </div>
             {/* Footer Buttons */}
-            <div className="flex w-full justify-end gap-x-2 pb-3 pl-2 text-sm md:pb-1 md:pl-0">
+            <div className="flex justify-end w-full pb-3 pl-2 text-sm gap-x-2 md:pb-1 md:pl-0">
                 <ApiButton />
                 <ThemeToggle />
                 <SettingsButton />
