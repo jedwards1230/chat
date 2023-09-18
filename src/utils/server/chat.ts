@@ -1,9 +1,9 @@
 import OpenAI from 'openai';
-import { CompletionCreateParams } from 'openai/resources/chat';
 import { Stream } from 'openai/streaming';
 
 import { Calculator, Search, WebBrowser, WikipediaQueryRun } from '@/tools';
 import { prepareMessages } from '..';
+import { ChatCompletionCreateParams } from 'openai/resources/chat';
 
 const SERVER_KEY = process.env.OPENAI_API_KEY;
 
@@ -119,7 +119,7 @@ export async function getChatStream(
         }
     };
 
-    let functions: CompletionCreateParams.Function[] | undefined;
+    let functions: ChatCompletionCreateParams.Function[] | undefined;
     if (tools && tools.length > 0) {
         functions = tools.map((tool) => formatTool(tool));
     }

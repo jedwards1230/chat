@@ -1,6 +1,5 @@
 import * as cheerio from 'cheerio';
 import { BaseLanguageModel } from 'langchain/dist/base_language';
-import { Embeddings } from 'langchain/embeddings';
 import {
     TextSplitter,
     RecursiveCharacterTextSplitter,
@@ -35,7 +34,7 @@ export interface WebBrowserArgs extends ToolParams {
 export class WebBrowser implements CustomTool {
     private model: BaseLanguageModel;
 
-    private embeddings: Embeddings;
+    private embeddings: OpenAIEmbeddings;
 
     private headers: Headers;
 

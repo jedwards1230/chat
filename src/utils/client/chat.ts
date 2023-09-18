@@ -162,7 +162,6 @@ export async function getChat(
             }
         };
 
-        // Set botTyping state to true
         setState((prevState) => ({
             ...prevState,
             botTyping: true,
