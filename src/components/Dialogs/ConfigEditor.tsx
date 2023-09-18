@@ -5,7 +5,6 @@ import Image from 'next/image';
 import { useSession, signOut } from 'next-auth/react';
 
 import Dialog from './Dialog';
-import Input from '../Forms/Input';
 import { Check, XMark } from '../Icons';
 import { useChat } from '@/providers/ChatProvider';
 import { useUI } from '@/providers/UIProvider';
@@ -17,6 +16,7 @@ import {
     deleteLocalOpenAiKey,
     setLocalOpenAiKey,
 } from '@/utils/client/storage';
+import { Input } from '../ui/input';
 
 export default function ConfigEditor() {
     const { openAiApiKey, setOpenAiApiKey } = useChat();
@@ -26,8 +26,6 @@ export default function ConfigEditor() {
     const [apiKey, setApiKey] = useState(openAiApiKey || '');
     const [apiError, setApiError] = useState<string | null>(null);
     const [validating, setValidating] = useState(false);
-
-    console.log(session);
 
     const closeConfigEditor = () => {
         setConfigEditorOpen(false);
@@ -96,7 +94,7 @@ export default function ConfigEditor() {
                         <div className="font-medium">OpenAI Api Key</div>
                         <div className="flex w-full gap-2 pt-2">
                             <Input
-                                className="w-full p-1 dark:border-neutral-600 dark:focus:border-neutral-400"
+                                className="w-full"
                                 value={apiKey}
                                 type={apiError ? 'text' : 'password'}
                                 placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"

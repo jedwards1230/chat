@@ -18,8 +18,6 @@ type ModalState = {
     setConfigEditorOpen: (open: boolean) => void;
     shareModalOpen: boolean;
     setShareModalOpen: (open: boolean) => void;
-    characterSelectorOpen: boolean;
-    setCharacterSelectorOpen: (open: boolean) => void;
     openAIKeyOpen: boolean;
     setOpenAIKeyOpen: Dispatch<SetStateAction<boolean>>;
     signInOpen: boolean;
@@ -35,8 +33,6 @@ const initialState: ModalState = {
     setConfigEditorOpen: () => {},
     shareModalOpen: false,
     setShareModalOpen: () => {},
-    characterSelectorOpen: false,
-    setCharacterSelectorOpen: () => {},
     openAIKeyOpen: false,
     setOpenAIKeyOpen: () => {},
     signInOpen: false,
@@ -58,9 +54,6 @@ export function UIProvider({ children }: { children: React.ReactNode }) {
     );
     const [shareModalOpen, setShareModalOpen] = useState(
         initialState.shareModalOpen,
-    );
-    const [characterSelectorOpen, setCharacterSelectorOpen] = useState(
-        initialState.characterSelectorOpen,
     );
     const [openAIKeyOpen, setOpenAIKeyOpen] = useState(
         initialState.openAIKeyOpen,
@@ -99,8 +92,6 @@ export function UIProvider({ children }: { children: React.ReactNode }) {
                 setConfigEditorOpen,
                 shareModalOpen,
                 setShareModalOpen,
-                characterSelectorOpen,
-                setCharacterSelectorOpen,
                 openAIKeyOpen,
                 setOpenAIKeyOpen,
                 signInOpen,

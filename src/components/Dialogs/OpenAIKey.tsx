@@ -6,7 +6,6 @@ import { signOut, useSession } from 'next-auth/react';
 import Dialog from './Dialog';
 import { useUI } from '@/providers/UIProvider';
 import { useChat } from '@/providers/ChatProvider';
-import Input from '../Forms/Input';
 import { Check, XMark } from '../Icons';
 import { validateOpenAIKey } from '@/utils/client/client';
 import {
@@ -14,6 +13,7 @@ import {
     setLocalOpenAiKey,
 } from '@/utils/client/storage';
 import { useRouter } from 'next/navigation';
+import { Input } from '../ui/input';
 
 export default function OpenAIKey() {
     const { setOpenAIKeyOpen } = useUI();
@@ -158,7 +158,7 @@ function ClientSideKey() {
             </div>
             <div className="flex w-full gap-2">
                 <Input
-                    className="w-full p-1"
+                    className="w-full"
                     value={apiKey}
                     type="password"
                     placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"

@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import { useState } from 'react';
 import clsx from 'clsx';
 import { PanInfo, motion } from 'framer-motion';
 
@@ -88,7 +88,7 @@ export default function Chat() {
 
     return (
         <>
-            <div className="flex h-full w-full">
+            <div className="flex w-full h-full">
                 <ChatHistory />
                 <motion.div
                     onPanStart={onPanStart}

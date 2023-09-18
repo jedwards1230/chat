@@ -5,7 +5,9 @@ import { useEffect, useState } from 'react';
 
 import { useChat } from '@/providers/ChatProvider';
 import { defaultAgentConfig } from '@/providers/characters';
-import Input from './Forms/Input';
+import { Input } from './ui/input';
+import { Textarea } from './ui/textarea';
+import { Checkbox } from './ui/checkbox';
 
 const availableTools: Tool[] = [
     'calculator',
@@ -85,20 +87,12 @@ export default function AgentSettings({
         <form onSubmit={handleSubmit} className="w-full space-y-4">
             <div className="flex flex-col gap-2">
                 <Input
-                    className={clsx(
-                        'border-border p-1 text-lg font-bold focus:border-border',
-                        active ? 'bg-accent' : 'bg-inherit',
-                    )}
                     placeholder="Agent Name"
                     required
                     value={config.name}
                     onChange={(e) => onFieldChange('name', e.target.value)}
                 />
-                <textarea
-                    className={clsx(
-                        'rounded border border-border p-1 font-medium transition-colors focus:border-neutral-500 focus:outline-none',
-                        active ? 'bg-accent' : 'bg-inherit',
-                    )}
+                <Textarea
                     placeholder="Agent System Message"
                     required
                     value={config.systemMessage}
@@ -128,16 +122,11 @@ export default function AgentSettings({
                             >
                                 Plugins
                             </div>
-                            <input
-                                type="checkbox"
+                            <Checkbox
                                 title="Toggle plugins"
-                                className="w-4 h-4 cursor-pointer"
                                 checked={config.toolsEnabled}
-                                onChange={(e) =>
-                                    onFieldChange(
-                                        'toolsEnabled',
-                                        e.target.checked,
-                                    )
+                                onCheckedChange={(e) =>
+                                    onFieldChange('toolsEnabled', e)
                                 }
                             />
                         </div>
@@ -171,11 +160,9 @@ export default function AgentSettings({
                                         <span className="capitalize">
                                             {plugin}
                                         </span>
-                                        <input
-                                            className="p-2 border rounded-lg"
-                                            type="checkbox"
+                                        <Checkbox
                                             checked={checked}
-                                            onChange={() =>
+                                            onCheckedChange={() =>
                                                 togglePlugin(plugin)
                                             }
                                         />
