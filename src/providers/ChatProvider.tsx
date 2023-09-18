@@ -2,7 +2,8 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useAuth } from '@clerk/nextjs';
+import { usePlausible } from 'next-plausible';
+import { useSession } from 'next-auth/react';
 
 import {
     abortRequestHandler,
@@ -34,7 +35,6 @@ import {
     getLocalThreadList,
     setLocalThreadList,
 } from '@/utils/client/storage';
-import { usePlausible } from 'next-plausible';
 
 const ChatContext = createContext<ChatState>(initialState);
 
@@ -50,7 +50,8 @@ export function ChatProvider({
     characterList: AgentConfig[];
 }) {
     const plausible = usePlausible();
-    const { userId } = useAuth();
+    const { data: session } = useSession();
+    const userId = session?.user?.email;
     const router = useRouter();
     const params = useSearchParams();
     const threadId = params.get('c');

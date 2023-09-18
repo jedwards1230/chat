@@ -4,25 +4,6 @@ const withPWA = require('@ducanh2912/next-pwa').default({
 
 const { withPlausibleProxy } = require('next-plausible');
 
-module.exports = withPWA({
-    experimental: {
-        serverActions: true,
-        webVitalsAttribution: ['CLS', 'LCP', 'FCP', 'FID', 'INP', 'TTFB'],
-    },
-    images: {
-        remotePatterns: [
-            {
-                protocol: 'https',
-                hostname: 'img.clerk.com',
-            },
-            {
-                protocol: 'https',
-                hostname: 'images.clerk.dev',
-            },
-        ],
-    },
-});
-
 module.exports = withPWA(
     withPlausibleProxy()({
         experimental: {
@@ -33,11 +14,7 @@ module.exports = withPWA(
             remotePatterns: [
                 {
                     protocol: 'https',
-                    hostname: 'img.clerk.com',
-                },
-                {
-                    protocol: 'https',
-                    hostname: 'images.clerk.dev',
+                    hostname: 'avatars.githubusercontent.com',
                 },
             ],
         },

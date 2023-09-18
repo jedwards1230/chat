@@ -1,15 +1,16 @@
 'use client';
 
+import { useSession } from 'next-auth/react';
+
 import ConfigEditor from './ConfigEditor';
 import CharacterSelector from './CharacterSelector';
 import ShareChat from './ShareChat';
 import { useUI } from '@/providers/UIProvider';
-import { useAuth } from '@clerk/nextjs';
 import OpenAIKey from './OpenAIKey';
-import SignIn from './SignIn';
 
 export default function Dialogs() {
-    const { userId } = useAuth();
+    const { data: session } = useSession();
+    const userId = session?.user?.email;
     const {
         configEditorOpen,
         shareModalOpen,
@@ -19,9 +20,9 @@ export default function Dialogs() {
     } = useUI();
 
     const ActiveDialog = () => {
-        if (signInOpen && !userId) {
+        /* if (signInOpen && !userId) {
             return <SignIn />;
-        }
+        } */
 
         if (openAIKeyOpen) {
             return <OpenAIKey />;

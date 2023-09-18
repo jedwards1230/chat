@@ -4,7 +4,7 @@ import * as React from 'react';
 import { Key, Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import clsx from 'clsx';
-import { useAuth } from '@clerk/nextjs';
+import { useSession } from 'next-auth/react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -46,7 +46,8 @@ export function ThemeToggle() {
 }
 
 export function ApiButton() {
-    const { userId } = useAuth();
+    const { data: session } = useSession();
+    const userId = session?.user?.email;
     const { openAiApiKey } = useChat();
     const { setSideBarOpen, setOpenAIKeyOpen } = useUI();
 
