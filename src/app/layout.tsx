@@ -4,12 +4,11 @@ import PlausibleProvider from 'next-plausible';
 import './globals.css';
 import Providers from '@/providers';
 import { ChatProvider } from '@/providers/ChatProvider';
-import supabase from '@/lib/supabase.server';
 import {
     getCharacterListByUserId,
     getThreadListByUserId,
+    getUserId,
 } from '@/utils/server/supabase';
-import { auth } from '@/auth';
 
 export const runtime = 'edge';
 
@@ -65,19 +64,7 @@ export default async function RootLayout({
 }: {
     children: React.ReactNode;
 }) {
-    const session = await auth();
-    const userId = session?.user?.email;
-
-    const { data, error } = await supabase
-        .from('users')
-        .select('userid')
-        .eq('userid', userId);
-
-    if (data?.length === 0) {
-        const { data, error } = await supabase
-            .from('users')
-            .insert([{ userid: userId }]);
-    }
+    const userId = await getUserId(true);
 
     const [threads, characterList] = await Promise.all([
         getThreadListByUserId(userId!),
@@ -92,13 +79,13 @@ export default async function RootLayout({
                     trackOutboundLinks={true}
                 />
             </head>
-            <body className="w-screen h-screen overflow-hidden transition-colors bg-background text-foreground">
+            <body className="h-screen w-screen overflow-hidden bg-background text-foreground transition-colors">
                 <Providers>
                     <ChatProvider
                         threadList={threads}
                         characterList={characterList}
                     >
-                        <div className="relative flex flex-col w-full h-full">
+                        <div className="relative flex h-full w-full flex-col">
                             {children}
                         </div>
                     </ChatProvider>

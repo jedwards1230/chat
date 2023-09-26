@@ -318,3 +318,23 @@ export async function deleteMessageById(messageId: string) {
         throw new Error(messageError.message);
     }
 }
+
+export async function getUserId(init = false) {
+    const session = await auth();
+    const userId = session?.user?.email;
+
+    if (init) {
+        const { data, error } = await supabase
+            .from('users')
+            .select('userid')
+            .eq('userid', userId);
+
+        if (data?.length === 0) {
+            const { data, error } = await supabase
+                .from('users')
+                .insert([{ userid: userId }]);
+        }
+    }
+
+    return userId;
+}
