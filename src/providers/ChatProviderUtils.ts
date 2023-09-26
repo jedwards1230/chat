@@ -1,7 +1,7 @@
 'use client';
 
 import { Dispatch, SetStateAction, FormEvent } from 'react';
-import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';
+import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 
 import initialState, { getDefaultThread } from './initialChat';
 import { createUserMsg, getTitle, getChat } from '@/utils/client';

@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-import { ClerkProvider, auth } from '@clerk/nextjs';
 import PlausibleProvider from 'next-plausible';
 
 import './globals.css';
@@ -10,6 +9,7 @@ import {
     getCharacterListByUserId,
     getThreadListByUserId,
 } from '@/utils/server/supabase';
+import { auth } from '@/auth';
 
 export const runtime = 'edge';
 
@@ -65,7 +65,8 @@ export default async function RootLayout({
 }: {
     children: React.ReactNode;
 }) {
-    const { userId } = auth();
+    const session = await auth();
+    const userId = session?.user?.email;
 
     const { data, error } = await supabase
         .from('users')
@@ -84,27 +85,25 @@ export default async function RootLayout({
     ]);
 
     return (
-        <ClerkProvider>
-            <html lang="en" suppressHydrationWarning={true}>
-                <head>
-                    <PlausibleProvider
-                        domain="chat.jedwards.cc"
-                        trackOutboundLinks={true}
-                    />
-                </head>
-                <body className="w-screen h-screen overflow-hidden transition-colors bg-background text-foreground">
-                    <Providers>
-                        <ChatProvider
-                            threadList={threads}
-                            characterList={characterList}
-                        >
-                            <div className="relative flex flex-col w-full h-full">
-                                {children}
-                            </div>
-                        </ChatProvider>
-                    </Providers>
-                </body>
-            </html>
-        </ClerkProvider>
+        <html lang="en" suppressHydrationWarning={true}>
+            <head>
+                <PlausibleProvider
+                    domain="chat.jedwards.cc"
+                    trackOutboundLinks={true}
+                />
+            </head>
+            <body className="w-screen h-screen overflow-hidden transition-colors bg-background text-foreground">
+                <Providers>
+                    <ChatProvider
+                        threadList={threads}
+                        characterList={characterList}
+                    >
+                        <div className="relative flex flex-col w-full h-full">
+                            {children}
+                        </div>
+                    </ChatProvider>
+                </Providers>
+            </body>
+        </html>
     );
 }

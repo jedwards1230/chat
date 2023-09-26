@@ -1,7 +1,6 @@
 'use server';
 
-import { auth } from '@clerk/nextjs';
-
+import { auth } from '@/auth';
 import supabase from '@/lib/supabase.server';
 import initialState from '@/providers/initialChat';
 
@@ -59,10 +58,8 @@ export async function getThreadListByUserId(
 export async function upsertThread(thread: ChatThread) {
     if (thread.messages.length === 0) return;
 
-    const { userId } = auth();
-    if (!userId) {
-        throw new Error('No user id');
-    }
+    const session = await auth();
+    const userId = session?.user?.email;
 
     if (thread.messages.length > 0) {
         const { data: threadData, error: threadError } = await supabase
@@ -111,10 +108,8 @@ export async function upsertThread(thread: ChatThread) {
 }
 
 export async function deleteThreadById(threadId: string) {
-    const { userId } = auth();
-    if (!userId) {
-        throw new Error('No user id');
-    }
+    const session = await auth();
+    const userId = session?.user?.email;
 
     const { data: threadData, error: threadError } = await supabase
         .from('chat_threads')
@@ -127,10 +122,8 @@ export async function deleteThreadById(threadId: string) {
 }
 
 export async function deleteAllThreads() {
-    const { userId } = auth();
-    if (!userId) {
-        throw new Error('No user id');
-    }
+    const session = await auth();
+    const userId = session?.user?.email;
 
     const { data: threadData, error: threadError } = await supabase
         .from('chat_threads')
@@ -146,10 +139,8 @@ export async function deleteAllThreads() {
 Shared Threads
 */
 export async function shareThread(thread: ChatThread) {
-    const { userId } = auth();
-    if (!userId) {
-        throw new Error('No user id');
-    }
+    const session = await auth();
+    const userId = session?.user?.email;
 
     const { data: threadData, error: threadError } = await supabase
         .from('shared_chat_threads')
@@ -256,10 +247,8 @@ export async function getCharacterListByUserId(
 }
 
 export async function upsertCharacter(character: AgentConfig) {
-    const { userId } = auth();
-    if (!userId) {
-        throw new Error('No user id');
-    }
+    const session = await auth();
+    const userId = session?.user?.email;
 
     const { data, error } = await supabase.from('agent_config').upsert(
         [
@@ -300,10 +289,8 @@ export async function upsertCharacter(character: AgentConfig) {
 } */
 
 export async function deleteAllCharacters() {
-    const { userId } = auth();
-    if (!userId) {
-        throw new Error('No user id');
-    }
+    const session = await auth();
+    const userId = session?.user?.email;
 
     const { data: characterData, error: characterError } = await supabase
         .from('agent_config')
@@ -319,10 +306,8 @@ export async function deleteAllCharacters() {
 Messages
 */
 export async function deleteMessageById(messageId: string) {
-    const { userId } = auth();
-    if (!userId) {
-        throw new Error('No user id');
-    }
+    const session = await auth();
+    const userId = session?.user?.email;
 
     const { data: messageData, error: messageError } = await supabase
         .from('messages')

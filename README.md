@@ -17,7 +17,7 @@ Chat comes with a range of features designed to enhance user experience:
 -   **Fast Streaming**: Leverages Edge Functions for quick and seamless exchanges.
 -   **Share Chat**: Share your conversations with a generated link.
 -   **Data Storage**: Securely stores data in Supabase database.
--   **OAuth Access**: Provides GitHub OAuth access via Clerk.com.
+-   **OAuth Access**: Provides GitHub OAuth access via Auth.js.
 -   **Responsive Design**: Offers a responsive design with dark mode and PWA.
 
 ## Installation
@@ -45,7 +45,7 @@ We're constantly working on improving Chat with new features:
 -   TypeScript
 -   Tailwind CSS
 -   OpenAI API
--   Clerk.com (OAuth)
+-   OAuth with Auth.js
 -   Supabase (PostgreSQL)
 
 ## Contribution

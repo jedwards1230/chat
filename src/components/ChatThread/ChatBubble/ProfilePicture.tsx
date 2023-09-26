@@ -1,12 +1,13 @@
-import { useUser } from '@clerk/nextjs';
 import clsx from 'clsx';
+import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 
 export default function ProfilePicture({ message }: { message: Message }) {
-    const { user } = useUser();
+    const { data: session } = useSession();
+    const user = session?.user;
 
     return (
-        <div className="my-1 flex h-full items-start">
+        <div className="flex items-start h-full my-1">
             <div
                 className={clsx(
                     'flex h-8 w-8 select-none items-center justify-center overflow-hidden rounded border transition-colors dark:border-neutral-700',
@@ -25,9 +26,9 @@ export default function ProfilePicture({ message }: { message: Message }) {
                         : 'Function'
                 }
             >
-                {message.role === 'user' && user?.imageUrl ? (
+                {message.role === 'user' && user?.image ? (
                     <Image
-                        src={user.imageUrl}
+                        src={user.image}
                         alt="You"
                         width={32}
                         height={32}
