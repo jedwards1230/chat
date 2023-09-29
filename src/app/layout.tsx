@@ -3,12 +3,6 @@ import PlausibleProvider from 'next-plausible';
 
 import './globals.css';
 import Providers from '@/providers';
-import { ChatProvider } from '@/providers/ChatProvider';
-import {
-    getCharacterListByUserId,
-    getThreadListByUserId,
-    getUserId,
-} from '@/utils/server/supabase';
 
 export const runtime = 'edge';
 
@@ -59,18 +53,11 @@ export const metadata: Metadata = {
     },
 };
 
-export default async function RootLayout({
+export default function RootLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
-    const userId = await getUserId(true);
-
-    const [threads, characterList] = await Promise.all([
-        getThreadListByUserId(userId!),
-        getCharacterListByUserId(userId!),
-    ]);
-
     return (
         <html lang="en" suppressHydrationWarning={true}>
             <head>
@@ -81,14 +68,9 @@ export default async function RootLayout({
             </head>
             <body className="h-screen w-screen overflow-hidden bg-background text-foreground transition-colors">
                 <Providers>
-                    <ChatProvider
-                        threadList={threads}
-                        characterList={characterList}
-                    >
-                        <div className="relative flex h-full w-full flex-col">
-                            {children}
-                        </div>
-                    </ChatProvider>
+                    <div className="relative flex h-full w-full flex-col">
+                        {children}
+                    </div>
                 </Providers>
             </body>
         </html>

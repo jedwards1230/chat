@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { usePlausible } from 'next-plausible';
 import { useSession } from 'next-auth/react';
 
@@ -44,17 +44,17 @@ export function ChatProvider({
     children,
     threadList,
     characterList,
+    threadId,
 }: {
     children: React.ReactNode;
     threadList: ChatThread[];
     characterList: AgentConfig[];
+    threadId?: string;
 }) {
     const plausible = usePlausible();
     const { data: session } = useSession();
     const userId = session?.user?.email;
     const router = useRouter();
-    const params = useSearchParams();
-    const threadId = params.get('c');
 
     const { setOpenAIKeyOpen } = useUI();
 
