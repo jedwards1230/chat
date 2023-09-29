@@ -2,25 +2,24 @@
 
 import clsx from 'clsx';
 import Link from 'next/link';
-import { useSession } from 'next-auth/react';
 
 import { useChat } from '@/providers/ChatProvider';
 import { Chat, Trash } from '../Icons';
 import { isMobile } from '@/utils/client';
 import { useUI } from '@/providers/UIProvider';
 import { deleteThreadById } from '@/utils/server/supabase';
+import { deleteLocalThreadById } from '@/utils/client/storage';
 
 export default function ChatHistoryEntry({ entry }: { entry: ChatThread }) {
     const { activeThread, removeThread } = useChat();
     const { setSideBarOpen } = useUI();
-    const { data: session } = useSession();
-    const userId = session?.user?.email;
 
     // Function to remove a thread and update the local storage
     const remove = (e: any) => {
         e.stopPropagation();
         removeThread(entry.id);
-        if (userId) deleteThreadById(entry.id);
+        deleteThreadById(entry.id);
+        deleteLocalThreadById(entry.id);
     };
 
     const setActive = (e: any) => {
@@ -47,7 +46,7 @@ export default function ChatHistoryEntry({ entry }: { entry: ChatThread }) {
                 </div>
             </Link>
             <div
-                className="absolute top-0 right-0 z-50 flex items-center justify-center col-span-2 mt-2 mr-2 rounded-full cursor-pointer select-none peer text-neutral-300 hover:text-neutral-50"
+                className="peer absolute right-0 top-0 z-50 col-span-2 mr-2 mt-2 flex cursor-pointer select-none items-center justify-center rounded-full text-neutral-300 hover:text-neutral-50"
                 onClick={remove}
                 title="Delete conversation"
             >

@@ -111,13 +111,15 @@ export async function deleteThreadById(threadId: string) {
     const session = await auth();
     const userId = session?.user?.email;
 
-    const { data: threadData, error: threadError } = await supabase
-        .from('chat_threads')
-        .delete()
-        .eq('id', threadId);
+    if (userId) {
+        const { data: threadData, error: threadError } = await supabase
+            .from('chat_threads')
+            .delete()
+            .eq('id', threadId);
 
-    if (threadError) {
-        throw new Error(threadError.message);
+        if (threadError) {
+            throw new Error(threadError.message);
+        }
     }
 }
 

@@ -26,6 +26,14 @@ export function getLocalThreadList() {
     return localThreads;
 }
 
+export function deleteLocalThreadById(id: string) {
+    const threads = window.localStorage.getItem('chatThreads');
+    const localThreads: ChatThread[] = threads
+        ? JSON.parse(threads).filter((t: ChatThread) => t.id !== id)
+        : initialState.threads;
+    window.localStorage.setItem('chatThreads', JSON.stringify(localThreads));
+}
+
 export function setLocalThreadList(threads: ChatThread[]) {
     window.localStorage.setItem('chatThreads', JSON.stringify(threads));
 }
