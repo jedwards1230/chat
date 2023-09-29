@@ -1,11 +1,8 @@
 'use client';
 
-import clsx from 'clsx';
 import { useMemo, useState } from 'react';
 import { PrismAsync as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vs } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { useTheme } from 'next-themes';
 import ReactMarkdown, { Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -20,7 +17,6 @@ export default function Markdown({
     content?: string;
     children?: string;
 }) {
-    const { resolvedTheme } = useTheme();
     const [btnClicked, setBtnClicked] = useState(false);
 
     const components = useMemo<Partial<Components>>(
@@ -74,7 +70,7 @@ export default function Markdown({
                 if (match) {
                     const Highlight = SyntaxHighlighter as any;
                     return (
-                        <div className="rounded-rounded flex flex-col gap-1 border border-neutral-600 bg-neutral-200 p-1 font-normal dark:bg-neutral-700">
+                        <div className="rounded-rounded flex flex-col gap-1 border border-border bg-accent p-1 font-normal text-accent-foreground">
                             <div className="flex items-center justify-between">
                                 <div className="pl-2">
                                     {language ? language : 'code'}
@@ -82,7 +78,7 @@ export default function Markdown({
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="text-foreground"
+                                    className="text-accent-foreground"
                                     onClick={() => {
                                         navigator.clipboard.writeText(
                                             String(children),
@@ -98,9 +94,7 @@ export default function Markdown({
                             </div>
                             <Highlight
                                 {...props}
-                                style={
-                                    resolvedTheme !== 'dark' ? vs : vscDarkPlus
-                                }
+                                style={vscDarkPlus}
                                 className="!m-0"
                                 language={match[1]}
                             >
@@ -152,7 +146,7 @@ export default function Markdown({
             thead: ({ node, ...props }) => <thead {...props} />,
             tr: ({ node, ...props }) => <tr {...props} className="border" />,
         }),
-        [btnClicked, resolvedTheme],
+        [btnClicked],
     );
 
     return (
