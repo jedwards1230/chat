@@ -1,9 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { defaultAgentConfig, defaultAgents } from './characters';
 
-// todo: thread id can be duplicated between different deployments
-// this causes weird thread merging issues
-// the id should probably be chosen by the database since it tracks unique ids
 export function getDefaultThread(config: AgentConfig): ChatThread {
     return {
         id: uuidv4(),

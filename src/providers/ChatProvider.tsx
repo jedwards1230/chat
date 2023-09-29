@@ -78,9 +78,7 @@ export function ChatProvider({
     useEffect(() => {
         // Load OpenAI API key from local storage
         const key = getLocalOpenAiKey();
-        if (key) {
-            setOpenAiApiKey(key);
-        }
+        if (key) setOpenAiApiKey(key);
 
         // Load threads from local storage if not connected to db
         setState((prevState) => ({
