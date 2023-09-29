@@ -60,14 +60,14 @@
         --muted: 0 0% 14.9%;
         --muted-foreground: 0 0% 63.9%;
 
-        --accent: 0 0% 12.9%;
+        --accent: 0 0% 9.9%;
         --accent-foreground: 0 0% 98%;
 
         --destructive: 0 62.8% 30.6%;
         --destructive-foreground: 0 0% 98%;
 
         --border: 0 0% 50%;
-        --input: 0 0% 89.8%;
+        --input: 0 0% 59.8%;
         --ring: 0 0% 83.1%;
     }
 }
@@ -78,5 +78,9 @@
     }
     body {
         @apply bg-background text-foreground;
+    }
+    ul,
+    ol {
+        list-style: revert;
     }
 }

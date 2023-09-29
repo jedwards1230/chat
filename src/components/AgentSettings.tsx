@@ -102,7 +102,7 @@ export default function AgentSettings({
                 />
             </div>
             <div className="flex flex-col gap-4 rounded-md">
-                <div className="flex flex-col w-full gap-2">
+                <div className="flex w-full flex-col gap-2">
                     <label
                         className={clsx(
                             'flex flex-col rounded px-1 transition-colors dark:hover:bg-neutral-600',
@@ -203,10 +203,10 @@ export default function AgentSettings({
                 </details>
             </div>
             {!active && (
-                <div className="flex justify-end w-full">
+                <div className="flex w-full justify-end">
                     <button
                         type="submit"
-                        className="px-3 py-2 transition-colors rounded-md bg-neutral-300 hover:bg-neutral-400 focus:bg-neutral-500 dark:bg-neutral-500 dark:hover:bg-neutral-600"
+                        className="rounded-md bg-neutral-300 px-3 py-2 transition-colors hover:bg-neutral-400 focus:bg-neutral-500 dark:bg-neutral-500 dark:hover:bg-neutral-600"
                     >
                         {!isNew ? 'Update' : 'Create'}
                     </button>

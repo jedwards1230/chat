@@ -121,20 +121,11 @@ export default function Markdown({
                 <strong {...props} className="font-bold" />
             ),
             hr: ({ node, ...props }) => <hr {...props} className="my-2" />,
-            li: ({ node, children, ...props }) => (
-                <li {...props}>{children}</li>
-            ),
             ol: ({ node, ...props }) => (
-                <ol
-                    {...props}
-                    className="inline-block list-outside list-decimal"
-                />
+                <ol {...props} className="list-inside list-decimal" />
             ),
             ul: ({ node, ...props }) => (
-                <ul
-                    {...props}
-                    className={clsx('inline-block list-outside list-disc')}
-                />
+                <ul {...props} className="list-inside list-disc" />
             ),
             a: ({ node, ...props }) => (
                 <a {...props} className="text-blue-500 hover:underline" />

@@ -26,11 +26,11 @@ export default function CharacterSelector({
                         variant="outline"
                         size="icon"
                         onClick={() => setActiveCard('New Character')}
-                        className="text-xl"
+                        className="bg-inherit text-xl hover:bg-accent/30"
                     >
                         +
                     </Button>
-                    <div className="flex-1 col-span-8 col-start-3 text-xl font-semibold text-center">
+                    <div className="col-span-8 col-start-3 flex-1 text-center text-xl font-semibold">
                         Character{' '}
                         {activeCard === undefined ? 'Selector' : 'Editor'}
                     </div>
