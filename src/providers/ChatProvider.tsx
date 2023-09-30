@@ -34,7 +34,7 @@ import {
     getLocalOpenAiKey,
     getLocalThreadList,
     setLocalThreadList,
-} from '@/utils/client/storage';
+} from '@/utils/client/localstorage';
 
 const ChatContext = createContext<ChatState>(initialState);
 

@@ -9,22 +9,26 @@ export const fullConfig = resolveConfig(tailwindConfig);
 
 export async function readStream(
     stream: ReadableStream,
-    chunkCallback: (token: string) => void,
+    chunkCallback: (
+        token: OpenAI.Chat.Completions.ChatCompletionChunk[],
+    ) => void,
 ) {
     const reader = stream.getReader();
-    let accumulatedResponse = '';
+    const accumulated = [];
 
     while (true) {
         const { done, value } = await reader.read();
         if (done) break;
         if (value) {
             const decoded = new TextDecoder().decode(value);
-            accumulatedResponse += decoded;
-            chunkCallback(accumulatedResponse);
+            accumulated.push(
+                JSON.parse(
+                    decoded,
+                ) as OpenAI.Chat.Completions.ChatCompletionChunk,
+            );
+            chunkCallback(accumulated);
         }
     }
-
-    return accumulatedResponse;
 }
 
 export function isMobile(size?: 'sm' | 'md' | 'lg' | 'xl') {
@@ -94,26 +98,52 @@ export async function callTool(tool: Tool, input: string) {
     return (await res.json()) as string;
 }
 
-export function parseStreamData(chunk: string): StreamData[] {
-    try {
-        return chunk
-            .split('\n')
-            .filter((c) => c.length > 0)
-            .map((c) => {
-                // TODO: ensure this only replaces the first instance
-                const jsonStr = c.replace('data: ', '');
-                if (jsonStr === '[DONE]') return;
-                try {
-                    return JSON.parse(jsonStr);
-                } catch {
-                    return;
-                }
+export function parseStreamData(
+    chunks: (OpenAI.Chat.Completions.ChatCompletionChunk & { error?: any })[],
+) {
+    let accumulatedResponse = '';
+    let toolCalls: ToolInput[] = [];
+    let tool = '';
+    let toolArgs = '';
+
+    const parseTool = () => {
+        try {
+            toolCalls.push({
+                name: tool as Tool,
+                args: JSON.parse(toolArgs),
             });
-    } catch (e) {
-        console.error(e);
-        console.log(chunk);
-        return [];
+        } catch {
+            toolCalls.push({
+                name: tool as Tool,
+                args: { input: toolArgs },
+            });
+        }
+        tool = '';
+        toolArgs = '';
+    };
+
+    for (const c of chunks) {
+        if (c.error) {
+            accumulatedResponse = c.error;
+            throw new Error(c.error);
+        }
+        const data = c.choices[0];
+        if (data) {
+            if (data.finish_reason === 'function_call') {
+                parseTool();
+            }
+            if (data.delta.function_call) {
+                if (data.delta.function_call.name)
+                    tool = data.delta.function_call.name;
+                toolArgs += data.delta.function_call.arguments || '';
+            }
+            if (data.delta.content) {
+                accumulatedResponse += data.delta.content;
+            }
+        }
     }
+
+    return { toolCalls, accumulatedResponse };
 }
 
 export async function validateOpenAIKey(apiKey: string) {

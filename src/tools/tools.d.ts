@@ -14,3 +14,8 @@ type CustomTool = {
         };
     };
 };
+
+type ToolInput = {
+    name: Tool;
+    args: any;
+};

@@ -8,7 +8,7 @@ import { Chat, Trash } from '../Icons';
 import { isMobile } from '@/utils/client';
 import { useUI } from '@/providers/UIProvider';
 import { deleteThreadById } from '@/utils/server/supabase';
-import { deleteLocalThreadById } from '@/utils/client/storage';
+import { deleteLocalThreadById } from '@/utils/client/localstorage';
 
 export default function ChatHistoryEntry({ entry }: { entry: ChatThread }) {
     const { activeThread, removeThread } = useChat();

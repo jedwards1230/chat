@@ -30,8 +30,8 @@ export default function TextContent({
         }
 
         return (
-            <details className="flex w-full flex-col items-start rounded">
-                <summary className="w-full cursor-pointer gap-2 text-ellipsis rounded-lg p-2 capitalize hover:bg-neutral-300 dark:hover:bg-neutral-700">
+            <details className="flex flex-col items-start w-full rounded">
+                <summary className="w-full gap-2 p-2 capitalize rounded-lg cursor-pointer text-ellipsis hover:bg-neutral-300 dark:hover:bg-neutral-700">
                     <div className="inline-block align-middle">
                         {message.name}:
                     </div>{' '}
@@ -52,7 +52,7 @@ export default function TextContent({
     const SystemContent = () => {
         if (!config) return null;
         return (
-            <div className="flex w-full flex-col justify-start rounded text-sm text-neutral-400 dark:text-neutral-400">
+            <div className="flex flex-col justify-start w-full text-sm rounded text-neutral-400 dark:text-neutral-400">
                 <div>Model: {config.model}</div>
                 <div>System Message: {message.content}</div>
                 {config.toolsEnabled && config.tools.length > 0 && (
@@ -65,7 +65,7 @@ export default function TextContent({
     };
 
     return (
-        <div className="flex w-full flex-col overflow-x-scroll rounded px-2 py-2 transition-colors">
+        <div className="flex flex-col w-full px-2 py-2 overflow-x-scroll transition-colors rounded">
             {message.role === 'function' ? (
                 <FunctionContent />
             ) : message.role === 'system' ? (

@@ -2,6 +2,7 @@
 
 import { Dispatch, SetStateAction } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import OpenAI from 'openai';
 
 import { readStream, callTool, parseStreamData } from '../client';
 import { getChatStream, getTitleStream } from '../server/chat';
@@ -47,26 +48,12 @@ export async function getTitle(
         openAiApiKey,
     );
 
-    // Function to reduce the response stream data
-    const reduceStreamData = (acc: string, curr: StreamData) => {
-        if (!curr || !curr.choices) return acc;
-        const res = curr.choices[0];
-        if (res.finish_reason) {
-            return acc;
-        }
-        if (res.delta.function_call) {
-            throw new Error('Function call in get_title');
-        }
-        return acc + res.delta.content;
-    };
-
     // Callback function to handle each chunk of the response stream
-    const streamCallback = (chunk: string) => {
-        const chunks = parseStreamData(chunk);
-        const accumulatedResponse = chunks.reduce(reduceStreamData, '');
-
-        // Call the provided callback function with the fetched title
-        callback(accumulatedResponse);
+    const streamCallback = (
+        chunk: OpenAI.Chat.Completions.ChatCompletionChunk[],
+    ) => {
+        const parsed = parseStreamData(chunk);
+        callback(parsed.accumulatedResponse);
     };
 
     // Read the response stream
@@ -96,6 +83,7 @@ export async function getChat(
     upsertMessage: (message: Message) => void,
     userId?: string | null,
     apiKey?: string,
+    retries: number = 0,
 ) {
     try {
         if (loops > MAX_LOOPS) {
@@ -103,60 +91,24 @@ export async function getChat(
         }
 
         const assistantId = uuidv4();
-        let tool: Tool | null = null;
+        let tools: ToolInput[] = [];
         let toolInput: string = '';
         let accumulatedResponse = '';
-        let error: any | null = null;
-        //let finishReason: string | null = null;
-
-        // Function to reduce the response stream data
-        const reduceStreamData = (acc: string, curr: StreamData) => {
-            if (!curr || !curr.choices) {
-                if (curr && curr.error) {
-                    error = JSON.stringify(curr.error);
-                }
-                return acc;
-            }
-            const res = curr.choices[0];
-            if (res.finish_reason) {
-                //finishReason = res.finish_reason;
-                return acc;
-            }
-            if (res.delta.function_call) {
-                if (res.delta.function_call.name) {
-                    tool = res.delta.function_call.name as Tool;
-                }
-                if (res.delta.function_call.arguments) {
-                    toolInput += res.delta.function_call.arguments;
-                }
-                return acc;
-            }
-            return acc + res.delta.content;
-        };
 
         // Callback function to handle each chunk of the response stream
-        const streamCallback = (chunk: string) => {
+        const streamCallback = (
+            chunk: OpenAI.Chat.Completions.ChatCompletionChunk[],
+        ) => {
             toolInput = '';
 
-            try {
-                const err: {
-                    error: {
-                        code: null;
-                        message: string;
-                        param: null;
-                        type: string;
-                    };
-                } = JSON.parse(chunk);
-                accumulatedResponse = `ERROR: ${err.error.message}`;
-            } catch (err) {
-                const chunks = parseStreamData(chunk);
-                accumulatedResponse = chunks.reduce(reduceStreamData, '');
-            }
+            const parsed = parseStreamData(chunk);
+            accumulatedResponse = parsed.accumulatedResponse || '';
+            tools = parsed.toolCalls || [];
 
-            if (!tool) {
+            if (tools.length === 0 && accumulatedResponse !== '') {
                 upsertMessage({
                     id: assistantId,
-                    content: error || accumulatedResponse,
+                    content: accumulatedResponse,
                     role: 'assistant',
                 });
             }
@@ -176,7 +128,23 @@ export async function getChat(
         );
 
         // Read the response stream
-        await readStream(stream, streamCallback);
+        try {
+            await readStream(stream, streamCallback);
+        } catch (e) {
+            if (retries < 3) {
+                await getChat(
+                    msgHistory,
+                    controller,
+                    activeThread,
+                    loops,
+                    setState,
+                    upsertMessage,
+                    userId,
+                    apiKey,
+                    retries + 1,
+                );
+            }
+        }
 
         // Set chat state
         setState((prevState) => ({
@@ -186,28 +154,27 @@ export async function getChat(
         }));
 
         // Check if a tool is requested
-        if (tool) {
-            await getToolData(
-                tool,
-                toolInput,
-                msgHistory,
-                upsertMessage,
-                controller,
-                activeThread,
-                setState,
-                loops + 1,
-                userId,
-                apiKey,
-            );
+        if (tools.length > 0) {
+            for (const tool of tools) {
+                await getToolData(
+                    tool,
+                    msgHistory,
+                    upsertMessage,
+                    controller,
+                    activeThread,
+                    setState,
+                    loops + 1,
+                    userId,
+                    apiKey,
+                );
+            }
         } else {
-            setState((prevState) => {
-                return {
-                    ...prevState,
-                    saved: false,
-                    botTyping: false,
-                    isNew: false,
-                };
-            });
+            setState((prevState) => ({
+                ...prevState,
+                saved: false,
+                botTyping: false,
+                isNew: false,
+            }));
         }
     } catch (error: any) {
         if (error.name === 'AbortError') {
@@ -287,8 +254,7 @@ async function requestChatStream(
 }
 
 async function getToolData(
-    tool: Tool,
-    toolInput: string,
+    toolInput: ToolInput,
     msgHistory: Message[],
     upsertMessage: (message: Message) => void,
     controller: AbortController,
@@ -298,17 +264,8 @@ async function getToolData(
     userId?: string | null,
     apiKey?: string,
 ) {
-    let input = '';
-    try {
-        if (tool !== 'web-browser') {
-            const cleaned = JSON.parse(toolInput);
-            input = cleaned.input;
-        } else {
-            input = toolInput;
-        }
-    } catch (err) {
-        input = toolInput;
-    }
+    const tool = toolInput.name;
+    const input = toolInput.args.input;
 
     const assistantMsg: Message = {
         id: uuidv4(),

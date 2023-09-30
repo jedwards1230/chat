@@ -1,10 +1,8 @@
-'use client';
+import clsx from 'clsx';
 
 import ProfilePicture from './ProfilePicture';
 import { ChatBubbleFunctionList } from './ChatBubbleFunctionList';
-import { useEffect, useState } from 'react';
 import TextContent from './TextContent';
-import clsx from 'clsx';
 
 export default function ChatBubble({
     message,
@@ -15,12 +13,6 @@ export default function ChatBubble({
     input?: string;
     config?: AgentConfig;
 }) {
-    const [messageInfo, setMessage] = useState<Message>(message);
-
-    useEffect(() => {
-        setMessage(message);
-    }, [message]);
-
     return (
         <div
             className={clsx(
@@ -31,13 +23,9 @@ export default function ChatBubble({
             )}
         >
             <div className="flex w-full max-w-4xl gap-2 mx-auto md:gap-4">
-                <ProfilePicture message={messageInfo} />
-                <TextContent
-                    message={messageInfo}
-                    input={input}
-                    config={config}
-                />
-                <ChatBubbleFunctionList message={messageInfo} />
+                <ProfilePicture message={message} />
+                <TextContent message={message} input={input} config={config} />
+                <ChatBubbleFunctionList message={message} />
             </div>
         </div>
     );
