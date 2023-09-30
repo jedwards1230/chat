@@ -84,7 +84,7 @@ export default function ChatInput() {
             >
                 <div className="relative flex flex-col w-full max-w-4xl gap-2">
                     {activeCommand && availableCommands.length > 0 && (
-                        <div className="p-1 border rounded-rounded border-border">
+                        <div className="p-1 border rounded-rounded border-border animate-in fade-in-50 slide-in-from-bottom-8">
                             {availableCommands.map((tool, index) => (
                                 <div
                                     key={index}
