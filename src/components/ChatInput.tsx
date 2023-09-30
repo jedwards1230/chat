@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 
@@ -9,6 +9,7 @@ import QuickActions from './QuickActions';
 import { isMobile } from '@/utils/client';
 import { calculateRows } from '@/utils';
 import { Send } from './Icons';
+import { baseCommands } from '@/tools/commands';
 
 export default function ChatInput() {
     const {
@@ -30,6 +31,14 @@ export default function ChatInput() {
         changeInput(e.target.value);
     };
 
+    const activeCommand = useMemo(() => {
+        if (input.startsWith('/')) {
+            const trimmed = input.trim();
+            return trimmed.split(' ')[0] as Command;
+        }
+        return undefined;
+    }, [input]);
+
     const onKeyDownHandler = (e: any) => {
         if (e.key === 'Enter' && !e.shiftKey && !isMobile()) {
             e.preventDefault();
@@ -45,6 +54,27 @@ export default function ChatInput() {
         }
     }, [activeId, activeThread.id]);
 
+    const commands = useMemo(() => {
+        return Object.keys(baseCommands).reduce(
+            (acc, command) => {
+                const com = command as Command;
+                if (
+                    activeThread.agentConfig.tools.includes(baseCommands[com])
+                ) {
+                    acc.push({ command: com, tool: baseCommands[com] });
+                }
+                return acc;
+            },
+            [] as Array<{ command: Command; tool: Tool }>,
+        );
+    }, [activeThread.agentConfig.tools]);
+
+    const availableCommands = useMemo(() => {
+        return activeCommand
+            ? commands.filter((tool) => tool.command.includes(activeCommand))
+            : commands;
+    }, [activeCommand, commands]);
+
     return (
         <div className="relative w-full">
             <QuickActions />
@@ -52,7 +82,22 @@ export default function ChatInput() {
                 onSubmit={handleSubmit}
                 className="flex items-end justify-center w-full gap-2 px-4 pt-4 pb-6 transition-all border-t shadow-xl justify-self-end border-border dark:shadow-none sm:pb-4 md:pb-2 md:pt-2"
             >
-                <div className="relative w-full max-w-4xl">
+                <div className="relative flex flex-col w-full max-w-4xl gap-2">
+                    {activeCommand && availableCommands.length > 0 && (
+                        <div className="p-1 border rounded-rounded border-border">
+                            {availableCommands.map((tool, index) => (
+                                <div
+                                    key={index}
+                                    className="flex items-center gap-2 rounded-lg px-4 py-1.5 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-neutral-50 dark:focus:ring-blue-500 dark:focus:ring-offset-2 dark:focus:ring-offset-neutral-900"
+                                >
+                                    <div>{tool.command}</div>
+                                    <div className="text-sm text-neutral-400">
+                                        {tool.tool}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                     <motion.textarea
                         ref={inputRef}
                         placeholder="Say something..."
@@ -61,7 +106,7 @@ export default function ChatInput() {
                         rows={rows}
                         onChange={handleInputChange}
                         onKeyDown={onKeyDownHandler}
-                        className="flex-1 w-full py-2 pl-2 pr-24 transition-colors border-2 rounded-lg shadow resize-none bg-background dark:bg-accent border-border focus:border-blue-primary focus:outline-none"
+                        className="flex-1 w-full py-2 pl-2 pr-24 transition-colors border-2 rounded-lg shadow resize-none border-border bg-background focus:border-blue-primary focus:outline-none dark:bg-accent"
                     />
                     {editId ? (
                         <div className="flex justify-between gap-4 pt-2">
@@ -89,7 +134,7 @@ export default function ChatInput() {
                             className={clsx(
                                 'absolute bottom-3 right-3 rounded-lg border border-transparent p-1 transition-colors focus:outline-none',
                                 input.length > 0
-                                    ? 'cursor-pointer text-background bg-blue-500 hover:bg-blue-400 focus:border-blue-500 focus:bg-blue-400 dark:bg-blue-500 dark:hover:bg-blue-400'
+                                    ? 'cursor-pointer bg-blue-500 text-background hover:bg-blue-400 focus:border-blue-500 focus:bg-blue-400 dark:bg-blue-500 dark:hover:bg-blue-400'
                                     : 'cursor-default text-foreground',
                             )}
                             type="submit"

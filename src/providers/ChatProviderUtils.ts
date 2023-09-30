@@ -8,6 +8,7 @@ import { createUserMsg, getTitle, getChat } from '@/utils/client';
 import { deleteMessageById, upsertCharacter } from '@/utils/server/supabase';
 import { sortThreadlist } from '@/utils';
 import { createFunctionCallMsg, getToolData } from '@/utils/client/chat';
+import { baseCommands } from '@/tools/commands';
 
 type ChatDispatch = Dispatch<SetStateAction<ChatState>>;
 
@@ -33,13 +34,6 @@ type PlausibleHook = (
         props: { threadId: string; usedCloudKey: boolean };
     },
 ) => any;
-
-const baseCommands: Record<Command, Tool> = {
-    '/calculator': 'calculator',
-    '/search': 'search',
-    '/scrape': 'web-browser',
-    '/wiki': 'wikipedia-api',
-};
 
 export function createSubmitHandler(
     plausible: PlausibleHook,
