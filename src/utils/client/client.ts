@@ -21,12 +21,16 @@ export async function readStream(
         if (done) break;
         if (value) {
             const decoded = new TextDecoder().decode(value);
-            accumulated.push(
-                JSON.parse(
-                    decoded,
-                ) as OpenAI.Chat.Completions.ChatCompletionChunk,
-            );
-            chunkCallback(accumulated);
+            try {
+                accumulated.push(
+                    JSON.parse(
+                        decoded,
+                    ) as OpenAI.Chat.Completions.ChatCompletionChunk,
+                );
+                chunkCallback(accumulated);
+            } catch (e) {
+                continue;
+            }
         }
     }
 }
