@@ -54,7 +54,7 @@ export default function ConfigEditor() {
 
     return (
         <Dialog callback={closeConfigEditor} size="lg">
-            <div className="w-full pb-4 text-center text-xl font-semibold">
+            <div className="w-full pb-4 text-xl font-semibold text-center">
                 App Settings
             </div>
 
@@ -67,8 +67,8 @@ export default function ConfigEditor() {
                         {user && (
                             <>
                                 <div className="font-medium">Cloud Auth</div>
-                                <div className="flex w-full items-center justify-between pb-4 pt-2">
-                                    <div className="flex w-full flex-col gap-0 overflow-x-scroll">
+                                <div className="flex items-center justify-between w-full pt-2 pb-4">
+                                    <div className="flex flex-col w-full gap-0 overflow-x-scroll">
                                         <div>{user.name}</div>
                                         <div>{user.email}</div>
                                     </div>
@@ -77,12 +77,12 @@ export default function ConfigEditor() {
                                         alt="You"
                                         width={64}
                                         height={64}
-                                        className="rounded border"
+                                        className="border rounded"
                                     />
                                 </div>
 
                                 <button
-                                    className="w-full rounded border border-red-500 py-2 text-center hover:bg-red-600 hover:text-neutral-50"
+                                    className="w-full py-2 text-center border border-red-500 rounded hover:bg-red-600 hover:text-neutral-50"
                                     onClick={() => signOut()}
                                 >
                                     Sign Out
@@ -108,7 +108,7 @@ export default function ConfigEditor() {
                                 }}
                                 title="Delete"
                                 disabled={validating}
-                                className="scale-90 rounded bg-red-500 p-1 text-neutral-50 transition-colors hover:bg-red-600 disabled:bg-neutral-500"
+                                className="p-1 transition-colors scale-90 bg-red-500 rounded text-neutral-50 hover:bg-red-600 disabled:bg-neutral-500"
                             >
                                 <XMark />
                             </button>
@@ -116,7 +116,7 @@ export default function ConfigEditor() {
                                 type="submit"
                                 title="Save"
                                 disabled={validating}
-                                className="scale-90 rounded bg-green-500 p-1 text-neutral-50 transition-colors hover:bg-green-600 disabled:bg-neutral-500"
+                                className="p-1 transition-colors scale-90 bg-green-500 rounded text-neutral-50 hover:bg-green-600 disabled:bg-neutral-500"
                             >
                                 <Check />
                             </button>
@@ -130,7 +130,7 @@ export default function ConfigEditor() {
                 </div>
 
                 <GeneralData />
-                <div className="flex w-full flex-wrap gap-4 whitespace-nowrap">
+                <div className="flex flex-wrap w-full gap-4 whitespace-nowrap">
                     <LocalData />
                     {user && <CloudData />}
                 </div>
@@ -166,31 +166,27 @@ function GeneralData() {
 
 function LocalData() {
     const { removeAllThreads } = useChat();
-    const { setConfigEditorOpen } = useUI();
 
     const clearAllLocalChatThreads = () => {
         deleteAllLocalThreadList();
         removeAllThreads();
-        setConfigEditorOpen(false);
     };
 
     const clearAllLocalCharacters = () => {
         deleteAllLocalCharacterList();
-        setConfigEditorOpen(false);
     };
 
     const clearAllLocal = () => {
         deleteAllLocalThreadList();
         deleteAllLocalCharacterList();
         removeAllThreads();
-        setConfigEditorOpen(false);
     };
 
     return (
-        <div className="flex flex-1 flex-col justify-between">
+        <div className="flex flex-col justify-between flex-1">
             <div className="text-xl font-medium">Local Data</div>
 
-            <label className="flex w-full items-center justify-between py-2 text-base">
+            <label className="flex items-center justify-between w-full py-2 text-base">
                 <button
                     onClick={clearAllLocalChatThreads}
                     className="w-full rounded border border-red-500 px-2 py-1.5 hover:bg-red-600 hover:text-neutral-50 dark:border-red-500/80 dark:text-neutral-50 dark:hover:bg-red-700"
@@ -198,7 +194,7 @@ function LocalData() {
                     Clear Local Chat Threads
                 </button>
             </label>
-            <label className="flex w-full items-center justify-between py-2 text-base">
+            <label className="flex items-center justify-between w-full py-2 text-base">
                 <button
                     onClick={clearAllLocalCharacters}
                     className="w-full rounded border border-red-500 px-2 py-1.5 hover:bg-red-600 hover:text-neutral-50 dark:border-red-500/80 dark:text-neutral-50 dark:hover:bg-red-700"
@@ -206,7 +202,7 @@ function LocalData() {
                     Clear Local Characters
                 </button>
             </label>
-            <label className="flex w-full items-center justify-between py-2 text-base">
+            <label className="flex items-center justify-between w-full py-2 text-base">
                 <button
                     onClick={clearAllLocal}
                     className="w-full rounded bg-red-500 px-2 py-1.5 text-neutral-50 hover:bg-red-600 dark:bg-red-500/80 dark:hover:bg-red-700"
@@ -220,30 +216,26 @@ function LocalData() {
 
 function CloudData() {
     const { removeAllThreads } = useChat();
-    const { setConfigEditorOpen } = useUI();
 
     const clearAllCloudChatThreads = async () => {
         await deleteAllThreads();
         removeAllThreads();
-        setConfigEditorOpen(false);
     };
 
     const clearAllCloudCharacters = async () => {
         await deleteAllCharacters();
-        setConfigEditorOpen(false);
     };
 
     const clearAllCloud = async () => {
         await deleteAllThreads();
         await deleteAllCharacters();
         removeAllThreads();
-        setConfigEditorOpen(false);
     };
 
     return (
-        <div className="flex flex-1 flex-col justify-between">
+        <div className="flex flex-col justify-between flex-1">
             <div className="text-xl font-medium">Cloud Data</div>
-            <label className="flex w-full items-center justify-between py-2 text-base">
+            <label className="flex items-center justify-between w-full py-2 text-base">
                 <button
                     onClick={clearAllCloudChatThreads}
                     className="w-full rounded border border-red-500 px-2 py-1.5 hover:bg-red-600 hover:text-neutral-50 dark:border-red-500/80 dark:text-neutral-50 dark:hover:bg-red-700"
@@ -251,7 +243,7 @@ function CloudData() {
                     Clear Cloud Chat Threads
                 </button>
             </label>
-            <label className="flex w-full items-center justify-between py-2 text-base">
+            <label className="flex items-center justify-between w-full py-2 text-base">
                 <button
                     onClick={clearAllCloudCharacters}
                     className="w-full rounded border border-red-500 px-2 py-1.5 hover:bg-red-600 hover:text-neutral-50 dark:border-red-500/80 dark:text-neutral-50 dark:hover:bg-red-700"
@@ -259,7 +251,7 @@ function CloudData() {
                     Clear Cloud Characters
                 </button>
             </label>
-            <label className="flex w-full items-center justify-between py-2 text-base">
+            <label className="flex items-center justify-between w-full py-2 text-base">
                 <button
                     onClick={clearAllCloud}
                     className="w-full rounded bg-red-500 px-2 py-1.5 text-neutral-50 hover:bg-red-600 dark:bg-red-500/80 dark:hover:bg-red-700"

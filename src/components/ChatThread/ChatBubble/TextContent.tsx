@@ -19,27 +19,17 @@ export default function TextContent({
     const FunctionContent = () => {
         const mdContent = `\`\`\`md\n${content}\n\`\`\``;
 
-        let inputDisplay = input;
-        if (message.name === 'web-browser' && input) {
-            const { url, task } = JSON.parse(input);
-            if (task) {
-                inputDisplay = `[${task}](${url})`;
-            } else {
-                inputDisplay = url;
-            }
-        }
-
         return (
             <details className="flex flex-col items-start w-full rounded">
-                <summary className="w-full gap-2 p-2 capitalize rounded-lg cursor-pointer text-ellipsis hover:bg-neutral-300 dark:hover:bg-neutral-700">
+                <summary className="w-full gap-2 p-2 rounded-lg cursor-pointer text-ellipsis hover:bg-neutral-300 dark:hover:bg-neutral-700">
                     <div className="inline-block align-middle">
                         {message.name}:
                     </div>{' '}
                     <div
-                        title={inputDisplay}
+                        title={input}
                         className="inline-block overflow-x-scroll align-middle"
                     >
-                        <Markdown content={inputDisplay} />
+                        <Markdown content={input} />
                     </div>
                 </summary>
                 <div className="mt-4">

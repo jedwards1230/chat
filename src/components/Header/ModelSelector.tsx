@@ -18,10 +18,8 @@ export default function ModelSelector() {
                 <div className="relative flex flex-row gap-4 group">
                     <button
                         className={clsx(
-                            'z-10 w-32 flex-1 rounded-lg px-4 py-2 text-center font-medium',
-                            isGPT3
-                                ? 'text-neutral-900 dark:text-white'
-                                : 'text-neutral-400 dark:text-neutral-400',
+                            'z-10 w-32 flex-1 rounded-lg px-4 py-2 text-center font-medium transition-colors',
+                            isGPT3 ? 'text-foreground' : 'text-background/50',
                         )}
                         onClick={() =>
                             updateThreadConfig({ model: 'gpt-3.5-turbo-16k' })
@@ -31,10 +29,8 @@ export default function ModelSelector() {
                     </button>
                     <button
                         className={clsx(
-                            'z-10 w-32 flex-1 rounded-lg px-4 py-2 text-center font-medium',
-                            isGPT4
-                                ? 'text-neutral-900 dark:text-white'
-                                : 'text-neutral-400 dark:text-neutral-400',
+                            'z-10 w-32 flex-1 rounded-lg px-4 py-2 text-center font-medium transition-colors',
+                            isGPT4 ? 'text-foreground' : 'text-background/50',
                         )}
                         onClick={() => updateThreadConfig({ model: 'gpt-4' })}
                     >

@@ -20,6 +20,22 @@ export function createUserMsg(
     };
 }
 
+export function createFunctionCallMsg(
+    input: ToolInput,
+    editId?: string | null,
+): Message {
+    return {
+        id: editId ? editId : uuidv4(),
+        content: JSON.stringify(input.args),
+        role: 'assistant',
+        name: input.name,
+        function_call: {
+            name: input.name,
+            arguments: input.args,
+        },
+    };
+}
+
 /**
  * This function fetches the title for a given input text.
  * It sends a POST request to the '/api/get_title' endpoint with the chat history and input as the body.
@@ -60,31 +76,42 @@ export async function getTitle(
     await readStream(stream!, streamCallback);
 }
 
+type GetChatParams = {
+    /** The history of messages in the conversation. */
+    msgHistory: Message[];
+    /** Used to optionally abort DOM requests. */
+    controller: AbortController;
+    /** The active thread of the chatbot. */
+    activeThread: ChatThread;
+    /** The number of recursive calls made to this function. Default is 0. */
+    loops?: number;
+    /** The state setter function from the useState React Hook. */
+    setState: Dispatch<SetStateAction<ChatState>>;
+    /** Function to add a new message or update an existing one. */
+    upsertMessage: (message: Message) => void;
+    /** The user ID to use for the request. */
+    userId?: string | null;
+    /** The API key to use for the request. */
+    apiKey?: string;
+    retries?: number;
+};
+
 /**
  * This function interacts with the AI model to generate responses for the chatbot.
  * It checks if the AI model requests a tool, and if so, recursively replies with tool messages.
  * The recursion is broken when the AI response doesn't request a tool.
- *
- * @param {Message[]} msgHistory - The history of messages in the conversation.
- * @param {AbortController} controller - Used to optionally abort DOM requests.
- * @param {ChatThread} activeThread - The active thread of the chatbot.
- * @param {number} loops - The number of recursive calls made to this function. Default is 0.
- * @param {Dispatch<SetStateAction<ChatState>>} setState - The state setter function from the useState React Hook.
- * @param {(message: Message) => void} upsertMessage - Function to add a new message or update an existing one.
- * @param {string} userId - The user ID to use for the request.
- * @param {string} apiKey - The API key to use for the request.
  */
-export async function getChat(
-    msgHistory: Message[],
-    controller: AbortController,
-    activeThread: ChatThread,
-    loops: number = 0,
-    setState: Dispatch<SetStateAction<ChatState>>,
-    upsertMessage: (message: Message) => void,
-    userId?: string | null,
-    apiKey?: string,
-    retries: number = 0,
-) {
+export async function getChat({
+    msgHistory,
+    controller,
+    activeThread,
+    loops = 0,
+    setState,
+    upsertMessage,
+    userId,
+    apiKey,
+    retries = 0,
+}: GetChatParams) {
     try {
         if (loops > MAX_LOOPS) {
             throw new Error('Too many loops');
@@ -133,7 +160,7 @@ export async function getChat(
         } catch (e) {
             if (retries < 5) {
                 setTimeout(() => {
-                    getChat(
+                    getChat({
                         msgHistory,
                         controller,
                         activeThread,
@@ -142,8 +169,8 @@ export async function getChat(
                         upsertMessage,
                         userId,
                         apiKey,
-                        retries + 1,
-                    );
+                        retries: retries + 1,
+                    });
                 }, 100);
             }
         }
@@ -157,18 +184,18 @@ export async function getChat(
 
         // Check if a tool is requested
         if (tools.length > 0) {
-            for (const tool of tools) {
-                await getToolData(
-                    tool,
+            for (const toolInput of tools) {
+                await getToolData({
+                    toolInput,
                     msgHistory,
                     upsertMessage,
                     controller,
                     activeThread,
                     setState,
-                    loops + 1,
+                    loops: loops + 1,
                     userId,
                     apiKey,
-                );
+                });
             }
         } else {
             setState((prevState) => ({
@@ -255,35 +282,37 @@ async function requestChatStream(
     throw new Error('No API key or user ID');
 }
 
-async function getToolData(
-    toolInput: ToolInput,
-    msgHistory: Message[],
-    upsertMessage: (message: Message) => void,
-    controller: AbortController,
-    activeThread: ChatThread,
-    setState: Dispatch<SetStateAction<ChatState>>,
-    loops: number = 0,
-    userId?: string | null,
-    apiKey?: string,
-) {
-    const tool = toolInput.name;
-    const input = toolInput.args.input;
+type ToolDataParams = {
+    toolInput: ToolInput;
+    msgHistory: Message[];
+    upsertMessage: (message: Message) => void;
+    controller: AbortController;
+    activeThread: ChatThread;
+    setState: Dispatch<SetStateAction<ChatState>>;
+    loops?: number;
+    userId?: string | null;
+    apiKey?: string;
+};
 
-    const assistantMsg: Message = {
-        id: uuidv4(),
-        content: input,
-        role: 'assistant',
-        name: tool,
-        function_call: {
-            name: tool,
-            arguments: input,
-        },
-    };
+export async function getToolData({
+    toolInput,
+    msgHistory,
+    upsertMessage,
+    controller,
+    activeThread,
+    setState,
+    loops,
+    userId,
+    apiKey,
+}: ToolDataParams) {
+    const tool = toolInput.name;
+
+    const assistantMsg = createFunctionCallMsg(toolInput);
 
     msgHistory.push(assistantMsg);
     upsertMessage(assistantMsg);
 
-    const res = await callTool(tool, input);
+    const res = await callTool(toolInput);
     if (!res) {
         throw new Error('Tool failure');
     }
@@ -300,7 +329,7 @@ async function getToolData(
 
     // Add a new function message with the response from the tool
     // Recursively call this function to generate the next response from the AI model
-    await getChat(
+    await getChat({
         msgHistory,
         controller,
         activeThread,
@@ -309,5 +338,5 @@ async function getToolData(
         upsertMessage,
         userId,
         apiKey,
-    );
+    });
 }

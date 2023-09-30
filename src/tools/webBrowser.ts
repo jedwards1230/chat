@@ -59,8 +59,15 @@ export class WebBrowser implements CustomTool {
             });
     }
 
-    async call(inputs: string) {
-        const { url, task } = JSON.parse(inputs);
+    async call(input: string) {
+        // get first substring from input
+        let url = '';
+        try {
+            url = JSON.parse(input.split(' ')[0]);
+        } catch {
+            url = input.split(' ')[0];
+        }
+        const task = input.slice(url.length + 1);
         const doSummary = !task;
 
         let text;
@@ -99,11 +106,11 @@ export class WebBrowser implements CustomTool {
             context = results.map((res) => res.pageContent).join('\n');
         }
 
-        const input = `Text:${context}\n\nI need ${
+        const instruction = `Text:${context}\n\nI need ${
             doSummary ? 'a summary' : task
         } from the above text, also provide up to 5 markdown links from within that would be of interest (always including URL and text). Links should be provided, if present, in markdown syntax as a list under the heading "Relevant Links:".`;
 
-        return this.model.predict(input);
+        return this.model.predict(instruction);
     }
 
     name: Tool = 'web-browser';
@@ -179,7 +186,8 @@ async function getHtml(baseUrl: string, headers: Headers) {
     let url;
     try {
         url = new URL(baseUrl);
-    } catch {
+    } catch (e) {
+        console.error(baseUrl, e);
         throw new Error('Invalid URL');
     }
 

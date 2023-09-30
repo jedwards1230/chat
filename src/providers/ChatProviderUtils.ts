@@ -7,6 +7,7 @@ import initialState, { getDefaultThread } from './initialChat';
 import { createUserMsg, getTitle, getChat } from '@/utils/client';
 import { deleteMessageById, upsertCharacter } from '@/utils/server/supabase';
 import { sortThreadlist } from '@/utils';
+import { createFunctionCallMsg, getToolData } from '@/utils/client/chat';
 
 type ChatDispatch = Dispatch<SetStateAction<ChatState>>;
 
@@ -32,6 +33,13 @@ type PlausibleHook = (
         props: { threadId: string; usedCloudKey: boolean };
     },
 ) => any;
+
+const baseCommands: Record<Command, Tool> = {
+    '/calculator': 'calculator',
+    '/search': 'search',
+    '/scrape': 'web-browser',
+    '/wiki': 'wikipedia-api',
+};
 
 export function createSubmitHandler(
     plausible: PlausibleHook,
@@ -126,9 +134,21 @@ export function createSubmitHandler(
             });
         };
 
-        const userMsg: Message = createUserMsg(state.input, state.editId);
-        const controller = new AbortController();
+        const parts = state.input.split(' ');
+        const command = parts[0] as Command;
+        const query = parts.slice(1).join(' ');
 
+        const toolInput =
+            command in baseCommands
+                ? {
+                      name: baseCommands[command],
+                      args: query,
+                  }
+                : undefined;
+
+        const userMsg = createUserMsg(state.input, state.editId);
+
+        const controller = new AbortController();
         setState((prevState) => ({
             ...prevState,
             input: '',
@@ -149,22 +169,34 @@ export function createSubmitHandler(
         }
 
         // Fetch chat
-        await getChat(
-            msgHistory,
-            controller,
-            state.activeThread,
-            0,
-            setState,
-            upsertMessage,
-            userId,
-            state.openAiApiKey,
-        );
+        toolInput
+            ? await getToolData({
+                  toolInput,
+                  msgHistory,
+                  upsertMessage,
+                  controller,
+                  activeThread: state.activeThread,
+                  setState,
+                  loops: 0,
+                  userId,
+                  apiKey: state.openAiApiKey,
+              })
+            : await getChat({
+                  msgHistory,
+                  controller,
+                  activeThread: state.activeThread,
+                  loops: 0,
+                  setState,
+                  upsertMessage,
+                  userId,
+                  apiKey: state.openAiApiKey,
+              });
 
         // Fetch title only if it's an initial message
         if (state.isNew) {
             getTitle(
                 state.activeThread,
-                state.input,
+                query,
                 upsertTitle,
                 userId,
                 state.openAiApiKey,
@@ -429,161 +461,3 @@ export function setOpenAiApiKeyHandler(setState: ChatDispatch) {
         }));
     };
 }
-
-/* 
-
-export function createThreadInsertHandler(setState: ChatDispatch) {
-    return async (
-        payload: RealtimePostgresInsertPayload<{
-            [key: string]: any;
-        }>,
-    ) => {
-        const newThreadId = payload.new.id;
-
-        // Fetch messages only related to the newly created thread
-        const { data: threadMessages, error: messageError } = await supabase
-            .from('messages')
-            .select('*')
-            .eq('chat_thread_id', newThreadId)
-            .order('message_order', { ascending: true });
-
-        if (messageError) {
-            throw new Error(messageError.message);
-        }
-
-        setState((prevState) => ({
-            ...prevState,
-            threads: [
-                ...prevState.threads,
-                {
-                    ...payload.new,
-                    messages: threadMessages,
-                } as ChatThread,
-            ],
-        }));
-    };
-}
-
-export function createThreadUpdateHandler(setState: ChatDispatch) {
-    return async (
-        payload: RealtimePostgresUpdatePayload<{
-            [key: string]: any;
-        }>,
-    ) => {
-        const newThreadId = payload.new.id;
-
-        // Fetch messages only related to the newly created thread
-        const { data: threadMessages, error: messageError } = await supabase
-            .from('messages')
-            .select('*')
-            .eq('chat_thread_id', newThreadId)
-            .order('message_order', { ascending: true });
-
-        if (messageError) {
-            throw new Error(messageError.message);
-        }
-
-        setState((prevState) => ({
-            ...prevState,
-            threads: prevState.threads.map((thread) => {
-                if (thread.id === newThreadId) {
-                    return {
-                        ...thread,
-                        ...payload.new,
-                        messages: threadMessages,
-                    };
-                }
-                return thread;
-            }),
-        }));
-    };
-}
-
-export function createThreadDeleteHandler(setState: ChatDispatch) {
-    return (
-        payload: RealtimePostgresDeletePayload<{
-            [key: string]: any;
-        }>,
-    ) => {
-        setState((prevState) => ({
-            ...prevState,
-            threads: prevState.threads.filter(
-                (thread) => thread.id !== payload.old.id,
-            ),
-        }));
-    };
-}
-
-export function subscribeToThreadEvents(
-    handleThreadInsert: (
-        payload: RealtimePostgresInsertPayload<{
-            [key: string]: any;
-        }>,
-    ) => void,
-    handleThreadUpdate: (
-        payload: RealtimePostgresUpdatePayload<{
-            [key: string]: any;
-        }>,
-    ) => void,
-    handleThreadDelete: (
-        payload: RealtimePostgresDeletePayload<{
-            [key: string]: any;
-        }>,
-    ) => void,
-) {
-    const onThreadInsert = supabase
-        .channel('supabase_realtime')
-        .on(
-            'postgres_changes',
-            {
-                event: 'INSERT',
-                schema: 'public',
-                table: 'chat_threads',
-            },
-            handleThreadInsert,
-        )
-        .subscribe();
-
-    const onThreadUpdate = supabase
-        .channel('supabase_realtime')
-        .on(
-            'postgres_changes',
-            {
-                event: 'UPDATE',
-                schema: 'public',
-                table: 'chat_threads',
-            },
-            handleThreadUpdate,
-        )
-        .subscribe();
-
-    const onThreadDelete = supabase
-        .channel('supabase_realtime')
-        .on(
-            'postgres_changes',
-            {
-                event: 'DELETE',
-                schema: 'public',
-                table: 'chat_threads',
-            },
-            handleThreadDelete,
-        )
-        .subscribe();
-
-    return {
-        onThreadInsert,
-        onThreadUpdate,
-        onThreadDelete,
-    };
-}
-
-export function unsubscribeFromThreadEvents(
-    handleThreadInsert: RealtimeChannel,
-    handleThreadUpdate: RealtimeChannel,
-    handleThreadDelete: RealtimeChannel,
-) {
-    supabase.removeChannel(handleThreadInsert);
-    supabase.removeChannel(handleThreadUpdate);
-    supabase.removeChannel(handleThreadDelete);
-}
-*/

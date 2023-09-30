@@ -25,25 +25,34 @@ export async function POST(request: Request) {
         });
     }
 
-    let result = '';
-    switch (tool) {
-        case 'calculator':
-            result = new Calculator().call(input);
-            break;
-        case 'search':
-            result = await new Search().call(input);
-            break;
-        case 'web-browser':
-            result = await new WebBrowser({}).call(input);
-            break;
-        case 'wikipedia-api':
-            result = await new WikipediaQueryRun().call(input);
-            break;
-        default:
-            return new Response('Invalid tool', {
-                status: 400,
-            });
-    }
+    const cleanInput = input.slice(1, input.length - 1);
 
-    return NextResponse.json(result);
+    try {
+        let result = '';
+        switch (tool) {
+            case 'calculator':
+                result = new Calculator().call(cleanInput);
+                break;
+            case 'search':
+                result = await new Search().call(cleanInput);
+                break;
+            case 'web-browser':
+                result = await new WebBrowser({}).call(cleanInput);
+                break;
+            case 'wikipedia-api':
+                result = await new WikipediaQueryRun().call(cleanInput);
+                break;
+            default:
+                return new Response(`Invalid tool: ${tool}`, {
+                    status: 400,
+                });
+        }
+
+        return NextResponse.json(result);
+    } catch (e) {
+        console.log(e);
+        return new Response(JSON.stringify(e), {
+            status: 500,
+        });
+    }
 }

@@ -1,5 +1,7 @@
 type Tool = 'calculator' | 'search' | 'web-browser' | 'wikipedia-api';
 
+type Command = '/calculator' | '/search' | '/scrape' | '/wiki';
+
 type CustomTool = {
     name: Tool;
     description: string;
@@ -19,3 +21,5 @@ type ToolInput = {
     name: Tool;
     args: any;
 };
+
+type CommandList = Record<Command, ToolInput>;

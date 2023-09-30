@@ -132,10 +132,13 @@ export async function analyzeSingleResult(
     }
 }
 
-export async function callTool(tool: Tool, input: string) {
+export async function callTool(toolInput: ToolInput) {
     const res = await fetch('/api/use_tool', {
         method: 'POST',
-        body: JSON.stringify({ tool, input }),
+        body: JSON.stringify({
+            tool: toolInput.name,
+            input: JSON.stringify(toolInput.args),
+        }),
     });
 
     if (!res.ok) {

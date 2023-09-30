@@ -42,7 +42,7 @@ export default function Sidebar({
                     close();
                 }}
                 className={clsx(
-                    'fixed z-10 h-screen w-screen transition-all md:hidden',
+                    'fixed z-20 h-screen w-screen transition-all md:hidden',
                     open
                         ? 'translate-x-0'
                         : pos === 'left'
