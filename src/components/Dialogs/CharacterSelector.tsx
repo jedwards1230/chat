@@ -13,8 +13,8 @@ export default function CharacterSelector({
     children: React.ReactNode;
 }) {
     const { activeThread, characterList } = useChat();
-    const [activeCard, setActiveCard] = useState<string | undefined>(
-        activeThread.agentConfig.name,
+    const [activeCard, setActiveCard] = useState<AgentConfig>(
+        activeThread.agentConfig,
     );
 
     return (
@@ -25,12 +25,17 @@ export default function CharacterSelector({
                     <Button
                         variant="outline"
                         size="icon"
-                        onClick={() => setActiveCard('New Character')}
-                        className="bg-inherit text-xl hover:bg-accent/30"
+                        onClick={() =>
+                            setActiveCard({
+                                ...activeCard,
+                                name: 'New Character',
+                            })
+                        }
+                        className="text-xl bg-inherit hover:bg-accent/30"
                     >
                         +
                     </Button>
-                    <div className="col-span-8 col-start-3 flex-1 text-center text-xl font-semibold">
+                    <div className="flex-1 col-span-8 col-start-3 text-xl font-semibold text-center">
                         Character{' '}
                         {activeCard === undefined ? 'Selector' : 'Editor'}
                     </div>
@@ -39,22 +44,28 @@ export default function CharacterSelector({
                     <div className="col-span-4 flex max-h-[80vh] w-full gap-2 overflow-y-scroll md:flex-col">
                         {characterList.map((agent, i) => {
                             const active =
-                                agent.name === activeThread.agentConfig.name;
+                                agent.id === activeThread.agentConfig.id;
                             return (
                                 <AgentCard
                                     key={'agent-config-' + i}
                                     agent={agent}
                                     active={active}
-                                    edit={() => setActiveCard(agent.name)}
+                                    edit={() =>
+                                        setActiveCard({
+                                            ...activeCard,
+                                            name: agent.name,
+                                        })
+                                    }
                                 />
                             );
                         })}
                     </div>
                     <div className="col-span-6">
                         <AgentSettings
-                            key={activeCard}
+                            key={activeCard.id}
+                            active={true}
                             agent={characterList.find(
-                                (agent) => agent.name === activeCard,
+                                (agent) => agent.id === activeCard.id,
                             )}
                         />
                     </div>

@@ -255,7 +255,6 @@ export async function upsertCharacter(character: AgentConfig) {
     const { data, error } = await supabase.from('agent_config').upsert(
         [
             {
-                ...(character.id ? { id: character.id } : {}),
                 ...character,
                 user_id: userId,
                 tools: JSON.stringify(character.tools),
@@ -268,27 +267,6 @@ export async function upsertCharacter(character: AgentConfig) {
         throw new Error(error.message);
     }
 }
-
-/* export async function upsertCharacterList(characters: AgentConfig[]) {
-    const { userId } = auth();
-    if (!userId) {
-        throw new Error('No user id');
-    }
-
-    const { data, error } = await supabase.from('agent_config').upsert(
-        characters.map((character) => ({
-            ...(character.id ? { id: character.id } : {}),
-            ...character,
-            user_id: userId,
-            tools: JSON.stringify(character.tools),
-        })),
-        { onConflict: 'id' },
-    );
-
-    if (error) {
-        throw new Error(error.message);
-    }
-} */
 
 export async function deleteAllCharacters() {
     const session = await auth();

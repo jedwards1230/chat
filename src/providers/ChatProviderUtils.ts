@@ -400,11 +400,24 @@ export function abortRequestHandler(state: ChatState, setState: ChatDispatch) {
 export function saveCharacterHandler(setState: ChatDispatch) {
     return async (character: AgentConfig) => {
         upsertCharacter(character);
-        setState((prevState) => ({
-            ...prevState,
-            saved: false,
-            characterList: [...prevState.characterList, character],
-        }));
+        setState((prevState) => {
+            const characterList = prevState.characterList;
+            const foundIndex = characterList.findIndex(
+                (config) => config.id === character.id,
+            );
+
+            if (foundIndex !== -1) {
+                characterList[foundIndex] = character;
+            } else {
+                characterList.push(character);
+            }
+
+            return {
+                ...prevState,
+                saved: false,
+                characterList,
+            };
+        });
     };
 }
 
