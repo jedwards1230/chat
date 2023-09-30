@@ -17,7 +17,7 @@ export default function TextContent({
             : message.content;
 
     const FunctionContent = () => {
-        const mdContent = `\`\`\`md\n${content}\`\`\``;
+        const mdContent = `\`\`\`md\n${content}\n\`\`\``;
 
         let inputDisplay = input;
         if (message.name === 'web-browser' && input) {

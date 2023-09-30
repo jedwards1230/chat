@@ -131,18 +131,20 @@ export async function getChat(
         try {
             await readStream(stream, streamCallback);
         } catch (e) {
-            if (retries < 3) {
-                await getChat(
-                    msgHistory,
-                    controller,
-                    activeThread,
-                    loops,
-                    setState,
-                    upsertMessage,
-                    userId,
-                    apiKey,
-                    retries + 1,
-                );
+            if (retries < 5) {
+                setTimeout(() => {
+                    getChat(
+                        msgHistory,
+                        controller,
+                        activeThread,
+                        loops,
+                        setState,
+                        upsertMessage,
+                        userId,
+                        apiKey,
+                        retries + 1,
+                    );
+                }, 100);
             }
         }
 

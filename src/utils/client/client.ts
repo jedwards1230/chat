@@ -14,25 +14,70 @@ export async function readStream(
     ) => void,
 ) {
     const reader = stream.getReader();
-    const accumulated = [];
+    const accumulated: OpenAI.Chat.Completions.ChatCompletionChunk[] = [];
 
     while (true) {
         const { done, value } = await reader.read();
         if (done) break;
         if (value) {
             const decoded = new TextDecoder().decode(value);
+            const jsonArr = splitJsonObjects(decoded);
+
             try {
-                accumulated.push(
-                    JSON.parse(
-                        decoded,
-                    ) as OpenAI.Chat.Completions.ChatCompletionChunk,
-                );
+                jsonArr.forEach((json) => {
+                    if (!json) return;
+                    accumulated.push(JSON.parse(json));
+                });
                 chunkCallback(accumulated);
             } catch (e) {
+                console.error(e);
                 continue;
             }
         }
     }
+}
+
+function splitJsonObjects(str: string): string[] {
+    let stack = 0; // keep track of opened and closed curly braces
+    let insideString = false; // flag to check if we're inside a string
+    let escapeNext = false; // flag to check if next character is escaped
+    let startIndex = 0;
+    const result: string[] = [];
+
+    for (let i = 0; i < str.length; i++) {
+        const char = str[i];
+
+        // Check if the character is escaped.
+        if (escapeNext) {
+            escapeNext = false;
+            continue;
+        }
+
+        if (char === '\\') {
+            escapeNext = true;
+            continue;
+        }
+
+        if (char === '"') {
+            insideString = !insideString;
+        }
+
+        if (!insideString) {
+            if (char === '{') {
+                if (stack === 0) {
+                    startIndex = i;
+                }
+                stack++;
+            } else if (char === '}') {
+                stack--;
+                if (stack === 0) {
+                    result.push(str.slice(startIndex, i + 1));
+                }
+            }
+        }
+    }
+
+    return result;
 }
 
 export function isMobile(size?: 'sm' | 'md' | 'lg' | 'xl') {
@@ -128,8 +173,9 @@ export function parseStreamData(
 
     for (const c of chunks) {
         if (c.error) {
-            accumulatedResponse = c.error;
-            throw new Error(c.error);
+            accumulatedResponse = c.error.message;
+            continue;
+            //throw new Error(c.error);
         }
         const data = c.choices[0];
         if (data) {
