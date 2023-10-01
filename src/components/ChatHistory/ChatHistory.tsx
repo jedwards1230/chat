@@ -52,7 +52,7 @@ function ChatHistory({
                 </Button>
             </Link>
             {/* Chat History */}
-            <div className="flex w-full flex-1 flex-col gap-1 overflow-y-scroll pt-2">
+            <div className="flex w-full flex-1 flex-col gap-1 overflow-y-scroll pt-2 sm:pt-0">
                 {threadList.map((thread, i) => (
                     <ChatHistoryEntry
                         key={`${i}-${thread.id}`}
