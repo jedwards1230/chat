@@ -1,12 +1,12 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, memo } from 'react';
 import ReactMarkdown, { Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
 import CodeBlock from '../CodeBlock';
 
-export default function Markdown({
+function Markdown({
     content = '',
     children,
 }: {
@@ -129,3 +129,5 @@ export default function Markdown({
         </ReactMarkdown>
     );
 }
+
+export default memo(Markdown);

@@ -1,17 +1,14 @@
 'use client';
 
-import { useChat } from '@/providers/ChatProvider';
-import { useEffect, useRef, useState } from 'react';
-import AgentSettings from '../AgentSettings';
 import clsx from 'clsx';
+import { useEffect, useRef, useState, memo } from 'react';
+
+import { useChat } from '@/providers/ChatProvider';
+import AgentSettings from '../AgentSettings';
 import { Dialog, DialogContent, DialogTrigger } from '../ui/dialog';
 import { Button } from '../ui/button';
 
-export default function CharacterSelector({
-    children,
-}: {
-    children: React.ReactNode;
-}) {
+function CharacterSelector({ children }: { children: React.ReactNode }) {
     const { activeThread, characterList } = useChat();
     const [activeCard, setActiveCard] = useState<AgentConfig>(
         activeThread.agentConfig,
@@ -31,11 +28,11 @@ export default function CharacterSelector({
                                 name: 'New Character',
                             })
                         }
-                        className="text-xl bg-inherit hover:bg-accent/30"
+                        className="bg-inherit text-xl hover:bg-accent/30"
                     >
                         +
                     </Button>
-                    <div className="flex-1 col-span-8 col-start-3 text-xl font-semibold text-center">
+                    <div className="col-span-8 col-start-3 flex-1 text-center text-xl font-semibold">
                         Character{' '}
                         {activeCard === undefined ? 'Selector' : 'Editor'}
                     </div>
@@ -74,6 +71,8 @@ export default function CharacterSelector({
         </Dialog>
     );
 }
+
+export default memo(CharacterSelector);
 
 function AgentCard({
     agent,

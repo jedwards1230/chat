@@ -2,7 +2,7 @@
 
 import clsx from 'clsx';
 
-export default function Sidebar({
+export function Sidebar({
     close,
     children,
     className,
@@ -30,7 +30,7 @@ export default function Sidebar({
                     className,
                 )}
             >
-                <div className="relative flex flex-col items-center justify-start w-full h-full gap-4 pb-2 md:pb-0">
+                <div className="relative flex h-full w-full flex-col items-center justify-start gap-4 pb-2 md:pb-0">
                     {children}
                 </div>
             </div>

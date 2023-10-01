@@ -10,8 +10,14 @@ import { useUI } from '@/providers/UIProvider';
 import { deleteThreadById } from '@/utils/server/supabase';
 import { deleteLocalThreadById } from '@/utils/client/localstorage';
 
-export default function ChatHistoryEntry({ entry }: { entry: ChatThread }) {
-    const { activeThread, removeThread } = useChat();
+export default function ChatHistoryEntry({
+    entry,
+    activeThread,
+}: {
+    entry: ChatThread;
+    activeThread: ChatThread;
+}) {
+    const { removeThread } = useChat();
     const { setSideBarOpen } = useUI();
 
     // Function to remove a thread and update the local storage

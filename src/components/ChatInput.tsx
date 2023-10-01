@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, memo } from 'react';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 
@@ -11,7 +11,7 @@ import { calculateRows } from '@/utils';
 import { Send } from './Icons';
 import { baseCommands } from '@/tools/commands';
 
-export default function ChatInput() {
+function ChatInput() {
     const {
         activeThread,
         input,
@@ -80,11 +80,11 @@ export default function ChatInput() {
             <QuickActions />
             <form
                 onSubmit={handleSubmit}
-                className="flex items-end justify-center w-full gap-2 px-4 pt-4 pb-6 transition-all border-t shadow-xl justify-self-end border-border dark:shadow-none sm:pb-4 md:pb-2 md:pt-2"
+                className="flex w-full items-end justify-center gap-2 justify-self-end border-t border-border px-4 pb-6 pt-4 shadow-xl transition-all dark:shadow-none sm:pb-4 md:pb-2 md:pt-2"
             >
-                <div className="relative flex flex-col w-full max-w-4xl gap-2">
+                <div className="relative flex w-full max-w-4xl flex-col gap-2">
                     {activeCommand && availableCommands.length > 0 && (
-                        <div className="p-1 border rounded-rounded border-border animate-in fade-in-50 slide-in-from-bottom-8">
+                        <div className="rounded-rounded border border-border p-1 animate-in fade-in-50 slide-in-from-bottom-8">
                             {availableCommands.map((tool, index) => (
                                 <div
                                     key={index}
@@ -106,7 +106,7 @@ export default function ChatInput() {
                         rows={rows}
                         onChange={handleInputChange}
                         onKeyDown={onKeyDownHandler}
-                        className="flex-1 w-full py-2 pl-2 pr-24 transition-colors border-2 rounded-lg shadow resize-none border-border bg-background focus:border-blue-primary focus:outline-none dark:bg-accent"
+                        className="w-full flex-1 resize-none rounded-lg border-2 border-border bg-background py-2 pl-2 pr-24 shadow transition-colors focus:border-blue-primary focus:outline-none dark:bg-accent"
                     />
                     {editId ? (
                         <div className="flex justify-between gap-4 pt-2">
@@ -147,3 +147,5 @@ export default function ChatInput() {
         </div>
     );
 }
+
+export default memo(ChatInput);

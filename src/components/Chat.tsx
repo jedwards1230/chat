@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import clsx from 'clsx';
 import { PanInfo, motion } from 'framer-motion';
 
@@ -16,7 +16,7 @@ import ChatSettings from './ChatSettings';
 import Dialogs from './Dialogs';
 
 export default function Chat() {
-    const { activeThread, botTyping } = useChat();
+    const { activeThread, botTyping, threads } = useChat();
     const {
         sideBarOpen,
         setSideBarOpen,
@@ -26,70 +26,78 @@ export default function Chat() {
 
     const [swipeInProgress, setSwipeInProgress] = useState(false);
 
-    function onPanStart(event: MouseEvent | TouchEvent | PointerEvent) {
+    const onPanStart = (event: MouseEvent | TouchEvent | PointerEvent) => {
         event.stopPropagation();
         setSwipeInProgress(true);
-    }
+    };
 
-    function onPanEnd() {
+    const onPanEnd = () => {
         setSwipeInProgress(false);
-    }
+    };
 
-    function onPan(
-        event: MouseEvent | TouchEvent | PointerEvent,
-        info: PanInfo,
-    ) {
-        const verticalDistance = Math.abs(info.offset.y);
+    const onPan = useCallback(
+        (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+            const verticalDistance = Math.abs(info.offset.y);
 
-        if (verticalDistance > 30) {
-            return;
-        }
-
-        if (swipeInProgress) {
-            const swipedRightFromLeftEdge =
-                info.point.x < 300 && info.offset.x > 120;
-
-            const swipedLeftFromRightEdge =
-                info.point.x > window.innerWidth - 300 && info.offset.x < -120;
-
-            const swipedRightFromRightEdge =
-                info.point.x > window.innerWidth - 300 && info.offset.x > 120;
-
-            const swipedLeftFromLeftEdge =
-                info.point.x < 300 && info.offset.x < -120;
-
-            const onMobileDevice = isMobile('md');
-
-            if (
-                !sideBarOpen &&
-                swipedRightFromLeftEdge &&
-                (!onMobileDevice || !chatSettingsOpen)
-            ) {
-                setSideBarOpen(true);
-                setSwipeInProgress(false);
-            } else if (sideBarOpen && swipedLeftFromLeftEdge) {
-                setSideBarOpen(false);
-                setSwipeInProgress(false);
+            if (verticalDistance > 30) {
+                return;
             }
 
-            if (
-                !chatSettingsOpen &&
-                swipedLeftFromRightEdge &&
-                (!onMobileDevice || !sideBarOpen)
-            ) {
-                setChatSettingsOpen(true);
-                setSwipeInProgress(false);
-            } else if (chatSettingsOpen && swipedRightFromRightEdge) {
-                setChatSettingsOpen(false);
-                setSwipeInProgress(false);
+            if (swipeInProgress) {
+                const swipedRightFromLeftEdge =
+                    info.point.x < 300 && info.offset.x > 120;
+
+                const swipedLeftFromRightEdge =
+                    info.point.x > window.innerWidth - 300 &&
+                    info.offset.x < -120;
+
+                const swipedRightFromRightEdge =
+                    info.point.x > window.innerWidth - 300 &&
+                    info.offset.x > 120;
+
+                const swipedLeftFromLeftEdge =
+                    info.point.x < 300 && info.offset.x < -120;
+
+                const onMobileDevice = isMobile('md');
+
+                if (
+                    !sideBarOpen &&
+                    swipedRightFromLeftEdge &&
+                    (!onMobileDevice || !chatSettingsOpen)
+                ) {
+                    setSideBarOpen(true);
+                    setSwipeInProgress(false);
+                } else if (sideBarOpen && swipedLeftFromLeftEdge) {
+                    setSideBarOpen(false);
+                    setSwipeInProgress(false);
+                }
+
+                if (
+                    !chatSettingsOpen &&
+                    swipedLeftFromRightEdge &&
+                    (!onMobileDevice || !sideBarOpen)
+                ) {
+                    setChatSettingsOpen(true);
+                    setSwipeInProgress(false);
+                } else if (chatSettingsOpen && swipedRightFromRightEdge) {
+                    setChatSettingsOpen(false);
+                    setSwipeInProgress(false);
+                }
             }
-        }
-    }
+        },
+        [
+            chatSettingsOpen,
+            setChatSettingsOpen,
+            setSideBarOpen,
+            sideBarOpen,
+            swipeInProgress,
+        ],
+    );
 
     return (
         <>
-            <div className="flex w-full h-full">
-                <ChatHistory />
+            <div className="flex h-full w-full">
+                <ChatHistory activeThread={activeThread} threads={threads} />
                 <motion.div
                     onPanStart={onPanStart}
                     onPanEnd={onPanEnd}

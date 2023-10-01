@@ -72,7 +72,7 @@ export default function ChatThread({
                         );
                     })
                 ) : (
-                    <ChatPlaceholder />
+                    <ChatPlaceholder activeThread={activeThread} />
                 )}
                 {/* Blank row at bottom. Better view of quick actions. */}
                 {hasMultipleMessages && <div className="min-h-[72px] w-full" />}
