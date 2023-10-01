@@ -17,6 +17,7 @@ import {
 } from './ui/select';
 import { modelList } from '@/utils/model';
 import { Label } from './ui/label';
+import { Button } from './ui/button';
 
 const availableTools: Tool[] = [
     'calculator',
@@ -246,12 +247,13 @@ export default function AgentSettings({
                 </details>
             </div>
             <div className="flex w-full justify-end">
-                <button
+                <Button
+                    variant="outlineAccent"
                     type="submit"
-                    className="rounded-md bg-neutral-300 px-3 py-2 transition-colors hover:bg-neutral-400 focus:bg-neutral-500 dark:bg-neutral-500 dark:hover:bg-neutral-600"
+                    //className="px-3 py-2 transition-colors rounded-md bg-neutral-300 hover:bg-neutral-400 focus:bg-neutral-500 dark:bg-neutral-500 dark:hover:bg-neutral-600"
                 >
                     {!isNew ? 'Update' : 'Create'}
-                </button>
+                </Button>
             </div>
         </form>
     );

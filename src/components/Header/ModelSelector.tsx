@@ -20,7 +20,9 @@ export default function ModelSelector() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="outline">Model: {activeModel.name}</Button>
+                <Button variant="outlineAccent">
+                    Model: {activeModel.name}
+                </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56 p-1">
                 <DropdownMenuRadioGroup>
