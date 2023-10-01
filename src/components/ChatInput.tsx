@@ -55,6 +55,7 @@ function ChatInput() {
     }, [activeId, activeThread.id]);
 
     const commands = useMemo(() => {
+        if (!activeThread.agentConfig.toolsEnabled) return [];
         return Object.keys(baseCommands).reduce(
             (acc, command) => {
                 const com = command as Command;
@@ -67,7 +68,7 @@ function ChatInput() {
             },
             [] as Array<{ command: Command; tool: Tool }>,
         );
-    }, [activeThread.agentConfig.tools]);
+    }, [activeThread.agentConfig.tools, activeThread.agentConfig.toolsEnabled]);
 
     const availableCommands = useMemo(() => {
         return activeCommand

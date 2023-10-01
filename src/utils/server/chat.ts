@@ -1,9 +1,11 @@
 import OpenAI from 'openai';
 import { Stream } from 'openai/streaming';
+import { ChatCompletionCreateParams } from 'openai/resources/chat';
+import { v4 as uuidv4 } from 'uuid';
 
 import { Calculator, Search, WebBrowser, WikipediaQueryRun } from '@/tools';
 import { prepareMessages } from '..';
-import { ChatCompletionCreateParams } from 'openai/resources/chat';
+import { getLlama2Chat } from '@/lib/cloudflare';
 
 const SERVER_KEY = process.env.OPENAI_API_KEY;
 
@@ -87,15 +89,21 @@ export async function getTitleStream(history: string, key?: string) {
     }
 }
 
-export async function getChatStream(
-    activeThread: ChatThread,
-    msgHistory: Message[],
-    signal?: AbortSignal,
-    key?: string,
-) {
-    const messages = prepareMessages(msgHistory);
-    const modelName = activeThread.agentConfig.model;
-    const temperature = activeThread.agentConfig.temperature;
+type FetchChatParams = {
+    activeThread: ChatThread;
+    msgHistory: Message[];
+    signal?: AbortSignal;
+    key?: string;
+    stream?: boolean;
+};
+
+export async function fetchChat({
+    activeThread,
+    msgHistory = [],
+    signal,
+    key,
+    stream = true,
+}: FetchChatParams): Promise<ReadableStream<any> | Message | string> {
     const tools = activeThread.agentConfig.toolsEnabled
         ? activeThread.agentConfig.tools
         : [];
@@ -119,35 +127,72 @@ export async function getChatStream(
         }
     };
 
-    let functions: ChatCompletionCreateParams.Function[] | undefined;
+    const functions: ChatCompletionCreateParams.Function[] = [];
     if (tools && tools.length > 0) {
-        functions = tools.map((tool) => formatTool(tool));
+        tools.forEach((tool) => functions.push(formatTool(tool)));
     }
 
     try {
-        const openai = getOpenAiClient(key);
+        switch (activeThread.agentConfig.model.name) {
+            case 'gpt-3.5-turbo':
+            case 'gpt-3.5-turbo-16k':
+            case 'gpt-4':
+            case 'gpt-4-0613':
+                return await fetchOpenAiChat(
+                    activeThread,
+                    msgHistory,
+                    functions,
+                    stream,
+                    signal,
+                    key,
+                );
+            case 'llama-2-7b-chat-int8':
+                return await fetchLlama2Chat(msgHistory);
+        }
+    } catch (err) {
+        console.error(err);
+        return stream
+            ? new ReadableStream({
+                  start(controller) {
+                      controller.error(JSON.stringify(err));
+                  },
+              })
+            : JSON.stringify(err);
+    }
+}
 
-        const completion = await openai.chat.completions.create(
-            {
-                model: modelName,
-                messages,
-                temperature,
-                stream: true,
-                functions,
-                //top_p: 1,
-                //n: 1,
-                //stop,
-                //max_tokens: 1024,
-                //presence_penalty: 0,
-                //frequency_penalty: 0,
-                //logit_bias: {},
-                //user: "",
-            },
-            {
-                signal,
-            },
-        );
+async function fetchLlama2Chat(msgHistory: Message[]) {
+    const messages = prepareMessages(msgHistory);
+    const res = await getLlama2Chat(messages);
+    return res;
+}
 
+async function fetchOpenAiChat(
+    activeThread: ChatThread,
+    msgHistory: Message[],
+    functions: ChatCompletionCreateParams.Function[],
+    stream: boolean,
+    signal?: AbortSignal,
+    key?: string,
+): Promise<ReadableStream<any> | Message> {
+    const messages = prepareMessages(msgHistory);
+    const model = activeThread.agentConfig.model;
+    const temperature = activeThread.agentConfig.temperature;
+
+    const openai = getOpenAiClient(key);
+
+    const completion = await openai.chat.completions.create(
+        {
+            model: model.name,
+            messages,
+            temperature,
+            functions,
+            stream,
+        },
+        { signal },
+    );
+
+    if (completion instanceof Stream) {
         const stream = toReadableStream(completion);
 
         if (!stream) {
@@ -155,12 +200,11 @@ export async function getChatStream(
         }
 
         return stream;
-    } catch (err) {
-        console.error(err);
-        return new ReadableStream({
-            start(controller) {
-                controller.error(JSON.stringify(err));
-            },
-        });
     }
+
+    return {
+        id: uuidv4(),
+        content: completion.choices[0].message.content,
+        role: completion.choices[0].message.role,
+    };
 }

@@ -10,6 +10,7 @@ type ChatState = {
     characterList: AgentConfig[];
     isNew: boolean;
     openAiApiKey?: string;
+    streamResponse: boolean;
 
     /** Abort request, stop typing, request a save */
     abortRequest: () => void;
@@ -30,4 +31,5 @@ type ChatState = {
     cancelEdit: () => void;
     handleSubmit: (e: React.FormEvent) => void;
     setOpenAiApiKey: (key?: string) => void;
+    setStreamResponse: (stream: boolean) => void;
 };

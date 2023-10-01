@@ -42,21 +42,21 @@ export class Search implements CustomTool {
             );
         }
 
-        const json = await res.json();
+        const json = (await res.json()) as {
+            items?: {
+                title: string;
+                link: string;
+                snippet: string;
+            }[];
+        };
 
         const results: SearchResult[] =
-            json?.items?.map(
-                (item: {
-                    title?: string;
-                    link?: string;
-                    snippet?: string;
-                }) => ({
-                    query: input,
-                    title: item.title,
-                    url: item.link,
-                    snippet: item.snippet,
-                }),
-            ) ?? [];
+            json?.items?.map((item) => ({
+                query: input,
+                title: item.title,
+                url: item.link,
+                snippet: item.snippet,
+            })) ?? [];
         return results;
     }
 

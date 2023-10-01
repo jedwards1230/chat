@@ -7,7 +7,7 @@ import initialState, { getDefaultThread } from './initialChat';
 import { createUserMsg, getTitle, getChat } from '@/utils/client';
 import { deleteMessageById, upsertCharacter } from '@/utils/server/supabase';
 import { sortThreadlist } from '@/utils';
-import { createFunctionCallMsg, getToolData } from '@/utils/client/chat';
+import { getToolData } from '@/utils/client/chat';
 import { baseCommands } from '@/tools/commands';
 
 type ChatDispatch = Dispatch<SetStateAction<ChatState>>;
@@ -169,21 +169,19 @@ export function createSubmitHandler(
                   msgHistory,
                   upsertMessage,
                   controller,
-                  activeThread: state.activeThread,
+                  state,
                   setState,
                   loops: 0,
                   userId,
-                  apiKey: state.openAiApiKey,
               })
             : await getChat({
                   msgHistory,
                   controller,
-                  activeThread: state.activeThread,
+                  state,
                   loops: 0,
                   setState,
                   upsertMessage,
                   userId,
-                  apiKey: state.openAiApiKey,
               });
 
         // Fetch title only if it's an initial message
@@ -266,17 +264,35 @@ export function setConfigHandler(setState: ChatDispatch) {
 
 export function updateThreadConfigHandler(setState: ChatDispatch) {
     return (configUpdates: Partial<AgentConfig>) => {
-        setState((prevState) => ({
-            ...prevState,
-            lastModified: new Date(),
-            activeThread: {
-                ...prevState.activeThread,
-                agentConfig: {
-                    ...prevState.activeThread.agentConfig,
-                    ...configUpdates,
+        setState((prevState) => {
+            const newConfig: AgentConfig = {
+                ...prevState.activeThread.agentConfig,
+                ...configUpdates,
+            };
+
+            if (
+                (configUpdates.toolsEnabled === true &&
+                    newConfig.model.api === 'llama') ||
+                configUpdates.model?.api === 'llama'
+            )
+                newConfig.toolsEnabled = false;
+
+            return {
+                ...prevState,
+                lastModified: new Date(),
+                streamResponse:
+                    newConfig.model.api === 'llama'
+                        ? false
+                        : prevState.streamResponse,
+                activeThread: {
+                    ...prevState.activeThread,
+                    agentConfig: {
+                        ...prevState.activeThread.agentConfig,
+                        ...newConfig,
+                    },
                 },
-            },
-        }));
+            };
+        });
     };
 }
 
@@ -322,7 +338,7 @@ export function editMessageHandler(state: ChatState, setState: ChatDispatch) {
         setState((prevState) => ({
             ...prevState,
             editId: id,
-            input: msg.content,
+            input: msg.content || '',
             saved: false,
         }));
     };
@@ -452,6 +468,15 @@ export function setOpenAiApiKeyHandler(setState: ChatDispatch) {
         setState((prevState) => ({
             ...prevState,
             openAiApiKey,
+        }));
+    };
+}
+
+export function setStreamResponseHandler(setState: ChatDispatch) {
+    return (streamResponse: boolean) => {
+        setState((prevState) => ({
+            ...prevState,
+            streamResponse,
         }));
     };
 }

@@ -43,7 +43,7 @@ export default function TextContent({
         if (!config) return null;
         return (
             <div className="flex w-full flex-col justify-start rounded text-sm text-neutral-400 dark:text-neutral-400">
-                <div>Model: {config.model}</div>
+                <div>Model: {config.model.name}</div>
                 <div>System Message: {message.content}</div>
                 {config.toolsEnabled && config.tools.length > 0 && (
                     <div className="capitalize">
@@ -61,7 +61,7 @@ export default function TextContent({
             ) : message.role === 'system' ? (
                 <SystemContent />
             ) : (
-                <Markdown content={content} />
+                content && <Markdown content={content} />
             )}
         </div>
     );

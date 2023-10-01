@@ -32,34 +32,34 @@ export default function Header() {
                     : 'border-transparent bg-transparent',
             )}
         >
-            <div className="flex items-center justify-start col-span-1">
+            <div className="col-span-1 flex items-center justify-start">
                 <button
                     name="sidebar-toggle"
-                    className="px-1 cursor-pointer text-neutral-400 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-50"
+                    className="cursor-pointer px-1 text-neutral-400 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-50"
                     onClick={handleSidebarToggle}
                 >
                     <Bars />
                 </button>
             </div>
-            <div className="col-span-10 text-center">
+            <div className="col-span-10 flex items-center justify-center text-center">
                 {activeThread.messages.length > 1 ? (
-                    <>
-                        <p className="font-semibold line-clamp-1">
+                    <div>
+                        <p className="line-clamp-1 font-semibold">
                             {activeThread.title}
                         </p>
                         <p className="text-sm font-light text-neutral-500">
-                            {activeThread.agentConfig.model} |{' '}
+                            {activeThread.agentConfig.model.name} |{' '}
                             {activeThread.messages.length} messages
                         </p>
-                    </>
+                    </div>
                 ) : (
                     <ModelSelector />
                 )}
             </div>
-            <div className="flex items-center justify-end col-span-1">
+            <div className="col-span-1 flex items-center justify-end">
                 <button
                     name="chat-settings-toggle"
-                    className="px-1 cursor-pointer text-neutral-400 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-50"
+                    className="cursor-pointer px-1 text-neutral-400 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-50"
                     onClick={handleChatSettingsToggle}
                 >
                     <Information />

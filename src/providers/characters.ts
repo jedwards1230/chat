@@ -5,7 +5,10 @@ export const defaultAgentConfig: AgentConfig = {
     name: 'Chat',
     tools: ['search', 'wikipedia-api'],
     toolsEnabled: true,
-    model: 'gpt-4',
+    model: {
+        name: 'gpt-4',
+        api: 'openai',
+    },
     temperature: 0.7,
     systemMessage: 'You are a helpful assistant.',
     topP: 1,

@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import OpenAI from 'openai';
 
 import { readStream, callTool, parseStreamData } from '../client';
-import { getChatStream, getTitleStream } from '../server/chat';
+import { fetchChat, getTitleStream } from '../server/chat';
 
 const MAX_LOOPS = 10;
 
@@ -81,8 +81,8 @@ type GetChatParams = {
     msgHistory: Message[];
     /** Used to optionally abort DOM requests. */
     controller: AbortController;
-    /** The active thread of the chatbot. */
-    activeThread: ChatThread;
+    /** The active state of the context. */
+    state: ChatState;
     /** The number of recursive calls made to this function. Default is 0. */
     loops?: number;
     /** The state setter function from the useState React Hook. */
@@ -91,8 +91,6 @@ type GetChatParams = {
     upsertMessage: (message: Message) => void;
     /** The user ID to use for the request. */
     userId?: string | null;
-    /** The API key to use for the request. */
-    apiKey?: string;
     retries?: number;
 };
 
@@ -104,14 +102,14 @@ type GetChatParams = {
 export async function getChat({
     msgHistory,
     controller,
-    activeThread,
+    state,
     loops = 0,
     setState,
     upsertMessage,
     userId,
-    apiKey,
-    retries = 0,
 }: GetChatParams) {
+    const activeThread = state.activeThread;
+    const apiKey = state.openAiApiKey;
     try {
         if (loops > MAX_LOOPS) {
             throw new Error('Too many loops');
@@ -119,59 +117,75 @@ export async function getChat({
 
         const assistantId = uuidv4();
         let tools: ToolInput[] = [];
-        let toolInput: string = '';
         let accumulatedResponse = '';
-
-        // Callback function to handle each chunk of the response stream
-        const streamCallback = (
-            chunk: OpenAI.Chat.Completions.ChatCompletionChunk[],
-        ) => {
-            toolInput = '';
-
-            const parsed = parseStreamData(chunk);
-            accumulatedResponse = parsed.accumulatedResponse || '';
-            tools = parsed.toolCalls || [];
-
-            if (tools.length === 0 && accumulatedResponse !== '') {
-                upsertMessage({
-                    id: assistantId,
-                    content: accumulatedResponse,
-                    role: 'assistant',
-                });
-            }
-        };
 
         setState((prevState) => ({
             ...prevState,
             botTyping: true,
         }));
 
-        const stream = await requestChatStream(
-            activeThread,
-            controller.signal,
-            msgHistory,
-            userId,
-            apiKey,
-        );
+        if (state.streamResponse) {
+            // Callback function to handle each chunk of the response stream
+            const streamCallback = (
+                chunk: OpenAI.Chat.Completions.ChatCompletionChunk[],
+            ) => {
+                const parsed = parseStreamData(chunk);
+                accumulatedResponse = parsed.accumulatedResponse || '';
+                tools = parsed.toolCalls || [];
 
-        // Read the response stream
-        try {
-            await readStream(stream, streamCallback);
-        } catch (e) {
-            if (retries < 5) {
-                setTimeout(() => {
-                    getChat({
-                        msgHistory,
-                        controller,
+                if (tools.length === 0 && accumulatedResponse !== '') {
+                    upsertMessage({
+                        id: assistantId,
+                        content: accumulatedResponse,
+                        role: 'assistant',
+                    });
+                }
+            };
+
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const stream = await requestChatWithClientOrServer(
                         activeThread,
-                        loops,
-                        setState,
-                        upsertMessage,
+                        controller.signal,
+                        msgHistory,
+                        true,
                         userId,
                         apiKey,
-                        retries: retries + 1,
-                    });
-                }, 100);
+                    );
+
+                    if (stream instanceof ReadableStream) {
+                        await readStream(stream, streamCallback);
+                        break;
+                    }
+
+                    throw new Error(
+                        `Non-streamable response: ${JSON.stringify(stream)}`,
+                    );
+                } catch (e: any) {
+                    console.error(e);
+                    continue;
+                }
+            }
+        } else {
+            const res = await requestChatWithClientOrServer(
+                activeThread,
+                controller.signal,
+                msgHistory,
+                false,
+                userId,
+                apiKey,
+            );
+
+            if (typeof res === 'string') {
+                upsertMessage({
+                    id: assistantId,
+                    content: res,
+                    role: 'assistant',
+                });
+            } else if (res instanceof ReadableStream) {
+                throw new Error('Cannot handle streamable response');
+            } else {
+                upsertMessage(res);
             }
         }
 
@@ -190,11 +204,10 @@ export async function getChat({
                     msgHistory,
                     upsertMessage,
                     controller,
-                    activeThread,
+                    state,
                     setState,
                     loops: loops + 1,
                     userId,
-                    apiKey,
                 });
             }
         } else {
@@ -251,10 +264,11 @@ async function requestTitleStream(
     throw new Error('No API key or user ID');
 }
 
-async function requestChatStream(
+async function requestChatWithClientOrServer(
     activeThread: ChatThread,
     signal: AbortSignal,
     msgHistory: Message[],
+    stream: boolean = true,
     userId?: string | null,
     apiKey?: string,
 ) {
@@ -266,17 +280,36 @@ async function requestChatStream(
             body: JSON.stringify({
                 activeThread,
                 msgHistory,
+                stream,
             }),
         });
 
-        if (!response.body) {
-            throw new Error('No response body from /api/chat');
-        }
+        if (stream) {
+            if (!response.body) {
+                throw new Error('No response body from /api/chat');
+            }
 
-        return response.body;
+            return response.body;
+        } else {
+            if (!response.ok) {
+                throw new Error(
+                    `Got ${response.status} error from /api/chat: ${response.statusText}`,
+                );
+            }
+
+            const json: Message = await response.json();
+
+            return json;
+        }
     } else if (apiKey) {
         // use client-side key
-        return await getChatStream(activeThread, msgHistory, signal, apiKey);
+        return await fetchChat({
+            activeThread,
+            msgHistory,
+            signal,
+            key: apiKey,
+            stream,
+        });
     }
 
     throw new Error('No API key or user ID');
@@ -287,11 +320,10 @@ type ToolDataParams = {
     msgHistory: Message[];
     upsertMessage: (message: Message) => void;
     controller: AbortController;
-    activeThread: ChatThread;
+    state: ChatState;
     setState: Dispatch<SetStateAction<ChatState>>;
     loops?: number;
     userId?: string | null;
-    apiKey?: string;
 };
 
 export async function getToolData({
@@ -299,11 +331,10 @@ export async function getToolData({
     msgHistory,
     upsertMessage,
     controller,
-    activeThread,
+    state,
     setState,
     loops,
     userId,
-    apiKey,
 }: ToolDataParams) {
     const tool = toolInput.name;
 
@@ -332,11 +363,10 @@ export async function getToolData({
     await getChat({
         msgHistory,
         controller,
-        activeThread,
+        state,
         loops,
         setState,
         upsertMessage,
         userId,
-        apiKey,
     });
 }

@@ -1,13 +1,14 @@
 'use client';
 
+import Link from 'next/link';
+
 export const runtime = 'edge';
 
 export default function GlobalError({
-    error,
-    reset,
+    error, // reset,
 }: {
     error: Error & { digest?: string };
-    reset: () => void;
+    // reset: () => void;
 }) {
     return (
         <html>
@@ -16,7 +17,7 @@ export default function GlobalError({
                 <p>{error.message}</p>
                 <p>{error.digest}</p>
                 <p className="text-xl">
-                    Go <button onClick={() => reset()}>Try again</button>
+                    Go <Link href="/">Home</Link>
                 </p>
             </body>
         </html>

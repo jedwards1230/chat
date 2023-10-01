@@ -1,10 +1,35 @@
-type Model = 'gpt-3.5-turbo' | 'gpt-3.5-turbo-16k' | 'gpt-4' | 'gpt-4-0613';
+type GPT3 = 'gpt-3.5-turbo' | 'gpt-3.5-turbo-16k';
+type GPT4 = 'gpt-4' | 'gpt-4-0613';
+
+type OpenAiModels = GPT3 | GPT4;
+type LlamaModels = 'llama-2-7b-chat-int8';
+
+type Model = OpenAiModels | LlamaModels;
+
+type ApiProvider = 'openai' | 'llama';
+
+interface ModelInfo {
+    name: Model;
+    api: ApiProvider;
+}
+
+interface OpenAiModelInfo extends ModelInfo {
+    name: OpenAiModels;
+    api: 'openai';
+}
+
+interface LlamaModelInfo extends ModelInfo {
+    name: LlamaModels;
+    api: 'llama';
+}
+
+type ModelApi = OpenAiModelInfo | LlamaModelInfo;
 
 type Role = 'system' | 'user' | 'assistant' | 'function';
 
 type Message = {
     id: string;
-    content: string;
+    content: string | null;
     role: Role;
     createdAt?: Date;
     name?: Tool;
@@ -19,7 +44,7 @@ interface AgentConfig {
     name: string;
     tools: Tool[];
     toolsEnabled: boolean;
-    model: Model;
+    model: ModelApi;
     temperature: number;
     systemMessage: string;
     topP: number;
@@ -41,7 +66,7 @@ interface ChatThread {
 interface SaveData {
     chatHistory: ChatThread[];
     config: {
-        model: Model;
+        model: ModelApi;
         temperature: number;
         systemMessage: string;
         topP: number;

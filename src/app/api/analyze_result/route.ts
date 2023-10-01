@@ -13,16 +13,11 @@ export const runtime = 'edge';
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 export async function POST(request: Request) {
-    const res = await request.json();
-    const {
-        query,
-        searchResult,
-        quickSearch,
-    }: {
+    const { query, searchResult, quickSearch } = (await request.json()) as {
         query: string;
         searchResult: SearchResult;
         quickSearch?: boolean;
-    } = res;
+    };
 
     try {
         let context: string;

@@ -8,6 +8,15 @@ import { defaultAgentConfig } from '@/providers/characters';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { Checkbox } from './ui/checkbox';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from './ui/select';
+import { modelList } from '@/utils/model';
+import { Label } from './ui/label';
 
 const availableTools: Tool[] = [
     'calculator',
@@ -28,17 +37,22 @@ export default function AgentSettings({
         setSystemMessage,
         saveCharacter,
         activeThread,
+        streamResponse,
+        setStreamResponse,
     } = useChat();
 
     const isNew = agent === undefined;
     const [config, setConfig] = useState(
-        agent !== undefined
+        agent
             ? agent
             : {
                   ...defaultAgentConfig,
                   name: 'New Character',
               },
     );
+    useEffect(() => {
+        setConfig(activeThread.agentConfig);
+    }, [activeThread]);
 
     const onFieldChange = (
         field: keyof AgentConfig,
@@ -78,11 +92,8 @@ export default function AgentSettings({
         { 'Presence Penalty': config.presencePenalty },
     ];
 
-    useEffect(() => {
-        if (!isNew && active) {
-            setConfig(activeThread.agentConfig);
-        }
-    }, [active, activeThread, isNew]);
+    const functionsAllowed = config.model.api !== 'llama';
+    const streamingAllowed = config.model.api !== 'llama';
 
     return (
         <form onSubmit={handleSubmit} className="w-full space-y-4">
@@ -103,76 +114,107 @@ export default function AgentSettings({
                 />
             </div>
             <div className="flex flex-col gap-4 rounded-md">
-                <div className="flex flex-col w-full gap-2">
-                    <label
-                        className={clsx(
-                            'flex flex-col rounded px-1 transition-colors dark:hover:bg-neutral-600',
-                            active
-                                ? 'hover:bg-neutral-500'
-                                : 'hover:bg-neutral-300',
-                        )}
-                    >
-                        <div className="flex items-center justify-between gap-4 dark:border-neutral-600">
-                            <div
-                                className={clsx(
-                                    'font-semibold transition-colors dark:text-neutral-100',
-                                    active
-                                        ? 'text-neutral-100'
-                                        : 'text-neutral-950',
-                                )}
+                <Select
+                    onValueChange={(v) => onFieldChange('model', JSON.parse(v))}
+                    value={JSON.stringify(config.model)}
+                >
+                    <SelectTrigger className="w-full">
+                        <SelectValue placeholder={config.model.name} />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {modelList.map((model) => (
+                            <SelectItem
+                                key={'select-' + model.name}
+                                value={JSON.stringify(model)}
                             >
-                                Plugins
+                                {model.name}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+                {streamingAllowed && (
+                    <div className="flex justify-between px-1">
+                        <Label htmlFor="stream-response">Stream Response</Label>
+                        <Checkbox
+                            id="stream-response"
+                            checked={streamResponse}
+                            onCheckedChange={setStreamResponse}
+                        />
+                    </div>
+                )}
+                {functionsAllowed && (
+                    <div className="flex w-full flex-col gap-2">
+                        <label
+                            className={clsx(
+                                'flex flex-col rounded px-1 transition-colors dark:hover:bg-neutral-600',
+                                active
+                                    ? 'hover:bg-neutral-500'
+                                    : 'hover:bg-neutral-300',
+                            )}
+                        >
+                            <div className="flex items-center justify-between gap-4 dark:border-neutral-600">
+                                <div
+                                    className={clsx(
+                                        'font-semibold transition-colors dark:text-neutral-100',
+                                        active
+                                            ? 'text-neutral-100'
+                                            : 'text-neutral-950',
+                                    )}
+                                >
+                                    Plugins
+                                </div>
+                                <Checkbox
+                                    title="Toggle plugins"
+                                    checked={config.toolsEnabled}
+                                    onCheckedChange={(e) =>
+                                        onFieldChange('toolsEnabled', e)
+                                    }
+                                />
                             </div>
-                            <Checkbox
-                                title="Toggle plugins"
-                                checked={config.toolsEnabled}
-                                onCheckedChange={(e) =>
-                                    onFieldChange('toolsEnabled', e)
-                                }
-                            />
-                        </div>
+                            {config.toolsEnabled && (
+                                <div
+                                    className={clsx(
+                                        'text-xs transition-colors dark:text-neutral-400',
+                                        active
+                                            ? 'text-neutral-400'
+                                            : 'text-neutral-600',
+                                    )}
+                                >
+                                    {config.tools.length} enabled
+                                </div>
+                            )}
+                        </label>
                         {config.toolsEnabled && (
-                            <div
-                                className={clsx(
-                                    'text-xs transition-colors dark:text-neutral-400',
-                                    active
-                                        ? 'text-neutral-400'
-                                        : 'text-neutral-600',
-                                )}
-                            >
-                                {config.tools.length} enabled
+                            <div>
+                                {availableTools.map((plugin) => {
+                                    const checked =
+                                        config.tools.includes(plugin);
+                                    return (
+                                        <label
+                                            key={plugin}
+                                            className={clsx(
+                                                'flex w-full cursor-pointer items-center justify-between rounded p-1 text-sm dark:hover:bg-neutral-600',
+                                                active
+                                                    ? 'hover:bg-neutral-500'
+                                                    : 'hover:bg-neutral-300',
+                                            )}
+                                        >
+                                            <span className="capitalize">
+                                                {plugin}
+                                            </span>
+                                            <Checkbox
+                                                checked={checked}
+                                                onCheckedChange={() =>
+                                                    togglePlugin(plugin)
+                                                }
+                                            />
+                                        </label>
+                                    );
+                                })}
                             </div>
                         )}
-                    </label>
-                    {config.toolsEnabled && (
-                        <div>
-                            {availableTools.map((plugin) => {
-                                const checked = config.tools.includes(plugin);
-                                return (
-                                    <label
-                                        key={plugin}
-                                        className={clsx(
-                                            'flex w-full cursor-pointer items-center justify-between rounded p-1 text-sm dark:hover:bg-neutral-600',
-                                            active
-                                                ? 'hover:bg-neutral-500'
-                                                : 'hover:bg-neutral-300',
-                                        )}
-                                    >
-                                        <span className="capitalize">
-                                            {plugin}
-                                        </span>
-                                        <Checkbox
-                                            checked={checked}
-                                            onCheckedChange={() =>
-                                                togglePlugin(plugin)
-                                            }
-                                        />
-                                    </label>
-                                );
-                            })}
-                        </div>
-                    )}
-                </div>
+                    </div>
+                )}
                 <details className="w-full">
                     <summary
                         className={clsx(
@@ -203,10 +245,10 @@ export default function AgentSettings({
                     })}
                 </details>
             </div>
-            <div className="flex justify-end w-full">
+            <div className="flex w-full justify-end">
                 <button
                     type="submit"
-                    className="px-3 py-2 transition-colors rounded-md bg-neutral-300 hover:bg-neutral-400 focus:bg-neutral-500 dark:bg-neutral-500 dark:hover:bg-neutral-600"
+                    className="rounded-md bg-neutral-300 px-3 py-2 transition-colors hover:bg-neutral-400 focus:bg-neutral-500 dark:bg-neutral-500 dark:hover:bg-neutral-600"
                 >
                     {!isNew ? 'Update' : 'Create'}
                 </button>

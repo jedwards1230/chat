@@ -4,14 +4,10 @@ import { NextResponse } from 'next/server';
 export const runtime = 'edge';
 
 export async function POST(request: Request) {
-    const res = await request.json();
-    const {
-        tool,
-        input,
-    }: {
+    const { tool, input } = (await request.json()) as {
         tool: Tool;
         input: string;
-    } = res;
+    };
 
     if (!tool) {
         return new Response('No tool', {
