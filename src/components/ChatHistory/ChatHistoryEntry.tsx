@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 import { useChat } from '@/providers/ChatProvider';
 import { Chat, Trash } from '../Icons';
-import { isMobile } from '@/utils/client';
+import { isMobile } from '@/utils/client/device';
 import { useUI } from '@/providers/UIProvider';
 import { deleteThreadById } from '@/utils/server/supabase';
 import { deleteLocalThreadById } from '@/utils/client/localstorage';

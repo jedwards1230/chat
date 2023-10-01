@@ -6,7 +6,7 @@ import { useSession } from 'next-auth/react';
 
 import { useChat } from '@/providers/ChatProvider';
 import { Share } from '../Icons';
-import { isMobile } from '@/utils/client';
+import { isMobile } from '@/utils/client/device';
 import { useUI } from '@/providers/UIProvider';
 import AgentSettings from '../AgentSettings';
 import { shareThread } from '@/utils/server/supabase';

@@ -2,8 +2,8 @@
 
 import { Copy } from 'lucide-react';
 import { useState } from 'react';
-import { PrismAsync as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { PrismAsync as SyntaxHighlighter } from 'react-syntax-highlighter';
 
 import { Check } from '../Icons';
 import { Button } from '@/components/ui/button';

@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useUI } from '@/providers/UIProvider';
 import ChatHistoryEntry from './ChatHistoryEntry';
 import { sortThreadlist } from '@/utils';
-import { isMobile } from '@/utils/client';
+import { isMobile } from '@/utils/client/device';
 import { Sidebar } from '../Sidebar';
 import { ApiButton, SettingsButton, ThemeToggle } from './Buttons';
 import { Button } from '../ui/button';

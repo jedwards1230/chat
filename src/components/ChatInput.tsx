@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 
 import { useChat } from '@/providers/ChatProvider';
 import QuickActions from './QuickActions';
-import { isMobile } from '@/utils/client';
+import { isMobile } from '@/utils/client/device';
 import { calculateRows } from '@/utils';
 import { Send } from './Icons';
 import { baseCommands } from '@/tools/commands';

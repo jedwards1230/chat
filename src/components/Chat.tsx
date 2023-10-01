@@ -6,7 +6,7 @@ import { PanInfo, motion } from 'framer-motion';
 
 import { useChat } from '@/providers/ChatProvider';
 import { useUI } from '@/providers/UIProvider';
-import { isMobile } from '@/utils/client';
+import { isMobile } from '@/utils/client/device';
 
 import ChatHistory from './ChatHistory';
 import ChatInput from './ChatInput';

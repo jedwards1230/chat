@@ -1,4 +1,4 @@
-import { Chat } from '@/components';
+import Chat from '@/components/Chat';
 import { ChatProvider } from '@/providers/ChatProvider';
 import {
     getUserId,

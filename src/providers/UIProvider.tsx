@@ -7,7 +7,7 @@ import {
     useState,
 } from 'react';
 
-import { isMobile as iM } from '@/utils/client';
+import { isMobile as iM } from '@/utils/client/device';
 
 type ModalState = {
     sideBarOpen: boolean;

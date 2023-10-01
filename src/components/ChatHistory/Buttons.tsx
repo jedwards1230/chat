@@ -14,7 +14,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useUI } from '@/providers/UIProvider';
-import { isMobile } from '@/utils/client';
+import { isMobile } from '@/utils/client/device';
 import { Person, Settings } from '../Icons';
 import { useChat } from '@/providers/ChatProvider';
 
