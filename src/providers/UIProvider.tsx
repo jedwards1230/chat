@@ -14,51 +14,44 @@ type ModalState = {
     setSideBarOpen: (open: boolean) => void;
     chatSettingsOpen: boolean;
     setChatSettingsOpen: (open: boolean) => void;
-    configEditorOpen: boolean;
-    setConfigEditorOpen: (open: boolean) => void;
     shareModalOpen: boolean;
     setShareModalOpen: (open: boolean) => void;
-    openAIKeyOpen: boolean;
-    setOpenAIKeyOpen: Dispatch<SetStateAction<boolean>>;
+    appSettingsOpen: boolean | AppSettingsSection;
+    setAppSettingsOpen: (open: boolean | AppSettingsSection) => void;
     signInOpen: boolean;
     setSignInOpen: Dispatch<SetStateAction<boolean>>;
 };
 
-const initialState: ModalState = {
+const initState: ModalState = {
     sideBarOpen: true,
     setSideBarOpen: () => {},
     chatSettingsOpen: false,
     setChatSettingsOpen: () => {},
-    configEditorOpen: false,
-    setConfigEditorOpen: () => {},
     shareModalOpen: false,
     setShareModalOpen: () => {},
-    openAIKeyOpen: false,
-    setOpenAIKeyOpen: () => {},
+    appSettingsOpen: false,
+    setAppSettingsOpen: () => {},
     signInOpen: false,
     setSignInOpen: () => {},
 };
 
-const UIContext = createContext<ModalState>(initialState);
+const UIContext = createContext<ModalState>(initState);
 
 export const useUI = () => useContext(UIContext);
 
 export function UIProvider({ children }: { children: React.ReactNode }) {
     const [isMobile, setIsMobile] = useState(iM('md') || false);
-    const [sideBarOpen, setSideBarOpen] = useState(initialState.sideBarOpen);
+    const [sideBarOpen, setSideBarOpen] = useState(initState.sideBarOpen);
     const [chatSettingsOpen, setChatSettingsOpen] = useState(
-        initialState.chatSettingsOpen,
-    );
-    const [configEditorOpen, setConfigEditorOpen] = useState(
-        initialState.configEditorOpen,
+        initState.chatSettingsOpen,
     );
     const [shareModalOpen, setShareModalOpen] = useState(
-        initialState.shareModalOpen,
+        initState.shareModalOpen,
     );
-    const [openAIKeyOpen, setOpenAIKeyOpen] = useState(
-        initialState.openAIKeyOpen,
+    const [signInOpen, setSignInOpen] = useState(initState.signInOpen);
+    const [appSettingsOpen, setAppSettingsOpen] = useState(
+        initState.appSettingsOpen,
     );
-    const [signInOpen, setSignInOpen] = useState(initialState.signInOpen);
 
     const handleResize = () => {
         if (isMobile && !iM('md')) {
@@ -88,14 +81,12 @@ export function UIProvider({ children }: { children: React.ReactNode }) {
                 setSideBarOpen,
                 chatSettingsOpen,
                 setChatSettingsOpen,
-                configEditorOpen,
-                setConfigEditorOpen,
                 shareModalOpen,
                 setShareModalOpen,
-                openAIKeyOpen,
-                setOpenAIKeyOpen,
                 signInOpen,
                 setSignInOpen,
+                appSettingsOpen,
+                setAppSettingsOpen,
             }}
         >
             {children}

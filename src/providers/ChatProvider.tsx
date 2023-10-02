@@ -28,6 +28,7 @@ import {
 } from './ChatProviderUtils';
 import { useUI } from './UIProvider';
 import initialState from './initialChat';
+import Dialogs from '@/components/Dialogs';
 import { upsertThread } from '@/utils/server/supabase';
 import { mergeThreads, mergeCharacters, sortThreadlist } from '@/utils';
 import {
@@ -57,7 +58,7 @@ export function ChatProvider({
     const userId = session?.user?.email;
     const router = useRouter();
 
-    const { setOpenAIKeyOpen } = useUI();
+    const { setAppSettingsOpen } = useUI();
 
     const [state, setState] = useState<ChatState>({
         ...initialState,
@@ -167,12 +168,15 @@ export function ChatProvider({
             state,
             setState,
             router,
-            setOpenAIKeyOpen,
+            setAppSettingsOpen,
             userId,
         ),
     };
 
     return (
-        <ChatContext.Provider value={value}>{children}</ChatContext.Provider>
+        <ChatContext.Provider value={value}>
+            {children}
+            <Dialogs />
+        </ChatContext.Provider>
     );
 }

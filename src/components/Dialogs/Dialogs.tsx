@@ -1,32 +1,16 @@
 'use client';
 
-import ConfigEditor from './ConfigEditor';
+import AppSettingsDialog from './AppSettings/AppSettingsDialog';
 import ShareChat from './ShareChat';
 import { useUI } from '@/providers/UIProvider';
-import OpenAIKey from './OpenAIKey';
 
 export default function Dialogs() {
-    const { configEditorOpen, shareModalOpen, openAIKeyOpen } = useUI();
-
-    const ActiveDialog = () => {
-        if (openAIKeyOpen) {
-            return <OpenAIKey />;
-        }
-
-        if (configEditorOpen) {
-            return <ConfigEditor />;
-        }
-
-        if (shareModalOpen) {
-            return <ShareChat />;
-        }
-
-        return null;
-    };
+    const { shareModalOpen } = useUI();
 
     return (
-        <div className="fixed z-50 transition-all">
-            <ActiveDialog />
+        <div>
+            <AppSettingsDialog />
+            {shareModalOpen && <ShareChat />}
         </div>
     );
 }

@@ -40,14 +40,14 @@ export function createSubmitHandler(
     state: ChatState,
     setState: ChatDispatch,
     router: AppRouterInstance,
-    setOpenAIKeyOpen: Dispatch<SetStateAction<boolean>>,
+    openKeyDialog: (open: boolean | AppSettingsSection) => void,
     userId?: string | null,
 ) {
     return async (e: FormEvent) => {
         e.preventDefault();
         if (state.input.trim() === '') return;
         if (!state.openAiApiKey && !userId) {
-            return setOpenAIKeyOpen(true);
+            return openKeyDialog('Credentials');
         }
 
         router.replace('/?c=' + state.activeThread.id);

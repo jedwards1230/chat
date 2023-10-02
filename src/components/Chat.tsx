@@ -1,19 +1,18 @@
 'use client';
 
-import { useCallback, useState } from 'react';
 import clsx from 'clsx';
+import { useCallback, useState } from 'react';
 import { PanInfo, motion } from 'framer-motion';
 
 import { useChat } from '@/providers/ChatProvider';
 import { useUI } from '@/providers/UIProvider';
 import { isMobile } from '@/utils/client/device';
 
-import ChatHistory from './ChatHistory';
+import Header from './Header';
 import ChatInput from './ChatInput';
 import ChatThread from './ChatThread';
-import Header from './Header';
+import ChatHistory from './ChatHistory';
 import ChatSettings from './ChatSettings';
-import Dialogs from './Dialogs';
 
 export default function Chat() {
     const { activeThread, botTyping, threads } = useChat();
@@ -31,9 +30,7 @@ export default function Chat() {
         setSwipeInProgress(true);
     };
 
-    const onPanEnd = () => {
-        setSwipeInProgress(false);
-    };
+    const onPanEnd = () => setSwipeInProgress(false);
 
     const onPan = useCallback(
         (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
@@ -95,32 +92,29 @@ export default function Chat() {
     );
 
     return (
-        <>
-            <div className="flex h-full w-full">
-                <ChatHistory activeThread={activeThread} threads={threads} />
-                <motion.div
-                    onPanStart={onPanStart}
-                    onPanEnd={onPanEnd}
-                    onPan={onPan}
-                    className={clsx(
-                        'flex h-full w-full flex-col overflow-hidden transition-all',
-                        sideBarOpen ? 'sm:pl-72' : 'lg:pl-0',
-                        chatSettingsOpen ? 'lg:pr-72' : 'lg:pr-0',
-                        botTyping && 'cursor-wait',
-                    )}
-                >
-                    <Header />
-                    <ChatThread
-                        activeThread={activeThread}
-                        style={{
-                            pointerEvents: swipeInProgress ? 'none' : 'auto',
-                        }}
-                    />
-                    <ChatInput />
-                </motion.div>
-                <ChatSettings />
-            </div>
-            <Dialogs />
-        </>
+        <div className="flex h-full w-full">
+            <ChatHistory activeThread={activeThread} threads={threads} />
+            <motion.div
+                onPanStart={onPanStart}
+                onPanEnd={onPanEnd}
+                onPan={onPan}
+                className={clsx(
+                    'flex h-full w-full flex-col overflow-hidden transition-all',
+                    sideBarOpen ? 'sm:pl-72' : 'lg:pl-0',
+                    chatSettingsOpen ? 'lg:pr-72' : 'lg:pr-0',
+                    botTyping && 'cursor-wait',
+                )}
+            >
+                <Header />
+                <ChatThread
+                    activeThread={activeThread}
+                    style={{
+                        pointerEvents: swipeInProgress ? 'none' : 'auto',
+                    }}
+                />
+                <ChatInput />
+            </motion.div>
+            <ChatSettings />
+        </div>
     );
 }

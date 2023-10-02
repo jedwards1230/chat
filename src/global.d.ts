@@ -1,6 +1,8 @@
 type GPT3 = 'gpt-3.5-turbo' | 'gpt-3.5-turbo-16k';
 type GPT4 = 'gpt-4' | 'gpt-4-0613';
 
+type AppSettingsSection = 'General' | 'Credentials' | 'Data';
+
 type OpenAiModels = GPT3 | GPT4;
 type LlamaModels = 'llama-2-7b-chat-int8';
 
@@ -121,3 +123,11 @@ interface SearchResult {
     /** Fime taken to store text embeddings  */
     timeToComplete?: number;
 }
+
+type User =
+    | {
+          name?: string | null;
+          email?: string | null;
+          image?: string | null;
+      }
+    | undefined;

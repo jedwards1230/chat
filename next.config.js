@@ -13,14 +13,6 @@ module.exports = withBundleAnalyzer(
         withPlausibleProxy()({
             experimental: {
                 serverActions: true,
-                webVitalsAttribution: [
-                    'CLS',
-                    'LCP',
-                    'FCP',
-                    'FID',
-                    'INP',
-                    'TTFB',
-                ],
             },
             images: {
                 remotePatterns: [

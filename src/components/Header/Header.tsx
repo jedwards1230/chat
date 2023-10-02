@@ -53,7 +53,9 @@ export default function Header() {
                         </p>
                     </div>
                 ) : (
-                    <ModelSelector />
+                    <div className="pt-1">
+                        <ModelSelector />
+                    </div>
                 )}
             </div>
             <div className="col-span-1 flex items-center justify-end">
