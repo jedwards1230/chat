@@ -367,15 +367,35 @@ export function removeThreadHandler(
     router: AppRouterInstance,
 ) {
     return (id: string) => {
-        setState((prevState) => ({
-            ...prevState,
-            threads: prevState.threads.filter((thread) => thread.id !== id),
-            saved: prevState.activeThread.id === id ? true : prevState.saved,
-        }));
-        if (state.activeThread.id === id) {
-            state.createThread();
-            router.replace('/');
-        }
+        setState((prevState) => {
+            const threads = prevState.threads.filter(
+                (thread) => thread.id !== id,
+            );
+
+            const removedThreadState = {
+                ...prevState,
+                threads,
+                saved:
+                    prevState.activeThread.id === id ? true : prevState.saved,
+            };
+
+            if (removedThreadState.activeThread.id === id) {
+                const newThread = getDefaultThread(
+                    removedThreadState.activeThread.agentConfig,
+                );
+                router.replace('/');
+                return {
+                    ...removedThreadState,
+                    activeThread: newThread,
+                    threads: [...threads, newThread],
+                    input: '',
+                    botTyping: false,
+                    isNew: true,
+                };
+            }
+
+            return removedThreadState;
+        });
     };
 }
 
