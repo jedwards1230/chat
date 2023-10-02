@@ -127,9 +127,9 @@ export async function fetchChat({
         }
     };
 
-    const functions: ChatCompletionCreateParams.Function[] = [];
+    let functions: ChatCompletionCreateParams.Function[] | undefined;
     if (tools && tools.length > 0) {
-        tools.forEach((tool) => functions.push(formatTool(tool)));
+        functions = tools.map((tool) => formatTool(tool));
     }
 
     try {
@@ -141,8 +141,8 @@ export async function fetchChat({
                 return await fetchOpenAiChat(
                     activeThread,
                     msgHistory,
-                    functions,
                     stream,
+                    functions,
                     signal,
                     key,
                 );
@@ -170,8 +170,8 @@ async function fetchLlama2Chat(msgHistory: Message[]) {
 async function fetchOpenAiChat(
     activeThread: ChatThread,
     msgHistory: Message[],
-    functions: ChatCompletionCreateParams.Function[],
     stream: boolean,
+    functions?: ChatCompletionCreateParams.Function[],
     signal?: AbortSignal,
     key?: string,
 ): Promise<ReadableStream<any> | Message> {
