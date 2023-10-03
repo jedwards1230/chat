@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, memo, FormEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, memo } from 'react';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 
@@ -22,44 +22,26 @@ function ChatInput() {
         useChat();
 
     const [activeId, setActiveId] = useState<string>(activeThread.id);
-    const [tokenCount, setTokenCount] = useState<number>(0);
     const inputRef = useRef<HTMLTextAreaElement>(null);
+
+    const tokenCount = useMemo(() => getTokenCount(input), [input]);
 
     const rows = calculateRows(input);
 
-    const submitInput = (e: FormEvent<Element>) => {
-        setTokenCount(0);
-        handleSubmit(e);
-    };
-
-    const handleInputChange = async (
-        e: React.ChangeEvent<HTMLTextAreaElement>,
-    ) => {
-        e.preventDefault();
-        changeInput(e.target.value);
-        const count = getTokenCount(e.target.value);
-        setTokenCount(count);
-    };
-
-    const activeCommand = useMemo(() => {
-        if (input.startsWith('/')) {
-            const trimmed = input.trim();
-            return trimmed.split(' ')[0] as Command;
-        }
-        return undefined;
-    }, [input]);
+    const activeCommand = input.startsWith('/')
+        ? (input.split(' ')[0] as Command)
+        : undefined;
 
     const onKeyDownHandler = (e: any) => {
         if (e.key === 'Enter' && !e.shiftKey && !isMobile()) {
             e.preventDefault();
             changeInput(e.target.value);
-            submitInput(e);
+            handleSubmit(e);
         }
     };
 
     useEffect(() => {
         if (activeThread.id !== activeId) {
-            setTokenCount(0);
             setActiveId(activeThread.id);
             inputRef.current?.focus();
         }
@@ -83,17 +65,21 @@ function ChatInput() {
         [activeThread.agentConfig.tools, activeThread.agentConfig.toolsEnabled],
     );
 
-    const availableCommands = useMemo(() => {
-        return activeCommand
-            ? commands.filter((tool) => tool.command.includes(activeCommand))
-            : commands;
-    }, [activeCommand, commands]);
+    const availableCommands = useMemo(
+        () =>
+            activeCommand
+                ? commands.filter((tool) =>
+                      tool.command.includes(activeCommand),
+                  )
+                : commands,
+        [activeCommand, commands],
+    );
 
     return (
         <div className="relative w-full">
             <QuickActions />
             <form
-                onSubmit={submitInput}
+                onSubmit={handleSubmit}
                 className="flex items-end justify-center w-full gap-2 px-4 pt-4 pb-6 transition-all border-t shadow-xl justify-self-end border-border dark:shadow-none sm:pb-4 md:pb-2 md:pt-2"
             >
                 <div className="relative flex flex-col w-full max-w-4xl gap-2">
@@ -119,7 +105,7 @@ function ChatInput() {
                             value={input}
                             onClick={(e) => inputRef.current?.focus()}
                             rows={rows}
-                            onChange={handleInputChange}
+                            onChange={(e) => changeInput(e.target.value)}
                             onKeyDown={onKeyDownHandler}
                             className="flex-1 w-full py-2 pl-2 pr-24 transition-colors border-2 rounded-lg shadow resize-none border-border bg-background focus:border-blue-primary focus:outline-none dark:bg-accent"
                         />

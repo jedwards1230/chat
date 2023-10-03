@@ -29,13 +29,10 @@ export default function Header() {
         return 0;
     }, [activeThread.messages]);
 
-    const handleSidebarToggle = () => {
-        setSideBarOpen(!sideBarOpen);
-    };
+    const handleSidebarToggle = () => setSideBarOpen(!sideBarOpen);
 
-    const handleChatSettingsToggle = () => {
+    const handleChatSettingsToggle = () =>
         setChatSettingsOpen(!chatSettingsOpen);
-    };
 
     return (
         <div
