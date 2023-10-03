@@ -10,9 +10,19 @@ type Model = OpenAiModels | LlamaModels;
 
 type ApiProvider = 'openai' | 'llama';
 
+type ModelParams = {
+    temperature?: number;
+    topP?: number;
+    N?: number;
+    maxTokens?: number;
+    frequencyPenalty?: number;
+    presencePenalty?: number;
+};
+
 interface ModelInfo {
     name: Model;
     api: ApiProvider;
+    params: ModelParams;
 }
 
 interface OpenAiModelInfo extends ModelInfo {
@@ -37,7 +47,7 @@ type Message = {
     name?: Tool;
     function_call?: {
         name: string;
-        arguments: string;
+        arguments: string | { input: string };
     };
 };
 
@@ -47,13 +57,7 @@ interface AgentConfig {
     tools: Tool[];
     toolsEnabled: boolean;
     model: ModelApi;
-    temperature: number;
     systemMessage: string;
-    topP: number;
-    N: number;
-    maxTokens: number;
-    frequencyPenalty: number;
-    presencePenalty: number;
 }
 
 interface ChatThread {

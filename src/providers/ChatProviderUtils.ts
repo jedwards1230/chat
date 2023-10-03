@@ -246,22 +246,6 @@ export function togglePluginHandler(state: ChatState, setState: ChatDispatch) {
     };
 }
 
-export function setConfigHandler(setState: ChatDispatch) {
-    return (newConfig: AgentConfig) => {
-        setState((prevState) => ({
-            ...prevState,
-            config: newConfig,
-            activeThread: {
-                ...prevState.activeThread,
-                agentConfig: {
-                    ...prevState.activeThread.agentConfig,
-                    ...newConfig,
-                },
-            },
-        }));
-    };
-}
-
 export function updateThreadConfigHandler(setState: ChatDispatch) {
     return (configUpdates: Partial<AgentConfig>) => {
         setState((prevState) => {
@@ -361,42 +345,13 @@ export function removeMessageHandler(setState: ChatDispatch) {
     };
 }
 
-export function removeThreadHandler(
-    state: ChatState,
-    setState: ChatDispatch,
-    router: AppRouterInstance,
-) {
-    return (id: string) => {
-        setState((prevState) => {
-            const threads = prevState.threads.filter(
-                (thread) => thread.id !== id,
-            );
-
-            const removedThreadState = {
-                ...prevState,
-                threads,
-                saved:
-                    prevState.activeThread.id === id ? true : prevState.saved,
-            };
-
-            if (removedThreadState.activeThread.id === id) {
-                const newThread = getDefaultThread(
-                    removedThreadState.activeThread.agentConfig,
-                );
-                router.replace('/');
-                return {
-                    ...removedThreadState,
-                    activeThread: newThread,
-                    threads: [...threads, newThread],
-                    input: '',
-                    botTyping: false,
-                    isNew: true,
-                };
-            }
-
-            return removedThreadState;
-        });
-    };
+export function removeThreadHandler(setState: ChatDispatch) {
+    return (id: string) =>
+        setState((prevState) => ({
+            ...prevState,
+            threads: prevState.threads.filter((thread) => thread.id !== id),
+            saved: prevState.activeThread.id === id ? true : prevState.saved,
+        }));
 }
 
 export function removeAllThreadsHandler(

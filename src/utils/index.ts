@@ -1,4 +1,4 @@
-import { CreateChatCompletionRequestMessage } from 'openai/resources/chat';
+import { ChatCompletionMessageParam } from 'openai/resources/chat';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -33,7 +33,7 @@ export function sortThreadlist(a: ChatThread, b: ChatThread) {
 
 export function prepareMessages(
     messages: Message[],
-): CreateChatCompletionRequestMessage[] {
+): ChatCompletionMessageParam[] {
     return messages.map((msg) => {
         if (msg.role === 'system') {
             return {
@@ -41,11 +41,21 @@ export function prepareMessages(
                 content: msg.content,
             };
         }
+        const functionCall = msg.function_call && {
+            ...msg.function_call,
+            arguments:
+                typeof msg.function_call.arguments === 'string'
+                    ? msg.function_call.arguments
+                    : msg.function_call?.arguments.input,
+        };
+
         return {
             role: msg.role,
             content: msg.content,
             ...(msg.name && { name: msg.name }),
-            ...(msg.function_call && { function_call: msg.function_call }),
+            ...(functionCall && {
+                function_call: functionCall,
+            }),
         };
     });
 }

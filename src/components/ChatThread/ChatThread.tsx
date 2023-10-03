@@ -49,7 +49,7 @@ export default function ChatThread({
                 hasMultipleMessages && 'overflow-y-scroll',
             )}
         >
-            <div className="flex h-full w-full flex-col">
+            <div className="flex flex-col w-full h-full">
                 {hasMultipleMessages ? (
                     messages.map((m, i) => {
                         if (m.role === 'assistant' && m.function_call) {
@@ -67,7 +67,11 @@ export default function ChatThread({
                                 key={m.id}
                                 message={m}
                                 config={activeThread.agentConfig}
-                                input={input}
+                                input={
+                                    typeof input === 'string'
+                                        ? input
+                                        : input?.input
+                                }
                             />
                         );
                     })

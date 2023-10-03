@@ -37,7 +37,7 @@ function Markdown({
             blockquote: ({ node, ...props }) => (
                 <blockquote
                     {...props}
-                    className="border-l-4 border-blue-500 pl-4"
+                    className="pl-4 border-l-4 border-blue-500"
                 />
             ),
             br: ({ node, ...props }) => <br {...props} className="my-1" />,
@@ -57,7 +57,7 @@ function Markdown({
                             <img
                                 alt={verifiedUrl.pathname}
                                 src={verifiedUrl.href}
-                                className="h-auto w-auto rounded-lg border border-gray-300"
+                                className="w-auto h-auto border border-gray-300 rounded-lg"
                                 loading="lazy"
                             />
                         );
@@ -86,10 +86,10 @@ function Markdown({
             ),
             hr: ({ node, ...props }) => <hr {...props} className="my-2" />,
             ol: ({ node, ...props }) => (
-                <ol {...props} className="list-inside list-decimal" />
+                <ol {...props} className="list-decimal list-inside" />
             ),
             ul: ({ node, ...props }) => (
-                <ul {...props} className="list-inside list-disc" />
+                <ul {...props} className="list-disc list-inside" />
             ),
             a: ({ node, ...props }) => (
                 <a {...props} className="text-blue-500 hover:underline" />
@@ -103,15 +103,15 @@ function Markdown({
             table: ({ node, ...props }) => (
                 <table
                     {...props}
-                    className="border-collapse border border-gray-300"
+                    className="border border-collapse border-gray-300"
                 />
             ),
             tbody: ({ node, ...props }) => <tbody {...props} />,
             td: ({ node, ...props }) => (
-                <td {...props} className="border border-gray-300 px-2 py-1" />
+                <td {...props} className="px-2 py-1 border border-gray-300" />
             ),
             th: ({ node, ...props }) => (
-                <th {...props} className="border border-gray-300 px-2 py-1" />
+                <th {...props} className="px-2 py-1 border border-gray-300" />
             ),
             thead: ({ node, ...props }) => <thead {...props} />,
             tr: ({ node, ...props }) => <tr {...props} className="border" />,
@@ -121,7 +121,7 @@ function Markdown({
 
     return (
         <ReactMarkdown
-            className="w-full space-y-4 overflow-y-hidden overflow-x-scroll"
+            className="w-full space-y-4 overflow-x-scroll overflow-y-hidden"
             remarkPlugins={[remarkGfm]}
             components={components}
         >

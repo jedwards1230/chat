@@ -58,8 +58,9 @@ export default function AppSettingsDialog() {
                                 onClick={() => setActiveSection(section)}
                                 className={clsx(
                                     'justify-start',
-                                    activeSection === section &&
-                                        'text-base font-bold',
+                                    activeSection === section
+                                        ? 'text-base font-bold dark:text-foreground'
+                                        : 'dark:text-foreground/50',
                                 )}
                             >
                                 {section}

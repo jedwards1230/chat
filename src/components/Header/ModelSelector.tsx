@@ -11,7 +11,7 @@ import {
 } from '../ui/dropdown-menu';
 import { useChat } from '@/providers/ChatProvider';
 import { Button } from '../ui/button';
-import { modelMap } from '@/utils/model';
+import { getListByApi } from '@/providers/models';
 
 export default function ModelSelector() {
     const { activeThread, updateThreadConfig } = useChat();
@@ -28,7 +28,7 @@ export default function ModelSelector() {
                 <DropdownMenuRadioGroup>
                     <DropdownMenuLabel>OpenAI</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    {modelMap.openai.map((model) => (
+                    {getListByApi('openai').map((model) => (
                         <DropdownMenuRadioItem
                             key={model.api + model.name}
                             value={model.name}
@@ -39,7 +39,7 @@ export default function ModelSelector() {
                     ))}
                     <DropdownMenuSeparator />
                     <DropdownMenuLabel>Llama</DropdownMenuLabel>
-                    {modelMap.llama.map((model) => (
+                    {getListByApi('llama').map((model) => (
                         <DropdownMenuRadioItem
                             key={model.api + model.name}
                             value={model.name}

@@ -34,24 +34,26 @@ export default async function Page({ params }: Props) {
     }
 
     return (
-        <div className="flex h-full w-full flex-col overflow-hidden transition-all">
-            <div className="grow-1 flex h-full w-full max-w-full flex-col overflow-y-scroll">
+        <div className="flex flex-col w-full h-full overflow-hidden transition-all">
+            <div className="flex flex-col w-full h-full max-w-full overflow-y-scroll grow-1">
                 {thread.messages.map((m, i) => {
                     if (m.role === 'assistant' && m.function_call) {
                         return null;
                     }
                     const lastMessage = thread.messages[i - 1];
+                    const input =
+                        m.role === 'function' &&
+                        lastMessage.function_call &&
+                        lastMessage.function_call.arguments
+                            ? lastMessage.function_call.arguments
+                            : undefined;
                     return (
                         <SharedBubble
                             key={m.id}
                             message={m}
                             config={thread.agentConfig}
                             input={
-                                m.role === 'function' &&
-                                lastMessage.function_call &&
-                                lastMessage.function_call.arguments
-                                    ? lastMessage.function_call.arguments
-                                    : undefined
+                                typeof input === 'string' ? input : input?.input
                             }
                         />
                     );

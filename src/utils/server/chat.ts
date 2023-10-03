@@ -177,7 +177,7 @@ async function fetchOpenAiChat(
 ): Promise<ReadableStream<any> | Message> {
     const messages = prepareMessages(msgHistory);
     const model = activeThread.agentConfig.model;
-    const temperature = activeThread.agentConfig.temperature;
+    const temperature = model.params?.temperature;
 
     const openai = getOpenAiClient(key);
 

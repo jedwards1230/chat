@@ -18,7 +18,6 @@ type ChatState = {
     /** Abort request, set default thread, save */
     createThread: () => void;
     toggleplugin: (plugin: Tool) => void;
-    setConfig: (config: AgentConfig) => void;
     saveCharacter: (character: AgentConfig) => Promise<void>;
     updateThreadConfig: (config: Partial<AgentConfig>) => void;
     setSystemMessage: (message: string) => void;

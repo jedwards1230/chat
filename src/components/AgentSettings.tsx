@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import { useEffect, useState } from 'react';
 
 import { useChat } from '@/providers/ChatProvider';
+import { modelList, modelMap } from '@/providers/models';
 import { defaultAgentConfig } from '@/providers/characters';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
@@ -15,7 +16,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from './ui/select';
-import { modelList } from '@/utils/model';
 import { Label } from './ui/label';
 import { Button } from './ui/button';
 
@@ -60,10 +60,17 @@ export default function AgentSettings({
         value: string | number | boolean,
     ) => {
         const update = { ...config, [field]: value };
+
+        if (field === 'model') {
+            const model = modelMap[value as Model];
+            if (model) update.model = model;
+        }
+
         setConfig(update);
+
         if (!isNew && active) {
             saveCharacter(update);
-            updateThreadConfig({ [field]: value });
+            updateThreadConfig(update);
         }
     };
 
@@ -84,13 +91,15 @@ export default function AgentSettings({
         saveCharacter(config);
     };
 
+    const params = config.model.params;
+
     const modelInfo = [
-        { Temperature: config.temperature },
-        { 'Top P': config.topP },
-        { N: config.N },
-        { 'Max Tokens': config.maxTokens },
-        { 'Frequency Penalty': config.frequencyPenalty },
-        { 'Presence Penalty': config.presencePenalty },
+        { Temperature: params?.temperature },
+        { 'Top P': params?.topP },
+        { N: params?.N },
+        { 'Max Tokens': params?.maxTokens },
+        { 'Frequency Penalty': params?.frequencyPenalty },
+        { 'Presence Penalty': params?.presencePenalty },
     ];
 
     const functionsAllowed = config.model.api !== 'llama';
@@ -116,7 +125,16 @@ export default function AgentSettings({
             </div>
             <div className="flex flex-col gap-4 rounded-md">
                 <Select
-                    onValueChange={(v) => onFieldChange('model', JSON.parse(v))}
+                    onValueChange={(v) => {
+                        try {
+                            if (!v) return;
+                            const m = JSON.parse(v);
+                            onFieldChange('model', m);
+                        } catch (e) {
+                            console.log(v);
+                            console.error(e);
+                        }
+                    }}
                     value={JSON.stringify(config.model)}
                 >
                     <SelectTrigger className="w-full">

@@ -1,21 +1,13 @@
 import { v4 as uuid } from 'uuid';
+import { modelMap } from './models';
 
 export const defaultAgentConfig: AgentConfig = {
     id: uuid(),
     name: 'Chat',
     tools: ['search', 'wikipedia-api'],
     toolsEnabled: true,
-    model: {
-        name: 'gpt-4',
-        api: 'openai',
-    },
-    temperature: 0.7,
+    model: modelMap['gpt-4'],
     systemMessage: 'You are a helpful assistant.',
-    topP: 1,
-    N: 1,
-    maxTokens: -1,
-    frequencyPenalty: 0,
-    presencePenalty: 0,
 };
 
 const softwareDeveloperAgentConfig: Partial<AgentConfig> = {
