@@ -1,10 +1,13 @@
 'use client';
 
+import clsx from 'clsx';
+import { useMemo } from 'react';
+
 import { useChat } from '@/providers/ChatProvider';
 import { Bars, Information } from '../Icons';
-import clsx from 'clsx';
 import ModelSelector from './ModelSelector';
 import { useUI } from '@/providers/UIProvider';
+import { getTokenCount } from '@/utils/tokenizer';
 
 export default function Header() {
     const { activeThread } = useChat();
@@ -14,6 +17,17 @@ export default function Header() {
         chatSettingsOpen,
         setChatSettingsOpen,
     } = useUI();
+
+    const tokenCount = useMemo(() => {
+        if (activeThread.messages.length > 1) {
+            return activeThread.messages.reduce(
+                (acc, msg) =>
+                    msg.content ? acc + getTokenCount(msg.content) : acc,
+                0,
+            );
+        }
+        return 0;
+    }, [activeThread.messages]);
 
     const handleSidebarToggle = () => {
         setSideBarOpen(!sideBarOpen);
@@ -32,24 +46,25 @@ export default function Header() {
                     : 'border-transparent bg-transparent',
             )}
         >
-            <div className="col-span-1 flex items-center justify-start">
+            <div className="flex items-center justify-start col-span-1">
                 <button
                     name="sidebar-toggle"
-                    className="cursor-pointer px-1 text-neutral-400 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-50"
+                    className="px-1 cursor-pointer text-neutral-400 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-50"
                     onClick={handleSidebarToggle}
                 >
                     <Bars />
                 </button>
             </div>
-            <div className="col-span-10 flex items-center justify-center text-center">
+            <div className="flex items-center justify-center col-span-10 text-center">
                 {activeThread.messages.length > 1 ? (
                     <div>
-                        <p className="line-clamp-1 font-semibold">
+                        <p className="font-semibold line-clamp-1">
                             {activeThread.title}
                         </p>
                         <p className="text-sm font-light text-neutral-500">
                             {activeThread.agentConfig.model.name} |{' '}
-                            {activeThread.messages.length} messages
+                            {activeThread.messages.length} messages |{' '}
+                            {tokenCount} tokens
                         </p>
                     </div>
                 ) : (
@@ -58,10 +73,10 @@ export default function Header() {
                     </div>
                 )}
             </div>
-            <div className="col-span-1 flex items-center justify-end">
+            <div className="flex items-center justify-end col-span-1">
                 <button
                     name="chat-settings-toggle"
-                    className="cursor-pointer px-1 text-neutral-400 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-50"
+                    className="px-1 cursor-pointer text-neutral-400 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-50"
                     onClick={handleChatSettingsToggle}
                 >
                     <Information />
