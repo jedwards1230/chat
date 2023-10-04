@@ -1,5 +1,6 @@
 'use client';
 
+import { v4 as uuid } from 'uuid';
 import { Dispatch, SetStateAction, FormEvent } from 'react';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 
@@ -9,19 +10,29 @@ import { deleteMessageById, upsertCharacter } from '@/utils/server/supabase';
 import { sortThreadlist } from '@/utils';
 import { getToolData } from '@/utils/client/chat';
 import { baseCommands } from '@/tools/commands';
+import ChatManager from '@/lib/ChatManager';
 
 type ChatDispatch = Dispatch<SetStateAction<ChatState>>;
+
+function createMessage(role: Role) {
+    return {
+        id: uuid(),
+        content: '',
+        role,
+        createdAt: new Date(),
+    };
+}
 
 export function getInitialActiveThread(
     savedConfig: AgentConfig,
     activeId: string | null | undefined,
     threadList: ChatThread[],
-) {
+): ChatThread {
     const requestedThread = threadList.find((thread) => thread.id === activeId);
     return (
         requestedThread || {
             ...initialState.activeThread,
-            ...(savedConfig || initialState.activeThread.agentConfig),
+            ...(savedConfig && { agentConfig: savedConfig }),
         }
     );
 }
@@ -60,21 +71,25 @@ export function createSubmitHandler(
 
         const upsertMessage = (newMessage: Message) => {
             setState((prevState) => {
-                const messages = [...prevState.activeThread.messages];
-                const foundIndex = messages.findIndex(
-                    (message) => message.id === newMessage.id,
-                );
-
-                if (foundIndex !== -1) {
-                    messages[foundIndex] = newMessage;
+                if (prevState.activeThread.mapping[newMessage.id]) {
+                    prevState.activeThread.mapping = ChatManager.updateMessage(
+                        newMessage,
+                        prevState.activeThread.mapping,
+                    );
                 } else {
-                    messages.push(newMessage);
+                    const { newMapping, newCurrentNode } =
+                        ChatManager.createMessage(
+                            newMessage,
+                            prevState.activeThread.mapping,
+                            prevState.activeThread.currentNode,
+                        );
+                    prevState.activeThread.currentNode = newCurrentNode;
+                    prevState.activeThread.mapping = newMapping;
                 }
 
-                const activeThread = {
+                const activeThread: ChatThread = {
                     ...prevState.activeThread,
                     lastModified: new Date(),
-                    messages,
                 };
 
                 const threads = [...prevState.threads];
@@ -152,15 +167,26 @@ export function createSubmitHandler(
         }));
         upsertMessage(userMsg);
 
-        const msgHistory = state.activeThread.messages;
         if (state.editId) {
-            const editIndex = msgHistory.findIndex(
-                (msg) => msg.id === state.editId,
+            state.activeThread.mapping = ChatManager.editMessageAndFork(
+                state.editId,
+                userMsg,
+                state.activeThread.mapping,
             );
-            msgHistory[editIndex] = userMsg;
         } else {
-            msgHistory.push(userMsg);
+            const { newMapping, newCurrentNode } = ChatManager.createMessage(
+                userMsg,
+                state.activeThread.mapping,
+                state.activeThread.currentNode,
+            );
+            state.activeThread.currentNode = newCurrentNode;
+            state.activeThread.mapping = newMapping;
         }
+
+        const msgHistory = ChatManager.getOrderedMessages(
+            state.activeThread.currentNode,
+            state.activeThread.mapping,
+        );
 
         // Fetch chat
         toolInput
@@ -186,7 +212,7 @@ export function createSubmitHandler(
 
         // Fetch title only if it's an initial message
         if (state.isNew) {
-            getTitle(
+            await getTitle(
                 state.activeThread,
                 query,
                 upsertTitle,
@@ -230,19 +256,22 @@ export function updateActiveThreadHandler(setState: ChatDispatch) {
 
 export function togglePluginHandler(state: ChatState, setState: ChatDispatch) {
     return (tool: Tool) => {
-        const tools = state.activeThread.agentConfig.tools;
-        setState((prevState) => ({
-            ...prevState,
-            activeThread: {
-                ...prevState.activeThread,
-                agentConfig: {
-                    ...prevState.activeThread.agentConfig,
-                    tools: tools.includes(tool)
-                        ? tools.filter((t) => t !== tool)
-                        : [...tools, tool],
+        setState((prevState) => {
+            const prevTools = prevState.activeThread.agentConfig.tools;
+            const tools = prevTools?.includes(tool)
+                ? prevTools.filter((t) => t !== tool)
+                : [...prevTools, tool];
+            return {
+                ...prevState,
+                activeThread: {
+                    ...prevState.activeThread,
+                    agentConfig: {
+                        ...prevState.activeThread.agentConfig,
+                        tools,
+                    },
                 },
-            },
-        }));
+            };
+        });
     };
 }
 
@@ -283,6 +312,32 @@ export function updateThreadConfigHandler(setState: ChatDispatch) {
 export function setSystemMessageHandler(setState: ChatDispatch) {
     return (systemMessage: string) => {
         setState((prevState) => {
+            const systemMsg = ChatManager.getSystemMessage(
+                prevState.activeThread.currentNode,
+                prevState.activeThread.mapping,
+            );
+            if (systemMsg) {
+                prevState.activeThread.mapping = ChatManager.updateMessage(
+                    {
+                        ...(systemMsg && systemMsg),
+                        content: systemMessage,
+                    },
+                    prevState.activeThread.mapping,
+                );
+            } else {
+                const { newMapping, newCurrentNode } =
+                    ChatManager.createMessage(
+                        {
+                            ...createMessage('system'),
+                            content: systemMessage,
+                        },
+                        prevState.activeThread.mapping,
+                        prevState.activeThread.currentNode,
+                    );
+                prevState.activeThread.currentNode = newCurrentNode;
+                prevState.activeThread.mapping = newMapping;
+            }
+
             const activeThread: ChatThread = {
                 ...prevState.activeThread,
                 lastModified: new Date(),
@@ -290,13 +345,6 @@ export function setSystemMessageHandler(setState: ChatDispatch) {
                     ...prevState.activeThread.agentConfig,
                     systemMessage,
                 },
-                messages: [
-                    {
-                        ...prevState.activeThread.messages[0],
-                        content: systemMessage,
-                    },
-                    ...prevState.activeThread.messages.slice(1),
-                ],
             };
 
             return {
@@ -313,7 +361,7 @@ export function setSystemMessageHandler(setState: ChatDispatch) {
 
 export function editMessageHandler(state: ChatState, setState: ChatDispatch) {
     return (id: string) => {
-        const msg = state.activeThread.messages.find((msg) => msg.id === id);
+        const msg = state.activeThread.mapping[id].message;
         if (!msg) {
             console.error('No message to edit');
             return;
@@ -331,17 +379,20 @@ export function editMessageHandler(state: ChatState, setState: ChatDispatch) {
 export function removeMessageHandler(setState: ChatDispatch) {
     return (id: string) => {
         deleteMessageById(id);
-        setState((prevState) => ({
-            ...prevState,
-            saved: false,
-            activeThread: {
-                ...prevState.activeThread,
-                messages: prevState.activeThread.messages.filter(
-                    (msg) => msg.id !== id,
-                ),
-                lastModified: new Date(),
-            },
-        }));
+        setState((prevState) => {
+            prevState.activeThread.mapping = ChatManager.deleteMessage(
+                id,
+                prevState.activeThread.mapping,
+            );
+            return {
+                ...prevState,
+                saved: false,
+                activeThread: {
+                    ...prevState.activeThread,
+                    lastModified: new Date(),
+                },
+            };
+        });
     };
 }
 

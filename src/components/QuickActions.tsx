@@ -1,16 +1,22 @@
 'use client';
 
-import { useChat } from '@/providers/ChatProvider';
 import clsx from 'clsx';
 import Link from 'next/link';
 
+import { useChat } from '@/providers/ChatProvider';
+import useMessages from '@/lib/ChatManagerHook';
+
 export default function QuickActions() {
     const { activeThread, botTyping, abortRequest } = useChat();
+    const messages = useMessages(
+        activeThread.currentNode,
+        activeThread.mapping,
+    );
 
     const btn = 'px-3 py-1.5 rounded';
 
     return (
-        <div className="absolute inset-x-0 flex justify-end gap-2 px-5 text-sm font-medium text-background dark:text-foreground -top-10">
+        <div className="absolute inset-x-0 -top-10 flex justify-end gap-2 px-5 text-sm font-medium text-background dark:text-foreground">
             {botTyping && (
                 <button
                     onClick={abortRequest}
@@ -19,7 +25,7 @@ export default function QuickActions() {
                     Stop
                 </button>
             )}
-            {activeThread.messages.length > 1 && (
+            {messages.length > 1 && (
                 <>
                     <Link replace={true} href="/">
                         <button

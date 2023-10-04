@@ -5,6 +5,9 @@
 /.pnp
 .pnp.js
 
+/example_export
+.fleet/
+
 /public/sw*
 /public/workbox-*
 

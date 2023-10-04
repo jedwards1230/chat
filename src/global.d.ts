@@ -39,18 +39,6 @@ type ModelApi = OpenAiModelInfo | LlamaModelInfo;
 
 type Role = 'system' | 'user' | 'assistant' | 'function';
 
-type Message = {
-    id: string;
-    content: string | null;
-    role: Role;
-    createdAt?: Date;
-    name?: Tool;
-    function_call?: {
-        name: string;
-        arguments: string | { input: string };
-    };
-};
-
 interface AgentConfig {
     id: string;
     name: string;
@@ -60,31 +48,37 @@ interface AgentConfig {
     systemMessage: string;
 }
 
-interface ChatThread {
-    created: Date;
-    lastModified: Date;
+interface Message {
     id: string;
-    title: string;
-    messages: Message[];
-    agentConfig: AgentConfig;
-}
-
-interface SaveData {
-    chatHistory: ChatThread[];
-    config: {
-        model: ModelApi;
-        temperature: number;
-        systemMessage: string;
-        topP: number;
-        N: number;
-        maxTokens: number;
-        frequencyPenalty: number;
-        presencePenalty: number;
+    content: string | null;
+    role: Role;
+    name?: string;
+    createdAt?: Date;
+    function_call?: {
+        name: string;
+        arguments: string | { input: string };
     };
 }
 
-interface ShareData {
-    thread: ChatThread;
+interface ChildMessage {
+    id: string;
+    message: Message | null;
+    parent: string | null;
+    children: string[];
+}
+
+type MessageMapping = {
+    [key: string]: ChildMessage;
+};
+
+interface ChatThread {
+    id: string;
+    created: Date;
+    lastModified: Date;
+    title: string;
+    mapping: MessageMapping;
+    currentNode: string | null;
+    agentConfig: AgentConfig;
 }
 
 type Choice = {
@@ -98,20 +92,6 @@ type Choice = {
     finish_reason: 'function_call' | null;
     index: number;
 };
-
-interface StreamData {
-    error?: {
-        code: string | null;
-        message: string;
-        param: string | null;
-        type: string;
-    };
-    choices?: Choice[];
-    created: number;
-    id: string;
-    model: Model;
-    object: string;
-}
 
 interface SearchResult {
     /** Query used with Search Engine API */

@@ -1,20 +1,28 @@
 import { v4 as uuidv4 } from 'uuid';
+
 import { defaultAgentConfig, defaultAgents } from './characters';
 
 export function getDefaultThread(config: AgentConfig): ChatThread {
+    const systemId = uuidv4();
     return {
         id: uuidv4(),
         title: 'New Chat',
         created: new Date(),
         lastModified: new Date(),
         agentConfig: config,
-        messages: [
-            {
-                id: uuidv4(),
-                role: 'system',
-                content: config.systemMessage,
+        mapping: {
+            [systemId]: {
+                id: systemId,
+                message: {
+                    id: systemId,
+                    role: 'system',
+                    content: config.systemMessage,
+                },
+                parent: null,
+                children: [],
             },
-        ],
+        },
+        currentNode: systemId,
     };
 }
 

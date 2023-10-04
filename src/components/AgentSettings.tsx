@@ -75,7 +75,7 @@ export default function AgentSettings({
     };
 
     const togglePlugin = (tool: Tool) => {
-        const newTools = config.tools.includes(tool)
+        const newTools = config.tools?.includes(tool)
             ? config.tools.filter((t) => t !== tool)
             : [...config.tools, tool];
 
@@ -125,17 +125,8 @@ export default function AgentSettings({
             </div>
             <div className="flex flex-col gap-4 rounded-md">
                 <Select
-                    onValueChange={(v) => {
-                        try {
-                            if (!v) return;
-                            const m = JSON.parse(v);
-                            onFieldChange('model', m);
-                        } catch (e) {
-                            console.log(v);
-                            console.error(e);
-                        }
-                    }}
-                    value={JSON.stringify(config.model)}
+                    onValueChange={(v) => v && onFieldChange('model', v)}
+                    value={config.model.name}
                 >
                     <SelectTrigger className="w-full">
                         <SelectValue placeholder={config.model.name} />
@@ -144,7 +135,7 @@ export default function AgentSettings({
                         {modelList.map((model) => (
                             <SelectItem
                                 key={'select-' + model.name}
-                                value={JSON.stringify(model)}
+                                value={model.name}
                             >
                                 {model.name}
                             </SelectItem>
@@ -162,7 +153,7 @@ export default function AgentSettings({
                     </div>
                 )}
                 {functionsAllowed && (
-                    <div className="flex flex-col w-full gap-2">
+                    <div className="flex w-full flex-col gap-2">
                         <label
                             className={clsx(
                                 'flex flex-col rounded px-1 transition-colors dark:hover:bg-neutral-600',
@@ -264,7 +255,7 @@ export default function AgentSettings({
                     })}
                 </details>
             </div>
-            <div className="flex justify-end w-full">
+            <div className="flex w-full justify-end">
                 <Button
                     variant="outlineAccent"
                     type="submit"

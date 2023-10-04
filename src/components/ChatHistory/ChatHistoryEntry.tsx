@@ -10,6 +10,7 @@ import { isMobile } from '@/utils/client/device';
 import { useUI } from '@/providers/UIProvider';
 import { deleteThreadById } from '@/utils/server/supabase';
 import { deleteLocalThreadById } from '@/utils/client/localstorage';
+import useMessages from '@/lib/ChatManagerHook';
 
 export default function ChatHistoryEntry({
     entry,
@@ -21,6 +22,7 @@ export default function ChatHistoryEntry({
     const router = useRouter();
     const { removeThread } = useChat();
     const { setSideBarOpen } = useUI();
+    const messages = useMessages(entry.currentNode, entry.mapping);
 
     // Function to remove a thread and update the local storage
     const remove = (e: any) => {
@@ -29,7 +31,6 @@ export default function ChatHistoryEntry({
         deleteThreadById(entry.id);
         deleteLocalThreadById(entry.id);
         if (entry.id === activeThread.id) {
-            console.log('createThread');
             router.push('/');
         }
     };
@@ -38,7 +39,7 @@ export default function ChatHistoryEntry({
         if (isMobile('md')) setSideBarOpen(false);
     };
 
-    if (entry.messages.length <= 1) return null;
+    if (messages.length <= 1) return null;
     return (
         <div className="relative">
             <Link
@@ -58,7 +59,7 @@ export default function ChatHistoryEntry({
                 </div>
             </Link>
             <div
-                className="absolute top-0 right-0 z-50 flex items-center justify-center col-span-2 mt-2 mr-2 rounded-full cursor-pointer select-none peer text-neutral-300 hover:text-neutral-50"
+                className="peer absolute right-0 top-0 z-50 col-span-2 mr-2 mt-2 flex cursor-pointer select-none items-center justify-center rounded-full text-neutral-300 hover:text-neutral-50"
                 onClick={remove}
                 title="Delete conversation"
             >

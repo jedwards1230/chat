@@ -1,10 +1,11 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect } from 'react';
 import clsx from 'clsx';
 
 import { ChatBubble } from './ChatBubble';
 import ChatPlaceholder from '../ChatPlaceholder';
+import useMessages from '@/lib/ChatManagerHook';
 
 export default function ChatThread({
     style,
@@ -13,14 +14,15 @@ export default function ChatThread({
     style?: React.CSSProperties;
     activeThread: ChatThread;
 }) {
-    const [messages, setMessages] = useState(activeThread.messages);
+    const messages = useMessages(
+        activeThread.currentNode,
+        activeThread.mapping,
+    );
 
     const threadRef = useRef<HTMLDivElement>(null);
     const prevScrollHeight = useRef<number>(0);
 
     useEffect(() => {
-        setMessages(activeThread.messages);
-
         const threadEl = threadRef.current;
         if (!threadEl) return;
 
@@ -36,7 +38,7 @@ export default function ChatThread({
         }
 
         prevScrollHeight.current = threadEl.scrollHeight;
-    }, [activeThread.messages]);
+    }, [activeThread.currentNode, activeThread.mapping]);
 
     const hasMultipleMessages = messages.length > 1;
 
@@ -49,7 +51,7 @@ export default function ChatThread({
                 hasMultipleMessages && 'overflow-y-scroll',
             )}
         >
-            <div className="flex flex-col w-full h-full">
+            <div className="flex h-full w-full flex-col">
                 {hasMultipleMessages ? (
                     messages.map((m, i) => {
                         if (m.role === 'assistant' && m.function_call) {

@@ -6,6 +6,7 @@ import OpenAI from 'openai';
 
 import { readStream, callTool, parseStreamData } from '../client';
 import { fetchChat, getTitleStream } from '../server/chat';
+import ChatManager from '@/lib/ChatManager';
 
 const MAX_LOOPS = 10;
 
@@ -54,11 +55,15 @@ export async function getTitle(
     userId?: string | null,
     openAiApiKey?: string,
 ) {
-    const l = activeThread.messages.length;
+    const messages = ChatManager.getOrderedMessages(
+        activeThread.currentNode,
+        activeThread.mapping,
+    );
+    const l = messages.length;
     if (l < 2 || l > 10) return;
 
     const stream = await requestTitleStream(
-        activeThread.messages,
+        messages,
         input,
         userId,
         openAiApiKey,
@@ -110,126 +115,115 @@ export async function getChat({
 }: GetChatParams) {
     const activeThread = state.activeThread;
     const apiKey = state.openAiApiKey;
-    try {
-        if (loops > MAX_LOOPS) {
-            throw new Error('Too many loops');
-        }
+    if (loops > MAX_LOOPS) {
+        throw new Error('Too many loops');
+    }
 
-        const assistantId = uuidv4();
-        let tools: ToolInput[] = [];
-        let accumulatedResponse = '';
+    const assistantId = uuidv4();
+    let tools: ToolInput[] = [];
+    let accumulatedResponse = '';
 
-        setState((prevState) => ({
-            ...prevState,
-            botTyping: true,
-        }));
+    setState((prevState) => ({
+        ...prevState,
+        botTyping: true,
+    }));
 
-        if (state.streamResponse) {
-            // Callback function to handle each chunk of the response stream
-            const streamCallback = (
-                chunk: OpenAI.Chat.Completions.ChatCompletionChunk[],
-            ) => {
-                const parsed = parseStreamData(chunk);
-                accumulatedResponse = parsed.accumulatedResponse || '';
-                tools = parsed.toolCalls || [];
+    if (state.streamResponse) {
+        // Callback function to handle each chunk of the response stream
+        const streamCallback = (
+            chunk: OpenAI.Chat.Completions.ChatCompletionChunk[],
+        ) => {
+            const parsed = parseStreamData(chunk);
+            accumulatedResponse = parsed.accumulatedResponse || '';
+            tools = parsed.toolCalls || [];
 
-                if (tools.length === 0 && accumulatedResponse !== '') {
-                    upsertMessage({
-                        id: assistantId,
-                        content: accumulatedResponse,
-                        role: 'assistant',
-                    });
-                }
-            };
-
-            for (let i = 0; i < 5; i++) {
-                try {
-                    const stream = await requestChatWithClientOrServer(
-                        activeThread,
-                        controller.signal,
-                        msgHistory,
-                        true,
-                        userId,
-                        apiKey,
-                    );
-
-                    if (stream instanceof ReadableStream) {
-                        await readStream(stream, streamCallback);
-                        break;
-                    }
-
-                    throw new Error(
-                        `Non-streamable response: ${JSON.stringify(stream)}`,
-                    );
-                } catch (e: any) {
-                    console.error(e);
-                    continue;
-                }
-            }
-        } else {
-            const res = await requestChatWithClientOrServer(
-                activeThread,
-                controller.signal,
-                msgHistory,
-                false,
-                userId,
-                apiKey,
-            );
-
-            if (typeof res === 'string') {
+            if (tools.length === 0 && accumulatedResponse !== '') {
                 upsertMessage({
                     id: assistantId,
-                    content: res,
+                    content: accumulatedResponse,
                     role: 'assistant',
                 });
-            } else if (res instanceof ReadableStream) {
-                throw new Error('Cannot handle streamable response');
-            } else {
-                upsertMessage(res);
+            }
+        };
+
+        for (let i = 0; i < 5; i++) {
+            try {
+                const stream = await requestChatWithClientOrServer(
+                    activeThread,
+                    controller.signal,
+                    msgHistory,
+                    true,
+                    userId,
+                    apiKey,
+                );
+
+                if (stream instanceof ReadableStream) {
+                    await readStream(stream, streamCallback);
+                    break;
+                }
+
+                throw new Error(
+                    `Non-streamable response: ${JSON.stringify(stream)}`,
+                );
+            } catch (e: any) {
+                console.error(e);
             }
         }
+    } else {
+        const res = await requestChatWithClientOrServer(
+            activeThread,
+            controller.signal,
+            msgHistory,
+            false,
+            userId,
+            apiKey,
+        );
 
-        // Set chat state
+        if (typeof res === 'string') {
+            upsertMessage({
+                id: assistantId,
+                content: res,
+                role: 'assistant',
+            });
+        } else if (res instanceof ReadableStream) {
+            throw new Error('Cannot handle streamable response');
+        } else {
+            upsertMessage(res);
+        }
+    }
+
+    // Set chat state
+    setState((prevState) => ({
+        ...prevState,
+        saved: false,
+        isNew: false,
+    }));
+
+    // Check if a tool is requested
+    if (tools.length > 0) {
+        for (const toolInput of tools) {
+            await getToolData({
+                toolInput,
+                msgHistory,
+                upsertMessage,
+                controller,
+                state,
+                setState,
+                loops: loops + 1,
+                userId,
+            });
+        }
+    } else {
         setState((prevState) => ({
             ...prevState,
-            saved: false,
             isNew: false,
         }));
-
-        // Check if a tool is requested
-        if (tools.length > 0) {
-            for (const toolInput of tools) {
-                await getToolData({
-                    toolInput,
-                    msgHistory,
-                    upsertMessage,
-                    controller,
-                    state,
-                    setState,
-                    loops: loops + 1,
-                    userId,
-                });
-            }
-        } else {
-            setState((prevState) => ({
-                ...prevState,
-                saved: false,
-                botTyping: false,
-                isNew: false,
-            }));
-        }
-    } catch (error: any) {
-        if (error.name === 'AbortError') {
-            //console.log('Fetch aborted');
-        } else {
-            //console.error('Error:', error);
-        }
-        setState((prevState) => ({
-            ...prevState,
-            botTyping: false,
-            saved: false,
-        }));
     }
+    setState((prevState) => ({
+        ...prevState,
+        botTyping: false,
+        saved: false,
+    }));
 }
 
 async function requestTitleStream(

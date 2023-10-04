@@ -12,7 +12,7 @@ const SERVER_KEY = process.env.OPENAI_API_KEY;
 export function getOpenAiClient(key?: string) {
     return new OpenAI({
         apiKey: SERVER_KEY || key,
-        dangerouslyAllowBrowser: key ? true : false,
+        dangerouslyAllowBrowser: !!key,
     });
 }
 
@@ -163,8 +163,7 @@ export async function fetchChat({
 
 async function fetchLlama2Chat(msgHistory: Message[]) {
     const messages = prepareMessages(msgHistory);
-    const res = await getLlama2Chat(messages);
-    return res;
+    return await getLlama2Chat(messages);
 }
 
 async function fetchOpenAiChat(

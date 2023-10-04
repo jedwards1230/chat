@@ -36,7 +36,6 @@ export default function AppSettingsDialog() {
     useEffect(() => {
         if (typeof appSettingsOpen === 'string') {
             setActiveSection(appSettingsOpen);
-            console.log('update');
         }
     }, [appSettingsOpen]);
 
@@ -67,7 +66,7 @@ export default function AppSettingsDialog() {
                             </Button>
                         ))}
                     </div>
-                    <div className="flex flex-col w-full gap-4">
+                    <div className="flex w-full flex-col gap-4">
                         {activeSection === 'General' && <GeneralSection />}
                         {activeSection === 'Credentials' && (
                             <CredentialsSection user={user} />

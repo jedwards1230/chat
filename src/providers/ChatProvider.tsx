@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { usePlausible } from 'next-plausible';
 import { useSession } from 'next-auth/react';
@@ -138,7 +138,6 @@ export function ChatProvider({
         state.isNew,
         state.threads,
         state.activeThread.id,
-        state.activeThread.messages.length,
         createThread,
         updateActiveThread,
     ]);

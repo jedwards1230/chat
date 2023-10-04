@@ -26,7 +26,6 @@ export async function readStream(
                 chunkCallback(accumulated);
             } catch (e) {
                 console.error(e);
-                continue;
             }
         }
     }
@@ -192,8 +191,5 @@ export async function validateOpenAIKey(apiKey: string) {
     });
     const modelListData = await openai.models.list();
 
-    if (modelListData && modelListData.data && modelListData.data.length > 0) {
-        return true;
-    }
-    return false;
+    return  (modelListData && modelListData.data && modelListData.data.length > 0)
 }
