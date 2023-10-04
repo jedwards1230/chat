@@ -196,7 +196,6 @@ interface Database {
                     createdAt: string | null;
                     functionCall: Json | null;
                     id: string;
-                    messageOrder: number;
                     name: string | null;
                     role: string;
                     sharedThreadId: string;
@@ -206,7 +205,6 @@ interface Database {
                     createdAt?: string | null;
                     functionCall?: Json | null;
                     id: string;
-                    messageOrder?: number;
                     name?: string | null;
                     role: string;
                     sharedThreadId: string;
@@ -216,7 +214,6 @@ interface Database {
                     createdAt?: string | null;
                     functionCall?: Json | null;
                     id?: string;
-                    messageOrder?: number;
                     name?: string | null;
                     role?: string;
                     sharedThreadId?: string;

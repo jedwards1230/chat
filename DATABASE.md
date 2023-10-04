@@ -74,7 +74,6 @@ CREATE TABLE "SharedMessages" (
     "createdAt" TIMESTAMP,
     "name" VARCHAR(255),
     "functionCall" JSON,
-    "messageOrder" SERIAL,
     FOREIGN KEY ("sharedThreadId") REFERENCES "SharedChatThreads"("id") ON DELETE CASCADE
 );
 

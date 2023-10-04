@@ -16,20 +16,18 @@ export default supabase;
 
 export const db = {
     async createAgentConfigs(agentConfigs: Tables<'AgentConfigs'>[]) {
-        const { data, error } = await supabase
+        const { error } = await supabase
             .from('AgentConfigs')
             .insert(agentConfigs);
         if (error) throw new Error(error.message);
-        return data;
     },
     async createUser(userId: string) {
-        const { data, error } = await supabase
+        const { error } = await supabase
             .from('Users')
             .insert([{ userId: userId }]);
         if (error) throw new Error(error.message);
-        return data;
     },
-    async getAgentConfigs(userId: string) {
+    async getAgentConfigs(userId: string): Promise<Tables<'AgentConfigs'>[]> {
         const { data: configs, error } = await supabase
             .from('AgentConfigs')
             .select('*')
@@ -37,7 +35,7 @@ export const db = {
         if (error) throw new Error(error.message);
         return configs;
     },
-    async getChatThreads(userId: string) {
+    async getChatThreads(userId: string): Promise<Tables<'ChatThreads'>[]> {
         const { data: threads, error } = await supabase
             .from('ChatThreads')
             .select('*')
@@ -45,7 +43,9 @@ export const db = {
         if (error) throw new Error(error.message);
         return threads;
     },
-    async getChildMessages(messageId: string) {
+    async getChildMessages(
+        messageId: string,
+    ): Promise<Tables<'ChildMessages'>[]> {
         const { data: childMessages, error } = await supabase
             .from('ChildMessages')
             .select('*')
@@ -53,7 +53,7 @@ export const db = {
         if (error) throw new Error(error.message);
         return childMessages;
     },
-    async getMessages(idList: string[]) {
+    async getMessages(idList: string[]): Promise<Tables<'Messages'>[]> {
         const { data: messages, error } = await supabase
             .from('Messages')
             .select('*')
@@ -61,7 +61,9 @@ export const db = {
         if (error) throw new Error(error.message);
         return messages;
     },
-    async getSharedMessages(sharedThreadId: string) {
+    async getSharedMessages(
+        sharedThreadId: string,
+    ): Promise<Tables<'SharedMessages'>[]> {
         const { data: messages, error } = await supabase
             .from('SharedMessages')
             .select('*')
@@ -69,7 +71,9 @@ export const db = {
         if (error) throw new Error(error.message);
         return messages;
     },
-    async getSharedChatThread(id: string) {
+    async getSharedChatThread(
+        id: string,
+    ): Promise<Tables<'SharedChatThreads'>[]> {
         const { data: thread, error } = await supabase
             .from('SharedChatThreads')
             .select('*')
@@ -77,7 +81,7 @@ export const db = {
         if (error) throw new Error(error.message);
         return thread;
     },
-    async getUser(userId: string) {
+    async getUser(userId: string): Promise<Tables<'Users'>[]> {
         const { data: user, error } = await supabase
             .from('Users')
             .select('*')
@@ -86,79 +90,66 @@ export const db = {
         return user;
     },
     async upsertAgentConfigs(agentConfigs: Tables<'AgentConfigs'>[]) {
-        const { data, error } = await supabase
+        const { error } = await supabase
             .from('AgentConfigs')
             .upsert(agentConfigs, { onConflict: 'id' });
         if (error) throw new Error(error.message);
-        return data;
     },
     async upsertChatThreads(chatThreads: Tables<'ChatThreads'>[]) {
-        const { data, error } = await supabase
+        const { error } = await supabase
             .from('ChatThreads')
             .upsert(chatThreads, { onConflict: 'id' });
         if (error) throw new Error(error.message);
-        return data;
     },
     async upsertChildMessages(childMessages: Tables<'ChildMessages'>[]) {
-        const { data, error } = await supabase
+        const { error } = await supabase
             .from('ChildMessages')
             .upsert(childMessages, { onConflict: 'messageId' });
         if (error) throw new Error(error.message);
-        return data;
     },
     async upsertMessages(messages: Tables<'Messages'>[]) {
-        const { data, error } = await supabase
+        const { error } = await supabase
             .from('Messages')
             .upsert(messages, { onConflict: 'id' });
         if (error) throw new Error(error.message);
-        return data;
     },
     async upsertSharedChatThreads(
         sharedChatThreads: Tables<'SharedChatThreads'>[],
     ) {
-        const { data, error } = await supabase
+        const { error } = await supabase
             .from('SharedChatThreads')
             .upsert(sharedChatThreads, { onConflict: 'id' });
         if (error) throw new Error(error.message);
-        return data;
     },
     async upsertSharedMessages(sharedMessages: Tables<'SharedMessages'>[]) {
-        const { data, error } = await supabase
+        const { error } = await supabase
             .from('SharedMessages')
             .upsert(sharedMessages, { onConflict: 'id' });
         if (error) throw new Error(error.message);
-        return data;
     },
     async deleteAllAgentConfigs(userId: string) {
-        const { data, error } = await supabase
+        const { error } = await supabase
             .from('AgentConfigs')
             .delete()
             .eq('userId', userId);
         if (error) throw new Error(error.message);
-        return data;
     },
     async deleteChatThreads(idList: string[]) {
-        const { data, error } = await supabase
+        const { error } = await supabase
             .from('ChatThreads')
             .delete()
             .in('id', idList);
         if (error) throw new Error(error.message);
-        return data;
     },
     async deleteAllChatThreads(userId: string) {
-        const { data, error } = await supabase
+        const { error } = await supabase
             .from('ChatThreads')
             .delete()
             .eq('userId', userId);
         if (error) throw new Error(error.message);
-        return data;
     },
     async deleteMessage(id: string) {
-        const { data, error } = await supabase
-            .from('Messages')
-            .delete()
-            .eq('id', id);
+        const { error } = await supabase.from('Messages').delete().eq('id', id);
         if (error) throw new Error(error.message);
-        return data;
     },
 };

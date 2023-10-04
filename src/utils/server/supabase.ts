@@ -16,23 +16,19 @@ export async function getThreadListByUserId(
     const threadList: ChatThread[] = [];
 
     for (const thread of threads) {
-        if (thread.currentNode === null) {
-            console.error(`Thread ${thread.id} has no current node`);
-            continue;
-        }
-        const childMessages = await db.getChildMessages(thread.currentNode);
+        if (thread.currentNode === null)
+            throw new Error(`Thread ${thread.id} has no current node`);
+        if (!thread.agentConfigId)
+            throw new Error(`Thread ${thread.id} has no agent config ID`);
+
+        const [childMessages, agentConfigs] = await Promise.all([
+            db.getChildMessages(thread.currentNode),
+            db.getAgentConfigs(userId),
+        ]);
 
         const messages = await db.getMessages(
             childMessages.map((cm: any) => cm.messageId),
         );
-
-        if (!thread.agentConfigId) {
-            console.error(`Thread ${thread.id} has no agent config ID`);
-            continue;
-        }
-
-        // ensure it matchs the userId too
-        const agentConfigs = await db.getAgentConfigs(userId);
 
         const mapping: MessageMapping = {};
         childMessages.forEach((cm: any) => {
@@ -150,7 +146,6 @@ export async function shareThread(thread: ChatThread) {
             sharedThreadId: thread.id,
             content: message.content || '',
             role: message.role,
-            messageOrder: 0,
             createdAt: message.createdAt?.toJSON() || new Date().toJSON(),
             name: message.name || '',
             functionCall: message.function_call || '',
