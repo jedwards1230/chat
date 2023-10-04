@@ -59,16 +59,22 @@ export function ChatProvider({
 
     const { setAppSettingsOpen } = useUI();
 
+    const [initialThread, currentThread] = getInitialActiveThread(
+        characterList.find((c) => c.name === 'Chat') || characterList[0],
+        threadId,
+        threadList,
+    );
+
+    if (currentThread === undefined) {
+        threadList.push(initialThread);
+    }
+
     const [state, setState] = useState<ChatState>({
         ...initialState,
         characterList,
         threads: threadList.sort(sortThreadlist),
         isNew: threadId === undefined,
-        activeThread: getInitialActiveThread(
-            characterList.find((c) => c.name === 'Chat') || characterList[0],
-            threadId,
-            threadList,
-        ),
+        currentThread: currentThread || 0,
     });
 
     const createThread = createThreadHandler(state, setState);
@@ -98,7 +104,8 @@ export function ChatProvider({
     useEffect(() => {
         if (!state.saved) {
             try {
-                if (userId) upsertThread(state.activeThread);
+                const thread = state.threads[state.currentThread];
+                if (userId) upsertThread(thread);
                 if (window !== undefined) {
                     setLocalThreadList(state.threads);
                 }
@@ -107,11 +114,12 @@ export function ChatProvider({
                 console.error(err);
             }
         }
-    }, [state.saved, state.activeThread, userId, state.threads]);
+    }, [state.saved, state.currentThread, userId, state.threads]);
 
     // Update active thread when threadId changes
     useEffect(() => {
-        if (state.activeThread.id === threadId) return;
+        const thread = state.threads[state.currentThread];
+        if (thread.id === threadId) return;
         if (!threadId) {
             if (!state.isNew) createThread();
             return;
@@ -136,9 +144,9 @@ export function ChatProvider({
         threadId,
         state.isNew,
         state.threads,
-        state.activeThread.id,
         createThread,
         updateActiveThread,
+        state.currentThread,
     ]);
 
     const value: ChatState = {
@@ -152,8 +160,8 @@ export function ChatProvider({
         removeThread: removeThreadHandler(setState),
         saveCharacter: saveCharacterHandler(setState),
         removeMessage: removeMessageHandler(setState),
-        editMessage: editMessageHandler(state, setState),
-        toggleplugin: togglePluginHandler(state, setState),
+        editMessage: editMessageHandler(setState),
+        toggleplugin: togglePluginHandler(setState),
         setSystemMessage: setSystemMessageHandler(setState),
         setStreamResponse: setStreamResponseHandler(setState),
         setPluginsEnabled: setPluginsEnabledHandler(setState),

@@ -113,12 +113,10 @@ export async function getChat({
     upsertMessage,
     userId,
 }: GetChatParams) {
-    const activeThread = state.activeThread;
-    const apiKey = state.openAiApiKey;
-    if (loops > MAX_LOOPS) {
-        throw new Error('Too many loops');
-    }
+    if (loops > MAX_LOOPS) throw new Error('Too many loops');
 
+    const activeThread = state.threads[state.currentThread];
+    const apiKey = state.openAiApiKey;
     const assistantId = uuidv4();
     let tools: ToolInput[] = [];
     let accumulatedResponse = '';
@@ -192,13 +190,6 @@ export async function getChat({
         }
     }
 
-    // Set chat state
-    setState((prevState) => ({
-        ...prevState,
-        saved: false,
-        isNew: false,
-    }));
-
     // Check if a tool is requested
     if (tools.length > 0) {
         for (const toolInput of tools) {
@@ -213,16 +204,13 @@ export async function getChat({
                 userId,
             });
         }
-    } else {
-        setState((prevState) => ({
-            ...prevState,
-            isNew: false,
-        }));
     }
+
     setState((prevState) => ({
         ...prevState,
         botTyping: false,
         saved: false,
+        isNew: false,
     }));
 }
 

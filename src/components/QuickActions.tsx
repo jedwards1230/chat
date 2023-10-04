@@ -7,7 +7,8 @@ import { useChat } from '@/providers/ChatProvider';
 import useMessages from '@/lib/ChatManagerHook';
 
 export default function QuickActions() {
-    const { activeThread, botTyping, abortRequest } = useChat();
+    const { currentThread, threads, botTyping, abortRequest } = useChat();
+    const activeThread = threads[currentThread];
     const messages = useMessages(
         activeThread.currentNode,
         activeThread.mapping,
@@ -16,7 +17,7 @@ export default function QuickActions() {
     const btn = 'px-3 py-1.5 rounded';
 
     return (
-        <div className="absolute inset-x-0 -top-10 flex justify-end gap-2 px-5 text-sm font-medium text-background dark:text-foreground">
+        <div className="absolute inset-x-0 flex justify-end gap-2 px-5 text-sm font-medium -top-10 text-background dark:text-foreground">
             {botTyping && (
                 <button
                     onClick={abortRequest}

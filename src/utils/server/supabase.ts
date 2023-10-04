@@ -21,19 +21,37 @@ export async function getThreadListByUserId(
         if (!thread.agentConfigId)
             throw new Error(`Thread ${thread.id} has no agent config ID`);
 
-        const [childMessages, agentConfigs] = await Promise.all([
-            db.getChildMessages(thread.currentNode),
-            db.getAgentConfigs(userId),
-        ]);
+        const agentConfigs = await db.getAgentConfigs(userId);
 
-        const messages = await db.getMessages(
-            childMessages.map((cm: any) => cm.messageId),
-        );
+        const messages = await db.getMessages(thread.id);
 
         const mapping: MessageMapping = {};
-        childMessages.forEach((cm: any) => {
-            mapping[cm.messageId] = cm;
-        });
+        for (const message of messages) {
+            const messageRelations = await db.getMessageRelations(
+                thread.currentNode,
+            );
+            const parent = [];
+            const children = [];
+            for (const relation of messageRelations) {
+                parent.push(relation.parentMessageId);
+                children.push(relation.childMessageId);
+            }
+
+            console.log({ parent, children });
+
+            mapping[message.id] = {
+                id: message.id,
+                message: {
+                    ...message,
+                    name: message.name || 'Chat',
+                    createdAt: message.createdAt
+                        ? new Date(message.createdAt)
+                        : new Date(),
+                },
+                parent: null,
+                children: [],
+            };
+        }
 
         const base = agentConfigs[0];
         const agentConfig: AgentConfig = {
@@ -69,32 +87,6 @@ export async function upsertThread(thread: ChatThread) {
     const userId = await getUserId();
 
     if (messages.length > 0) {
-        for (const message of messages) {
-            // First upsert the message in the Messages table
-            await db.upsertMessages([
-                {
-                    id: message.id,
-                    content: message.content,
-                    role: message.role,
-                    createdAt:
-                        message.createdAt?.toJSON() || new Date().toJSON(),
-                    name: message.name || 'Chat',
-                    functionCallName: message.function_call?.name || null,
-                    functionCallArguments:
-                        message.function_call?.arguments || null,
-                },
-            ]);
-
-            // Then upsert the corresponding child message in the ChildMessages table
-            await db.upsertChildMessages([
-                {
-                    messageId: message.id,
-                    parent: thread.mapping[message.id]?.parent,
-                },
-            ]);
-        }
-
-        // Now, upsert the thread in the ChatThreads table
         await db.upsertChatThreads([
             {
                 id: thread.id,
@@ -106,6 +98,37 @@ export async function upsertThread(thread: ChatThread) {
                 currentNode: thread.currentNode,
             },
         ]);
+
+        for (const message of messages) {
+            await db.upsertMessages([
+                {
+                    id: message.id,
+                    threadId: thread.id,
+                    content: message.content,
+                    role: message.role,
+                    createdAt:
+                        message.createdAt?.toJSON() || new Date().toJSON(),
+                    name: message.name || 'Chat',
+                    functionCallName: message.function_call?.name || null,
+                    functionCallArguments:
+                        message.function_call?.arguments || null,
+                },
+            ]);
+            console.log('upsertted message');
+
+            // Then upsert the corresponding child message in the ChildMessages table
+            const messageRelations = Object.values(thread.mapping);
+            const relations: Tables<'MessageRelationships'>[] = [];
+            for (const relation of messageRelations) {
+                if (relation.parent) {
+                    relations.push({
+                        childMessageId: relation.id,
+                        parentMessageId: relation.parent,
+                    });
+                }
+            }
+            await db.upsertChildMessages(relations);
+        }
     }
 }
 

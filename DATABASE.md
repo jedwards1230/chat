@@ -15,15 +15,18 @@ CREATE TABLE "Messages" (
     "name" TEXT,
     "createdAt" TIMESTAMP,
     "functionCallName" TEXT,
-    "functionCallArguments" JSONB
+    "functionCallArguments" JSONB,
+    "threadId" UUID,
+    FOREIGN KEY ("threadId") REFERENCES "ChatThreads"("id") ON DELETE CASCADE
 );
 
--- ChildMessages table
-CREATE TABLE "ChildMessages" (
-    "messageId" UUID PRIMARY KEY,
-    "parent" UUID,
-    FOREIGN KEY ("messageId") REFERENCES "Messages"("id") ON DELETE CASCADE,
-    FOREIGN KEY ("parent") REFERENCES "ChildMessages"("messageId") ON DELETE CASCADE
+-- MessageRelationships table
+CREATE TABLE "MessageRelationships" (
+    "parentMessageId" UUID,
+    "childMessageId" UUID,
+    PRIMARY KEY ("parentMessageId", "childMessageId"),
+    FOREIGN KEY ("parentMessageId") REFERENCES "Messages"("id") ON DELETE CASCADE,
+    FOREIGN KEY ("childMessageId") REFERENCES "Messages"("id") ON DELETE CASCADE
 );
 
 -- AgentConfigs table

@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 
-import { defaultAgentConfig, defaultAgents } from './characters';
+import { defaultAgents } from './characters';
 
 export function getDefaultThread(config: AgentConfig): ChatThread {
     const systemId = uuidv4();
@@ -26,18 +26,16 @@ export function getDefaultThread(config: AgentConfig): ChatThread {
     };
 }
 
-const baseEntry = getDefaultThread(defaultAgentConfig);
-
 const initialState: ChatState = {
     input: '',
     threads: [],
     saved: true,
     isNew: true,
     editId: null,
+    currentThread: 0,
     botTyping: false,
     openAiApiKey: '',
     streamResponse: true,
-    activeThread: baseEntry,
     characterList: defaultAgents,
     abortController: new AbortController(),
 

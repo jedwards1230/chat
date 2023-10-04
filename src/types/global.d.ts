@@ -60,7 +60,7 @@ interface Message {
     };
 }
 
-interface ChildMessage {
+interface MessageRelationship {
     id: string;
     message: Message | null;
     parent: string | null;
@@ -68,7 +68,7 @@ interface ChildMessage {
 }
 
 type MessageMapping = {
-    [key: string]: ChildMessage;
+    [key: string]: MessageRelationship;
 };
 
 interface ChatThread {

@@ -43,21 +43,21 @@ export const db = {
         if (error) throw new Error(error.message);
         return threads;
     },
-    async getChildMessages(
+    async getMessageRelations(
         messageId: string,
-    ): Promise<Tables<'ChildMessages'>[]> {
+    ): Promise<Tables<'MessageRelationships'>[]> {
         const { data: childMessages, error } = await supabase
-            .from('ChildMessages')
+            .from('MessageRelationships')
             .select('*')
-            .eq('messageId', messageId);
+            .eq('parentMessageId', messageId);
         if (error) throw new Error(error.message);
         return childMessages;
     },
-    async getMessages(idList: string[]): Promise<Tables<'Messages'>[]> {
+    async getMessages(threadId: string): Promise<Tables<'Messages'>[]> {
         const { data: messages, error } = await supabase
             .from('Messages')
             .select('*')
-            .in('id', idList);
+            .eq('threadId', threadId);
         if (error) throw new Error(error.message);
         return messages;
     },
@@ -101,11 +101,35 @@ export const db = {
             .upsert(chatThreads, { onConflict: 'id' });
         if (error) throw new Error(error.message);
     },
-    async upsertChildMessages(childMessages: Tables<'ChildMessages'>[]) {
-        const { error } = await supabase
-            .from('ChildMessages')
-            .upsert(childMessages, { onConflict: 'messageId' });
-        if (error) throw new Error(error.message);
+    async upsertChildMessages(childMessages: Tables<'MessageRelationships'>[]) {
+        for (let message of childMessages) {
+            const { data: existingMessage, error: existingError } =
+                await supabase
+                    .from('MessageRelationships')
+                    .select('*')
+                    .eq('parentMessageId', message.parentMessageId)
+                    .eq('childMessageId', message.childMessageId);
+
+            if (existingError) throw new Error(existingError.message);
+
+            if (existingMessage && existingMessage.length > 0) {
+                // if message exists, update it
+                const { error: updateError } = await supabase
+                    .from('MessageRelationships')
+                    .update(message)
+                    .eq('parentMessageId', message.parentMessageId)
+                    .eq('childMessageId', message.childMessageId);
+
+                if (updateError) throw new Error(updateError.message);
+            } else {
+                // if message doesn't exist, insert it
+                const { error: insertError } = await supabase
+                    .from('MessageRelationships')
+                    .insert([message]);
+
+                if (insertError) throw new Error(insertError.message);
+            }
+        }
     },
     async upsertMessages(messages: Tables<'Messages'>[]) {
         const { error } = await supabase

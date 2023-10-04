@@ -1,5 +1,5 @@
 type ChatState = {
-    activeThread: ChatThread;
+    currentThread: number;
     threads: ChatThread[];
     botTyping: boolean;
     input: string;

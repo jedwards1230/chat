@@ -11,7 +11,8 @@ import { getTokenCount } from '@/utils/tokenizer';
 import useMessages from '@/lib/ChatManagerHook';
 
 export default function Header() {
-    const { activeThread } = useChat();
+    const { currentThread, threads } = useChat();
+    const activeThread = threads[currentThread];
     const {
         sideBarOpen,
         setSideBarOpen,
@@ -49,19 +50,19 @@ export default function Header() {
                     : 'border-transparent bg-transparent',
             )}
         >
-            <div className="col-span-1 flex items-center justify-start">
+            <div className="flex items-center justify-start col-span-1">
                 <button
                     name="sidebar-toggle"
-                    className="cursor-pointer px-1 text-neutral-400 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-50"
+                    className="px-1 cursor-pointer text-neutral-400 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-50"
                     onClick={handleSidebarToggle}
                 >
                     <Bars />
                 </button>
             </div>
-            <div className="col-span-10 flex items-center justify-center text-center">
+            <div className="flex items-center justify-center col-span-10 text-center">
                 {messages.length > 1 ? (
                     <div>
-                        <p className="line-clamp-1 font-semibold">
+                        <p className="font-semibold line-clamp-1">
                             {activeThread.title}
                         </p>
                         <p className="text-sm font-light text-neutral-500">
@@ -75,10 +76,10 @@ export default function Header() {
                     </div>
                 )}
             </div>
-            <div className="col-span-1 flex items-center justify-end">
+            <div className="flex items-center justify-end col-span-1">
                 <button
                     name="chat-settings-toggle"
-                    className="cursor-pointer px-1 text-neutral-400 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-50"
+                    className="px-1 cursor-pointer text-neutral-400 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-50"
                     onClick={handleChatSettingsToggle}
                 >
                     <Information />

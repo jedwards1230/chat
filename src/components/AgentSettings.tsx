@@ -37,11 +37,13 @@ export default function AgentSettings({
         updateThreadConfig,
         setSystemMessage,
         saveCharacter,
-        activeThread,
+        threads,
+        currentThread,
         streamResponse,
         setStreamResponse,
     } = useChat();
 
+    const activeThread = threads[currentThread];
     const isNew = agent === undefined;
     const [config, setConfig] = useState(
         agent
@@ -153,7 +155,7 @@ export default function AgentSettings({
                     </div>
                 )}
                 {functionsAllowed && (
-                    <div className="flex w-full flex-col gap-2">
+                    <div className="flex flex-col w-full gap-2">
                         <label
                             className={clsx(
                                 'flex flex-col rounded px-1 transition-colors dark:hover:bg-neutral-600',
@@ -255,7 +257,7 @@ export default function AgentSettings({
                     })}
                 </details>
             </div>
-            <div className="flex w-full justify-end">
+            <div className="flex justify-end w-full">
                 <Button
                     variant="outlineAccent"
                     type="submit"

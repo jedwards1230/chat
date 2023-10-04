@@ -9,7 +9,8 @@ import { useUI } from '@/providers/UIProvider';
 import { Input } from '../ui/input';
 
 export default function ShareChat() {
-    const { activeThread } = useChat();
+    const { currentThread, threads } = useChat();
+    const activeThread = threads[currentThread];
     const { setShareModalOpen } = useUI();
     const shareUrl = `${window.location.origin}/share/${activeThread.id}`;
 

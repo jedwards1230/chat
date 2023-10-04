@@ -89,33 +89,20 @@ interface Database {
                     },
                 ];
             };
-            ChildMessages: {
+            MessageRelationships: {
                 Row: {
-                    messageId: string;
-                    parent: string | null;
+                    childMessageId: string;
+                    parentMessageId: string;
                 };
                 Insert: {
-                    messageId: string;
-                    parent?: string | null;
+                    childMessageId: string;
+                    parentMessageId: string;
                 };
                 Update: {
-                    messageId?: string;
-                    parent?: string | null;
+                    childMessageId?: string;
+                    parentMessageId?: string;
                 };
-                Relationships: [
-                    {
-                        foreignKeyName: 'ChildMessages_messageId_fkey';
-                        columns: ['messageId'];
-                        referencedRelation: 'Messages';
-                        referencedColumns: ['id'];
-                    },
-                    {
-                        foreignKeyName: 'ChildMessages_parent_fkey';
-                        columns: ['parent'];
-                        referencedRelation: 'ChildMessages';
-                        referencedColumns: ['messageId'];
-                    },
-                ];
+                Relationships: [];
             };
             Messages: {
                 Row: {
@@ -126,6 +113,7 @@ interface Database {
                     id: string;
                     name: string | null;
                     role: Database['public']['Enums']['Role'];
+                    threadId: string | null;
                 };
                 Insert: {
                     content?: string | null;
@@ -135,6 +123,7 @@ interface Database {
                     id: string;
                     name?: string | null;
                     role: Database['public']['Enums']['Role'];
+                    threadId?: string | null;
                 };
                 Update: {
                     content?: string | null;
@@ -144,8 +133,16 @@ interface Database {
                     id?: string;
                     name?: string | null;
                     role?: Database['public']['Enums']['Role'];
+                    threadId?: string | null;
                 };
-                Relationships: [];
+                Relationships: [
+                    {
+                        foreignKeyName: 'Messages_threadId_fkey';
+                        columns: ['threadId'];
+                        referencedRelation: 'ChatThreads';
+                        referencedColumns: ['id'];
+                    },
+                ];
             };
             SharedChatThreads: {
                 Row: {
@@ -254,6 +251,3 @@ interface Database {
         };
     };
 }
-
-type Tables<T extends keyof Database['public']['Tables']> =
-    Database['public']['Tables'][T]['Row'];
