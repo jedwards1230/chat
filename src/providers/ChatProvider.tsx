@@ -65,7 +65,7 @@ export function ChatProvider({
         threads: threadList.sort(sortThreadlist),
         isNew: threadId === undefined,
         activeThread: getInitialActiveThread(
-            characterList[0],
+            characterList.find((c) => c.name === 'Chat') || characterList[0],
             threadId,
             threadList,
         ),
@@ -134,7 +134,6 @@ export function ChatProvider({
     }, [
         router,
         threadId,
-        state.input,
         state.isNew,
         state.threads,
         state.activeThread.id,

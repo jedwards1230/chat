@@ -37,15 +37,6 @@ export function getInitialActiveThread(
     );
 }
 
-type PlausibleHook = (
-    eventName: string,
-    {
-        props: { threadId, usedCloudKey },
-    }: {
-        props: { threadId: string; usedCloudKey: boolean };
-    },
-) => any;
-
 export function createSubmitHandler(
     plausible: PlausibleHook,
     state: ChatState,

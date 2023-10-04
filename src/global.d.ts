@@ -115,3 +115,12 @@ type User =
           image?: string | null;
       }
     | undefined;
+
+type PlausibleHook = (
+    eventName: string,
+    {
+        props: { threadId, usedCloudKey },
+    }: {
+        props: { threadId: string; usedCloudKey: boolean };
+    },
+) => any;
