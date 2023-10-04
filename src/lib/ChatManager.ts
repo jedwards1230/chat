@@ -79,7 +79,10 @@ export default class ChatManager {
 
         while (currentNode) {
             const childMessage = mapping[currentNode];
-
+            if (!childMessage) {
+                //console.error('Child message does not exist');
+                break;
+            }
             if (childMessage.message) {
                 orderedMessages.unshift(childMessage.message);
             }
