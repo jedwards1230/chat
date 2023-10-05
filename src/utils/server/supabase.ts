@@ -27,17 +27,8 @@ export async function getThreadListByUserId(
 
         const mapping: MessageMapping = {};
         for (const message of messages) {
-            const messageRelations = await db.getMessageRelations(
-                thread.currentNode,
-            );
-            const parent = [];
-            const children = [];
-            for (const relation of messageRelations) {
-                parent.push(relation.parentMessageId);
-                children.push(relation.childMessageId);
-            }
-
-            console.log({ parent, children });
+            const [{ parentMessageId, childMessageId }] =
+                await db.getMessageRelations(thread.currentNode);
 
             mapping[message.id] = {
                 id: message.id,
@@ -48,8 +39,8 @@ export async function getThreadListByUserId(
                         ? new Date(message.createdAt)
                         : new Date(),
                 },
-                parent: null,
-                children: [],
+                parent: parentMessageId,
+                children: [childMessageId],
             };
         }
 
@@ -86,49 +77,44 @@ export async function upsertThread(thread: ChatThread) {
 
     const userId = await getUserId();
 
-    if (messages.length > 0) {
-        await db.upsertChatThreads([
+    await db.upsertChatThreads([
+        {
+            id: thread.id,
+            userId,
+            created: thread.created?.toJSON(),
+            lastModified: thread.lastModified?.toJSON(),
+            title: thread.title,
+            agentConfigId: thread.agentConfig.id,
+            currentNode: thread.currentNode,
+        },
+    ]);
+
+    for (const message of messages) {
+        await db.upsertMessages([
             {
-                id: thread.id,
-                userId,
-                created: thread.created?.toJSON(),
-                lastModified: thread.lastModified?.toJSON(),
-                title: thread.title,
-                agentConfigId: thread.agentConfig.id,
-                currentNode: thread.currentNode,
+                id: message.id,
+                threadId: thread.id,
+                content: message.content,
+                role: message.role,
+                createdAt: message.createdAt?.toJSON() || new Date().toJSON(),
+                name: message.name || 'Chat',
+                functionCallName: message.function_call?.name || null,
+                functionCallArguments: message.function_call?.arguments || null,
             },
         ]);
 
-        for (const message of messages) {
-            await db.upsertMessages([
-                {
-                    id: message.id,
-                    threadId: thread.id,
-                    content: message.content,
-                    role: message.role,
-                    createdAt:
-                        message.createdAt?.toJSON() || new Date().toJSON(),
-                    name: message.name || 'Chat',
-                    functionCallName: message.function_call?.name || null,
-                    functionCallArguments:
-                        message.function_call?.arguments || null,
-                },
-            ]);
-            console.log('upsertted message');
-
-            // Then upsert the corresponding child message in the ChildMessages table
-            const messageRelations = Object.values(thread.mapping);
-            const relations: Tables<'MessageRelationships'>[] = [];
-            for (const relation of messageRelations) {
-                if (relation.parent) {
-                    relations.push({
-                        childMessageId: relation.id,
-                        parentMessageId: relation.parent,
-                    });
-                }
+        // Then upsert the corresponding child message in the ChildMessages table
+        const messageRelations = Object.values(thread.mapping);
+        const relations: Tables<'MessageRelationships'>[] = [];
+        for (const relation of messageRelations) {
+            if (relation.parent) {
+                relations.push({
+                    childMessageId: relation.id,
+                    parentMessageId: relation.parent,
+                });
             }
-            await db.upsertChildMessages(relations);
         }
+        await db.upsertChildMessages(relations);
     }
 }
 

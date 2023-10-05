@@ -1,13 +1,12 @@
 'use client';
 
-import { useEffect, useMemo, useState, memo } from 'react';
+import { useEffect, useState, memo } from 'react';
 import clsx from 'clsx';
 import Link from 'next/link';
 import Image from 'next/image';
 
 import { useUI } from '@/providers/UIProvider';
 import ChatHistoryEntry from './ChatHistoryEntry';
-import { sortThreadlist } from '@/utils';
 import { isMobile } from '@/utils/client/device';
 import { Sidebar } from '../Sidebar';
 import { AccountDropdown } from './Buttons';
@@ -19,7 +18,7 @@ function ChatHistory({
     activeThread,
     threads,
 }: {
-    activeThread: ChatThread;
+    activeThread?: ChatThread;
     threads: ChatThread[];
 }) {
     const { data: session } = useSession();
@@ -27,7 +26,7 @@ function ChatHistory({
     const [mounted, setMounted] = useState(false);
     const { sideBarOpen, setSideBarOpen } = useUI();
 
-    const threadList = useMemo(() => threads.sort(sortThreadlist), [threads]);
+    const threadList = threads;
 
     const newThread = () => {
         if (isMobile()) setSideBarOpen(false);
@@ -37,6 +36,17 @@ function ChatHistory({
         if (isMobile()) setSideBarOpen(false);
         setMounted(true);
     }, [setSideBarOpen]);
+
+    const getMessageCount = (mapping: MessageMapping) => {
+        let count = 0;
+        for (const key in mapping) {
+            const r = mapping[key];
+            if (r) count++;
+        }
+        return count;
+    };
+
+    const messageCount = getMessageCount(activeThread?.mapping || {});
 
     return (
         <Sidebar
@@ -57,19 +67,21 @@ function ChatHistory({
                 </Button>
             </Link>
             {/* Chat History */}
-            <div className="flex w-full flex-1 flex-col gap-1 overflow-y-scroll pt-2 sm:pt-0">
-                {threadList.map((thread, i) => (
-                    <ChatHistoryEntry
-                        key={`${i}-${thread.id}`}
-                        entry={thread}
-                        activeThread={activeThread}
-                    />
-                ))}
+            <div className="flex flex-col flex-1 w-full gap-1 pt-2 overflow-y-scroll sm:pt-0">
+                {threadList.map((thread, i) =>
+                    messageCount > 1 ? (
+                        <ChatHistoryEntry
+                            key={`${i}-${thread.id}`}
+                            entry={thread}
+                            active={thread.id === activeThread?.id}
+                        />
+                    ) : null,
+                )}
             </div>
             {/* Footer Buttons */}
-            <div className="flex w-full justify-end gap-x-2 pb-3 pl-2 text-sm md:pb-1 md:pl-0">
+            <div className="flex justify-end w-full pb-3 pl-2 text-sm gap-x-2 md:pb-1 md:pl-0">
                 <AccountDropdown user={user}>
-                    <div className="grid w-full grid-cols-6 items-center gap-1">
+                    <div className="grid items-center w-full grid-cols-6 gap-1">
                         {user ? (
                             <>
                                 {user.image && (
@@ -88,7 +100,7 @@ function ChatHistory({
                         ) : (
                             <div className="col-span-5 text-left">Menu</div>
                         )}
-                        <div className="col-span-1 flex justify-center">
+                        <div className="flex justify-center col-span-1">
                             <Ellipsis />
                         </div>
                     </div>

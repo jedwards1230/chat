@@ -49,7 +49,7 @@ export const db = {
         const { data: childMessages, error } = await supabase
             .from('MessageRelationships')
             .select('*')
-            .eq('parentMessageId', messageId);
+            .eq('childMessageId', messageId);
         if (error) throw new Error(error.message);
         return childMessages;
     },

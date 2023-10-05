@@ -8,14 +8,16 @@ import useMessages from '@/lib/ChatManagerHook';
 
 export default function QuickActions() {
     const { currentThread, threads, botTyping, abortRequest } = useChat();
-    const activeThread = threads[currentThread];
+    const activeThread =
+        currentThread !== null ? threads[currentThread] : undefined;
     const messages = useMessages(
-        activeThread.currentNode,
-        activeThread.mapping,
+        activeThread?.currentNode,
+        activeThread?.mapping,
     );
 
     const btn = 'px-3 py-1.5 rounded';
 
+    if (!activeThread) return null;
     return (
         <div className="absolute inset-x-0 flex justify-end gap-2 px-5 text-sm font-medium -top-10 text-background dark:text-foreground">
             {botTyping && (

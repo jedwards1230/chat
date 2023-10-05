@@ -20,7 +20,6 @@ import {
     setPluginsEnabledHandler,
     setSystemMessageHandler,
     togglePluginHandler,
-    updateActiveThreadHandler,
     updateThreadConfigHandler,
     saveCharacterHandler,
     setOpenAiApiKeyHandler,
@@ -59,29 +58,34 @@ export function ChatProvider({
 
     const { setAppSettingsOpen } = useUI();
 
-    const [initialThread, currentThread] = getInitialActiveThread(
-        characterList.find((c) => c.name === 'Chat') || characterList[0],
+    const defaultCharacter = characterList.find((c) => c.name === 'Chat');
+
+    const currentThread = getInitialActiveThread(
+        defaultCharacter || characterList[0],
         threadId,
         threadList,
     );
 
-    if (currentThread === undefined) {
-        threadList.push(initialThread);
-    }
+    const defaultThread = defaultCharacter
+        ? {
+              ...initialState.defaultThread,
+              agentConfig: defaultCharacter,
+          }
+        : initialState.defaultThread;
 
     const [state, setState] = useState<ChatState>({
         ...initialState,
         characterList,
+        currentThread,
+        defaultThread,
         threads: threadList.sort(sortThreadlist),
-        isNew: threadId === undefined,
-        currentThread: currentThread || 0,
     });
 
     const createThread = createThreadHandler(state, setState);
-    const updateActiveThread = updateActiveThreadHandler(setState);
     const setOpenAiApiKey = setOpenAiApiKeyHandler(setState);
     const abortRequest = abortRequestHandler(state, setState);
 
+    // Load local data
     useEffect(() => {
         // Load OpenAI API key from local storage
         const key = getLocalOpenAiKey();
@@ -102,7 +106,7 @@ export function ChatProvider({
 
     // Save thread when it is updated
     useEffect(() => {
-        if (!state.saved) {
+        if (!state.saved && state.currentThread !== null) {
             try {
                 const thread = state.threads[state.currentThread];
                 if (userId) upsertThread(thread);
@@ -118,19 +122,24 @@ export function ChatProvider({
 
     // Update active thread when threadId changes
     useEffect(() => {
-        const thread = state.threads[state.currentThread];
+        if (!threadId) return;
+
+        const thread =
+            state.currentThread !== null
+                ? state.threads[state.currentThread]
+                : state.defaultThread;
+
         if (thread.id === threadId) return;
-        if (!threadId) {
-            if (!state.isNew) createThread();
-            return;
-        }
 
         const newThread = state.threads.find((t) => t.id === threadId);
         if (newThread) {
-            updateActiveThread(newThread);
             setState((prevState) => ({
                 ...prevState,
                 isNew: false,
+                input: '',
+                currentThread: prevState.threads.findIndex(
+                    (thread) => thread.id === threadId,
+                ),
             }));
         } else {
             router.replace('/');
@@ -142,11 +151,10 @@ export function ChatProvider({
     }, [
         router,
         threadId,
-        state.isNew,
         state.threads,
         createThread,
-        updateActiveThread,
         state.currentThread,
+        state.defaultThread,
     ]);
 
     const value: ChatState = {
@@ -154,7 +162,6 @@ export function ChatProvider({
         abortRequest,
         createThread,
         setOpenAiApiKey,
-        updateActiveThread,
         cancelEdit: cancelEditHandler(setState),
         changeInput: changeInputHandler(setState),
         removeThread: removeThreadHandler(setState),
@@ -180,7 +187,7 @@ export function ChatProvider({
     return (
         <ChatContext.Provider value={value}>
             {children}
-            <Dialogs />
+            <Dialogs threadId={threadId} />
         </ChatContext.Provider>
     );
 }

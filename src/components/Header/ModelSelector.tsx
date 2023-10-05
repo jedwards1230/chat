@@ -14,8 +14,10 @@ import { Button } from '../ui/button';
 import { getListByApi } from '@/providers/models';
 
 export default function ModelSelector() {
-    const { currentThread, threads, updateThreadConfig } = useChat();
-    const activeThread = threads[currentThread];
+    const { currentThread, defaultThread, threads, updateThreadConfig } =
+        useChat();
+    const activeThread =
+        currentThread !== null ? threads[currentThread] : defaultThread;
     const activeModel = activeThread.agentConfig.model;
 
     return (

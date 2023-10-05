@@ -12,7 +12,8 @@ import useMessages from '@/lib/ChatManagerHook';
 
 export default function Header() {
     const { currentThread, threads } = useChat();
-    const activeThread = threads[currentThread];
+    const activeThread =
+        currentThread !== null ? threads[currentThread] : undefined;
     const {
         sideBarOpen,
         setSideBarOpen,
@@ -21,8 +22,8 @@ export default function Header() {
     } = useUI();
 
     const messages = useMessages(
-        activeThread.currentNode,
-        activeThread.mapping,
+        activeThread?.currentNode,
+        activeThread?.mapping,
     );
 
     const tokenCount = useMemo(() => {
@@ -60,7 +61,7 @@ export default function Header() {
                 </button>
             </div>
             <div className="flex items-center justify-center col-span-10 text-center">
-                {messages.length > 1 ? (
+                {activeThread && messages.length > 1 ? (
                     <div>
                         <p className="font-semibold line-clamp-1">
                             {activeThread.title}

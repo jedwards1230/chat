@@ -9,8 +9,9 @@ import { Dialog, DialogContent, DialogTrigger } from '../ui/dialog';
 import { Button } from '../ui/button';
 
 function CharacterSelector({ children }: { children: React.ReactNode }) {
-    const { currentThread, threads, characterList } = useChat();
-    const activeThread = threads[currentThread];
+    const { currentThread, defaultThread, threads, characterList } = useChat();
+    const activeThread =
+        currentThread !== null ? threads[currentThread] : defaultThread;
     const [activeCard, setActiveCard] = useState<AgentConfig>(
         activeThread.agentConfig,
     );

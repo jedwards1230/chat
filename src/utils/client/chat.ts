@@ -10,14 +10,21 @@ import ChatManager from '@/lib/ChatManager';
 
 const MAX_LOOPS = 10;
 
-export function createUserMsg(
-    content: string,
-    editId?: string | null,
-): Message {
+/** Create blank message */
+export function createMessage({
+    role,
+    id,
+    content = '',
+}: {
+    role: Role;
+    id?: string;
+    content?: string;
+}): Message {
     return {
-        id: editId ? editId : uuidv4(),
-        role: 'user',
+        id: id || uuidv4(),
         content,
+        role,
+        createdAt: new Date(),
     };
 }
 
@@ -82,6 +89,8 @@ export async function getTitle(
 }
 
 type GetChatParams = {
+    /** The active thread of the chatbot. */
+    activeThread: ChatThread;
     /** The history of messages in the conversation. */
     msgHistory: Message[];
     /** Used to optionally abort DOM requests. */
@@ -105,6 +114,7 @@ type GetChatParams = {
  * The recursion is broken when the AI response doesn't request a tool.
  */
 export async function getChat({
+    activeThread,
     msgHistory,
     controller,
     state,
@@ -115,7 +125,6 @@ export async function getChat({
 }: GetChatParams) {
     if (loops > MAX_LOOPS) throw new Error('Too many loops');
 
-    const activeThread = state.threads[state.currentThread];
     const apiKey = state.openAiApiKey;
     const assistantId = uuidv4();
     let tools: ToolInput[] = [];
@@ -194,6 +203,7 @@ export async function getChat({
     if (tools.length > 0) {
         for (const toolInput of tools) {
             await getToolData({
+                activeThread,
                 toolInput,
                 msgHistory,
                 upsertMessage,
@@ -298,6 +308,7 @@ async function requestChatWithClientOrServer(
 }
 
 type ToolDataParams = {
+    activeThread: ChatThread;
     toolInput: ToolInput;
     msgHistory: Message[];
     upsertMessage: (message: Message) => void;
@@ -309,6 +320,7 @@ type ToolDataParams = {
 };
 
 export async function getToolData({
+    activeThread,
     toolInput,
     msgHistory,
     upsertMessage,
@@ -343,6 +355,7 @@ export async function getToolData({
     // Add a new function message with the response from the tool
     // Recursively call this function to generate the next response from the AI model
     await getChat({
+        activeThread,
         msgHistory,
         controller,
         state,

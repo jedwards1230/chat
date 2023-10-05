@@ -26,13 +26,17 @@ export function getDefaultThread(config: AgentConfig): ChatThread {
     };
 }
 
+export function resetDefaultThread() {
+    return getDefaultThread(defaultAgents[0]);
+}
+
 const initialState: ChatState = {
     input: '',
     threads: [],
     saved: true,
-    isNew: true,
     editId: null,
-    currentThread: 0,
+    currentThread: null,
+    defaultThread: resetDefaultThread(),
     botTyping: false,
     openAiApiKey: '',
     streamResponse: true,
@@ -53,7 +57,6 @@ const initialState: ChatState = {
     setStreamResponse: () => {},
     setPluginsEnabled: () => {},
     updateThreadConfig: () => {},
-    updateActiveThread: () => {},
     handleSubmit: () => Promise.resolve(),
     saveCharacter: () => Promise.resolve(),
 };

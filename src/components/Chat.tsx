@@ -16,7 +16,8 @@ import ChatSettings from './ChatSettings';
 
 export default function Chat() {
     const { currentThread, botTyping, threads } = useChat();
-    const activeThread = threads[currentThread];
+    const activeThread =
+        currentThread !== null ? threads[currentThread] : undefined;
     const {
         sideBarOpen,
         setSideBarOpen,

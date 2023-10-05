@@ -3,11 +3,25 @@ export default class ChatManager {
         message: Message,
         mapping: MessageMapping,
         current_node: string | null,
-    ) {
+    ): NewMapping {
         const id = message.id;
+
+        const updateCurrentNode = (current_node: string) => {
+            const node = mapping[current_node];
+
+            return {
+                [current_node]: {
+                    ...node,
+                    children: node.children.includes(id)
+                        ? node.children
+                        : [...node.children, id],
+                },
+            };
+        };
 
         const newMapping: MessageMapping = {
             ...mapping,
+            ...(current_node && updateCurrentNode(current_node)),
             [id]: {
                 id,
                 message,
@@ -25,6 +39,21 @@ export default class ChatManager {
         }
 
         return { newMapping, newCurrentNode: id };
+    }
+
+    static upsertMessage(
+        message: Message,
+        mapping: MessageMapping,
+        current_node: string | null,
+    ): NewMapping {
+        if (mapping[message.id]) {
+            return {
+                newMapping: ChatManager.updateMessage(message, mapping),
+                newCurrentNode: current_node,
+            };
+        } else {
+            return ChatManager.createMessage(message, mapping, current_node);
+        }
     }
 
     static readMessage(id: string, mapping: MessageMapping): Message | null {
@@ -80,7 +109,6 @@ export default class ChatManager {
         while (currentNode) {
             const childMessage = mapping[currentNode];
             if (!childMessage) {
-                //console.error('Child message does not exist');
                 break;
             }
             if (childMessage.message) {

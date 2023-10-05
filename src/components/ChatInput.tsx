@@ -18,10 +18,18 @@ type ToolCommand = {
 };
 
 function ChatInput() {
-    const { currentThread, threads, input, editId, changeInput, handleSubmit } =
-        useChat();
+    const {
+        currentThread,
+        defaultThread,
+        threads,
+        input,
+        editId,
+        changeInput,
+        handleSubmit,
+    } = useChat();
 
-    const activeThread = threads[currentThread];
+    const activeThread =
+        currentThread !== null ? threads[currentThread] : defaultThread;
     const [activeId, setActiveId] = useState<string>(activeThread.id);
     const inputRef = useRef<HTMLTextAreaElement>(null);
 

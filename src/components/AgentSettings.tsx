@@ -39,11 +39,13 @@ export default function AgentSettings({
         saveCharacter,
         threads,
         currentThread,
+        defaultThread,
         streamResponse,
         setStreamResponse,
     } = useChat();
 
-    const activeThread = threads[currentThread];
+    const activeThread =
+        currentThread !== null ? threads[currentThread] : defaultThread;
     const isNew = agent === undefined;
     const [config, setConfig] = useState(
         agent

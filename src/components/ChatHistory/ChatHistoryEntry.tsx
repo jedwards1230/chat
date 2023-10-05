@@ -14,10 +14,10 @@ import useMessages from '@/lib/ChatManagerHook';
 
 export default function ChatHistoryEntry({
     entry,
-    activeThread,
+    active,
 }: {
     entry: ChatThread;
-    activeThread: ChatThread;
+    active: boolean;
 }) {
     const router = useRouter();
     const { removeThread } = useChat();
@@ -30,7 +30,7 @@ export default function ChatHistoryEntry({
         removeThread(entry.id);
         deleteThreadById(entry.id);
         deleteLocalThreadById(entry.id);
-        if (entry.id === activeThread.id) {
+        if (active) {
             router.push('/');
         }
     };
@@ -48,7 +48,7 @@ export default function ChatHistoryEntry({
                 onClick={setActive}
                 className={clsx(
                     'flex w-full max-w-full items-center gap-2 rounded-lg px-2 py-1 transition-colors duration-100 hover:bg-neutral-500 peer-hover:bg-neutral-500 dark:hover:bg-neutral-600 dark:peer-hover:bg-neutral-600',
-                    entry.id === activeThread.id
+                    active
                         ? 'bg-neutral-500 dark:bg-neutral-600'
                         : 'cursor-pointer focus:bg-neutral-600  dark:focus:bg-neutral-700',
                 )}
@@ -59,7 +59,7 @@ export default function ChatHistoryEntry({
                 </div>
             </Link>
             <div
-                className="peer absolute right-0 top-0 z-50 col-span-2 mr-2 mt-2 flex cursor-pointer select-none items-center justify-center rounded-full text-neutral-300 hover:text-neutral-50"
+                className="absolute top-0 right-0 z-50 flex items-center justify-center col-span-2 mt-2 mr-2 rounded-full cursor-pointer select-none peer text-neutral-300 hover:text-neutral-50"
                 onClick={remove}
                 title="Delete conversation"
             >

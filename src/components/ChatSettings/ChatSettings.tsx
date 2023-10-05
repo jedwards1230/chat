@@ -16,8 +16,9 @@ import useMessages from '@/lib/ChatManagerHook';
 function ChatSettings() {
     const { data: session } = useSession();
     const userId = session?.user?.email;
-    const { currentThread, threads } = useChat();
-    const activeThread = threads[currentThread];
+    const { currentThread, defaultThread, threads } = useChat();
+    const activeThread =
+        currentThread !== null ? threads[currentThread] : defaultThread;
     const { chatSettingsOpen, setChatSettingsOpen, setShareModalOpen } =
         useUI();
 

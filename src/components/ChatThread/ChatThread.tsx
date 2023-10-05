@@ -12,12 +12,14 @@ export default function ChatThread({
     activeThread,
 }: {
     style?: React.CSSProperties;
-    activeThread: ChatThread;
+    activeThread?: ChatThread;
 }) {
     const messages = useMessages(
-        activeThread.currentNode,
-        activeThread.mapping,
+        activeThread?.currentNode,
+        activeThread?.mapping,
     );
+
+    console.log(messages, activeThread?.mapping, activeThread?.currentNode);
 
     const threadRef = useRef<HTMLDivElement>(null);
     const prevScrollHeight = useRef<number>(0);
@@ -38,7 +40,7 @@ export default function ChatThread({
         }
 
         prevScrollHeight.current = threadEl.scrollHeight;
-    }, [activeThread.currentNode, activeThread.mapping]);
+    }, [activeThread?.currentNode, activeThread?.mapping]);
 
     const hasMultipleMessages = messages.length > 1;
 
@@ -51,8 +53,8 @@ export default function ChatThread({
                 hasMultipleMessages && 'overflow-y-scroll',
             )}
         >
-            <div className="flex h-full w-full flex-col">
-                {hasMultipleMessages ? (
+            <div className="flex flex-col w-full h-full">
+                {activeThread ? (
                     messages.map((m, i) => {
                         if (m.role === 'assistant' && m.function_call) {
                             return null;
@@ -78,7 +80,7 @@ export default function ChatThread({
                         );
                     })
                 ) : (
-                    <ChatPlaceholder activeThread={activeThread} />
+                    <ChatPlaceholder />
                 )}
                 {/* Blank row at bottom. Better view of quick actions. */}
                 {hasMultipleMessages && <div className="min-h-[72px] w-full" />}

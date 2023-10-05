@@ -63,6 +63,7 @@ interface Message {
 interface MessageRelationship {
     id: string;
     message: Message | null;
+    /** Parent is null when it is the initial message */
     parent: string | null;
     children: string[];
 }
@@ -124,3 +125,8 @@ type PlausibleHook = (
         props: { threadId: string; usedCloudKey: boolean };
     },
 ) => any;
+
+type NewMapping = {
+    newMapping: MessageMapping;
+    newCurrentNode: string | null;
+};

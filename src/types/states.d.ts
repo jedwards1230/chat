@@ -1,6 +1,7 @@
 type ChatState = {
-    currentThread: number;
+    currentThread: number | null;
     threads: ChatThread[];
+    defaultThread: ChatThread;
     botTyping: boolean;
     input: string;
     editId: string | null;
@@ -8,13 +9,11 @@ type ChatState = {
     /** Setting this to false will trigger a save */
     saved: boolean;
     characterList: AgentConfig[];
-    isNew: boolean;
     openAiApiKey?: string;
     streamResponse: boolean;
 
     /** Abort request, stop typing, request a save */
     abortRequest: () => void;
-    updateActiveThread: (thread: ChatThread) => void;
     /** Abort request, set default thread, save */
     createThread: () => void;
     toggleplugin: (plugin: Tool) => void;

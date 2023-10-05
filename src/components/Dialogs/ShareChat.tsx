@@ -2,17 +2,14 @@
 
 import Link from 'next/link';
 
-import { useChat } from '@/providers/ChatProvider';
 import Dialog from './Dialog';
 import { OpenNew } from '../Icons';
 import { useUI } from '@/providers/UIProvider';
 import { Input } from '../ui/input';
 
-export default function ShareChat() {
-    const { currentThread, threads } = useChat();
-    const activeThread = threads[currentThread];
+export default function ShareChat({ threadId }: { threadId: string }) {
     const { setShareModalOpen } = useUI();
-    const shareUrl = `${window.location.origin}/share/${activeThread.id}`;
+    const shareUrl = `${window.location.origin}/share/${threadId}`;
 
     const handleInputClick = (event: any) => {
         event.target.select();
