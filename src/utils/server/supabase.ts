@@ -8,9 +8,9 @@ import initialState from '@/providers/initialChat';
 /* 
 Threads
 */
-export async function getThreadListByUserId(
-    userId: string,
-): Promise<ChatThread[]> {
+export async function getThreadListByUserId(): Promise<ChatThread[]> {
+    const userId = await getUserId();
+    if (!userId) return [];
     // Fetch threads for the user
     const threads = await db.getChatThreads(userId);
     const threadList: ChatThread[] = [];
@@ -76,6 +76,19 @@ export async function upsertThread(thread: ChatThread) {
     if (messages.length === 0) return;
 
     const userId = await getUserId();
+    if (!userId) return;
+
+    await db.upsertAgentConfigs([
+        {
+            id: thread.agentConfig.id,
+            userId,
+            name: thread.agentConfig.name,
+            tools: thread.agentConfig.tools,
+            toolsEnabled: thread.agentConfig.toolsEnabled,
+            model: JSON.stringify(thread.agentConfig.model),
+            systemMessage: thread.agentConfig.systemMessage,
+        },
+    ]);
 
     await db.upsertChatThreads([
         {
@@ -120,11 +133,13 @@ export async function upsertThread(thread: ChatThread) {
 
 export async function deleteThreadById(threadId: string) {
     const userId = await getUserId();
+    if (!userId) return;
     await db.deleteChatThreads([threadId]);
 }
 
 export async function deleteAllThreads() {
     const userId = await getUserId();
+    if (!userId) return;
     await db.deleteAllChatThreads(userId);
 }
 
@@ -133,6 +148,7 @@ Shared Threads
 */
 export async function shareThread(thread: ChatThread) {
     const userId = await getUserId();
+    if (!userId) return;
     const threadData = await db.upsertSharedChatThreads([
         {
             id: thread.id,
@@ -180,9 +196,9 @@ export async function getSharedThreadById(
 /* 
 Characters
 */
-export async function getCharacterListByUserId(
-    userId: string,
-): Promise<AgentConfig[]> {
+export async function getCharacterListByUserId(): Promise<AgentConfig[]> {
+    const userId = await getUserId();
+    if (!userId) return [];
     const configs = await db.getAgentConfigs(userId);
 
     if (configs.length > 0) {
@@ -210,6 +226,7 @@ export async function getCharacterListByUserId(
 
 export async function upsertCharacter(character: AgentConfig) {
     const userId = await getUserId();
+    if (!userId) return;
     await db.upsertAgentConfigs([
         {
             ...character,
@@ -221,6 +238,7 @@ export async function upsertCharacter(character: AgentConfig) {
 
 export async function deleteAllCharacters() {
     const userId = await getUserId();
+    if (!userId) return;
     await db.deleteAllAgentConfigs(userId);
 }
 
@@ -236,12 +254,14 @@ export async function getUserId(init = false) {
     const session = await auth();
     const userId = session?.user?.email;
 
-    if (!userId) throw new Error('No user ID');
+    if (!userId) return;
 
     if (init) {
+        console.log('Initializing user', userId);
         const data = await db.getUser(userId);
 
         if (data?.length === 0) {
+            console.log('Creating user', userId);
             await db.createUser(userId);
         }
     }

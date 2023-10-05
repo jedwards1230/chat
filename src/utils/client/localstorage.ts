@@ -2,12 +2,9 @@
 
 import initialState from '@/providers/initialChat';
 
-export function getLocalCharacterList() {
+export function getLocalCharacterList(): AgentConfig[] {
     const characters = window.localStorage.getItem('chatCharacterList');
-    const localCharacters: AgentConfig[] = characters
-        ? JSON.parse(characters)
-        : initialState.characterList;
-    return localCharacters;
+    return characters ? JSON.parse(characters) : [];
 }
 
 export function deleteAllLocalCharacterList() {
@@ -16,12 +13,33 @@ export function deleteAllLocalCharacterList() {
 
 export function getLocalThreadList() {
     const threads = window.localStorage.getItem('chatThreads');
+
+    const parseThread = (t: ChatThread): ChatThread => {
+        return {
+            ...t,
+            created: new Date(t.created),
+            lastModified: new Date(t.lastModified),
+            mapping: Object.fromEntries(
+                Object.entries(t.mapping).map(([key, value]) => [
+                    key,
+                    {
+                        ...value,
+                        message: value.message
+                            ? {
+                                  ...value.message,
+                                  createdAt: value.message.createdAt
+                                      ? new Date(value.message.createdAt)
+                                      : new Date(),
+                              }
+                            : null,
+                    },
+                ]),
+            ),
+        };
+    };
+
     const localThreads: ChatThread[] = threads
-        ? JSON.parse(threads).map((t: ChatThread) => ({
-              ...t,
-              created: new Date(t.created),
-              lastModified: new Date(t.lastModified),
-          }))
+        ? JSON.parse(threads).map(parseThread)
         : initialState.threads;
     return localThreads;
 }

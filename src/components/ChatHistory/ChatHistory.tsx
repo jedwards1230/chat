@@ -13,6 +13,7 @@ import { AccountDropdown } from './Buttons';
 import { Button } from '../ui/button';
 import { useSession } from 'next-auth/react';
 import { Ellipsis } from '../Icons';
+import { sortThreadlist } from '@/utils';
 
 function ChatHistory({
     activeThread,
@@ -26,7 +27,7 @@ function ChatHistory({
     const [mounted, setMounted] = useState(false);
     const { sideBarOpen, setSideBarOpen } = useUI();
 
-    const threadList = threads;
+    const threadList = threads.sort(sortThreadlist);
 
     const newThread = () => {
         if (isMobile()) setSideBarOpen(false);
@@ -45,8 +46,6 @@ function ChatHistory({
         }
         return count;
     };
-
-    const messageCount = getMessageCount(activeThread?.mapping || {});
 
     return (
         <Sidebar
@@ -67,9 +66,9 @@ function ChatHistory({
                 </Button>
             </Link>
             {/* Chat History */}
-            <div className="flex flex-col flex-1 w-full gap-1 pt-2 overflow-y-scroll sm:pt-0">
+            <div className="flex w-full flex-1 flex-col gap-1 overflow-y-scroll pt-2 sm:pt-0">
                 {threadList.map((thread, i) =>
-                    messageCount > 1 ? (
+                    getMessageCount(thread.mapping) > 1 ? (
                         <ChatHistoryEntry
                             key={`${i}-${thread.id}`}
                             entry={thread}
@@ -79,9 +78,9 @@ function ChatHistory({
                 )}
             </div>
             {/* Footer Buttons */}
-            <div className="flex justify-end w-full pb-3 pl-2 text-sm gap-x-2 md:pb-1 md:pl-0">
+            <div className="flex w-full justify-end gap-x-2 pb-3 pl-2 text-sm md:pb-1 md:pl-0">
                 <AccountDropdown user={user}>
-                    <div className="grid items-center w-full grid-cols-6 gap-1">
+                    <div className="grid w-full grid-cols-6 items-center gap-1">
                         {user ? (
                             <>
                                 {user.image && (
@@ -100,7 +99,7 @@ function ChatHistory({
                         ) : (
                             <div className="col-span-5 text-left">Menu</div>
                         )}
-                        <div className="flex justify-center col-span-1">
+                        <div className="col-span-1 flex justify-center">
                             <Ellipsis />
                         </div>
                     </div>

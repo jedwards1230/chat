@@ -92,13 +92,16 @@ export function ChatProvider({
         if (key) setOpenAiApiKey(key);
 
         // Load threads from local storage if not connected to db
+        const localCharacters = getLocalCharacterList();
+        const localThreads = getLocalThreadList();
+
         setState((prevState) => ({
             ...prevState,
             saved: false,
-            threads: mergeThreads(prevState.threads, getLocalThreadList()),
+            threads: mergeThreads(prevState.threads, localThreads),
             characterList: mergeCharacters(
                 prevState.characterList,
-                getLocalCharacterList(),
+                localCharacters,
             ),
         }));
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -122,40 +125,35 @@ export function ChatProvider({
 
     // Update active thread when threadId changes
     useEffect(() => {
-        if (!threadId) return;
+        if (!threadId) {
+            if (state.currentThread !== null) {
+                setState((prevState) => ({
+                    ...prevState,
+                    input: '',
+                    currentThread: null,
+                }));
+            }
+            return;
+        }
 
-        const thread =
-            state.currentThread !== null
-                ? state.threads[state.currentThread]
-                : state.defaultThread;
+        const foundThreadIndex = state.threads.findIndex(
+            (t) => t.id === threadId,
+        );
 
-        if (thread.id === threadId) return;
-
-        const newThread = state.threads.find((t) => t.id === threadId);
-        if (newThread) {
+        if (foundThreadIndex !== -1) {
             setState((prevState) => ({
                 ...prevState,
-                isNew: false,
                 input: '',
-                currentThread: prevState.threads.findIndex(
-                    (thread) => thread.id === threadId,
-                ),
+                currentThread: foundThreadIndex,
             }));
         } else {
             router.replace('/');
             setState((prevState) => ({
                 ...prevState,
-                isNew: true,
+                currentThread: null,
             }));
         }
-    }, [
-        router,
-        threadId,
-        state.threads,
-        createThread,
-        state.currentThread,
-        state.defaultThread,
-    ]);
+    }, [router, threadId, state.threads, state.currentThread]);
 
     const value: ChatState = {
         ...state,
@@ -165,7 +163,7 @@ export function ChatProvider({
         cancelEdit: cancelEditHandler(setState),
         changeInput: changeInputHandler(setState),
         removeThread: removeThreadHandler(setState),
-        saveCharacter: saveCharacterHandler(setState),
+        saveCharacter: saveCharacterHandler(setState, userId),
         removeMessage: removeMessageHandler(setState),
         editMessage: editMessageHandler(setState),
         toggleplugin: togglePluginHandler(setState),

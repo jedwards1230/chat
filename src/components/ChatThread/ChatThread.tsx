@@ -19,8 +19,6 @@ export default function ChatThread({
         activeThread?.mapping,
     );
 
-    console.log(messages, activeThread?.mapping, activeThread?.currentNode);
-
     const threadRef = useRef<HTMLDivElement>(null);
     const prevScrollHeight = useRef<number>(0);
 
@@ -53,7 +51,7 @@ export default function ChatThread({
                 hasMultipleMessages && 'overflow-y-scroll',
             )}
         >
-            <div className="flex flex-col w-full h-full">
+            <div className="flex h-full w-full flex-col">
                 {activeThread ? (
                     messages.map((m, i) => {
                         if (m.role === 'assistant' && m.function_call) {

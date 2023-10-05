@@ -22,22 +22,24 @@ export default function DataSection({ user }: { user?: User }) {
 
 function GeneralData() {
     const { threads, characterList } = useChat();
+
+    const threadList = threads.filter((t) => {
+        const list = ChatManager.getOrderedMessages(t.currentNode, t.mapping);
+        return list.length > 1;
+    });
+
+    const messages = threadList.reduce((acc, thread) => {
+        const list = ChatManager.getOrderedMessages(
+            thread.currentNode,
+            thread.mapping,
+        );
+        return acc + list.length;
+    }, 0);
+
     return (
         <div>
             <div className="flex gap-2">
-                <div>{threads.length} Chats</div>|
-                <div>
-                    {threads.reduce(
-                        (acc, thread) =>
-                            acc +
-                            ChatManager.getOrderedMessages(
-                                thread.currentNode,
-                                thread.mapping,
-                            ).length,
-                        0,
-                    )}{' '}
-                    Messages
-                </div>
+                <div>{threads.length} Chats</div>|<div>{messages} Messages</div>
                 |
                 <div>
                     {characterList.length}{' '}

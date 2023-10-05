@@ -56,7 +56,6 @@ function upsertMessageState(
         currentNode: newCurrentNode,
         lastModified: new Date(),
     };
-    console.log('newThread', newThread);
     threads[prevState.currentThread] = newThread;
 
     return {
@@ -67,7 +66,7 @@ function upsertMessageState(
 
 /** Upsert Title into ChatThread */
 function upsertTitleState(prevState: ChatState, title: string): ChatState {
-    if (!prevState.currentThread) return prevState;
+    if (prevState.currentThread === null) return prevState;
     const threads = prevState.threads;
     const activeThread = {
         ...threads[prevState.currentThread],
@@ -106,7 +105,6 @@ function createNewThread(
     newMap: NewMapping,
     controller: AbortController,
 ): ChatState {
-    const isNew = prevState.currentThread === null;
     const newState = {
         ...prevState,
         editId: prevState.editId ? null : prevState.editId,
@@ -115,24 +113,27 @@ function createNewThread(
         botTyping: true,
     };
 
-    const getNewThread = (): ChatThread =>
-        isNew
+    const newThread: ChatThread =
+        prevState.currentThread === null
             ? { ...prevState.defaultThread }
             : {
-                  ...prevState.threads[prevState.currentThread!],
+                  ...prevState.threads[prevState.currentThread],
                   mapping: newMap.newMapping,
                   currentNode: newMap.newCurrentNode,
                   lastModified: new Date(),
               };
 
-    const newThread = getNewThread();
-    const threads = [...prevState.threads, newThread];
+    const threads = [...prevState.threads];
+    if (prevState.currentThread === null) {
+        threads.push(newThread);
+    }
 
     return {
         ...newState,
         threads,
+        botTyping: true,
         currentThread: threads.length - 1,
-        ...(isNew && {
+        ...(prevState.currentThread === null && {
             defaultThread: resetDefaultThread(),
         }),
     };
@@ -209,29 +210,6 @@ export function createSubmitHandler(
 
         const activeThread = getActiveThread(state);
 
-        if (state.currentThread === null) {
-            setState((prevState) => {
-                const threads = [...prevState.threads];
-                const currentThread = threads.findIndex(
-                    (thread) => thread.id === activeThread.id,
-                );
-
-                if (currentThread === -1) {
-                    threads.push(activeThread);
-                    return {
-                        ...prevState,
-                        currentThread: threads.length - 1,
-                        threads,
-                    };
-                } else {
-                    return {
-                        ...prevState,
-                        currentThread,
-                    };
-                }
-            });
-        }
-
         router.replace('/?c=' + activeThread.id);
         plausible('Submitted Message', {
             props: {
@@ -246,7 +224,6 @@ export function createSubmitHandler(
             content: state.input,
             id: state.editId || undefined,
         });
-        upsertMessage(userMsg);
 
         // create new mapping and ordered list of messages
         const newMap = getNewMapping(activeThread, userMsg, state.editId);
@@ -258,6 +235,7 @@ export function createSubmitHandler(
         // create new thread
         const controller = new AbortController();
         setState((prevState) => createNewThread(prevState, newMap, controller));
+        upsertMessage(userMsg);
 
         const toolInput = getToolInput(state.input);
         toolInput
@@ -300,13 +278,10 @@ export function createThreadHandler(state: ChatState, setState: ChatDispatch) {
     return () => {
         state.abortController?.abort();
         setState((prevState) => {
-            const activeThread = getActiveThread(prevState);
-            const newThread = getDefaultThread(activeThread.agentConfig);
-            const threads = [...prevState.threads, newThread];
             return {
                 ...prevState,
-                currentThread: threads.length - 1,
-                threads,
+                currentThread: null,
+                defaultThread: resetDefaultThread(),
                 input: '',
                 botTyping: false,
                 isNew: true,
@@ -350,36 +325,44 @@ export function updateThreadConfigHandler(setState: ChatDispatch) {
     return (configUpdates: Partial<AgentConfig>) => {
         setState((prevState) => {
             const activeThread = getActiveThread(prevState);
-            const newConfig: AgentConfig = {
+            const agentConfig: AgentConfig = {
                 ...activeThread.agentConfig,
                 ...configUpdates,
             };
 
-            if (
-                (configUpdates.toolsEnabled === true &&
-                    newConfig.model.api === 'llama') ||
-                configUpdates.model?.api === 'llama'
-            )
-                newConfig.toolsEnabled = false;
+            if (agentConfig.model?.api === 'llama')
+                agentConfig.toolsEnabled = false;
 
-            const threads = prevState.threads.map((thread) =>
-                thread.id === activeThread.id
-                    ? {
-                          ...thread,
-                          agentConfig: newConfig,
-                      }
-                    : thread,
-            );
+            const streamResponse =
+                agentConfig.model.api === 'llama'
+                    ? false
+                    : prevState.streamResponse;
 
-            return {
-                ...prevState,
-                threads,
-                lastModified: new Date(),
-                streamResponse:
-                    newConfig.model.api === 'llama'
-                        ? false
-                        : prevState.streamResponse,
-            };
+            const threads = [...prevState.threads];
+            if (prevState.currentThread) {
+                threads[prevState.currentThread] = {
+                    ...threads[prevState.currentThread!],
+                    agentConfig,
+                };
+                return {
+                    ...prevState,
+                    threads,
+                    lastModified: new Date(),
+                    streamResponse,
+                };
+            } else {
+                const defaultThread = {
+                    ...prevState.defaultThread,
+                    agentConfig,
+                };
+
+                return {
+                    ...prevState,
+                    defaultThread,
+                    lastModified: new Date(),
+                    streamResponse,
+                };
+            }
         });
     };
 }
@@ -548,9 +531,12 @@ export function abortRequestHandler(state: ChatState, setState: ChatDispatch) {
     };
 }
 
-export function saveCharacterHandler(setState: ChatDispatch) {
+export function saveCharacterHandler(
+    setState: ChatDispatch,
+    userId?: string | null,
+) {
     return async (character: AgentConfig) => {
-        upsertCharacter(character);
+        if (userId) upsertCharacter(character);
         setState((prevState) => {
             const characterList = prevState.characterList;
             const foundIndex = characterList.findIndex(
