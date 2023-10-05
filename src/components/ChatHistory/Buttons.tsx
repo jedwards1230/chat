@@ -1,18 +1,10 @@
 'use client';
 
 import * as React from 'react';
-import {
-    Key,
-    LucideLogIn,
-    LucideLogOut,
-    Moon,
-    Settings,
-    Sun,
-} from 'lucide-react';
+import { LucideLogIn, LucideLogOut, Moon, Settings, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
-import { signOut, useSession } from 'next-auth/react';
+import { signOut } from 'next-auth/react';
 import Link from 'next/link';
-import clsx from 'clsx';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -22,9 +14,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useChat } from '@/providers/ChatProvider';
 import { useUI } from '@/providers/UIProvider';
-import { Person } from '../Icons';
 
 export function AccountDropdown({
     children,
@@ -96,7 +86,7 @@ export function LogOutButton() {
     return (
         <button
             onClick={() => signOut()}
-            className="flex items-center w-full gap-2"
+            className="flex w-full items-center gap-2"
         >
             <LucideLogOut />
             <span>Log Out</span>
@@ -108,7 +98,7 @@ export function LogInButton() {
     return (
         <Link
             href="/api/auth/signin"
-            className="flex items-center w-full gap-2"
+            className="flex w-full items-center gap-2"
         >
             <LucideLogIn />
             <span>Log In</span>
@@ -121,44 +111,10 @@ export function SettingsButton() {
     return (
         <button
             onClick={() => setAppSettingsOpen(true)}
-            className="flex items-center w-full gap-2"
+            className="flex w-full items-center gap-2"
         >
             <Settings />
             <span>Config</span>
         </button>
     );
 }
-
-/* export function ApiButton() {
-    const { data: session } = useSession();
-    const userId = session?.user?.email;
-    const { openAiApiKey } = useChat();
-    const { openKeyDialog } = useUI();
-
-    return (
-        <button
-            onClick={() => openKeyDialog(true)}
-            title={
-                userId
-                    ? 'Using Cloud Key (currently set by EnvVar. Ignoring Local Key)'
-                    : openAiApiKey
-                    ? 'Using Local Key'
-                    : 'Invalid OpenAI API Key'
-            }
-            className="flex items-center w-full gap-2 cursor-pointer"
-        >
-            <span
-                className={clsx(
-                    userId
-                        ? 'text-green-600'
-                        : openAiApiKey
-                        ? 'text-neutral-300'
-                        : 'text-red-600',
-                )}
-            >
-                {userId ? <Person /> : <Key />}
-            </span>
-            <span>API Key</span>
-        </button>
-    );
-} */

@@ -13,6 +13,10 @@ module.exports = withBundleAnalyzer(
         withPlausibleProxy()({
             experimental: {
                 serverActions: true,
+                logging: {
+                    level: 'verbose',
+                    fullUrl: true,
+                },
             },
             images: {
                 remotePatterns: [
