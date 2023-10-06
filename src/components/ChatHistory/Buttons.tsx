@@ -15,6 +15,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useUI } from '@/providers/UIProvider';
+import { AUTH_ENABLED } from '@/appConfig';
 
 export function AccountDropdown({
     children,
@@ -43,10 +44,14 @@ export function AccountDropdown({
                 <DropdownMenuItem onSelect={onSelect}>
                     <SettingsButton />
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                    {user ? <LogOutButton /> : <LogInButton />}
-                </DropdownMenuItem>
+                {AUTH_ENABLED && (
+                    <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem>
+                            {user ? <LogOutButton /> : <LogInButton />}
+                        </DropdownMenuItem>
+                    </>
+                )}
             </DropdownMenuContent>
         </DropdownMenu>
     );
