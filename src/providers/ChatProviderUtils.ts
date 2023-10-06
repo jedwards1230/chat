@@ -113,18 +113,21 @@ function createNewThread(
         botTyping: true,
     };
 
+    const currentThread = prevState.currentThread;
     const newThread: ChatThread =
-        prevState.currentThread === null
+        currentThread === null
             ? { ...prevState.defaultThread }
             : {
-                  ...prevState.threads[prevState.currentThread],
+                  ...prevState.threads[currentThread],
                   mapping: newMap.newMapping,
                   currentNode: newMap.newCurrentNode,
                   lastModified: new Date(),
               };
 
-    const threads = [...prevState.threads];
-    if (prevState.currentThread === null) {
+    const threads = prevState.threads.map((thread) =>
+        thread.id === newThread.id ? newThread : thread,
+    );
+    if (currentThread === null) {
         threads.push(newThread);
     }
 
@@ -133,7 +136,7 @@ function createNewThread(
         threads,
         botTyping: true,
         currentThread: threads.length - 1,
-        ...(prevState.currentThread === null && {
+        ...(currentThread === null && {
             defaultThread: resetDefaultThread(),
         }),
     };

@@ -126,14 +126,15 @@ export function ChatProvider({
     // Update active thread when threadId changes
     useEffect(() => {
         if (!threadId) {
-            if (state.currentThread !== null) {
-                setState((prevState) => ({
-                    ...prevState,
-                    input: '',
-                    currentThread: null,
-                }));
-            }
-            return;
+            return setState((prevState) =>
+                prevState.currentThread !== null
+                    ? {
+                          ...prevState,
+                          input: '',
+                          currentThread: null,
+                      }
+                    : prevState,
+            );
         }
 
         const foundThreadIndex = state.threads.findIndex(
