@@ -51,25 +51,37 @@ function FunctionContent({
 
     return (
         <>
-            <Button
+            <FunctionPreview
+                name={message.name}
+                input={input}
                 onClick={() => setOpen(!open)}
-                className="gap-2 text-ellipsis"
-            >
-                <div className="inline-block align-middle">{message.name}:</div>{' '}
-                <div
-                    title={input}
-                    className="inline-block overflow-x-scroll align-middle"
-                >
-                    <Markdown content={input} />
-                </div>
-            </Button>
+            />
             {open && (
-                /* ISSUE HERE. STILL OVERFLOWS */
-                <div className="mt-4 max-w-full overflow-x-scroll">
-                    <Markdown content={mdContent} />
-                </div>
+                <Markdown
+                    className="mt-4 [&>pre]:whitespace-pre-wrap"
+                    content={mdContent}
+                />
             )}
         </>
+    );
+}
+
+function FunctionPreview({
+    name,
+    input,
+    onClick,
+}: {
+    name?: string;
+    input?: string;
+    onClick: () => void;
+}) {
+    return (
+        <Button onClick={onClick} className="gap-2 text-ellipsis">
+            <div className="inline-block align-middle">{name}:</div>{' '}
+            <div title={input} className="inline-block align-middle">
+                <Markdown content={input} />
+            </div>
+        </Button>
     );
 }
 

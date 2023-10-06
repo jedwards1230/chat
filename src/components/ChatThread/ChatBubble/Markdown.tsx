@@ -1,17 +1,20 @@
 'use client';
 
+import clsx from 'clsx';
+import remarkGfm from 'remark-gfm';
 import { useMemo, memo } from 'react';
 import ReactMarkdown, { Components } from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 
 import CodeBlock from '../CodeBlock';
 
 function Markdown({
     content = '',
     children,
+    className,
 }: {
     content?: string;
     children?: string;
+    className?: string;
 }) {
     const components = useMemo<Partial<Components>>(
         () => ({
@@ -37,7 +40,7 @@ function Markdown({
             blockquote: ({ node, ...props }) => (
                 <blockquote
                     {...props}
-                    className="pl-4 border-l-4 border-blue-500"
+                    className="border-l-4 border-blue-500 pl-4"
                 />
             ),
             br: ({ node, ...props }) => <br {...props} className="my-1" />,
@@ -57,7 +60,7 @@ function Markdown({
                             <img
                                 alt={verifiedUrl.pathname}
                                 src={verifiedUrl.href}
-                                className="w-auto h-auto border border-gray-300 rounded-lg"
+                                className="h-auto w-auto rounded-lg border border-gray-300"
                                 loading="lazy"
                             />
                         );
@@ -86,10 +89,10 @@ function Markdown({
             ),
             hr: ({ node, ...props }) => <hr {...props} className="my-2" />,
             ol: ({ node, ...props }) => (
-                <ol {...props} className="list-decimal list-inside" />
+                <ol {...props} className="list-inside list-decimal" />
             ),
             ul: ({ node, ...props }) => (
-                <ul {...props} className="list-disc list-inside" />
+                <ul {...props} className="list-inside list-disc" />
             ),
             a: ({ node, ...props }) => (
                 <a {...props} className="text-blue-500 hover:underline" />
@@ -103,15 +106,15 @@ function Markdown({
             table: ({ node, ...props }) => (
                 <table
                     {...props}
-                    className="border border-collapse border-gray-300"
+                    className="border-collapse border border-gray-300"
                 />
             ),
             tbody: ({ node, ...props }) => <tbody {...props} />,
             td: ({ node, ...props }) => (
-                <td {...props} className="px-2 py-1 border border-gray-300" />
+                <td {...props} className="border border-gray-300 px-2 py-1" />
             ),
             th: ({ node, ...props }) => (
-                <th {...props} className="px-2 py-1 border border-gray-300" />
+                <th {...props} className="border border-gray-300 px-2 py-1" />
             ),
             thead: ({ node, ...props }) => <thead {...props} />,
             tr: ({ node, ...props }) => <tr {...props} className="border" />,
@@ -121,7 +124,7 @@ function Markdown({
 
     return (
         <ReactMarkdown
-            className="w-full space-y-4 overflow-x-scroll overflow-y-hidden"
+            className={clsx('space-y-4', className)}
             remarkPlugins={[remarkGfm]}
             components={components}
         >
