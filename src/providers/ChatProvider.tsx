@@ -23,6 +23,7 @@ import {
     updateThreadConfigHandler,
     saveCharacterHandler,
     setOpenAiApiKeyHandler,
+    upsertTitleState,
 } from './ChatProviderUtils';
 import { useUI } from './UIProvider';
 import initialState from './initialChat';
@@ -35,6 +36,8 @@ import {
     getLocalThreadList,
     setLocalThreadList,
 } from '@/utils/client/localstorage';
+import ChatManager from '@/lib/ChatManager';
+import { getTitle } from '@/utils/client/chat';
 
 const ChatContext = createContext<ChatState>(initialState);
 
@@ -60,7 +63,7 @@ export function ChatProvider({
 
     const defaultCharacter = characterList.find((c) => c.name === 'Chat');
 
-    const currentThread = getInitialActiveThread(
+    const initialThread = getInitialActiveThread(
         defaultCharacter || characterList[0],
         threadId,
         threadList,
@@ -76,10 +79,42 @@ export function ChatProvider({
     const [state, setState] = useState<ChatState>({
         ...initialState,
         characterList,
-        currentThread,
+        currentThread: initialThread,
         defaultThread,
         threads: threadList.sort(sortThreadlist),
     });
+
+    const activeThread =
+        state.currentThread !== null
+            ? state.threads[state.currentThread]
+            : undefined;
+
+    useEffect(() => {
+        if (
+            activeThread &&
+            activeThread.title === initialState.defaultThread.title &&
+            !state.botTyping
+        ) {
+            const messageList = ChatManager.getOrderedMessages(
+                activeThread.currentNode,
+                activeThread.mapping,
+            );
+            if (messageList.length % 2 === 0) {
+                const upsertTitle = (title: string) => {
+                    document.title = 'Chat | ' + title;
+                    setState((prevState) => upsertTitleState(prevState, title));
+                };
+
+                getTitle(activeThread, upsertTitle, userId, state.openAiApiKey);
+            }
+        }
+    }, [
+        activeThread,
+        activeThread?.currentNode,
+        state.botTyping,
+        state.openAiApiKey,
+        userId,
+    ]);
 
     const createThread = createThreadHandler(state, setState);
     const setOpenAiApiKey = setOpenAiApiKeyHandler(setState);

@@ -50,14 +50,12 @@ export function createFunctionCallMsg(
  * It then processes the response stream and calls the provided callback function with the title as the argument.
  *
  * @param {ChatThread} activeThread - The active thread of the chatbot.
- * @param {string} input - The input text to fetch the title for.
  * @param {(title: string) => void} callback - The callback function to be called with the fetched title.
  * @param {string} userId - The user ID to be used for the request.
  * @param {string} openAiApiKey - The OpenAI API key to be used for the request.
  */
 export async function getTitle(
     activeThread: ChatThread,
-    input: string,
     callback: (title: string) => void,
     userId?: string | null,
     openAiApiKey?: string,
@@ -69,12 +67,7 @@ export async function getTitle(
     const l = messages.length;
     if (l < 2 || l > 10) return;
 
-    const stream = await requestTitleStream(
-        messages,
-        input,
-        userId,
-        openAiApiKey,
-    );
+    const stream = await requestTitleStream(messages, userId, openAiApiKey);
 
     // Callback function to handle each chunk of the response stream
     const streamCallback = (
@@ -226,13 +219,11 @@ export async function getChat({
 
 async function requestTitleStream(
     msgHistory: Message[],
-    input: string,
     userId?: string | null,
     apiKey?: string,
 ) {
     // Prepare the chat history
     const history = msgHistory.map((msg) => msg.role + ': ' + msg.content);
-    history.push('user: ' + input);
     const historyStr = history.join('\n');
 
     if (userId && !apiKey) {

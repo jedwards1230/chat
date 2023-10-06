@@ -4,7 +4,7 @@ import { Dispatch, SetStateAction, FormEvent } from 'react';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 
 import { getDefaultThread, resetDefaultThread } from './initialChat';
-import { getTitle, getChat } from '@/utils/client';
+import { getChat } from '@/utils/client';
 import { deleteMessageById, upsertCharacter } from '@/utils/server/supabase';
 import { sortThreadlist } from '@/utils';
 import { createMessage, getToolData } from '@/utils/client/chat';
@@ -65,7 +65,10 @@ function upsertMessageState(
 }
 
 /** Upsert Title into ChatThread */
-function upsertTitleState(prevState: ChatState, title: string): ChatState {
+export function upsertTitleState(
+    prevState: ChatState,
+    title: string,
+): ChatState {
     if (prevState.currentThread === null) return prevState;
     const threads = prevState.threads;
     const activeThread = {
@@ -78,20 +81,15 @@ function upsertTitleState(prevState: ChatState, title: string): ChatState {
         (thread) => thread.id === activeThread.id,
     );
 
-    if (foundThreadIndex !== -1) {
-        threads[foundThreadIndex] = {
-            ...threads[foundThreadIndex],
-            lastModified: new Date(),
-            title,
-        };
-    } else {
-        threads.push(activeThread);
-    }
+    threads[foundThreadIndex] = {
+        ...threads[foundThreadIndex],
+        lastModified: new Date(),
+        title,
+    };
 
     return {
         ...prevState,
-        currentThread: threads.length - 1,
-        threads: threads.sort(sortThreadlist),
+        threads: threads,
     };
 }
 
@@ -171,11 +169,6 @@ export function createSubmitHandler(
     const upsertMessage = (newMessage: Message) =>
         setState((prevState) => upsertMessageState(prevState, newMessage));
 
-    const upsertTitle = (title: string) => {
-        document.title = 'Chat | ' + title;
-        setState((prevState) => upsertTitleState(prevState, title));
-    };
-
     const getNewMapping = (
         activeThread: ChatThread,
         msg: Message,
@@ -241,39 +234,24 @@ export function createSubmitHandler(
         upsertMessage(userMsg);
 
         const toolInput = getToolInput(state.input);
-        toolInput
-            ? await getToolData({
-                  activeThread,
-                  toolInput,
-                  msgHistory,
-                  upsertMessage,
-                  controller,
-                  state,
-                  setState,
-                  loops: 0,
-                  userId,
-              })
-            : await getChat({
-                  activeThread,
-                  msgHistory,
-                  controller,
-                  state,
-                  loops: 0,
-                  setState,
-                  upsertMessage,
-                  userId,
-              });
 
-        // Fetch title only if it's an initial message
-        if (state.currentThread === null) {
-            await getTitle(
-                activeThread,
-                state.input,
-                upsertTitle,
-                userId,
-                state.openAiApiKey,
-            );
-        }
+        const opts = {
+            activeThread,
+            msgHistory,
+            upsertMessage,
+            controller,
+            state,
+            setState,
+            loops: 0,
+            userId,
+        };
+
+        toolInput
+            ? getToolData({
+                  ...opts,
+                  toolInput,
+              })
+            : getChat(opts);
     };
 }
 
