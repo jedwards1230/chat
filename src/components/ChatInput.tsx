@@ -11,6 +11,7 @@ import { calculateRows } from '@/utils';
 import { baseCommands } from '@/tools/commands';
 import { getTokenCount } from '@/utils/tokenizer';
 import { Button } from './ui/button';
+import { Textarea } from './ui/textarea';
 
 type ToolCommand = {
     command: Command;
@@ -89,11 +90,11 @@ function ChatInput() {
             <QuickActions />
             <form
                 onSubmit={handleSubmit}
-                className="flex items-end justify-center w-full gap-2 px-4 pt-4 pb-6 transition-all border-t shadow-xl justify-self-end border-border dark:shadow-none sm:pb-4 md:pb-2 md:pt-2"
+                className="flex w-full items-end justify-center gap-2 justify-self-end border-t border-border px-4 pb-6 pt-4 shadow-xl transition-all dark:shadow-none sm:pb-4 md:pb-2 md:pt-2"
             >
-                <div className="relative flex flex-col w-full max-w-4xl gap-2">
+                <div className="relative flex w-full max-w-4xl flex-col gap-2">
                     {activeCommand && availableCommands.length > 0 && (
-                        <div className="p-1 border rounded-rounded border-border animate-in fade-in-50 slide-in-from-bottom-8">
+                        <div className="rounded-rounded border border-border p-1 animate-in fade-in-50 slide-in-from-bottom-8">
                             {availableCommands.map((tool, index) => (
                                 <div
                                     key={index}
@@ -108,7 +109,8 @@ function ChatInput() {
                         </div>
                     )}
                     <div className="flex gap-1">
-                        <motion.textarea
+                        <Textarea
+                            variant="blue"
                             ref={inputRef}
                             placeholder="Say something..."
                             value={input}
@@ -116,7 +118,7 @@ function ChatInput() {
                             rows={rows}
                             onChange={(e) => changeInput(e.target.value)}
                             onKeyDown={onKeyDownHandler}
-                            className="flex-1 w-full py-2 pl-2 pr-24 transition-colors border-2 rounded-lg shadow resize-none border-border bg-background focus:border-blue-primary focus:outline-none dark:bg-accent"
+                            //className="flex-1 w-full py-2 pl-2 pr-24 transition-colors border-2 rounded-lg shadow resize-none border-border bg-background focus:border-blue-primary focus:outline-none dark:bg-accent"
                         />
                         {editId ? (
                             <EditButtons />
@@ -154,12 +156,7 @@ function SubmitButton({
             )}
             <Button
                 size="sm"
-                className={clsx(
-                    'transition-colors',
-                    input.length > 0
-                        ? 'cursor-pointer bg-blue-primary text-background hover:bg-blue-primary/80 focus:border-blue-primary focus:bg-blue-primary/90'
-                        : 'cursor-default text-background dark:text-foreground',
-                )}
+                variant={input.length > 0 ? 'primaryBlue' : 'default'}
                 type="submit"
             >
                 Send
@@ -172,25 +169,13 @@ function EditButtons() {
     const { handleSubmit, cancelEdit } = useChat();
 
     return (
-        <div className="flex justify-between gap-4 pt-2">
-            <button
-                className="rounded-lg border border-transparent bg-blue-primary px-6 py-1.5 transition-colors hover:bg-blue-primary/70 focus:border-blue-primary focus:bg-blue-primary focus:outline-none"
-                onClick={handleSubmit}
-            >
-                Update and Regenerate
-            </button>
-            {/* <button
-        className="rounded-lg border border-transparent bg-green-500 px-6 py-1.5 text-neutral-50 transition-colors hover:bg-green-400 focus:border-green-500 focus:bg-green-400 focus:outline-none dark:bg-green-500 dark:hover:bg-green-400"
-        onClick={handleSubmit}
-    >
-        Replace Only
-    </button> */}
-            <button
-                className="rounded-lg border border-transparent bg-neutral-300 px-6 py-1.5 transition-colors hover:bg-neutral-400 focus:border-blue-500 focus:bg-neutral-400 focus:outline-none dark:bg-neutral-500 dark:hover:bg-neutral-400"
-                onClick={cancelEdit}
-            >
+        <div className="flex flex-col justify-end gap-1 p-1">
+            <Button size="sm" variant="primaryBlue" onClick={handleSubmit}>
+                Update
+            </Button>
+            <Button size="sm" onClick={cancelEdit}>
                 Cancel
-            </button>
+            </Button>
         </div>
     );
 }
