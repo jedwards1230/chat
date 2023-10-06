@@ -6,6 +6,7 @@ import clsx from 'clsx';
 import { ChatBubble } from './ChatBubble';
 import ChatPlaceholder from '../ChatPlaceholder';
 import useMessages from '@/lib/ChatManagerHook';
+import ChatGroup from './ChatGroup';
 
 export default function ChatThread({
     style,
@@ -42,6 +43,44 @@ export default function ChatThread({
 
     const hasMultipleMessages = messages.length > 1;
 
+    const groupMessages = () => {
+        const grouped: MessageGroup[] = [];
+
+        // helper to add a message to the last group
+        const addToLastGroup = (message: Message) => {
+            if (grouped.length === 0) {
+                grouped.push({ role: message.role, messages: [message] });
+            } else {
+                grouped[grouped.length - 1].messages.push(message);
+            }
+        };
+
+        for (const message of messages) {
+            // check if the last message is from the same role
+            const eqPrevMsg = (role: Role) =>
+                grouped[grouped.length - 1]?.role === role;
+
+            const upsert = (message: Message, r?: Role) => {
+                const role = r || message.role;
+                if (eqPrevMsg(role)) {
+                    addToLastGroup(message);
+                } else {
+                    grouped.push({ role: message.role, messages: [message] });
+                }
+            };
+
+            if (message.role === 'function') {
+                upsert(message, 'assistant');
+            } else {
+                upsert(message);
+            }
+        }
+
+        return grouped;
+    };
+
+    const groupedMessages: MessageGroup[] = groupMessages();
+
     return (
         <div
             style={style}
@@ -53,30 +92,13 @@ export default function ChatThread({
         >
             <div className="flex h-full w-full flex-col">
                 {activeThread ? (
-                    messages.map((m, i) => {
-                        if (m.role === 'assistant' && m.function_call) {
-                            return null;
-                        }
-                        const lastMessage = messages[i - 1];
-                        const input =
-                            m.role === 'function' &&
-                            lastMessage.function_call &&
-                            lastMessage.function_call.arguments
-                                ? lastMessage.function_call.arguments
-                                : undefined;
-                        return (
-                            <ChatBubble
-                                key={m.id}
-                                message={m}
-                                config={activeThread.agentConfig}
-                                input={
-                                    typeof input === 'string'
-                                        ? input
-                                        : input?.input
-                                }
-                            />
-                        );
-                    })
+                    groupedMessages.map((group, i) => (
+                        <ChatGroup
+                            key={i}
+                            groupedMessages={group}
+                            config={activeThread?.agentConfig}
+                        />
+                    ))
                 ) : (
                     <ChatPlaceholder />
                 )}

@@ -60,6 +60,11 @@ interface Message {
     };
 }
 
+type MessageGroup = {
+    role: Role;
+    messages: Message[];
+};
+
 interface MessageRelationship {
     id: string;
     message: Message | null;

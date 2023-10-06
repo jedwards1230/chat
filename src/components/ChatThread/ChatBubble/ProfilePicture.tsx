@@ -2,31 +2,30 @@ import clsx from 'clsx';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 
-export default function ProfilePicture({ message }: { message: Message }) {
+export default function ProfilePicture({ role }: { role: Role }) {
     const { data: session } = useSession();
     const user = session?.user;
 
     return (
-        <div className="flex items-start h-full my-1">
+        <div className="my-1 flex h-full items-start">
             <div
                 className={clsx(
                     'flex h-8 w-8 select-none items-center justify-center overflow-hidden rounded border transition-colors dark:border-neutral-700',
-                    message.role === 'user' &&
-                        'bg-neutral-300 dark:bg-neutral-600',
-                    message.role === 'assistant' &&
+                    role === 'user' && 'bg-neutral-300 dark:bg-neutral-600',
+                    role === 'assistant' &&
                         'bg-green-500 text-neutral-900 dark:text-neutral-50',
-                    message.role === 'function' &&
+                    role === 'function' &&
                         'bg-purple-500 text-neutral-900 dark:text-neutral-50',
                 )}
                 title={
-                    message.role === 'user'
+                    role === 'user'
                         ? 'You'
-                        : message.role === 'assistant'
+                        : role === 'assistant'
                         ? 'Assistant'
                         : 'Function'
                 }
             >
-                {message.role === 'user' && user?.image ? (
+                {role === 'user' && user?.image ? (
                     <Image
                         src={user.image}
                         alt="You"
@@ -35,7 +34,7 @@ export default function ProfilePicture({ message }: { message: Message }) {
                         className=""
                     />
                 ) : (
-                    message.role[0].toUpperCase()
+                    role[0].toUpperCase()
                 )}
             </div>
         </div>
