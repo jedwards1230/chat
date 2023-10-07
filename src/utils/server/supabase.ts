@@ -3,6 +3,7 @@
 import { auth } from '@/auth';
 import ChatManager from '@/lib/ChatManager';
 import { db } from '@/lib/supabase.server';
+import { defaultAgents } from '@/providers/characters';
 import initialState from '@/providers/initialChat';
 
 /* 
@@ -198,7 +199,7 @@ Characters
 */
 export async function getCharacterListByUserId(): Promise<AgentConfig[]> {
     const userId = await getUserId();
-    if (!userId) return [];
+    if (!userId) return defaultAgents;
     const configs = await db.getAgentConfigs(userId);
 
     if (configs.length > 0) {
