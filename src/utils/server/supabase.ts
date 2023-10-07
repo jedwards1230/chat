@@ -285,11 +285,9 @@ export async function getUserId(init = false) {
     if (!userId) return;
 
     if (init) {
-        console.log('Initializing user', userId);
         const data = await db.getUser(userId);
 
         if (data?.length === 0) {
-            console.log('Creating user', userId);
             await db.createUser(userId);
         }
     }

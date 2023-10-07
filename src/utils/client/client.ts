@@ -137,9 +137,10 @@ export function parseStreamData(
 
     const parseTool = () => {
         try {
+            const parsedArgs = JSON.parse(toolArgs);
             toolCall = {
                 name: tool as Tool,
-                args: JSON.parse(toolArgs).input,
+                args: parsedArgs.input ? parsedArgs.input : toolArgs,
             };
         } catch {
             toolCall = {

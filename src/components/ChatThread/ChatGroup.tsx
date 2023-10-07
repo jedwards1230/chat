@@ -31,6 +31,7 @@ export default function ChatGroup({
                         const lastMessage = messages[i - 1];
                         const input =
                             m.role === 'function' &&
+                            lastMessage &&
                             lastMessage.function_call &&
                             lastMessage.function_call.arguments
                                 ? lastMessage.function_call.arguments
