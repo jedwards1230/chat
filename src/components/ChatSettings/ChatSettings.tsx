@@ -11,6 +11,7 @@ import { useUI } from '@/providers/UIProvider';
 import AgentSettings from '../AgentSettings';
 import { shareThread } from '@/utils/server/supabase';
 import { Sidebar } from '../Sidebar';
+import { Button } from '../ui/button';
 
 function ChatSettings() {
     const { data: session } = useSession();
@@ -47,15 +48,16 @@ function ChatSettings() {
                     />
                 </div>
                 {userId && currentThread !== null && (
-                    <button
-                        className="mx-2 flex items-center justify-center rounded-lg border border-neutral-500 py-2 font-medium transition-colors hover:border-neutral-400 hover:bg-neutral-600 dark:hover:bg-neutral-700"
+                    <Button
+                        variant="outlineAccent"
+                        className="mx-2"
                         onClick={handleShare}
                     >
                         Share{' '}
                         <span className="scale-[60%]">
                             <Share />
                         </span>
-                    </button>
+                    </Button>
                 )}
             </div>
         </Sidebar>

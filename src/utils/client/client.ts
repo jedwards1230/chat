@@ -131,21 +131,21 @@ export function parseStreamData(
     chunks: (OpenAI.Chat.Completions.ChatCompletionChunk & { error?: any })[],
 ) {
     let accumulatedResponse = '';
-    let toolCalls: ToolInput[] = [];
+    let toolCall: ToolInput | undefined;
     let tool = '';
     let toolArgs = '';
 
     const parseTool = () => {
         try {
-            toolCalls.push({
+            toolCall = {
                 name: tool as Tool,
-                args: JSON.parse(toolArgs),
-            });
+                args: JSON.parse(toolArgs).input,
+            };
         } catch {
-            toolCalls.push({
+            toolCall = {
                 name: tool as Tool,
                 args: { input: toolArgs },
-            });
+            };
         }
         tool = '';
         toolArgs = '';
@@ -155,7 +155,6 @@ export function parseStreamData(
         if (c.error) {
             accumulatedResponse = c.error.message;
             continue;
-            //throw new Error(c.error);
         }
         const data = c.choices[0];
         if (data) {
@@ -173,7 +172,7 @@ export function parseStreamData(
         }
     }
 
-    return { toolCalls, accumulatedResponse };
+    return { toolCall, accumulatedResponse };
 }
 
 export async function validateOpenAIKey(apiKey: string) {
@@ -191,5 +190,5 @@ export async function validateOpenAIKey(apiKey: string) {
     });
     const modelListData = await openai.models.list();
 
-    return  (modelListData && modelListData.data && modelListData.data.length > 0)
+    return modelListData && modelListData.data && modelListData.data.length > 0;
 }

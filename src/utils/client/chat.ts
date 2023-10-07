@@ -123,7 +123,7 @@ export async function getChat({
 
     const apiKey = state.openAiApiKey;
     const assistantId = uuidv4();
-    let tools: ToolInput[] = [];
+    let toolInput: ToolInput | undefined;
     let accumulatedResponse = '';
 
     setState((prevState) => ({
@@ -138,9 +138,9 @@ export async function getChat({
         ) => {
             const parsed = parseStreamData(chunk);
             accumulatedResponse = parsed.accumulatedResponse || '';
-            tools = parsed.toolCalls || [];
+            toolInput = parsed.toolCall;
 
-            if (tools.length === 0 && accumulatedResponse !== '') {
+            if (accumulatedResponse) {
                 upsertMessage(
                     {
                         id: assistantId,
@@ -193,20 +193,18 @@ export async function getChat({
     }
 
     // Check if a tool is requested
-    if (tools.length > 0) {
-        for (const toolInput of tools) {
-            await getToolData({
-                activeThread,
-                toolInput,
-                msgHistory,
-                upsertMessage,
-                controller,
-                state,
-                setState,
-                loops: loops + 1,
-                userId,
-            });
-        }
+    if (toolInput) {
+        await getToolData({
+            activeThread,
+            toolInput,
+            msgHistory,
+            upsertMessage,
+            controller,
+            state,
+            setState,
+            loops: loops + 1,
+            userId,
+        });
     }
 
     setState((prevState) => ({

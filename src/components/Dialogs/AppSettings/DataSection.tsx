@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui/button';
 import { DialogHeader } from '@/components/ui/dialog';
 import ChatManager from '@/lib/ChatManager';
 import { useChat } from '@/providers/ChatProvider';
@@ -69,33 +70,24 @@ function LocalData() {
     };
 
     return (
-        <div className="flex flex-1 flex-col justify-between">
+        <div className="flex flex-1 flex-col justify-between gap-2">
             <DialogHeader>Local Data</DialogHeader>
 
-            <label className="flex w-full items-center justify-between py-2 text-base">
-                <button
-                    onClick={clearAllLocalChatThreads}
-                    className="w-full rounded border border-red-500 px-2 py-1.5 hover:bg-red-600 hover:text-neutral-50 dark:border-red-500/80 dark:text-neutral-50 dark:hover:bg-red-700"
-                >
-                    Clear Local Chat Threads
-                </button>
-            </label>
-            <label className="flex w-full items-center justify-between py-2 text-base">
-                <button
-                    onClick={clearAllLocalCharacters}
-                    className="w-full rounded border border-red-500 px-2 py-1.5 hover:bg-red-600 hover:text-neutral-50 dark:border-red-500/80 dark:text-neutral-50 dark:hover:bg-red-700"
-                >
-                    Clear Local Characters
-                </button>
-            </label>
-            <label className="flex w-full items-center justify-between py-2 text-base">
-                <button
-                    onClick={clearAllLocal}
-                    className="w-full rounded bg-red-500 px-2 py-1.5 text-neutral-50 hover:bg-red-600 dark:bg-red-500/80 dark:hover:bg-red-700"
-                >
-                    Clear Local Data
-                </button>
-            </label>
+            <Button
+                variant="outlineDestructive"
+                onClick={clearAllLocalChatThreads}
+            >
+                Clear Local Chat Threads
+            </Button>
+            <Button
+                variant="outlineDestructive"
+                onClick={clearAllLocalCharacters}
+            >
+                Clear Local Characters
+            </Button>
+            <Button variant="destructive" onClick={clearAllLocal}>
+                Clear Local Characters
+            </Button>
         </div>
     );
 }
@@ -119,32 +111,23 @@ function CloudData() {
     };
 
     return (
-        <div className="flex flex-1 flex-col justify-between">
+        <div className="flex flex-1 flex-col justify-between gap-2">
             <DialogHeader>Cloud Data</DialogHeader>
-            <label className="flex w-full items-center justify-between py-2 text-base">
-                <button
-                    onClick={clearAllCloudChatThreads}
-                    className="w-full rounded border border-red-500 px-2 py-1.5 hover:bg-red-600 hover:text-neutral-50 dark:border-red-500/80 dark:text-neutral-50 dark:hover:bg-red-700"
-                >
-                    Clear Cloud Chat Threads
-                </button>
-            </label>
-            <label className="flex w-full items-center justify-between py-2 text-base">
-                <button
-                    onClick={clearAllCloudCharacters}
-                    className="w-full rounded border border-red-500 px-2 py-1.5 hover:bg-red-600 hover:text-neutral-50 dark:border-red-500/80 dark:text-neutral-50 dark:hover:bg-red-700"
-                >
-                    Clear Cloud Characters
-                </button>
-            </label>
-            <label className="flex w-full items-center justify-between py-2 text-base">
-                <button
-                    onClick={clearAllCloud}
-                    className="w-full rounded bg-red-500 px-2 py-1.5 text-neutral-50 hover:bg-red-600 dark:bg-red-500/80 dark:hover:bg-red-700"
-                >
-                    Clear Cloud Data
-                </button>
-            </label>
+            <Button
+                variant="outlineDestructive"
+                onClick={clearAllCloudChatThreads}
+            >
+                Clear Cloud Chat Threads
+            </Button>
+            <Button
+                variant="outlineDestructive"
+                onClick={clearAllCloudCharacters}
+            >
+                Clear Cloud Characters
+            </Button>
+            <Button variant="destructive" onClick={clearAllCloud}>
+                Clear Cloud Data
+            </Button>
         </div>
     );
 }

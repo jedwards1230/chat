@@ -9,6 +9,7 @@ import ModelSelector from './ModelSelector';
 import { useUI } from '@/providers/UIProvider';
 import { getTokenCount } from '@/utils/tokenizer';
 import useMessages from '@/lib/ChatManagerHook';
+import { Button } from '../ui/button';
 
 export default function Header() {
     const { currentThread, threads } = useChat();
@@ -52,13 +53,14 @@ export default function Header() {
             )}
         >
             <div className="col-span-1 flex items-center justify-start">
-                <button
+                <Button
+                    size="icon"
+                    variant="ghost"
                     name="sidebar-toggle"
-                    className="cursor-pointer px-1 text-neutral-400 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-50"
                     onClick={handleSidebarToggle}
                 >
                     <Bars />
-                </button>
+                </Button>
             </div>
             <div className="col-span-10 flex items-center justify-center text-center">
                 {activeThread && messages.length > 1 ? (
@@ -78,13 +80,14 @@ export default function Header() {
                 )}
             </div>
             <div className="col-span-1 flex items-center justify-end">
-                <button
+                <Button
+                    size="icon"
+                    variant="ghost"
                     name="chat-settings-toggle"
-                    className="cursor-pointer px-1 text-neutral-400 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-50"
                     onClick={handleChatSettingsToggle}
                 >
                     <Information />
-                </button>
+                </Button>
             </div>
         </div>
     );
