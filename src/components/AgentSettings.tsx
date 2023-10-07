@@ -3,12 +3,14 @@
 import clsx from 'clsx';
 import { useEffect, useState } from 'react';
 
-import { useChat } from '@/providers/ChatProvider';
-import { modelList, modelMap } from '@/providers/models';
 import { defaultAgentConfig } from '@/providers/characters';
-import { Input } from './ui/input';
+import { modelList, modelMap } from '@/providers/models';
+import { useChat } from '@/providers/ChatProvider';
 import { Textarea } from './ui/textarea';
 import { Checkbox } from './ui/checkbox';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
 import {
     Select,
     SelectContent,
@@ -16,8 +18,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from './ui/select';
-import { Label } from './ui/label';
-import { Button } from './ui/button';
 
 const availableTools: Tool[] = [
     'calculator',
@@ -55,9 +55,7 @@ export default function AgentSettings({
                   name: 'New Character',
               },
     );
-    useEffect(() => {
-        setConfig(activeThread.agentConfig);
-    }, [activeThread]);
+    useEffect(() => setConfig(activeThread.agentConfig), [activeThread]);
 
     const onFieldChange = (
         field: keyof AgentConfig,
@@ -157,7 +155,7 @@ export default function AgentSettings({
                     </div>
                 )}
                 {functionsAllowed && (
-                    <div className="flex flex-col w-full gap-2">
+                    <div className="flex w-full flex-col gap-2">
                         <label
                             className={clsx(
                                 'flex flex-col rounded px-1 transition-colors dark:hover:bg-neutral-600',
@@ -259,12 +257,8 @@ export default function AgentSettings({
                     })}
                 </details>
             </div>
-            <div className="flex justify-end w-full">
-                <Button
-                    variant="outlineAccent"
-                    type="submit"
-                    //className="px-3 py-2 transition-colors rounded-md bg-neutral-300 hover:bg-neutral-400 focus:bg-neutral-500 dark:bg-neutral-500 dark:hover:bg-neutral-600"
-                >
+            <div className="flex w-full justify-end">
+                <Button variant="outlineAccent" type="submit">
                     {!isNew ? 'Update' : 'Create'}
                 </Button>
             </div>

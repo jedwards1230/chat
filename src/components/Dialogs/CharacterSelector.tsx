@@ -1,7 +1,7 @@
 'use client';
 
 import clsx from 'clsx';
-import { useEffect, useRef, useState, memo } from 'react';
+import { useState, memo } from 'react';
 
 import { useChat } from '@/providers/ChatProvider';
 import AgentSettings from '../AgentSettings';
@@ -30,35 +30,41 @@ function CharacterSelector({ children }: { children: React.ReactNode }) {
                                 name: 'New Character',
                             })
                         }
-                        className="text-xl bg-inherit hover:bg-accent/30"
+                        className="bg-inherit text-xl hover:bg-accent/30"
                     >
                         +
                     </Button>
-                    <div className="flex-1 col-span-8 col-start-3 text-xl font-semibold text-center">
+                    <div className="col-span-8 col-start-3 flex-1 text-center text-xl font-semibold">
                         Character{' '}
                         {activeCard === undefined ? 'Selector' : 'Editor'}
                     </div>
                 </div>
                 <div className="grid w-full grid-cols-3 gap-4 md:grid-cols-10">
-                    <div className="col-span-4 flex max-h-[80vh] w-full gap-2 overflow-y-scroll md:flex-col">
-                        {characterList.map((agent, i) => {
-                            const active =
-                                agent.id === activeThread.agentConfig.id;
-                            return (
-                                <AgentCard
-                                    key={'agent-config-' + i}
-                                    agent={agent}
-                                    active={active}
-                                    edit={() =>
-                                        setActiveCard({
-                                            ...activeCard,
-                                            name: agent.name,
-                                        })
-                                    }
-                                />
-                            );
-                        })}
+                    <div className="col-span-4 flex max-h-[80vh] w-full flex-col justify-between gap-2">
+                        <div className="flex w-full gap-2 overflow-y-scroll md:flex-col">
+                            {characterList.map((agent, i) => {
+                                const active =
+                                    agent.id === activeThread.agentConfig.id;
+                                return (
+                                    <AgentCard
+                                        key={'agent-config-' + i}
+                                        agent={agent}
+                                        active={active}
+                                        edit={() =>
+                                            setActiveCard({
+                                                ...activeCard,
+                                                name: agent.name,
+                                            })
+                                        }
+                                    />
+                                );
+                            })}
+                        </div>
+                        <Button variant="link" size="sm">
+                            Reset defaults
+                        </Button>
                     </div>
+
                     <div className="col-span-6">
                         <AgentSettings
                             key={activeCard.id}
@@ -86,7 +92,6 @@ function AgentCard({
     edit: () => void;
 }) {
     const { updateThreadConfig, setSystemMessage } = useChat();
-    const cardRef = useRef<HTMLDivElement>(null);
 
     const setActive = (e: any) => {
         e.stopPropagation();
@@ -95,24 +100,12 @@ function AgentCard({
         edit();
     };
 
-    useEffect(() => {
-        if (active) {
-            cardRef.current?.scrollIntoView({ behavior: 'smooth' });
-        }
-    }, [active]);
-
     return (
-        <div
-            ref={cardRef}
+        <Button
+            variant={active ? 'primaryGreen' : 'outline'}
             onClick={setActive}
-            className={clsx(
-                'mb-3 flex cursor-pointer items-center whitespace-nowrap rounded-lg px-2 py-1 shadow transition-colors md:mb-0',
-                active
-                    ? 'bg-green-400 hover:bg-green-500 dark:bg-green-600 dark:hover:bg-green-700'
-                    : 'hover:bg-neutral-200 dark:hover:bg-neutral-600',
-            )}
         >
             {agent.name}
-        </div>
+        </Button>
     );
 }

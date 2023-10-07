@@ -146,7 +146,7 @@ function ChatInput() {
                     <div className="flex gap-1 sm:gap-2">
                         <Button
                             className="text-xl font-bold"
-                            variant="outlineAccent"
+                            variant="outline"
                             size="icon"
                             onClick={() =>
                                 document.getElementById('fileInput')?.click()

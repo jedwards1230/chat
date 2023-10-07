@@ -58,7 +58,11 @@ module.exports = {
                 'blue-primary': {
                     DEFAULT: 'hsl(var(--blue-primary))',
                     foreground: 'hsl(var(--blue-primary-foreground))',
-                } 
+                },
+                'green-primary': {
+                    DEFAULT: 'hsl(var(--green-primary))',
+                    foreground: 'hsl(var(--green-primary-foreground))',
+                },
             },
             borderRadius: {
                 lg: 'var(--radius)',

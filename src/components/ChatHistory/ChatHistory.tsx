@@ -57,7 +57,11 @@ function ChatHistory({
             open={sideBarOpen}
         >
             {/* Header Buttons */}
-            <Button className="w-full" onClick={newThread} variant="outline">
+            <Button
+                className="w-full"
+                onClick={newThread}
+                variant="outlineAccent"
+            >
                 New Chat
             </Button>
             {/* Chat History */}
