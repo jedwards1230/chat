@@ -15,16 +15,19 @@ export function createMessage({
     role,
     id,
     content = '',
+    name,
 }: {
     role: Role;
     id?: string;
     content?: string;
+    name?: string;
 }): Message {
     return {
         id: id || uuidv4(),
+        createdAt: new Date(),
         content,
         role,
-        createdAt: new Date(),
+        name,
     };
 }
 
@@ -95,7 +98,7 @@ type GetChatParams = {
     /** The state setter function from the useState React Hook. */
     setState: Dispatch<SetStateAction<ChatState>>;
     /** Function to add a new message or update an existing one. */
-    upsertMessage: (message: Message) => void;
+    upsertMessage: (message: Message, threadId?: string) => void;
     /** The user ID to use for the request. */
     userId?: string | null;
     retries?: number;
@@ -138,11 +141,14 @@ export async function getChat({
             tools = parsed.toolCalls || [];
 
             if (tools.length === 0 && accumulatedResponse !== '') {
-                upsertMessage({
-                    id: assistantId,
-                    content: accumulatedResponse,
-                    role: 'assistant',
-                });
+                upsertMessage(
+                    {
+                        id: assistantId,
+                        content: accumulatedResponse,
+                        role: 'assistant',
+                    },
+                    activeThread.id,
+                );
             }
         };
 
@@ -179,16 +185,10 @@ export async function getChat({
             apiKey,
         );
 
-        if (typeof res === 'string') {
-            upsertMessage({
-                id: assistantId,
-                content: res,
-                role: 'assistant',
-            });
-        } else if (res instanceof ReadableStream) {
+        if (res instanceof ReadableStream) {
             throw new Error('Cannot handle streamable response');
         } else {
-            upsertMessage(res);
+            upsertMessage(res, activeThread.id);
         }
     }
 

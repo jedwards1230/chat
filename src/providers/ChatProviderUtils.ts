@@ -39,9 +39,14 @@ export function getInitialActiveThread(
 function upsertMessageState(
     prevState: ChatState,
     newMessage: Message,
+    threadId?: string,
 ): ChatState {
-    if (prevState.currentThread === null) return prevState;
-    const active = prevState.threads[prevState.currentThread];
+    const activeIdx = threadId
+        ? prevState.threads.findIndex((thread) => thread.id === threadId)
+        : prevState.currentThread;
+
+    if (activeIdx === null) return prevState;
+    const active = prevState.threads[activeIdx];
 
     const { newMapping, newCurrentNode } = ChatManager.upsertMessage(
         newMessage,
@@ -49,14 +54,15 @@ function upsertMessageState(
         active.currentNode,
     );
 
-    const threads = [...prevState.threads];
     const newThread: ChatThread = {
         ...active,
         mapping: newMapping,
         currentNode: newCurrentNode,
         lastModified: new Date(),
     };
-    threads[prevState.currentThread] = newThread;
+
+    const threads = [...prevState.threads];
+    threads[activeIdx] = newThread;
 
     return {
         ...prevState,
@@ -101,14 +107,13 @@ export function upsertTitleState(
 function createNewThread(
     prevState: ChatState,
     newMap: NewMapping,
-    controller: AbortController,
+    controller?: AbortController,
 ): ChatState {
     const newState = {
         ...prevState,
         editId: prevState.editId ? null : prevState.editId,
-        abortController: controller,
+        abortController: controller ? controller : prevState.abortController,
         input: '',
-        botTyping: true,
     };
 
     const currentThread = prevState.currentThread;
@@ -132,7 +137,6 @@ function createNewThread(
     return {
         ...newState,
         threads,
-        botTyping: true,
         currentThread: threads.length - 1,
         ...(currentThread === null && {
             defaultThread: resetDefaultThread(),
@@ -166,8 +170,13 @@ export function createSubmitHandler(
         }
     };
 
-    const upsertMessage = (newMessage: Message) =>
-        setState((prevState) => upsertMessageState(prevState, newMessage));
+    const upsertThread = (newMap: NewMapping, controller: AbortController) =>
+        setState((prevState) => createNewThread(prevState, newMap, controller));
+
+    const upsertMessage = (newMessage: Message, threadId?: string) =>
+        setState((prevState) =>
+            upsertMessageState(prevState, newMessage, threadId),
+        );
 
     const getNewMapping = (
         activeThread: ChatThread,
@@ -186,15 +195,11 @@ export function createSubmitHandler(
             };
         }
 
-        const newMessage = ChatManager.createMessage(
+        return ChatManager.createMessage(
             msg,
             activeThread.mapping,
             activeThread.currentNode,
         );
-        return {
-            newMapping: newMessage.newMapping,
-            newCurrentNode: newMessage.newCurrentNode,
-        };
     };
 
     return async (e: FormEvent) => {
@@ -204,22 +209,15 @@ export function createSubmitHandler(
             return openKeyDialog('Credentials');
         }
 
-        const activeThread = getActiveThread(state);
-
-        router.replace('/?c=' + activeThread.id);
-        plausible('Submitted Message', {
-            props: {
-                threadId: activeThread.id,
-                usedCloudKey: !!state.openAiApiKey,
-            },
-        });
-
         // create user message
         const userMsg = createMessage({
             role: 'user',
             content: state.input,
             id: state.editId || undefined,
         });
+
+        const activeThread = getActiveThread(state);
+        const controller = new AbortController();
 
         // create new mapping and ordered list of messages
         const newMap = getNewMapping(activeThread, userMsg, state.editId);
@@ -228,10 +226,16 @@ export function createSubmitHandler(
             newMap.newMapping,
         );
 
-        // create new thread
-        const controller = new AbortController();
-        setState((prevState) => createNewThread(prevState, newMap, controller));
+        upsertThread(newMap, controller);
         upsertMessage(userMsg);
+
+        router.replace('/?c=' + activeThread.id);
+        plausible('Submitted Message', {
+            props: {
+                threadId: activeThread.id,
+                usedCloudKey: !!state.openAiApiKey,
+            },
+        });
 
         const toolInput = getToolInput(state.input);
 
@@ -246,29 +250,27 @@ export function createSubmitHandler(
             userId,
         };
 
-        toolInput
-            ? getToolData({
-                  ...opts,
-                  toolInput,
-              })
-            : getChat(opts);
+        toolInput ? getToolData({ ...opts, toolInput }) : getChat(opts);
     };
 }
 
-export function createThreadHandler(state: ChatState, setState: ChatDispatch) {
+export function createThreadHandler(
+    state: ChatState,
+    setState: ChatDispatch,
+    router: AppRouterInstance,
+) {
     return () => {
         state.abortController?.abort();
-        setState((prevState) => {
-            return {
-                ...prevState,
-                currentThread: null,
-                defaultThread: resetDefaultThread(),
-                input: '',
-                botTyping: false,
-                isNew: true,
-                editId: null,
-            };
-        });
+        setState((prevState) => ({
+            ...prevState,
+            currentThread: null,
+            defaultThread: resetDefaultThread(),
+            input: '',
+            botTyping: false,
+            isNew: true,
+            editId: null,
+        }));
+        router.replace('/');
     };
 }
 
@@ -554,5 +556,22 @@ export function setStreamResponseHandler(setState: ChatDispatch) {
             ...prevState,
             streamResponse,
         }));
+    };
+}
+
+export function addMessageHandler(
+    setState: ChatDispatch,
+    router: AppRouterInstance,
+) {
+    return (message: Message, activeThread: ChatThread) => {
+        const newMap = ChatManager.createMessage(
+            message,
+            activeThread.mapping,
+            activeThread.currentNode,
+        );
+
+        setState((prevState) => createNewThread(prevState, newMap));
+        setState((prevState) => upsertMessageState(prevState, message));
+        router.replace('/?c=' + activeThread.id);
     };
 }

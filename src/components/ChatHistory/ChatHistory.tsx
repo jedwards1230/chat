@@ -14,6 +14,7 @@ import { Button } from '../ui/button';
 import { useSession } from 'next-auth/react';
 import { Ellipsis } from '../Icons';
 import { sortThreadlist } from '@/utils';
+import { useChat } from '@/providers/ChatProvider';
 
 function ChatHistory({
     activeThread,
@@ -22,6 +23,7 @@ function ChatHistory({
     activeThread?: ChatThread;
     threads: ChatThread[];
 }) {
+    const { createThread } = useChat();
     const { data: session } = useSession();
     const user = session?.user;
     const [mounted, setMounted] = useState(false);
@@ -31,6 +33,7 @@ function ChatHistory({
 
     const newThread = () => {
         if (isMobile()) setSideBarOpen(false);
+        createThread();
     };
 
     useEffect(() => {
@@ -55,16 +58,9 @@ function ChatHistory({
             open={sideBarOpen}
         >
             {/* Header Buttons */}
-            <Link
-                className="flex w-full"
-                replace={true}
-                onClick={newThread}
-                href="/"
-            >
-                <Button className="w-full" variant="outline">
-                    New Chat
-                </Button>
-            </Link>
+            <Button className="w-full" onClick={newThread} variant="outline">
+                New Chat
+            </Button>
             {/* Chat History */}
             <div className="flex w-full flex-1 flex-col gap-1 overflow-y-scroll pt-2 sm:pt-0">
                 {threadList.map((thread, i) =>

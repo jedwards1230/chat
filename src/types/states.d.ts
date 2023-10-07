@@ -21,6 +21,8 @@ type ChatState = {
     updateThreadConfig: (config: Partial<AgentConfig>) => void;
     setSystemMessage: (message: string) => void;
     editMessage: (messageId: string) => void;
+    /** Add a message to the thread without triggering a response */
+    addMessage: (message: ChatMessage, activeThread: ChatThread) => void;
     removeMessage: (messageId: string) => void;
     removeThread: (threadId: string) => void;
     removeAllThreads: () => void;

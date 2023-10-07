@@ -22,17 +22,26 @@ export default function TextContent({
 
     return (
         <div className="p-2">
-            {message.role === 'function' ? (
+            {message.role === 'function' && (
                 <FunctionContent
                     message={message}
                     input={input}
                     content={content}
                 />
-            ) : message.role === 'system' ? (
-                <SystemContent message={message} config={config} />
-            ) : (
-                content && <Markdown content={content} />
             )}
+            {message.role === 'system' && (
+                <SystemContent message={message} config={config} />
+            )}
+            {message.role === 'assistant' && content && (
+                <Markdown content={content} />
+            )}
+            {message.role === 'user' &&
+                content &&
+                (message.name !== undefined ? (
+                    <FileContent message={message} />
+                ) : (
+                    <Markdown content={content} />
+                ))}
         </div>
     );
 }
@@ -63,6 +72,35 @@ function FunctionContent({
                 />
             )}
         </>
+    );
+}
+
+function FileContent({ message }: { message: Message }) {
+    const [open, setOpen] = useState(false);
+    return (
+        <>
+            <FilePreview message={message} onClick={() => setOpen(!open)} />
+            {open && (
+                <Markdown
+                    className="mt-4 [&>pre]:whitespace-pre-wrap"
+                    content={message.content || ''}
+                />
+            )}
+        </>
+    );
+}
+
+function FilePreview({
+    message,
+    onClick,
+}: {
+    message: Message;
+    onClick: () => void;
+}) {
+    return (
+        <Button onClick={onClick} className="gap-2 text-ellipsis">
+            <div className="inline-block align-middle">{message.name}</div>
+        </Button>
     );
 }
 

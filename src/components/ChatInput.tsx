@@ -1,8 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, memo } from 'react';
-import clsx from 'clsx';
-import { motion } from 'framer-motion';
+import { useEffect, useMemo, useRef, useState, memo, ChangeEvent } from 'react';
 
 import { useChat } from '@/providers/ChatProvider';
 import QuickActions from './QuickActions';
@@ -12,6 +10,9 @@ import { baseCommands } from '@/tools/commands';
 import { getTokenCount } from '@/utils/tokenizer';
 import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
+import { createMessage } from '@/utils/client/chat';
 
 type ToolCommand = {
     command: Command;
@@ -25,6 +26,7 @@ function ChatInput() {
         threads,
         input,
         editId,
+        addMessage,
         changeInput,
         handleSubmit,
     } = useChat();
@@ -47,6 +49,39 @@ function ChatInput() {
             e.preventDefault();
             changeInput(e.target.value);
             handleSubmit(e);
+        }
+    };
+
+    const onFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        console.log(e.target.files);
+        if (file) {
+            switch (file.type) {
+                case 'text/markdown':
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const contents = e.target?.result;
+                        if (contents) {
+                            const content =
+                                typeof contents === 'string'
+                                    ? contents
+                                    : contents.toString();
+                            const message = createMessage({
+                                role: 'user',
+                                name: file.name,
+                                content,
+                            });
+
+                            console.log(message);
+
+                            addMessage(message, activeThread);
+                        }
+                    };
+                    reader.readAsText(file);
+                    break;
+                default:
+                    break;
+            }
         }
     };
 
@@ -108,7 +143,23 @@ function ChatInput() {
                             ))}
                         </div>
                     )}
-                    <div className="flex gap-1">
+                    <div className="flex gap-1 sm:gap-2">
+                        <Button
+                            className="text-xl font-bold"
+                            variant="outlineAccent"
+                            size="icon"
+                            onClick={() =>
+                                document.getElementById('fileInput')?.click()
+                            }
+                        >
+                            +
+                        </Button>
+                        <Input
+                            id="fileInput"
+                            className="hidden"
+                            type="file"
+                            onChange={onFileUpload}
+                        />
                         <Textarea
                             variant="blue"
                             ref={inputRef}
@@ -118,7 +169,6 @@ function ChatInput() {
                             rows={rows}
                             onChange={(e) => changeInput(e.target.value)}
                             onKeyDown={onKeyDownHandler}
-                            //className="flex-1 w-full py-2 pl-2 pr-24 transition-colors border-2 rounded-lg shadow resize-none border-border bg-background focus:border-blue-primary focus:outline-none dark:bg-accent"
                         />
                         {editId ? (
                             <EditButtons />

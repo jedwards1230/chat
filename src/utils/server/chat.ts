@@ -103,7 +103,7 @@ export async function fetchChat({
     signal,
     key,
     stream = true,
-}: FetchChatParams): Promise<ReadableStream<any> | Message | string> {
+}: FetchChatParams): Promise<ReadableStream<any> | Message> {
     const tools = activeThread.agentConfig.toolsEnabled
         ? activeThread.agentConfig.tools
         : [];
@@ -157,7 +157,11 @@ export async function fetchChat({
                       controller.error(JSON.stringify(err));
                   },
               })
-            : JSON.stringify(err);
+            : {
+                  id: uuidv4(),
+                  role: 'assistant',
+                  content: JSON.stringify(err),
+              };
     }
 }
 

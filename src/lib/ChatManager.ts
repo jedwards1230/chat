@@ -1,5 +1,3 @@
-import { sortThreadlist } from '@/utils';
-
 export default class ChatManager {
     static createMessage(
         message: Message,

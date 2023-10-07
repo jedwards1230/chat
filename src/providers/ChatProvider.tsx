@@ -24,6 +24,7 @@ import {
     saveCharacterHandler,
     setOpenAiApiKeyHandler,
     upsertTitleState,
+    addMessageHandler,
 } from './ChatProviderUtils';
 import { useUI } from './UIProvider';
 import initialState from './initialChat';
@@ -116,7 +117,7 @@ export function ChatProvider({
         userId,
     ]);
 
-    const createThread = createThreadHandler(state, setState);
+    const createThread = createThreadHandler(state, setState, router);
     const setOpenAiApiKey = setOpenAiApiKeyHandler(setState);
     const abortRequest = abortRequestHandler(state, setState);
 
@@ -160,42 +161,26 @@ export function ChatProvider({
 
     // Update active thread when threadId changes
     useEffect(() => {
-        if (!threadId) {
-            return setState((prevState) =>
-                prevState.currentThread !== null
-                    ? {
-                          ...prevState,
-                          input: '',
-                          currentThread: null,
-                      }
-                    : prevState,
+        if (!threadId) return;
+        setState((prevState) => {
+            const foundThreadIndex = prevState.threads.findIndex(
+                (t) => t.id === threadId,
             );
-        }
 
-        const foundThreadIndex = state.threads.findIndex(
-            (t) => t.id === threadId,
-        );
-
-        if (foundThreadIndex !== -1) {
-            setState((prevState) => ({
+            return {
                 ...prevState,
                 input: '',
                 currentThread: foundThreadIndex,
-            }));
-        } else {
-            router.replace('/');
-            setState((prevState) => ({
-                ...prevState,
-                currentThread: null,
-            }));
-        }
-    }, [router, threadId, state.threads, state.currentThread]);
+            };
+        });
+    }, [threadId, state.threads]);
 
     const value: ChatState = {
         ...state,
         abortRequest,
         createThread,
         setOpenAiApiKey,
+        addMessage: addMessageHandler(setState, router),
         cancelEdit: cancelEditHandler(setState),
         changeInput: changeInputHandler(setState),
         removeThread: removeThreadHandler(setState),
