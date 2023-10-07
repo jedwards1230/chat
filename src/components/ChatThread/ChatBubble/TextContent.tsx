@@ -21,7 +21,7 @@ export default function TextContent({
             : message.content;
 
     return (
-        <div className="p-2">
+        <div className="overflow-hidden p-2">
             {message.role === 'function' && (
                 <FunctionContent
                     message={message}
@@ -82,7 +82,7 @@ function FileContent({ message }: { message: Message }) {
             <FilePreview message={message} onClick={() => setOpen(!open)} />
             {open && (
                 <Markdown
-                    className="mt-4 [&>pre]:whitespace-pre-wrap"
+                    className="mt-4 animate-in fade-in slide-in-from-top-16 [&>pre]:whitespace-pre-wrap"
                     content={message.content || ''}
                 />
             )}

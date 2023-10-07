@@ -120,6 +120,22 @@ export default class ChatManager {
         return orderedMessages;
     }
 
+    static prepareMessageHistory(
+        current_node: string | null,
+        mapping: MessageMapping,
+    ): Message[] {
+        const orderedMessages = ChatManager.getOrderedMessages(
+            current_node,
+            mapping,
+        );
+        return orderedMessages.map((message) => {
+            return {
+                ...message,
+                name: message.role === 'user' ? undefined : message.name,
+            };
+        });
+    }
+
     static editMessageAndFork(
         id: string,
         alternateMessage: Message,

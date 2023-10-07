@@ -53,34 +53,35 @@ function ChatInput() {
     };
 
     const onFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
+        const files = e.target.files;
         console.log(e.target.files);
-        if (file) {
-            switch (file.type) {
-                case 'text/markdown':
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        const contents = e.target?.result;
-                        if (contents) {
-                            const content =
-                                typeof contents === 'string'
-                                    ? contents
-                                    : contents.toString();
-                            const message = createMessage({
-                                role: 'user',
-                                name: file.name,
-                                content,
-                            });
+        if (files) {
+            for (const file of files) {
+                switch (file.type) {
+                    case 'text/markdown':
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            const contents = e.target?.result;
+                            if (contents) {
+                                const content =
+                                    typeof contents === 'string'
+                                        ? contents
+                                        : contents.toString();
+                                const message = createMessage({
+                                    role: 'user',
+                                    name: file.name,
+                                    content: `\`\`\`markdown\n${file.name}\n\n${content}\n\`\`\``,
+                                });
 
-                            console.log(message);
-
-                            addMessage(message, activeThread);
-                        }
-                    };
-                    reader.readAsText(file);
-                    break;
-                default:
-                    break;
+                                addMessage(message, activeThread);
+                            }
+                        };
+                        reader.readAsText(file);
+                        break;
+                    default:
+                        console.log('Unsupported file type', file.type);
+                        break;
+                }
             }
         }
     };
@@ -158,6 +159,7 @@ function ChatInput() {
                             id="fileInput"
                             className="hidden"
                             type="file"
+                            multiple
                             onChange={onFileUpload}
                         />
                         <Textarea

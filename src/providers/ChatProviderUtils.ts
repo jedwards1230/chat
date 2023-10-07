@@ -93,10 +93,7 @@ export function upsertTitleState(
         title,
     };
 
-    return {
-        ...prevState,
-        threads: threads,
-    };
+    return { ...prevState, threads };
 }
 
 /**
@@ -134,10 +131,12 @@ function createNewThread(
         threads.push(newThread);
     }
 
+    const newIndex = threads.findIndex((thread) => thread.id === newThread.id);
+
     return {
         ...newState,
         threads,
-        currentThread: threads.length - 1,
+        currentThread: newIndex !== -1 ? newIndex : null,
         ...(currentThread === null && {
             defaultThread: resetDefaultThread(),
         }),
@@ -221,7 +220,7 @@ export function createSubmitHandler(
 
         // create new mapping and ordered list of messages
         const newMap = getNewMapping(activeThread, userMsg, state.editId);
-        const msgHistory = ChatManager.getOrderedMessages(
+        const msgHistory = ChatManager.prepareMessageHistory(
             newMap.newCurrentNode,
             newMap.newMapping,
         );
@@ -573,5 +572,6 @@ export function addMessageHandler(
         setState((prevState) => createNewThread(prevState, newMap));
         setState((prevState) => upsertMessageState(prevState, message));
         router.replace('/?c=' + activeThread.id);
+        console.log('addMessage', activeThread.id);
     };
 }
