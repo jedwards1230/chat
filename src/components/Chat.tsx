@@ -9,7 +9,7 @@ import { useUI } from '@/providers/UIProvider';
 import { isMobile } from '@/utils/client/device';
 
 import Header from './Header';
-import ChatInput from './ChatInput';
+import ChatInput from './ChatInput/ChatInput';
 import ChatThread from './ChatThread';
 import ChatHistory from './ChatHistory';
 import ChatSettings from './ChatSettings';
@@ -94,7 +94,7 @@ export default function Chat() {
     );
 
     return (
-        <div className="flex w-full h-full">
+        <div className="flex h-full w-full">
             <ChatHistory activeThread={activeThread} threads={threads} />
             <motion.div
                 onPanStart={onPanStart}

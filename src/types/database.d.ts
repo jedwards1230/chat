@@ -106,6 +106,7 @@ interface Database {
                     active: boolean | null;
                     content: string | null;
                     createdAt: string | null;
+                    fileName: string | null;
                     functionCallArguments: Json | null;
                     functionCallName: string | null;
                     id: string;
@@ -117,6 +118,7 @@ interface Database {
                     active?: boolean | null;
                     content?: string | null;
                     createdAt?: string | null;
+                    fileName?: string | null;
                     functionCallArguments?: Json | null;
                     functionCallName?: string | null;
                     id: string;
@@ -128,6 +130,7 @@ interface Database {
                     active?: boolean | null;
                     content?: string | null;
                     createdAt?: string | null;
+                    fileName?: string | null;
                     functionCallArguments?: Json | null;
                     functionCallName?: string | null;
                     id?: string;

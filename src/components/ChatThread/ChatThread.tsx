@@ -1,9 +1,8 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useMemo } from 'react';
 import clsx from 'clsx';
 
-import { ChatBubble } from './ChatBubble';
 import ChatPlaceholder from '../ChatPlaceholder';
 import useMessages from '@/lib/ChatManagerHook';
 import ChatGroup from './ChatGroup';
@@ -43,7 +42,7 @@ export default function ChatThread({
 
     const hasMultipleMessages = messages.length > 1;
 
-    const groupMessages = () => {
+    const groupedMessages = useMemo(() => {
         const grouped: MessageGroup[] = [];
 
         // helper to add a message to the last group
@@ -77,9 +76,7 @@ export default function ChatThread({
         }
 
         return grouped;
-    };
-
-    const groupedMessages: MessageGroup[] = groupMessages();
+    }, [messages]);
 
     return (
         <div

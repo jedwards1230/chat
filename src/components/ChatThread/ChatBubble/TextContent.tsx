@@ -21,9 +21,9 @@ export default function TextContent({
             : message.content;
 
     return (
-        <div className="overflow-hidden p-2">
+        <div className="relative overflow-hidden p-2">
             {message.role === 'function' && (
-                <FunctionContent
+                <FunctionDetails
                     message={message}
                     input={input}
                     content={content}
@@ -38,7 +38,7 @@ export default function TextContent({
             {message.role === 'user' &&
                 content &&
                 (message.name !== undefined ? (
-                    <FileContent message={message} />
+                    <FileDetails message={message} />
                 ) : (
                     <Markdown content={content} />
                 ))}
@@ -46,7 +46,7 @@ export default function TextContent({
     );
 }
 
-function FunctionContent({
+function FunctionDetails({
     message,
     input,
     content,
@@ -60,65 +60,48 @@ function FunctionContent({
 
     return (
         <>
-            <FunctionPreview
-                name={message.name}
-                input={input}
-                onClick={() => setOpen(!open)}
-            />
-            {open && (
-                <Markdown
-                    className="mt-4 [&>pre]:whitespace-pre-wrap"
-                    content={mdContent}
-                />
-            )}
+            <PreviewButton onClick={() => setOpen(!open)}>
+                <div className="inline-block align-middle">{message.name}:</div>{' '}
+                <div title={input} className="inline-block align-middle">
+                    <Markdown content={input} />
+                </div>
+            </PreviewButton>
+            {open && <DetailsContent content={mdContent} />}
         </>
     );
 }
 
-function FileContent({ message }: { message: Message }) {
+function FileDetails({ message }: { message: Message }) {
     const [open, setOpen] = useState(false);
     return (
         <>
-            <FilePreview message={message} onClick={() => setOpen(!open)} />
-            {open && (
-                <Markdown
-                    className="mt-4 animate-in fade-in slide-in-from-top-16 [&>pre]:whitespace-pre-wrap"
-                    content={message.content || ''}
-                />
-            )}
+            <PreviewButton onClick={() => setOpen(!open)}>
+                <div className="inline-block align-middle">{message.name}</div>
+            </PreviewButton>
+            {open && <DetailsContent content={message.content || ''} />}
         </>
     );
 }
 
-function FilePreview({
-    message,
-    onClick,
-}: {
-    message: Message;
-    onClick: () => void;
-}) {
+function DetailsContent({ content }: { content: string }) {
     return (
-        <Button onClick={onClick} className="gap-2 text-ellipsis">
-            <div className="inline-block align-middle">{message.name}</div>
-        </Button>
+        <Markdown
+            className="mt-4 animate-in fade-in slide-in-from-top-6 [&>pre]:whitespace-pre-wrap"
+            content={content || ''}
+        />
     );
 }
 
-function FunctionPreview({
-    name,
-    input,
+function PreviewButton({
+    children,
     onClick,
 }: {
-    name?: string;
-    input?: string;
+    children: React.ReactNode;
     onClick: () => void;
 }) {
     return (
         <Button onClick={onClick} className="gap-2 text-ellipsis">
-            <div className="inline-block align-middle">{name}:</div>{' '}
-            <div title={input} className="inline-block align-middle">
-                <Markdown content={input} />
-            </div>
+            {children}
         </Button>
     );
 }

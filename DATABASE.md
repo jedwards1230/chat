@@ -37,6 +37,7 @@ CREATE TABLE "Messages" (
     "content" TEXT,
     "role" "Role" NOT NULL,
     "name" TEXT,
+    "fileName" TEXT,
     "createdAt" TIMESTAMP,
     "functionCallName" TEXT,
     "functionCallArguments" JSONB,

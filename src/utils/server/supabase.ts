@@ -34,14 +34,31 @@ export async function getThreadListByUserId(
 
             const relations = await db.getMessageRelations(message.id);
             for (const { parentMessageId, childMessageId } of relations) {
+                const name =
+                    (message.role !== 'user'
+                        ? message.name
+                        : message.fileName) || undefined;
+
+                const createdAt = message.createdAt
+                    ? new Date(message.createdAt)
+                    : new Date();
+
                 mapping[message.id] = {
                     id: message.id,
                     message: {
-                        ...message,
-                        name: message.name || 'Chat',
-                        createdAt: message.createdAt
-                            ? new Date(message.createdAt)
-                            : new Date(),
+                        id: message.id,
+                        content: message.content,
+                        role: message.role,
+                        name,
+                        createdAt,
+                        ...(message.functionCallName &&
+                            message.functionCallArguments && {
+                                function_call: {
+                                    name: message.functionCallName,
+                                    arguments:
+                                        message.functionCallArguments as string,
+                                },
+                            }),
                     },
                     parent: parentMessageId,
                     children: [childMessageId],
@@ -119,6 +136,10 @@ export async function upsertThread(thread: ChatThread) {
                 name: message.name || 'Chat',
                 functionCallName: message.function_call?.name || null,
                 functionCallArguments: message.function_call?.arguments || null,
+                fileName:
+                    message.role === 'user' && message.name
+                        ? message.name
+                        : null,
             },
         ]);
     }
