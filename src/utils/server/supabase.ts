@@ -9,16 +9,16 @@ import initialState from '@/providers/initialChat';
 /* 
 Threads
 */
-export async function getThreadListByUserId(): Promise<ChatThread[]> {
-    const userId = await getUserId();
+export async function getThreadListByUserId(
+    userId: string | undefined,
+): Promise<ChatThread[]> {
     if (!userId) return [];
+
     // Fetch threads for the user
     const threads = await db.getChatThreads(userId);
     const threadList: ChatThread[] = [];
 
     for (const thread of threads) {
-        if (thread.currentNode === null)
-            throw new Error(`Thread ${thread.id} has no current node`);
         if (!thread.agentConfigId)
             throw new Error(`Thread ${thread.id} has no agent config ID`);
 
@@ -26,23 +26,26 @@ export async function getThreadListByUserId(): Promise<ChatThread[]> {
 
         const messages = await db.getMessages(thread.id);
 
+        let currentNode: string | null = null;
         const mapping: MessageMapping = {};
         for (const message of messages) {
-            const [{ parentMessageId, childMessageId }] =
-                await db.getMessageRelations(thread.currentNode);
+            if (message.active) currentNode = message.id;
 
-            mapping[message.id] = {
-                id: message.id,
-                message: {
-                    ...message,
-                    name: message.name || 'Chat',
-                    createdAt: message.createdAt
-                        ? new Date(message.createdAt)
-                        : new Date(),
-                },
-                parent: parentMessageId,
-                children: [childMessageId],
-            };
+            const relations = await db.getMessageRelations(message.id);
+            for (const { parentMessageId, childMessageId } of relations) {
+                mapping[message.id] = {
+                    id: message.id,
+                    message: {
+                        ...message,
+                        name: message.name || 'Chat',
+                        createdAt: message.createdAt
+                            ? new Date(message.createdAt)
+                            : new Date(),
+                    },
+                    parent: parentMessageId,
+                    children: [childMessageId],
+                };
+            }
         }
 
         const base = agentConfigs[0];
@@ -58,7 +61,7 @@ export async function getThreadListByUserId(): Promise<ChatThread[]> {
         threadList.push({
             id: thread.id,
             title: thread.title || 'Title',
-            currentNode: thread.currentNode,
+            currentNode,
             created: new Date(thread.created),
             lastModified: new Date(thread.lastModified),
             mapping,
@@ -99,16 +102,17 @@ export async function upsertThread(thread: ChatThread) {
             lastModified: thread.lastModified?.toJSON(),
             title: thread.title,
             agentConfigId: thread.agentConfig.id,
-            currentNode: thread.currentNode,
         },
     ]);
 
+    // Upsert messages before upserting chat threads
     for (const message of messages) {
         await db.upsertMessages([
             {
                 id: message.id,
                 threadId: thread.id,
                 content: message.content,
+                active: message.id === thread.currentNode,
                 role: message.role,
                 createdAt: message.createdAt?.toJSON() || new Date().toJSON(),
                 name: message.name || 'Chat',
@@ -116,20 +120,20 @@ export async function upsertThread(thread: ChatThread) {
                 functionCallArguments: message.function_call?.arguments || null,
             },
         ]);
-
-        // Then upsert the corresponding child message in the MessageRelationships table
-        const messageRelations = Object.values(thread.mapping);
-        const relations: Tables<'MessageRelationships'>[] = [];
-        for (const relation of messageRelations) {
-            if (relation.parent) {
-                relations.push({
-                    childMessageId: relation.id,
-                    parentMessageId: relation.parent,
-                });
-            }
-        }
-        await db.upsertMessageRelationships(relations);
     }
+
+    // Then upsert the corresponding child message in the MessageRelationships table
+    const messageRelations = Object.values(thread.mapping);
+    const relations: Tables<'MessageRelationships'>[] = [];
+    for (const relation of messageRelations) {
+        if (relation.parent) {
+            relations.push({
+                childMessageId: relation.id,
+                parentMessageId: relation.parent,
+            });
+        }
+    }
+    await db.upsertMessageRelationships(relations);
 }
 
 export async function deleteThreadById(threadId: string) {
@@ -197,8 +201,9 @@ export async function getSharedThreadById(
 /* 
 Characters
 */
-export async function getCharacterListByUserId(): Promise<AgentConfig[]> {
-    const userId = await getUserId();
+export async function getCharacterListByUserId(
+    userId: string | undefined,
+): Promise<AgentConfig[]> {
     if (!userId) return defaultAgents;
     const configs = await db.getAgentConfigs(userId);
 

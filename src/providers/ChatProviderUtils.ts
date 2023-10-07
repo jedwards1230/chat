@@ -464,7 +464,7 @@ export function removeAllThreadsHandler(
             return {
                 ...prevState,
                 threads: [getDefaultThread(activeThread.agentConfig)],
-                currentThread: 0,
+                currentThread: null,
                 input: '',
                 saved: true,
                 editId: null,

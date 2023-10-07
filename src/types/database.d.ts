@@ -50,7 +50,6 @@ interface Database {
                 Row: {
                     agentConfigId: string | null;
                     created: string;
-                    currentNode: string | null;
                     id: string;
                     lastModified: string;
                     title: string | null;
@@ -59,7 +58,6 @@ interface Database {
                 Insert: {
                     agentConfigId?: string | null;
                     created: string;
-                    currentNode?: string | null;
                     id: string;
                     lastModified: string;
                     title?: string | null;
@@ -68,7 +66,6 @@ interface Database {
                 Update: {
                     agentConfigId?: string | null;
                     created?: string;
-                    currentNode?: string | null;
                     id?: string;
                     lastModified?: string;
                     title?: string | null;
@@ -106,6 +103,7 @@ interface Database {
             };
             Messages: {
                 Row: {
+                    active: boolean | null;
                     content: string | null;
                     createdAt: string | null;
                     functionCallArguments: Json | null;
@@ -116,6 +114,7 @@ interface Database {
                     threadId: string | null;
                 };
                 Insert: {
+                    active?: boolean | null;
                     content?: string | null;
                     createdAt?: string | null;
                     functionCallArguments?: Json | null;
@@ -126,6 +125,7 @@ interface Database {
                     threadId?: string | null;
                 };
                 Update: {
+                    active?: boolean | null;
                     content?: string | null;
                     createdAt?: string | null;
                     functionCallArguments?: Json | null;
@@ -173,12 +173,6 @@ interface Database {
                     userId?: string | null;
                 };
                 Relationships: [
-                    {
-                        foreignKeyName: 'SharedChatThreads_originalThreadId_fkey';
-                        columns: ['originalThreadId'];
-                        referencedRelation: 'ChatThreads';
-                        referencedColumns: ['id'];
-                    },
                     {
                         foreignKeyName: 'SharedChatThreads_userId_fkey';
                         columns: ['userId'];

@@ -11,11 +11,11 @@ export default async function Page({
 }: {
     searchParams?: { c?: string };
 }) {
-    await getUserId(true);
+    const userId = await getUserId(true);
 
     const [threads, characterList] = await Promise.all([
-        getThreadListByUserId(),
-        getCharacterListByUserId(),
+        getThreadListByUserId(userId),
+        getCharacterListByUserId(userId),
     ]);
 
     return (

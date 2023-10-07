@@ -19,6 +19,18 @@ CREATE TABLE "AgentConfigs" (
     FOREIGN KEY ("userId") REFERENCES "Users"("userId")
 );
 
+-- ChatThreads table
+CREATE TABLE "ChatThreads" (
+    "id" UUID PRIMARY KEY,
+    "created" TIMESTAMP NOT NULL,
+    "lastModified" TIMESTAMP NOT NULL,
+    "title" TEXT,
+    "agentConfigId" UUID,
+    "userId" VARCHAR(255),
+    FOREIGN KEY ("agentConfigId") REFERENCES "AgentConfigs"("id"),
+    FOREIGN KEY ("userId") REFERENCES "Users"("userId")
+);
+
 -- Messages table
 CREATE TABLE "Messages" (
     "id" UUID PRIMARY KEY,
@@ -28,26 +40,10 @@ CREATE TABLE "Messages" (
     "createdAt" TIMESTAMP,
     "functionCallName" TEXT,
     "functionCallArguments" JSONB,
-    "threadId" UUID
+    "threadId" UUID,
+    "active" BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY ("threadId") REFERENCES "ChatThreads"("id") ON DELETE CASCADE
 );
-
--- ChatThreads table
-CREATE TABLE "ChatThreads" (
-    "id" UUID PRIMARY KEY,
-    "created" TIMESTAMP NOT NULL,
-    "lastModified" TIMESTAMP NOT NULL,
-    "title" TEXT,
-    "currentNode" UUID,
-    "agentConfigId" UUID,
-    "userId" VARCHAR(255),
-    FOREIGN KEY ("currentNode") REFERENCES "Messages"("id") ON DELETE CASCADE,
-    FOREIGN KEY ("agentConfigId") REFERENCES "AgentConfigs"("id"),
-    FOREIGN KEY ("userId") REFERENCES "Users"("userId")
-);
-
--- Now that Messages and ChatThreads tables are created, we can add the foreign key relation to Messages
-ALTER TABLE "Messages"
-ADD FOREIGN KEY ("threadId") REFERENCES "ChatThreads"("id") ON DELETE CASCADE;
 
 -- MessageRelationships table
 CREATE TABLE "MessageRelationships" (
