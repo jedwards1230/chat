@@ -7,28 +7,6 @@ CREATE TABLE "Users" (
     "userId" VARCHAR(255) PRIMARY KEY
 );
 
--- Messages table
-CREATE TABLE "Messages" (
-    "id" UUID PRIMARY KEY,
-    "content" TEXT,
-    "role" "Role" NOT NULL,
-    "name" TEXT,
-    "createdAt" TIMESTAMP,
-    "functionCallName" TEXT,
-    "functionCallArguments" JSONB,
-    "threadId" UUID,
-    FOREIGN KEY ("threadId") REFERENCES "ChatThreads"("id") ON DELETE CASCADE
-);
-
--- MessageRelationships table
-CREATE TABLE "MessageRelationships" (
-    "parentMessageId" UUID,
-    "childMessageId" UUID,
-    PRIMARY KEY ("parentMessageId", "childMessageId"),
-    FOREIGN KEY ("parentMessageId") REFERENCES "Messages"("id") ON DELETE CASCADE,
-    FOREIGN KEY ("childMessageId") REFERENCES "Messages"("id") ON DELETE CASCADE
-);
-
 -- AgentConfigs table
 CREATE TABLE "AgentConfigs" (
     "id" UUID PRIMARY KEY,
@@ -41,6 +19,18 @@ CREATE TABLE "AgentConfigs" (
     FOREIGN KEY ("userId") REFERENCES "Users"("userId")
 );
 
+-- Messages table
+CREATE TABLE "Messages" (
+    "id" UUID PRIMARY KEY,
+    "content" TEXT,
+    "role" "Role" NOT NULL,
+    "name" TEXT,
+    "createdAt" TIMESTAMP,
+    "functionCallName" TEXT,
+    "functionCallArguments" JSONB,
+    "threadId" UUID
+);
+
 -- ChatThreads table
 CREATE TABLE "ChatThreads" (
     "id" UUID PRIMARY KEY,
@@ -50,9 +40,22 @@ CREATE TABLE "ChatThreads" (
     "currentNode" UUID,
     "agentConfigId" UUID,
     "userId" VARCHAR(255),
-    FOREIGN KEY ("currentNode") REFERENCES "ChildMessages"("id") ON DELETE CASCADE,
+    FOREIGN KEY ("currentNode") REFERENCES "Messages"("id") ON DELETE CASCADE,
     FOREIGN KEY ("agentConfigId") REFERENCES "AgentConfigs"("id"),
     FOREIGN KEY ("userId") REFERENCES "Users"("userId")
+);
+
+-- Now that Messages and ChatThreads tables are created, we can add the foreign key relation to Messages
+ALTER TABLE "Messages"
+ADD FOREIGN KEY ("threadId") REFERENCES "ChatThreads"("id") ON DELETE CASCADE;
+
+-- MessageRelationships table
+CREATE TABLE "MessageRelationships" (
+    "parentMessageId" UUID,
+    "childMessageId" UUID,
+    PRIMARY KEY ("parentMessageId", "childMessageId"),
+    FOREIGN KEY ("parentMessageId") REFERENCES "Messages"("id") ON DELETE CASCADE,
+    FOREIGN KEY ("childMessageId") REFERENCES "Messages"("id") ON DELETE CASCADE
 );
 
 -- SharedChatThreads table
@@ -83,5 +86,4 @@ CREATE TABLE "SharedMessages" (
 -- Create index
 CREATE INDEX "idxAgentConfigUserId"
 ON "AgentConfigs" ("userId");
-
 ```

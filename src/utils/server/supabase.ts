@@ -116,7 +116,7 @@ export async function upsertThread(thread: ChatThread) {
             },
         ]);
 
-        // Then upsert the corresponding child message in the ChildMessages table
+        // Then upsert the corresponding child message in the MessageRelationships table
         const messageRelations = Object.values(thread.mapping);
         const relations: Tables<'MessageRelationships'>[] = [];
         for (const relation of messageRelations) {
@@ -127,7 +127,7 @@ export async function upsertThread(thread: ChatThread) {
                 });
             }
         }
-        await db.upsertChildMessages(relations);
+        await db.upsertMessageRelationships(relations);
     }
 }
 

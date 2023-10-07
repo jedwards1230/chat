@@ -46,12 +46,12 @@ export const db = {
     async getMessageRelations(
         messageId: string,
     ): Promise<Tables<'MessageRelationships'>[]> {
-        const { data: childMessages, error } = await supabase
+        const { data: messageRelationships, error } = await supabase
             .from('MessageRelationships')
             .select('*')
             .eq('childMessageId', messageId);
         if (error) throw new Error(error.message);
-        return childMessages;
+        return messageRelationships;
     },
     async getMessages(threadId: string): Promise<Tables<'Messages'>[]> {
         const { data: messages, error } = await supabase
@@ -101,8 +101,10 @@ export const db = {
             .upsert(chatThreads, { onConflict: 'id' });
         if (error) throw new Error(error.message);
     },
-    async upsertChildMessages(childMessages: Tables<'MessageRelationships'>[]) {
-        for (let message of childMessages) {
+    async upsertMessageRelationships(
+        messageRelationships: Tables<'MessageRelationships'>[],
+    ) {
+        for (let message of messageRelationships) {
             const { data: existingMessage, error: existingError } =
                 await supabase
                     .from('MessageRelationships')
