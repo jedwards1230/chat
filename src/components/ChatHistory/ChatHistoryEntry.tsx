@@ -2,7 +2,6 @@
 
 import clsx from 'clsx';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
 import { useChat } from '@/providers/ChatProvider';
 import { Chat, Trash } from '../Icons';
@@ -19,8 +18,7 @@ export default function ChatHistoryEntry({
     entry: ChatThread;
     active: boolean;
 }) {
-    const router = useRouter();
-    const { removeThread } = useChat();
+    const { removeThread, createThread } = useChat();
     const { setSideBarOpen } = useUI();
     const messages = useMessages(entry.currentNode, entry.mapping);
 
@@ -31,7 +29,7 @@ export default function ChatHistoryEntry({
         deleteThreadById(entry.id);
         deleteLocalThreadById(entry.id);
         if (active) {
-            router.push('/');
+            createThread();
         }
     };
 
@@ -59,7 +57,7 @@ export default function ChatHistoryEntry({
                 </div>
             </Link>
             <div
-                className="absolute top-0 right-0 z-50 flex items-center justify-center col-span-2 mt-2 mr-2 rounded-full cursor-pointer select-none peer text-neutral-300 hover:text-neutral-50"
+                className="peer absolute right-0 top-0 z-50 col-span-2 mr-2 mt-2 flex cursor-pointer select-none items-center justify-center rounded-full text-neutral-300 hover:text-neutral-50"
                 onClick={remove}
                 title="Delete conversation"
             >

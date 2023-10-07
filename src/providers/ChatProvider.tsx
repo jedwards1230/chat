@@ -37,8 +37,6 @@ import {
     getLocalThreadList,
     setLocalThreadList,
 } from '@/utils/client/localstorage';
-import ChatManager from '@/lib/ChatManager';
-import { getTitle } from '@/utils/client/chat';
 
 const ChatContext = createContext<ChatState>(initialState);
 
@@ -93,36 +91,6 @@ export function ChatProvider({
     const createThread = createThreadHandler(state, setState, router);
     const setOpenAiApiKey = setOpenAiApiKeyHandler(setState);
     const abortRequest = abortRequestHandler(state, setState);
-
-    // set title
-    useEffect(() => {
-        if (
-            activeThread &&
-            activeThread.title === initialState.defaultThread.title &&
-            !state.botTyping
-        ) {
-            const messageList = ChatManager.getOrderedMessages(
-                activeThread.currentNode,
-                activeThread.mapping,
-            );
-
-            const wasAssistant = messageList[0].role === 'assistant';
-            if (wasAssistant) {
-                const upsertTitle = (title: string) => {
-                    document.title = 'Chat | ' + title;
-                    setState((prevState) => upsertTitleState(prevState, title));
-                };
-
-                getTitle(activeThread, upsertTitle, userId, state.openAiApiKey);
-            }
-        }
-    }, [
-        activeThread,
-        activeThread?.currentNode,
-        state.botTyping,
-        state.openAiApiKey,
-        userId,
-    ]);
 
     // Load local data
     useEffect(() => {

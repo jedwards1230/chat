@@ -7,7 +7,7 @@ import { getDefaultThread, resetDefaultThread } from './initialChat';
 import { getChat } from '@/utils/client';
 import { deleteMessageById, upsertCharacter } from '@/utils/server/supabase';
 import { sortThreadlist } from '@/utils';
-import { createMessage, getToolData } from '@/utils/client/chat';
+import { createMessage, getTitle, getToolData } from '@/utils/client/chat';
 import { baseCommands } from '@/tools/commands';
 import ChatManager from '@/lib/ChatManager';
 import { defaultAgentConfig } from './characters';
@@ -177,6 +177,11 @@ export function createSubmitHandler(
             upsertMessageState(prevState, newMessage, threadId),
         );
 
+    const upsertTitle = (title: string) => {
+        document.title = 'Chat | ' + title;
+        setState((prevState) => upsertTitleState(prevState, title));
+    };
+
     const getNewMapping = (
         activeThread: ChatThread,
         msg: Message,
@@ -249,7 +254,12 @@ export function createSubmitHandler(
             userId,
         };
 
-        toolInput ? getToolData({ ...opts, toolInput }) : getChat(opts);
+        const getRes = toolInput
+            ? getToolData({ ...opts, toolInput })
+            : getChat(opts);
+        getRes.then(() =>
+            getTitle(activeThread, upsertTitle, userId, state.openAiApiKey),
+        );
     };
 }
 
