@@ -572,6 +572,5 @@ export function addMessageHandler(
         setState((prevState) => createNewThread(prevState, newMap));
         setState((prevState) => upsertMessageState(prevState, message));
         router.replace('/?c=' + activeThread.id);
-        console.log('addMessage', activeThread.id);
     };
 }

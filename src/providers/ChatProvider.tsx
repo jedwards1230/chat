@@ -131,14 +131,17 @@ export function ChatProvider({
         const localCharacters = getLocalCharacterList();
         const localThreads = getLocalThreadList();
 
+        const threads = mergeThreads(state.threads, localThreads);
+        const characterList = mergeCharacters(
+            state.characterList,
+            localCharacters,
+        );
+
         setState((prevState) => ({
             ...prevState,
             saved: false,
-            threads: mergeThreads(prevState.threads, localThreads),
-            characterList: mergeCharacters(
-                prevState.characterList,
-                localCharacters,
-            ),
+            threads,
+            characterList,
         }));
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
