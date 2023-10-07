@@ -174,6 +174,8 @@ export function ChatProvider({
                 (t) => t.id === threadId,
             );
 
+            if (foundThreadIndex === -1) return prevState;
+
             return {
                 ...prevState,
                 input: '',
