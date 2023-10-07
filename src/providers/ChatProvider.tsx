@@ -90,6 +90,11 @@ export function ChatProvider({
             ? state.threads[state.currentThread]
             : undefined;
 
+    const createThread = createThreadHandler(state, setState, router);
+    const setOpenAiApiKey = setOpenAiApiKeyHandler(setState);
+    const abortRequest = abortRequestHandler(state, setState);
+
+    // set title
     useEffect(() => {
         if (
             activeThread &&
@@ -100,11 +105,9 @@ export function ChatProvider({
                 activeThread.currentNode,
                 activeThread.mapping,
             );
-            // check if it contains a message with role='assistant'
-            const hasAssistantMessage = messageList.some(
-                (m) => m.role === 'assistant',
-            );
-            if (hasAssistantMessage && messageList.length % 2 === 0) {
+
+            const wasAssistant = messageList[0].role === 'assistant';
+            if (wasAssistant) {
                 const upsertTitle = (title: string) => {
                     document.title = 'Chat | ' + title;
                     setState((prevState) => upsertTitleState(prevState, title));
@@ -120,10 +123,6 @@ export function ChatProvider({
         state.openAiApiKey,
         userId,
     ]);
-
-    const createThread = createThreadHandler(state, setState, router);
-    const setOpenAiApiKey = setOpenAiApiKeyHandler(setState);
-    const abortRequest = abortRequestHandler(state, setState);
 
     // Load local data
     useEffect(() => {
@@ -176,11 +175,13 @@ export function ChatProvider({
 
             if (foundThreadIndex === -1) return prevState;
 
-            return {
-                ...prevState,
-                input: '',
-                currentThread: foundThreadIndex,
-            };
+            return foundThreadIndex === -1
+                ? prevState
+                : {
+                      ...prevState,
+                      input: '',
+                      currentThread: foundThreadIndex,
+                  };
         });
     }, [threadId, state.threads]);
 
