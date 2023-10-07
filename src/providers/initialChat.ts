@@ -1,38 +1,49 @@
 import { v4 as uuidv4 } from 'uuid';
-import { defaultAgentConfig, defaultAgents } from './characters';
+
+import { defaultAgents } from './characters';
 
 export function getDefaultThread(config: AgentConfig): ChatThread {
+    const systemId = uuidv4();
     return {
         id: uuidv4(),
         title: 'New Chat',
         created: new Date(),
         lastModified: new Date(),
         agentConfig: config,
-        messages: [
-            {
-                id: uuidv4(),
-                role: 'system',
-                content: config.systemMessage,
+        mapping: {
+            [systemId]: {
+                id: systemId,
+                message: {
+                    id: systemId,
+                    role: 'system',
+                    content: config.systemMessage,
+                },
+                parent: null,
+                children: [],
             },
-        ],
+        },
+        currentNode: systemId,
     };
 }
 
-const baseEntry = getDefaultThread(defaultAgentConfig);
+export function resetDefaultThread() {
+    return getDefaultThread(defaultAgents[0]);
+}
 
 const initialState: ChatState = {
     input: '',
     threads: [],
     saved: true,
-    isNew: true,
     editId: null,
+    currentThread: null,
+    defaultThread: resetDefaultThread(),
     botTyping: false,
     openAiApiKey: '',
     streamResponse: true,
-    activeThread: baseEntry,
     characterList: defaultAgents,
     abortController: new AbortController(),
 
+    addMessage: () => {},
     cancelEdit: () => {},
     changeInput: () => {},
     editMessage: () => {},
@@ -47,7 +58,6 @@ const initialState: ChatState = {
     setStreamResponse: () => {},
     setPluginsEnabled: () => {},
     updateThreadConfig: () => {},
-    updateActiveThread: () => {},
     handleSubmit: () => Promise.resolve(),
     saveCharacter: () => Promise.resolve(),
 };

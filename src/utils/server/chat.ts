@@ -12,7 +12,7 @@ const SERVER_KEY = process.env.OPENAI_API_KEY;
 export function getOpenAiClient(key?: string) {
     return new OpenAI({
         apiKey: SERVER_KEY || key,
-        dangerouslyAllowBrowser: key ? true : false,
+        dangerouslyAllowBrowser: !!key,
     });
 }
 
@@ -103,7 +103,7 @@ export async function fetchChat({
     signal,
     key,
     stream = true,
-}: FetchChatParams): Promise<ReadableStream<any> | Message | string> {
+}: FetchChatParams): Promise<ReadableStream<any> | Message> {
     const tools = activeThread.agentConfig.toolsEnabled
         ? activeThread.agentConfig.tools
         : [];
@@ -157,14 +157,17 @@ export async function fetchChat({
                       controller.error(JSON.stringify(err));
                   },
               })
-            : JSON.stringify(err);
+            : {
+                  id: uuidv4(),
+                  role: 'assistant',
+                  content: JSON.stringify(err),
+              };
     }
 }
 
 async function fetchLlama2Chat(msgHistory: Message[]) {
     const messages = prepareMessages(msgHistory);
-    const res = await getLlama2Chat(messages);
-    return res;
+    return await getLlama2Chat(messages);
 }
 
 async function fetchOpenAiChat(

@@ -37,11 +37,15 @@ export default function AgentSettings({
         updateThreadConfig,
         setSystemMessage,
         saveCharacter,
-        activeThread,
+        threads,
+        currentThread,
+        defaultThread,
         streamResponse,
         setStreamResponse,
     } = useChat();
 
+    const activeThread =
+        currentThread !== null ? threads[currentThread] : defaultThread;
     const isNew = agent === undefined;
     const [config, setConfig] = useState(
         agent
@@ -75,7 +79,7 @@ export default function AgentSettings({
     };
 
     const togglePlugin = (tool: Tool) => {
-        const newTools = config.tools.includes(tool)
+        const newTools = config.tools?.includes(tool)
             ? config.tools.filter((t) => t !== tool)
             : [...config.tools, tool];
 
@@ -125,17 +129,8 @@ export default function AgentSettings({
             </div>
             <div className="flex flex-col gap-4 rounded-md">
                 <Select
-                    onValueChange={(v) => {
-                        try {
-                            if (!v) return;
-                            const m = JSON.parse(v);
-                            onFieldChange('model', m);
-                        } catch (e) {
-                            console.log(v);
-                            console.error(e);
-                        }
-                    }}
-                    value={JSON.stringify(config.model)}
+                    onValueChange={(v) => v && onFieldChange('model', v)}
+                    value={config.model.name}
                 >
                     <SelectTrigger className="w-full">
                         <SelectValue placeholder={config.model.name} />
@@ -144,7 +139,7 @@ export default function AgentSettings({
                         {modelList.map((model) => (
                             <SelectItem
                                 key={'select-' + model.name}
-                                value={JSON.stringify(model)}
+                                value={model.name}
                             >
                                 {model.name}
                             </SelectItem>

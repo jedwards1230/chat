@@ -1,42 +1,53 @@
 'use client';
 
-import { useEffect, useMemo, useState, memo } from 'react';
+import { useEffect, useState, memo } from 'react';
 import clsx from 'clsx';
-import Link from 'next/link';
 import Image from 'next/image';
 
 import { useUI } from '@/providers/UIProvider';
 import ChatHistoryEntry from './ChatHistoryEntry';
-import { sortThreadlist } from '@/utils';
 import { isMobile } from '@/utils/client/device';
 import { Sidebar } from '../Sidebar';
 import { AccountDropdown } from './Buttons';
 import { Button } from '../ui/button';
 import { useSession } from 'next-auth/react';
 import { Ellipsis } from '../Icons';
+import { sortThreadlist } from '@/utils';
+import { useChat } from '@/providers/ChatProvider';
 
 function ChatHistory({
     activeThread,
     threads,
 }: {
-    activeThread: ChatThread;
+    activeThread?: ChatThread;
     threads: ChatThread[];
 }) {
+    const { createThread } = useChat();
     const { data: session } = useSession();
     const user = session?.user;
     const [mounted, setMounted] = useState(false);
     const { sideBarOpen, setSideBarOpen } = useUI();
 
-    const threadList = useMemo(() => threads.sort(sortThreadlist), [threads]);
+    const threadList = threads.sort(sortThreadlist);
 
     const newThread = () => {
         if (isMobile()) setSideBarOpen(false);
+        createThread();
     };
 
     useEffect(() => {
         if (isMobile()) setSideBarOpen(false);
         setMounted(true);
     }, [setSideBarOpen]);
+
+    const getMessageCount = (mapping: MessageMapping) => {
+        let count = 0;
+        for (const key in mapping) {
+            const r = mapping[key];
+            if (r) count++;
+        }
+        return count;
+    };
 
     return (
         <Sidebar
@@ -46,25 +57,20 @@ function ChatHistory({
             open={sideBarOpen}
         >
             {/* Header Buttons */}
-            <Link
-                className="flex w-full"
-                replace={true}
-                onClick={newThread}
-                href="/"
-            >
-                <Button className="w-full" variant="outline">
-                    New Chat
-                </Button>
-            </Link>
+            <Button className="w-full" onClick={newThread} variant="outline">
+                New Chat
+            </Button>
             {/* Chat History */}
             <div className="flex w-full flex-1 flex-col gap-1 overflow-y-scroll pt-2 sm:pt-0">
-                {threadList.map((thread, i) => (
-                    <ChatHistoryEntry
-                        key={`${i}-${thread.id}`}
-                        entry={thread}
-                        activeThread={activeThread}
-                    />
-                ))}
+                {threadList.map((thread, i) =>
+                    getMessageCount(thread.mapping) > 1 ? (
+                        <ChatHistoryEntry
+                            key={`${i}-${thread.id}`}
+                            entry={thread}
+                            active={thread.id === activeThread?.id}
+                        />
+                    ) : null,
+                )}
             </div>
             {/* Footer Buttons */}
             <div className="flex w-full justify-end gap-x-2 pb-3 pl-2 text-sm md:pb-1 md:pl-0">

@@ -9,7 +9,9 @@ import { Dialog, DialogContent, DialogTrigger } from '../ui/dialog';
 import { Button } from '../ui/button';
 
 function CharacterSelector({ children }: { children: React.ReactNode }) {
-    const { activeThread, characterList } = useChat();
+    const { currentThread, defaultThread, threads, characterList } = useChat();
+    const activeThread =
+        currentThread !== null ? threads[currentThread] : defaultThread;
     const [activeCard, setActiveCard] = useState<AgentConfig>(
         activeThread.agentConfig,
     );
@@ -28,11 +30,11 @@ function CharacterSelector({ children }: { children: React.ReactNode }) {
                                 name: 'New Character',
                             })
                         }
-                        className="bg-inherit text-xl hover:bg-accent/30"
+                        className="text-xl bg-inherit hover:bg-accent/30"
                     >
                         +
                     </Button>
-                    <div className="col-span-8 col-start-3 flex-1 text-center text-xl font-semibold">
+                    <div className="flex-1 col-span-8 col-start-3 text-xl font-semibold text-center">
                         Character{' '}
                         {activeCard === undefined ? 'Selector' : 'Editor'}
                     </div>
@@ -83,15 +85,13 @@ function AgentCard({
     active: boolean;
     edit: () => void;
 }) {
-    const { activeThread, updateThreadConfig, setSystemMessage } = useChat();
+    const { updateThreadConfig, setSystemMessage } = useChat();
     const cardRef = useRef<HTMLDivElement>(null);
 
     const setActive = (e: any) => {
         e.stopPropagation();
-        if (activeThread) {
-            updateThreadConfig(agent);
-            setSystemMessage(agent.systemMessage);
-        }
+        updateThreadConfig(agent);
+        setSystemMessage(agent.systemMessage);
         edit();
     };
 

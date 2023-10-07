@@ -17,6 +17,7 @@ import {
 import { DialogHeader } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useUI } from '@/providers/UIProvider';
+import { AUTH_ENABLED } from '@/appConfig';
 
 export default function CredentialsSection({ user }: { user?: User }) {
     return (
@@ -27,8 +28,8 @@ export default function CredentialsSection({ user }: { user?: User }) {
                 {user && (
                     <>
                         <div className="font-medium">Cloud Auth</div>
-                        <div className="flex items-center justify-between w-full pt-2 pb-4">
-                            <div className="flex flex-col w-full gap-0 overflow-x-scroll">
+                        <div className="flex w-full items-center justify-between pb-4 pt-2">
+                            <div className="flex w-full flex-col gap-0 overflow-x-scroll">
                                 <div>{user.name}</div>
                                 <div>{user.email}</div>
                             </div>
@@ -37,12 +38,12 @@ export default function CredentialsSection({ user }: { user?: User }) {
                                 alt="You"
                                 width={64}
                                 height={64}
-                                className="border rounded"
+                                className="rounded border"
                             />
                         </div>
 
                         <button
-                            className="w-full py-2 text-center border border-red-500 rounded hover:bg-red-600 hover:text-neutral-50"
+                            className="w-full rounded border border-red-500 py-2 text-center hover:bg-red-600 hover:text-neutral-50"
                             onClick={() => signOut()}
                         >
                             Sign Out
@@ -51,9 +52,9 @@ export default function CredentialsSection({ user }: { user?: User }) {
                 )}
             </div>
             <div>
-                <KeyInfo />
+                {AUTH_ENABLED && <KeyInfo />}
                 <ClientSideKey />
-                <HybridKey />
+                {AUTH_ENABLED && <HybridKey />}
             </div>
         </div>
     );
@@ -102,7 +103,7 @@ function HybridKey() {
     const userId = session?.user?.email;
 
     return (
-        <div className="flex flex-col w-full gap-2 pt-2">
+        <div className="flex w-full flex-col gap-2 pt-2">
             <div className="flex items-center gap-2">
                 <DialogHeader>Database</DialogHeader>
                 {userId ? (
@@ -178,7 +179,7 @@ function ClientSideKey() {
     return (
         <form
             onSubmit={handleSubmit}
-            className="flex flex-col w-full gap-2 pt-2"
+            className="flex w-full flex-col gap-2 pt-2"
         >
             <div className="flex items-center gap-2">
                 <DialogHeader>OpenAI API Key</DialogHeader>
@@ -205,7 +206,7 @@ function ClientSideKey() {
                     title="Delete"
                     id="delete-key"
                     disabled={validating}
-                    className="p-1 transition-colors scale-90 bg-red-500 rounded text-neutral-50 hover:bg-red-600 disabled:bg-neutral-500"
+                    className="scale-90 rounded bg-red-500 p-1 text-neutral-50 transition-colors hover:bg-red-600 disabled:bg-neutral-500"
                 >
                     <XMark />
                 </Button>
@@ -215,7 +216,7 @@ function ClientSideKey() {
                     title="Save"
                     id="save-key"
                     disabled={validating}
-                    className="p-1 transition-colors scale-90 bg-green-500 rounded text-neutral-50 hover:bg-green-600 disabled:bg-neutral-500"
+                    className="scale-90 rounded bg-green-500 p-1 text-neutral-50 transition-colors hover:bg-green-600 disabled:bg-neutral-500"
                 >
                     <Check />
                 </Button>

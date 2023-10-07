@@ -10,17 +10,19 @@ import { isMobile } from '@/utils/client/device';
 import { useUI } from '@/providers/UIProvider';
 import { deleteThreadById } from '@/utils/server/supabase';
 import { deleteLocalThreadById } from '@/utils/client/localstorage';
+import useMessages from '@/lib/ChatManagerHook';
 
 export default function ChatHistoryEntry({
     entry,
-    activeThread,
+    active,
 }: {
     entry: ChatThread;
-    activeThread: ChatThread;
+    active: boolean;
 }) {
     const router = useRouter();
     const { removeThread } = useChat();
     const { setSideBarOpen } = useUI();
+    const messages = useMessages(entry.currentNode, entry.mapping);
 
     // Function to remove a thread and update the local storage
     const remove = (e: any) => {
@@ -28,8 +30,7 @@ export default function ChatHistoryEntry({
         removeThread(entry.id);
         deleteThreadById(entry.id);
         deleteLocalThreadById(entry.id);
-        if (entry.id === activeThread.id) {
-            console.log('createThread');
+        if (active) {
             router.push('/');
         }
     };
@@ -38,7 +39,7 @@ export default function ChatHistoryEntry({
         if (isMobile('md')) setSideBarOpen(false);
     };
 
-    if (entry.messages.length <= 1) return null;
+    if (messages.length <= 1) return null;
     return (
         <div className="relative">
             <Link
@@ -47,7 +48,7 @@ export default function ChatHistoryEntry({
                 onClick={setActive}
                 className={clsx(
                     'flex w-full max-w-full items-center gap-2 rounded-lg px-2 py-1 transition-colors duration-100 hover:bg-neutral-500 peer-hover:bg-neutral-500 dark:hover:bg-neutral-600 dark:peer-hover:bg-neutral-600',
-                    entry.id === activeThread.id
+                    active
                         ? 'bg-neutral-500 dark:bg-neutral-600'
                         : 'cursor-pointer focus:bg-neutral-600  dark:focus:bg-neutral-700',
                 )}

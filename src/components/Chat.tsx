@@ -15,7 +15,9 @@ import ChatHistory from './ChatHistory';
 import ChatSettings from './ChatSettings';
 
 export default function Chat() {
-    const { activeThread, botTyping, threads } = useChat();
+    const { currentThread, botTyping, threads } = useChat();
+    const activeThread =
+        currentThread !== null ? threads[currentThread] : undefined;
     const {
         sideBarOpen,
         setSideBarOpen,
@@ -92,7 +94,7 @@ export default function Chat() {
     );
 
     return (
-        <div className="flex h-full w-full">
+        <div className="flex w-full h-full">
             <ChatHistory activeThread={activeThread} threads={threads} />
             <motion.div
                 onPanStart={onPanStart}

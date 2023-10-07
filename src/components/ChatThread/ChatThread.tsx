@@ -1,26 +1,29 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect } from 'react';
 import clsx from 'clsx';
 
 import { ChatBubble } from './ChatBubble';
 import ChatPlaceholder from '../ChatPlaceholder';
+import useMessages from '@/lib/ChatManagerHook';
+import ChatGroup from './ChatGroup';
 
 export default function ChatThread({
     style,
     activeThread,
 }: {
     style?: React.CSSProperties;
-    activeThread: ChatThread;
+    activeThread?: ChatThread;
 }) {
-    const [messages, setMessages] = useState(activeThread.messages);
+    const messages = useMessages(
+        activeThread?.currentNode,
+        activeThread?.mapping,
+    );
 
     const threadRef = useRef<HTMLDivElement>(null);
     const prevScrollHeight = useRef<number>(0);
 
     useEffect(() => {
-        setMessages(activeThread.messages);
-
         const threadEl = threadRef.current;
         if (!threadEl) return;
 
@@ -36,9 +39,47 @@ export default function ChatThread({
         }
 
         prevScrollHeight.current = threadEl.scrollHeight;
-    }, [activeThread.messages]);
+    }, [activeThread?.currentNode, activeThread?.mapping]);
 
     const hasMultipleMessages = messages.length > 1;
+
+    const groupMessages = () => {
+        const grouped: MessageGroup[] = [];
+
+        // helper to add a message to the last group
+        const addToLastGroup = (message: Message) => {
+            if (grouped.length === 0) {
+                grouped.push({ role: message.role, messages: [message] });
+            } else {
+                grouped[grouped.length - 1].messages.push(message);
+            }
+        };
+
+        for (const message of messages) {
+            // check if the last message is from the same role
+            const eqPrevMsg = (role: Role) =>
+                grouped[grouped.length - 1]?.role === role;
+
+            const upsert = (message: Message, r?: Role) => {
+                const role = r || message.role;
+                if (eqPrevMsg(role)) {
+                    addToLastGroup(message);
+                } else {
+                    grouped.push({ role: message.role, messages: [message] });
+                }
+            };
+
+            if (message.role === 'function') {
+                upsert(message, 'assistant');
+            } else {
+                upsert(message);
+            }
+        }
+
+        return grouped;
+    };
+
+    const groupedMessages: MessageGroup[] = groupMessages();
 
     return (
         <div
@@ -49,34 +90,17 @@ export default function ChatThread({
                 hasMultipleMessages && 'overflow-y-scroll',
             )}
         >
-            <div className="flex flex-col w-full h-full">
-                {hasMultipleMessages ? (
-                    messages.map((m, i) => {
-                        if (m.role === 'assistant' && m.function_call) {
-                            return null;
-                        }
-                        const lastMessage = messages[i - 1];
-                        const input =
-                            m.role === 'function' &&
-                            lastMessage.function_call &&
-                            lastMessage.function_call.arguments
-                                ? lastMessage.function_call.arguments
-                                : undefined;
-                        return (
-                            <ChatBubble
-                                key={m.id}
-                                message={m}
-                                config={activeThread.agentConfig}
-                                input={
-                                    typeof input === 'string'
-                                        ? input
-                                        : input?.input
-                                }
-                            />
-                        );
-                    })
+            <div className="flex h-full w-full flex-col">
+                {activeThread ? (
+                    groupedMessages.map((group, i) => (
+                        <ChatGroup
+                            key={i}
+                            groupedMessages={group}
+                            config={activeThread?.agentConfig}
+                        />
+                    ))
                 ) : (
-                    <ChatPlaceholder activeThread={activeThread} />
+                    <ChatPlaceholder />
                 )}
                 {/* Blank row at bottom. Better view of quick actions. */}
                 {hasMultipleMessages && <div className="min-h-[72px] w-full" />}

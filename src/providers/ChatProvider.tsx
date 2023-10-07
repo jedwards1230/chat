@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { usePlausible } from 'next-plausible';
 import { useSession } from 'next-auth/react';
@@ -20,10 +20,11 @@ import {
     setPluginsEnabledHandler,
     setSystemMessageHandler,
     togglePluginHandler,
-    updateActiveThreadHandler,
     updateThreadConfigHandler,
     saveCharacterHandler,
     setOpenAiApiKeyHandler,
+    upsertTitleState,
+    addMessageHandler,
 } from './ChatProviderUtils';
 import { useUI } from './UIProvider';
 import initialState from './initialChat';
@@ -36,6 +37,8 @@ import {
     getLocalThreadList,
     setLocalThreadList,
 } from '@/utils/client/localstorage';
+import ChatManager from '@/lib/ChatManager';
+import { getTitle } from '@/utils/client/chat';
 
 const ChatContext = createContext<ChatState>(initialState);
 
@@ -59,46 +62,100 @@ export function ChatProvider({
 
     const { setAppSettingsOpen } = useUI();
 
+    const defaultCharacter = characterList.find((c) => c.name === 'Chat');
+
+    const initialThread = getInitialActiveThread(
+        defaultCharacter || characterList[0],
+        threadId,
+        threadList,
+    );
+
+    const defaultThread = defaultCharacter
+        ? {
+              ...initialState.defaultThread,
+              agentConfig: defaultCharacter,
+          }
+        : initialState.defaultThread;
+
     const [state, setState] = useState<ChatState>({
         ...initialState,
         characterList,
+        currentThread: initialThread,
+        defaultThread,
         threads: threadList.sort(sortThreadlist),
-        isNew: threadId === undefined,
-        activeThread: getInitialActiveThread(
-            characterList[0],
-            threadId,
-            threadList,
-        ),
     });
 
-    const createThread = createThreadHandler(state, setState);
-    const updateActiveThread = updateActiveThreadHandler(setState);
+    const activeThread =
+        state.currentThread !== null
+            ? state.threads[state.currentThread]
+            : undefined;
+
+    useEffect(() => {
+        if (
+            activeThread &&
+            activeThread.title === initialState.defaultThread.title &&
+            !state.botTyping
+        ) {
+            const messageList = ChatManager.getOrderedMessages(
+                activeThread.currentNode,
+                activeThread.mapping,
+            );
+            // check if it contains a message with role='assistant'
+            const hasAssistantMessage = messageList.some(
+                (m) => m.role === 'assistant',
+            );
+            if (hasAssistantMessage && messageList.length % 2 === 0) {
+                const upsertTitle = (title: string) => {
+                    document.title = 'Chat | ' + title;
+                    setState((prevState) => upsertTitleState(prevState, title));
+                };
+
+                getTitle(activeThread, upsertTitle, userId, state.openAiApiKey);
+            }
+        }
+    }, [
+        activeThread,
+        activeThread?.currentNode,
+        state.botTyping,
+        state.openAiApiKey,
+        userId,
+    ]);
+
+    const createThread = createThreadHandler(state, setState, router);
     const setOpenAiApiKey = setOpenAiApiKeyHandler(setState);
     const abortRequest = abortRequestHandler(state, setState);
 
+    // Load local data
     useEffect(() => {
         // Load OpenAI API key from local storage
         const key = getLocalOpenAiKey();
         if (key) setOpenAiApiKey(key);
 
         // Load threads from local storage if not connected to db
+        const localCharacters = getLocalCharacterList();
+        const localThreads = getLocalThreadList();
+
+        const threads = mergeThreads(state.threads, localThreads);
+        const characterList = mergeCharacters(
+            state.characterList,
+            localCharacters,
+        );
+
         setState((prevState) => ({
             ...prevState,
             saved: false,
-            threads: mergeThreads(prevState.threads, getLocalThreadList()),
-            characterList: mergeCharacters(
-                prevState.characterList,
-                getLocalCharacterList(),
-            ),
+            threads,
+            characterList,
         }));
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Save thread when it is updated
     useEffect(() => {
-        if (!state.saved) {
+        if (!state.saved && state.currentThread !== null) {
             try {
-                if (userId) upsertThread(state.activeThread);
+                const thread = state.threads[state.currentThread];
+                if (userId) upsertThread(thread);
                 if (window !== undefined) {
                     setLocalThreadList(state.threads);
                 }
@@ -107,55 +164,37 @@ export function ChatProvider({
                 console.error(err);
             }
         }
-    }, [state.saved, state.activeThread, userId, state.threads]);
+    }, [state.saved, state.currentThread, userId, state.threads]);
 
     // Update active thread when threadId changes
     useEffect(() => {
-        if (state.activeThread.id === threadId) return;
-        if (!threadId) {
-            if (!state.isNew) createThread();
-            return;
-        }
+        if (!threadId) return;
+        setState((prevState) => {
+            const foundThreadIndex = prevState.threads.findIndex(
+                (t) => t.id === threadId,
+            );
 
-        const newThread = state.threads.find((t) => t.id === threadId);
-        if (newThread) {
-            updateActiveThread(newThread);
-            setState((prevState) => ({
+            return {
                 ...prevState,
-                isNew: false,
-            }));
-        } else {
-            router.replace('/');
-            setState((prevState) => ({
-                ...prevState,
-                isNew: true,
-            }));
-        }
-    }, [
-        router,
-        threadId,
-        state.input,
-        state.isNew,
-        state.threads,
-        state.activeThread.id,
-        state.activeThread.messages.length,
-        createThread,
-        updateActiveThread,
-    ]);
+                input: '',
+                currentThread: foundThreadIndex,
+            };
+        });
+    }, [threadId, state.threads]);
 
     const value: ChatState = {
         ...state,
         abortRequest,
         createThread,
         setOpenAiApiKey,
-        updateActiveThread,
+        addMessage: addMessageHandler(setState, router),
         cancelEdit: cancelEditHandler(setState),
         changeInput: changeInputHandler(setState),
         removeThread: removeThreadHandler(setState),
-        saveCharacter: saveCharacterHandler(setState),
+        saveCharacter: saveCharacterHandler(setState, userId),
         removeMessage: removeMessageHandler(setState),
-        editMessage: editMessageHandler(state, setState),
-        toggleplugin: togglePluginHandler(state, setState),
+        editMessage: editMessageHandler(setState),
+        toggleplugin: togglePluginHandler(setState),
         setSystemMessage: setSystemMessageHandler(setState),
         setStreamResponse: setStreamResponseHandler(setState),
         setPluginsEnabled: setPluginsEnabledHandler(setState),
@@ -174,7 +213,7 @@ export function ChatProvider({
     return (
         <ChatContext.Provider value={value}>
             {children}
-            <Dialogs />
+            <Dialogs threadId={threadId} />
         </ChatContext.Provider>
     );
 }

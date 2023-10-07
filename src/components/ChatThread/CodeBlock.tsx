@@ -18,9 +18,8 @@ export default function CodeBlock({
 }) {
     const [btnClicked, setBtnClicked] = useState(false);
 
-    const Highlight = SyntaxHighlighter as any;
     return (
-        <div className="rounded-rounded flex flex-col gap-1 border border-border bg-accent font-normal text-accent-foreground">
+        <div className="rounded-rounded gap-1 overflow-x-auto border border-border bg-accent font-normal text-accent-foreground">
             <div className="flex items-center justify-between px-4 py-2">
                 <div>{language ? language : 'code'}</div>
                 <Button
@@ -38,14 +37,15 @@ export default function CodeBlock({
                     {btnClicked ? <Check /> : <Copy />}
                 </Button>
             </div>
-            <Highlight
+            <SyntaxHighlighter
                 {...props}
                 style={vscDarkPlus}
+                wrapLongLines={true}
                 className="!m-0"
                 language={language}
             >
                 {value}
-            </Highlight>
+            </SyntaxHighlighter>
         </div>
     );
 }

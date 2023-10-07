@@ -2,13 +2,10 @@
 
 import Link from 'next/link';
 
-export const runtime = 'edge';
-
 export default function GlobalError({
-    error, // reset,
+    error,
 }: {
     error: Error & { digest?: string };
-    // reset: () => void;
 }) {
     return (
         <html>

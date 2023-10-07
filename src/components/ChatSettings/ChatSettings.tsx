@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, memo } from 'react';
+import { memo } from 'react';
 
 import { useSession } from 'next-auth/react';
 
@@ -11,11 +11,14 @@ import { useUI } from '@/providers/UIProvider';
 import AgentSettings from '../AgentSettings';
 import { shareThread } from '@/utils/server/supabase';
 import { Sidebar } from '../Sidebar';
+import useMessages from '@/lib/ChatManagerHook';
 
 function ChatSettings() {
     const { data: session } = useSession();
     const userId = session?.user?.email;
-    const { activeThread } = useChat();
+    const { currentThread, defaultThread, threads } = useChat();
+    const activeThread =
+        currentThread !== null ? threads[currentThread] : defaultThread;
     const { chatSettingsOpen, setChatSettingsOpen, setShareModalOpen } =
         useUI();
 
@@ -31,22 +34,27 @@ function ChatSettings() {
         }
     };
 
+    const messages = useMessages(
+        activeThread.currentNode,
+        activeThread.mapping,
+    );
+
     return (
         <Sidebar
             pos="right"
             close={() => setChatSettingsOpen(false)}
             open={chatSettingsOpen}
         >
-            <div className="flex h-full w-full flex-col pb-3 md:pb-1">
+            <div className="flex flex-col w-full h-full pb-3 md:pb-1">
                 <div className="flex-1 px-2">
                     <AgentSettings
                         active={true}
                         agent={activeThread.agentConfig}
                     />
                 </div>
-                {userId && activeThread.messages.length > 1 && (
+                {userId && messages.length > 1 && (
                     <button
-                        className="mx-2 flex items-center justify-center rounded-lg border border-neutral-500 py-2 font-medium transition-colors hover:border-neutral-400 hover:bg-neutral-600 dark:hover:bg-neutral-700"
+                        className="flex items-center justify-center py-2 mx-2 font-medium transition-colors border rounded-lg border-neutral-500 hover:border-neutral-400 hover:bg-neutral-600 dark:hover:bg-neutral-700"
                         onClick={handleShare}
                     >
                         Share{' '}

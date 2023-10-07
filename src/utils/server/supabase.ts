@@ -1,318 +1,268 @@
 'use server';
 
 import { auth } from '@/auth';
-import supabase from '@/lib/supabase.server';
+import ChatManager from '@/lib/ChatManager';
+import { db } from '@/lib/supabase.server';
 import initialState from '@/providers/initialChat';
 
 /* 
 Threads
 */
-export async function getThreadListByUserId(
-    userId: string,
-): Promise<ChatThread[]> {
-    const { data: threads, error } = await supabase
-        .from('chat_threads')
-        .select('*')
-        .eq('user_id', userId);
+export async function getThreadListByUserId(): Promise<ChatThread[]> {
+    const userId = await getUserId();
+    if (!userId) return [];
+    // Fetch threads for the user
+    const threads = await db.getChatThreads(userId);
+    const threadList: ChatThread[] = [];
 
-    if (error) {
-        throw new Error(error.message);
-    }
+    for (const thread of threads) {
+        if (thread.currentNode === null)
+            throw new Error(`Thread ${thread.id} has no current node`);
+        if (!thread.agentConfigId)
+            throw new Error(`Thread ${thread.id} has no agent config ID`);
 
-    const { data: allMessages, error: messageError } = await supabase
-        .from('messages')
-        .select('*')
-        .in(
-            'chat_thread_id',
-            threads.map((thread: any) => thread.id),
-        )
-        .order('message_order', { ascending: true });
+        const agentConfigs = await db.getAgentConfigs(userId);
 
-    if (messageError) {
-        throw new Error(messageError.message);
-    }
+        const messages = await db.getMessages(thread.id);
 
-    const threadList = threads
-        .map((thread: ChatThread) => {
-            const messages = allMessages.filter(
-                (message: any) => message.chat_thread_id === thread.id,
-            );
+        const mapping: MessageMapping = {};
+        for (const message of messages) {
+            const [{ parentMessageId, childMessageId }] =
+                await db.getMessageRelations(thread.currentNode);
 
-            if (messages.length <= 1) {
-                return null;
-            }
-
-            return {
-                ...thread,
-                created: new Date(thread.created),
-                lastModified: new Date(thread.lastModified),
-                messages,
-                agentConfig: JSON.parse(thread.agentConfig as any),
+            mapping[message.id] = {
+                id: message.id,
+                message: {
+                    ...message,
+                    name: message.name || 'Chat',
+                    createdAt: message.createdAt
+                        ? new Date(message.createdAt)
+                        : new Date(),
+                },
+                parent: parentMessageId,
+                children: [childMessageId],
             };
-        })
-        .filter(Boolean) as ChatThread[];
+        }
+
+        const base = agentConfigs[0];
+        const agentConfig: AgentConfig = {
+            id: base.id,
+            name: base.name || 'Chat',
+            tools: base.tools ? (base.tools as Tool[]) : [],
+            toolsEnabled: base.toolsEnabled || false,
+            model: JSON.parse(base.model as string),
+            systemMessage: base.systemMessage || '',
+        };
+
+        threadList.push({
+            id: thread.id,
+            title: thread.title || 'Title',
+            currentNode: thread.currentNode,
+            created: new Date(thread.created),
+            lastModified: new Date(thread.lastModified),
+            mapping,
+            agentConfig,
+        });
+    }
 
     return threadList.length > 0 ? threadList : initialState.threads;
 }
 
 export async function upsertThread(thread: ChatThread) {
-    if (thread.messages.length === 0) return;
+    const messages = ChatManager.getOrderedMessages(
+        thread.currentNode,
+        thread.mapping,
+    );
+    if (messages.length === 0) return;
 
-    const session = await auth();
-    const userId = session?.user?.email;
+    const userId = await getUserId();
+    if (!userId) return;
 
-    if (thread.messages.length > 0) {
-        const { data: threadData, error: threadError } = await supabase
-            .from('chat_threads')
-            .upsert(
-                [
-                    {
-                        id: thread.id,
-                        user_id: userId,
-                        created: thread.created,
-                        lastModified: thread.lastModified,
-                        title: thread.title,
-                        agentConfig: JSON.stringify(thread.agentConfig),
-                    },
-                ],
-                { onConflict: 'id' },
-            );
+    await db.upsertAgentConfigs([
+        {
+            id: thread.agentConfig.id,
+            userId,
+            name: thread.agentConfig.name,
+            tools: thread.agentConfig.tools,
+            toolsEnabled: thread.agentConfig.toolsEnabled,
+            model: JSON.stringify(thread.agentConfig.model),
+            systemMessage: thread.agentConfig.systemMessage,
+        },
+    ]);
 
-        if (threadError) {
-            throw new Error(threadError.message);
-        }
+    await db.upsertChatThreads([
+        {
+            id: thread.id,
+            userId,
+            created: thread.created?.toJSON(),
+            lastModified: thread.lastModified?.toJSON(),
+            title: thread.title,
+            agentConfigId: thread.agentConfig.id,
+            currentNode: thread.currentNode,
+        },
+    ]);
 
-        for (const message of thread.messages) {
-            const { data: messageData, error: messageError } = await supabase
-                .from('messages')
-                .upsert(
-                    [
-                        {
-                            id: message.id,
-                            chat_thread_id: thread.id,
-                            content: message.content,
-                            role: message.role,
-                            created_at: message.createdAt,
-                            name: message.name,
-                            function_call: message.function_call,
-                        },
-                    ],
-                    { onConflict: 'id' },
-                );
+    for (const message of messages) {
+        await db.upsertMessages([
+            {
+                id: message.id,
+                threadId: thread.id,
+                content: message.content,
+                role: message.role,
+                createdAt: message.createdAt?.toJSON() || new Date().toJSON(),
+                name: message.name || 'Chat',
+                functionCallName: message.function_call?.name || null,
+                functionCallArguments: message.function_call?.arguments || null,
+            },
+        ]);
 
-            if (messageError) {
-                throw new Error(messageError.message);
+        // Then upsert the corresponding child message in the MessageRelationships table
+        const messageRelations = Object.values(thread.mapping);
+        const relations: Tables<'MessageRelationships'>[] = [];
+        for (const relation of messageRelations) {
+            if (relation.parent) {
+                relations.push({
+                    childMessageId: relation.id,
+                    parentMessageId: relation.parent,
+                });
             }
         }
+        await db.upsertMessageRelationships(relations);
     }
 }
 
 export async function deleteThreadById(threadId: string) {
-    const session = await auth();
-    const userId = session?.user?.email;
-
-    if (userId) {
-        const { data: threadData, error: threadError } = await supabase
-            .from('chat_threads')
-            .delete()
-            .eq('id', threadId);
-
-        if (threadError) {
-            throw new Error(threadError.message);
-        }
-    }
+    const userId = await getUserId();
+    if (!userId) return;
+    await db.deleteChatThreads([threadId]);
 }
 
 export async function deleteAllThreads() {
-    const session = await auth();
-    const userId = session?.user?.email;
-
-    const { data: threadData, error: threadError } = await supabase
-        .from('chat_threads')
-        .delete()
-        .eq('user_id', userId);
-
-    if (threadError) {
-        throw new Error(threadError.message);
-    }
+    const userId = await getUserId();
+    if (!userId) return;
+    await db.deleteAllChatThreads(userId);
 }
 
 /* 
 Shared Threads
 */
 export async function shareThread(thread: ChatThread) {
-    const session = await auth();
-    const userId = session?.user?.email;
+    const userId = await getUserId();
+    if (!userId) return;
+    const threadData = await db.upsertSharedChatThreads([
+        {
+            id: thread.id,
+            userId,
+            originalThreadId: thread.id,
+            created: thread.created?.toJSON(),
+            lastModified: thread.lastModified?.toJSON(),
+            title: thread.title,
+            agentConfig: JSON.stringify(thread.agentConfig),
+        },
+    ]);
 
-    const { data: threadData, error: threadError } = await supabase
-        .from('shared_chat_threads')
-        .upsert(
-            [
-                {
-                    id: thread.id,
-                    user_id: userId,
-                    original_thread_id: thread.id,
-                    created: thread.created,
-                    lastModified: thread.lastModified,
-                    title: thread.title,
-                    agentConfig: thread.agentConfig,
-                },
-            ],
-            { onConflict: 'id' },
-        );
-
-    if (threadError) {
-        throw new Error(`Error sharing chat thread: ${threadError.message}`);
-    }
-
-    const { data: messageData, error: messageError } = await supabase
-        .from('shared_messages')
-        .upsert(
-            thread.messages.map(
-                (message) => ({
-                    id: message.id,
-                    shared_thread_id: thread.id,
-                    content: message.content,
-                    role: message.role,
-                    created_at: message.createdAt,
-                    name: message.name,
-                    function_call: message.function_call,
-                }),
-                { onConflict: 'id' },
-            ),
-        );
-
-    if (messageError) {
-        throw new Error(`Error sharing chat messages: ${messageError.message}`);
-    }
+    const messages = ChatManager.getOrderedMessages(
+        thread.currentNode,
+        thread.mapping,
+    );
+    const messageData = await db.upsertSharedMessages(
+        messages.map((message) => ({
+            id: message.id,
+            sharedThreadId: thread.id,
+            content: message.content || '',
+            role: message.role,
+            createdAt: message.createdAt?.toJSON() || new Date().toJSON(),
+            name: message.name || '',
+            functionCall: message.function_call || '',
+        })),
+    );
 
     return { thread: threadData, messages: messageData };
 }
 
-/* 
-Characters
-*/
-
-// get single thread by id plus all messages
 export async function getSharedThreadById(
     threadId: string,
 ): Promise<ChatThread> {
-    const { data: thread, error } = await supabase
-        .from('shared_chat_threads')
-        .select('*')
-        .eq('id', threadId);
-
-    if (error) {
-        throw new Error(error.message);
-    }
-
-    const { data: messages, error: messageError } = await supabase
-        .from('shared_messages')
-        .select('*')
-        .eq('shared_thread_id', threadId)
-        .order('message_order', { ascending: true });
-
-    if (messageError) {
-        throw new Error(messageError.message);
-    }
+    const thread = await db.getSharedChatThread(threadId);
+    const messages = await db.getSharedMessages(threadId);
 
     return {
         ...thread[0],
         created: new Date(thread[0].created),
         lastModified: new Date(thread[0].lastModified),
-        messages,
-    };
+    } as unknown as ChatThread;
 }
 
-export async function getCharacterListByUserId(
-    userId: string,
-): Promise<AgentConfig[]> {
-    const { data: configs, error } = await supabase
-        .from('agent_config')
-        .select('*')
-        .eq('user_id', userId);
+/* 
+Characters
+*/
+export async function getCharacterListByUserId(): Promise<AgentConfig[]> {
+    const userId = await getUserId();
+    if (!userId) return [];
+    const configs = await db.getAgentConfigs(userId);
 
-    if (error) {
-        throw new Error(error.message);
+    if (configs.length > 0) {
+        return configs.map((c) => ({
+            ...c,
+            name: c.name || 'Chat',
+            tools: c.tools ? (c.tools as Tool[]) : [],
+            toolsEnabled: c.toolsEnabled || false,
+            model: JSON.parse(c.model as string),
+            systemMessage: c.systemMessage || '',
+        }));
     }
 
-    const characterList: AgentConfig[] = configs.map((config: any) => {
-        return {
-            ...config,
-            tools: JSON.parse(config.tools),
-        };
-    });
+    const characterList = initialState.characterList;
+    await db.createAgentConfigs(
+        characterList.map((character) => ({
+            ...character,
+            userId,
+            model: JSON.stringify(character.model),
+        })),
+    );
 
-    return characterList.length > 0
-        ? characterList
-        : initialState.characterList;
+    return characterList;
 }
 
 export async function upsertCharacter(character: AgentConfig) {
-    const session = await auth();
-    const userId = session?.user?.email;
-
-    const { data, error } = await supabase.from('agent_config').upsert(
-        [
-            {
-                ...character,
-                user_id: userId,
-                tools: JSON.stringify(character.tools),
-            },
-        ],
-        { onConflict: 'id' },
-    );
-
-    if (error) {
-        throw new Error(error.message);
-    }
+    const userId = await getUserId();
+    if (!userId) return;
+    await db.upsertAgentConfigs([
+        {
+            ...character,
+            userId,
+            model: JSON.stringify(character.model),
+        },
+    ]);
 }
 
 export async function deleteAllCharacters() {
-    const session = await auth();
-    const userId = session?.user?.email;
-
-    const { data: characterData, error: characterError } = await supabase
-        .from('agent_config')
-        .delete()
-        .eq('user_id', userId);
-
-    if (characterError) {
-        throw new Error(characterError.message);
-    }
+    const userId = await getUserId();
+    if (!userId) return;
+    await db.deleteAllAgentConfigs(userId);
 }
 
 /* 
 Messages
 */
 export async function deleteMessageById(messageId: string) {
-    const session = await auth();
-    const userId = session?.user?.email;
-
-    const { data: messageData, error: messageError } = await supabase
-        .from('messages')
-        .delete()
-        .eq('id', messageId);
-
-    if (messageError) {
-        throw new Error(messageError.message);
-    }
+    const userId = await getUserId();
+    await db.deleteMessage(messageId);
 }
 
 export async function getUserId(init = false) {
     const session = await auth();
     const userId = session?.user?.email;
 
+    if (!userId) return;
+
     if (init) {
-        const { data, error } = await supabase
-            .from('users')
-            .select('userid')
-            .eq('userid', userId);
+        console.log('Initializing user', userId);
+        const data = await db.getUser(userId);
 
         if (data?.length === 0) {
-            const { data, error } = await supabase
-                .from('users')
-                .insert([{ userid: userId }]);
+            console.log('Creating user', userId);
+            await db.createUser(userId);
         }
     }
 

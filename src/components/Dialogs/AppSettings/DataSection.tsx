@@ -1,4 +1,5 @@
 import { DialogHeader } from '@/components/ui/dialog';
+import ChatManager from '@/lib/ChatManager';
 import { useChat } from '@/providers/ChatProvider';
 import {
     deleteAllLocalThreadList,
@@ -11,7 +12,7 @@ export default function DataSection({ user }: { user?: User }) {
         <>
             <DialogHeader>Data</DialogHeader>
             <GeneralData />
-            <div className="flex flex-wrap w-full gap-4 whitespace-nowrap">
+            <div className="flex w-full flex-wrap gap-4 whitespace-nowrap">
                 <LocalData />
                 {user && <CloudData />}
             </div>
@@ -21,17 +22,24 @@ export default function DataSection({ user }: { user?: User }) {
 
 function GeneralData() {
     const { threads, characterList } = useChat();
+
+    const threadList = threads.filter((t) => {
+        const list = ChatManager.getOrderedMessages(t.currentNode, t.mapping);
+        return list.length > 1;
+    });
+
+    const messages = threadList.reduce((acc, thread) => {
+        const list = ChatManager.getOrderedMessages(
+            thread.currentNode,
+            thread.mapping,
+        );
+        return acc + list.length;
+    }, 0);
+
     return (
         <div>
             <div className="flex gap-2">
-                <div>{threads.length} Chats</div>|
-                <div>
-                    {threads.reduce(
-                        (acc, thread) => acc + thread.messages.length,
-                        0,
-                    )}{' '}
-                    Messages
-                </div>
+                <div>{threads.length} Chats</div>|<div>{messages} Messages</div>
                 |
                 <div>
                     {characterList.length}{' '}
@@ -61,10 +69,10 @@ function LocalData() {
     };
 
     return (
-        <div className="flex flex-col justify-between flex-1">
+        <div className="flex flex-1 flex-col justify-between">
             <DialogHeader>Local Data</DialogHeader>
 
-            <label className="flex items-center justify-between w-full py-2 text-base">
+            <label className="flex w-full items-center justify-between py-2 text-base">
                 <button
                     onClick={clearAllLocalChatThreads}
                     className="w-full rounded border border-red-500 px-2 py-1.5 hover:bg-red-600 hover:text-neutral-50 dark:border-red-500/80 dark:text-neutral-50 dark:hover:bg-red-700"
@@ -72,7 +80,7 @@ function LocalData() {
                     Clear Local Chat Threads
                 </button>
             </label>
-            <label className="flex items-center justify-between w-full py-2 text-base">
+            <label className="flex w-full items-center justify-between py-2 text-base">
                 <button
                     onClick={clearAllLocalCharacters}
                     className="w-full rounded border border-red-500 px-2 py-1.5 hover:bg-red-600 hover:text-neutral-50 dark:border-red-500/80 dark:text-neutral-50 dark:hover:bg-red-700"
@@ -80,7 +88,7 @@ function LocalData() {
                     Clear Local Characters
                 </button>
             </label>
-            <label className="flex items-center justify-between w-full py-2 text-base">
+            <label className="flex w-full items-center justify-between py-2 text-base">
                 <button
                     onClick={clearAllLocal}
                     className="w-full rounded bg-red-500 px-2 py-1.5 text-neutral-50 hover:bg-red-600 dark:bg-red-500/80 dark:hover:bg-red-700"
@@ -111,9 +119,9 @@ function CloudData() {
     };
 
     return (
-        <div className="flex flex-col justify-between flex-1">
+        <div className="flex flex-1 flex-col justify-between">
             <DialogHeader>Cloud Data</DialogHeader>
-            <label className="flex items-center justify-between w-full py-2 text-base">
+            <label className="flex w-full items-center justify-between py-2 text-base">
                 <button
                     onClick={clearAllCloudChatThreads}
                     className="w-full rounded border border-red-500 px-2 py-1.5 hover:bg-red-600 hover:text-neutral-50 dark:border-red-500/80 dark:text-neutral-50 dark:hover:bg-red-700"
@@ -121,7 +129,7 @@ function CloudData() {
                     Clear Cloud Chat Threads
                 </button>
             </label>
-            <label className="flex items-center justify-between w-full py-2 text-base">
+            <label className="flex w-full items-center justify-between py-2 text-base">
                 <button
                     onClick={clearAllCloudCharacters}
                     className="w-full rounded border border-red-500 px-2 py-1.5 hover:bg-red-600 hover:text-neutral-50 dark:border-red-500/80 dark:text-neutral-50 dark:hover:bg-red-700"
@@ -129,7 +137,7 @@ function CloudData() {
                     Clear Cloud Characters
                 </button>
             </label>
-            <label className="flex items-center justify-between w-full py-2 text-base">
+            <label className="flex w-full items-center justify-between py-2 text-base">
                 <button
                     onClick={clearAllCloud}
                     className="w-full rounded bg-red-500 px-2 py-1.5 text-neutral-50 hover:bg-red-600 dark:bg-red-500/80 dark:hover:bg-red-700"

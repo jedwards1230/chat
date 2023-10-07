@@ -1,25 +1,10 @@
 import { ChatCompletionMessageParam } from 'openai/resources/chat';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { upsertCharacter, upsertThread } from './server/supabase';
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
-}
-
-export function serializeSaveData(saveData: SaveData | ShareData): string {
-    if ('thread' in saveData) {
-        return JSON.stringify({
-            ...saveData.thread,
-            messages: JSON.stringify(saveData.thread.messages),
-        });
-    }
-    return JSON.stringify({
-        config: saveData.config,
-        chatHistory: saveData.chatHistory.map((thread) => ({
-            ...thread,
-            messages: JSON.stringify(thread.messages),
-        })),
-    });
 }
 
 export function calculateRows(text: string, maxRows: number = 15) {
@@ -79,6 +64,7 @@ export function mergeThreads(
             existingThread.lastModified < thread.lastModified
         ) {
             threadMap.set(thread.id, thread);
+            upsertThread(thread);
         }
     });
 
@@ -89,7 +75,7 @@ export function mergeThreads(
 export function mergeCharacters(
     oldCharacters: any[],
     newCharacters: any[],
-): any[] {
+): AgentConfig[] {
     const characterMap = new Map<string, any>();
 
     // Add the old characters to the map
@@ -105,6 +91,7 @@ export function mergeCharacters(
             existingCharacter.lastModified < character.lastModified
         ) {
             characterMap.set(character.name, character);
+            upsertCharacter(character);
         }
     });
 

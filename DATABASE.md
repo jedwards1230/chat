@@ -1,83 +1,89 @@
 ```sql
--- Users Table
-CREATE TABLE Users (
-    userId VARCHAR(255) PRIMARY KEY
+-- Create ENUM type for Role
+CREATE TYPE "Role" AS ENUM ('system', 'user', 'assistant', 'function');
+
+-- Users table
+CREATE TABLE "Users" (
+    "userId" VARCHAR(255) PRIMARY KEY
 );
 
--- Create chat thread table
-CREATE TABLE public.chat_threads (
-    id character varying(255) NOT NULL,
-    user_id character varying(255),
-    created timestamp without time zone NOT NULL,
-    "lastModified" timestamp without time zone NOT NULL,
-    title text NOT NULL,
-    "agentConfig" json NOT NULL,
-    PRIMARY KEY (id),
-    FOREIGN KEY (user_id) REFERENCES public.users(userid) ON DELETE CASCADE
+-- AgentConfigs table
+CREATE TABLE "AgentConfigs" (
+    "id" UUID PRIMARY KEY,
+    "name" TEXT,
+    "tools" VARCHAR[],
+    "toolsEnabled" BOOLEAN,
+    "model" JSONB,
+    "systemMessage" TEXT,
+    "userId" VARCHAR(255),
+    FOREIGN KEY ("userId") REFERENCES "Users"("userId")
 );
 
--- Create message table
-CREATE TABLE public.messages (
-    id character varying(255) NOT NULL,
-    chat_thread_id character varying(255) NOT NULL,
-    content text NOT NULL,
-    role character varying(50) NOT NULL,
-    created_at timestamp without time zone,
-    name character varying(255),
-    function_call json,
-    message_order serial,
-    PRIMARY KEY (id),
-    FOREIGN KEY (chat_thread_id) REFERENCES public.chat_threads(id) ON DELETE CASCADE
+-- Messages table
+CREATE TABLE "Messages" (
+    "id" UUID PRIMARY KEY,
+    "content" TEXT,
+    "role" "Role" NOT NULL,
+    "name" TEXT,
+    "createdAt" TIMESTAMP,
+    "functionCallName" TEXT,
+    "functionCallArguments" JSONB,
+    "threadId" UUID
 );
 
--- Create shared chat thread table
-CREATE TABLE public.shared_chat_threads (
-    id character varying(255) NOT NULL,
-    user_id character varying(255),
-    original_thread_id character varying(255) NOT NULL,
-    created timestamp without time zone NOT NULL,
-    "lastModified" timestamp without time zone NOT NULL,
-    title text NOT NULL,
-    "agentConfig" json NOT NULL,
-    PRIMARY KEY (id),
-    FOREIGN KEY (user_id) REFERENCES public.users(userid) ON DELETE CASCADE,
-    FOREIGN KEY (original_thread_id) REFERENCES public.chat_threads(id) ON DELETE CASCADE
+-- ChatThreads table
+CREATE TABLE "ChatThreads" (
+    "id" UUID PRIMARY KEY,
+    "created" TIMESTAMP NOT NULL,
+    "lastModified" TIMESTAMP NOT NULL,
+    "title" TEXT,
+    "currentNode" UUID,
+    "agentConfigId" UUID,
+    "userId" VARCHAR(255),
+    FOREIGN KEY ("currentNode") REFERENCES "Messages"("id") ON DELETE CASCADE,
+    FOREIGN KEY ("agentConfigId") REFERENCES "AgentConfigs"("id"),
+    FOREIGN KEY ("userId") REFERENCES "Users"("userId")
 );
 
--- Create shared message table
-CREATE TABLE public.shared_messages (
-    id character varying(255) NOT NULL,
-    shared_thread_id character varying(255) NOT NULL,
-    content text NOT NULL,
-    role character varying(50) NOT NULL,
-    created_at timestamp without time zone,
-    name character varying(255),
-    function_call json,
-    message_order serial,
-    PRIMARY KEY (id),
-    FOREIGN KEY (shared_thread_id) REFERENCES public.shared_chat_threads(id) ON DELETE CASCADE
+-- Now that Messages and ChatThreads tables are created, we can add the foreign key relation to Messages
+ALTER TABLE "Messages"
+ADD FOREIGN KEY ("threadId") REFERENCES "ChatThreads"("id") ON DELETE CASCADE;
+
+-- MessageRelationships table
+CREATE TABLE "MessageRelationships" (
+    "parentMessageId" UUID,
+    "childMessageId" UUID,
+    PRIMARY KEY ("parentMessageId", "childMessageId"),
+    FOREIGN KEY ("parentMessageId") REFERENCES "Messages"("id") ON DELETE CASCADE,
+    FOREIGN KEY ("childMessageId") REFERENCES "Messages"("id") ON DELETE CASCADE
 );
 
--- Create agent_config table
-CREATE TABLE public.agent_config (
-    id UUID NOT NULL DEFAULT gen_random_uuid(),
-    user_id character varying(255),
-    name character varying(255) NOT NULL,
-    tools json NOT NULL,
-    "toolsEnabled" boolean NOT NULL,
-    model character varying(50) NOT NULL,
-    temperature numeric NOT NULL,
-    "systemMessage" text NOT NULL,
-    "topP" numeric NOT NULL,
-    "N" integer NOT NULL,
-    "maxTokens" integer NOT NULL,
-    "frequencyPenalty" numeric NOT NULL,
-    "presencePenalty" numeric NOT NULL,
-    PRIMARY KEY (id),
-    FOREIGN KEY (user_id) REFERENCES public.users(userid) ON DELETE CASCADE
+-- SharedChatThreads table
+CREATE TABLE "SharedChatThreads" (
+    "id" VARCHAR(255) PRIMARY KEY,
+    "userId" VARCHAR(255),
+    "originalThreadId" UUID NOT NULL,
+    "created" TIMESTAMP NOT NULL,
+    "lastModified" TIMESTAMP NOT NULL,
+    "title" TEXT NOT NULL,
+    "agentConfig" JSON NOT NULL,
+    FOREIGN KEY ("userId") REFERENCES "Users"("userId") ON DELETE CASCADE,
+    FOREIGN KEY ("originalThreadId") REFERENCES "ChatThreads"("id") ON DELETE CASCADE
 );
 
-CREATE INDEX idx_agent_config_user_id
-ON public.agent_config (user_id);
+-- SharedMessages table
+CREATE TABLE "SharedMessages" (
+    "id" VARCHAR(255) PRIMARY KEY,
+    "sharedThreadId" VARCHAR(255) NOT NULL,
+    "content" TEXT NOT NULL,
+    "role" VARCHAR(50) NOT NULL,
+    "createdAt" TIMESTAMP,
+    "name" VARCHAR(255),
+    "functionCall" JSON,
+    FOREIGN KEY ("sharedThreadId") REFERENCES "SharedChatThreads"("id") ON DELETE CASCADE
+);
 
+-- Create index
+CREATE INDEX "idxAgentConfigUserId"
+ON "AgentConfigs" ("userId");
 ```
