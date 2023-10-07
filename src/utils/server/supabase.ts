@@ -15,14 +15,15 @@ export async function getThreadListByUserId(
     if (!userId) return [];
 
     // Fetch threads for the user
-    const threads = await db.getChatThreads(userId);
-    const threadList: ChatThread[] = [];
+    const [agentConfigs, threads] = await Promise.all([
+        db.getAgentConfigs(userId),
+        db.getChatThreads(userId),
+    ]);
 
+    const threadList: ChatThread[] = [];
     for (const thread of threads) {
         if (!thread.agentConfigId)
             throw new Error(`Thread ${thread.id} has no agent config ID`);
-
-        const agentConfigs = await db.getAgentConfigs(userId);
 
         const messages = await db.getMessages(thread.id);
 
