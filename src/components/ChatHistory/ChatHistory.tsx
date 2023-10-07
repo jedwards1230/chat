@@ -2,7 +2,6 @@
 
 import { useEffect, useState, memo } from 'react';
 import clsx from 'clsx';
-import Link from 'next/link';
 import Image from 'next/image';
 
 import { useUI } from '@/providers/UIProvider';

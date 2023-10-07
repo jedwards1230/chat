@@ -11,7 +11,6 @@ import { getTokenCount } from '@/utils/tokenizer';
 import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
 import { Input } from './ui/input';
-import { Label } from './ui/label';
 import { createMessage } from '@/utils/client/chat';
 
 type ToolCommand = {
@@ -70,7 +69,7 @@ function ChatInput() {
                                 const message = createMessage({
                                     role: 'user',
                                     name: file.name,
-                                    content: `\`\`\`markdown\n${file.name}\n\n${content}\n\`\`\``,
+                                    content: `\`\`\`markdown\n// ${file.name}\n\n${content}\n\`\`\``,
                                 });
 
                                 addMessage(message, activeThread);

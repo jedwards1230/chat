@@ -100,7 +100,11 @@ export function ChatProvider({
                 activeThread.currentNode,
                 activeThread.mapping,
             );
-            if (messageList.length % 2 === 0) {
+            // check if it contains a message with role='assistant'
+            const hasAssistantMessage = messageList.some(
+                (m) => m.role === 'assistant',
+            );
+            if (hasAssistantMessage && messageList.length % 2 === 0) {
                 const upsertTitle = (title: string) => {
                     document.title = 'Chat | ' + title;
                     setState((prevState) => upsertTitleState(prevState, title));
