@@ -16,9 +16,8 @@ import CommandOverlay from './CommandOverlay';
 
 function ChatInput() {
     const {
-        currentThread,
+        activeThread,
         defaultThread,
-        threads,
         input,
         editId,
         addMessage,
@@ -26,9 +25,8 @@ function ChatInput() {
         handleSubmit,
     } = useChat();
 
-    const activeThread =
-        currentThread !== null ? threads[currentThread] : defaultThread;
-    const [activeId, setActiveId] = useState<string>(activeThread.id);
+    const thread = activeThread || defaultThread;
+    const [activeId, setActiveId] = useState<string>(thread.id);
     const inputRef = useRef<HTMLTextAreaElement>(null);
 
     const tokenCount = useMemo(() => getTokenCount(input), [input]);
@@ -71,7 +69,7 @@ function ChatInput() {
                                 content: `\`\`\`${fileExtension}\n// ${file.name}\n\n${content}\n\`\`\``,
                             });
 
-                            addMessage(message, activeThread);
+                            addMessage(message, thread);
                         }
                     };
                     reader.readAsText(file);
@@ -83,11 +81,11 @@ function ChatInput() {
     };
 
     useEffect(() => {
-        if (activeThread.id !== activeId) {
-            setActiveId(activeThread.id);
+        if (thread.id !== activeId) {
+            setActiveId(thread.id);
             inputRef.current?.focus();
         }
-    }, [activeId, activeThread.id]);
+    }, [activeId, thread.id]);
 
     return (
         <div className="relative w-full">
@@ -100,7 +98,7 @@ function ChatInput() {
                     {activeCommand && (
                         <CommandOverlay
                             activeCommand={activeCommand}
-                            activeThread={activeThread}
+                            activeThread={thread}
                         />
                     )}
                     <div className="flex gap-1 sm:gap-2">
@@ -137,7 +135,7 @@ function ChatInput() {
                             <SubmitButton
                                 tokenCount={tokenCount}
                                 input={input}
-                                config={activeThread.agentConfig}
+                                config={thread.agentConfig}
                             />
                         )}
                     </div>

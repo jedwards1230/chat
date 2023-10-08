@@ -9,11 +9,10 @@ import { Dialog, DialogContent, DialogTrigger } from '../ui/dialog';
 import { Button } from '../ui/button';
 
 function CharacterSelector({ children }: { children: React.ReactNode }) {
-    const { currentThread, defaultThread, threads, characterList } = useChat();
-    const activeThread =
-        currentThread !== null ? threads[currentThread] : defaultThread;
+    const { activeThread, defaultThread, characterList } = useChat();
+    const thread = activeThread || defaultThread;
     const [activeCard, setActiveCard] = useState<AgentConfig>(
-        activeThread.agentConfig,
+        thread.agentConfig,
     );
 
     return (
@@ -44,7 +43,7 @@ function CharacterSelector({ children }: { children: React.ReactNode }) {
                         <div className="flex w-full gap-2 overflow-y-scroll md:flex-col">
                             {characterList.map((agent, i) => {
                                 const active =
-                                    agent.id === activeThread.agentConfig.id;
+                                    agent.id === thread.agentConfig.id;
                                 return (
                                     <AgentCard
                                         key={'agent-config-' + i}

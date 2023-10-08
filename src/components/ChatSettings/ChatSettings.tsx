@@ -16,15 +16,14 @@ import { Button } from '../ui/button';
 function ChatSettings() {
     const { data: session } = useSession();
     const userId = session?.user?.email;
-    const { currentThread, defaultThread, threads } = useChat();
-    const activeThread =
-        currentThread !== null ? threads[currentThread] : defaultThread;
+    const { activeThread, defaultThread } = useChat();
+    const thread = activeThread || defaultThread;
     const { chatSettingsOpen, setChatSettingsOpen, setShareModalOpen } =
         useUI();
 
     const handleShare = async () => {
         try {
-            await shareThread(activeThread);
+            await shareThread(thread);
             setShareModalOpen(true);
             if (isMobile()) {
                 setChatSettingsOpen(false);
@@ -42,12 +41,9 @@ function ChatSettings() {
         >
             <div className="flex h-full w-full flex-col pb-3 md:pb-1">
                 <div className="flex-1 px-2">
-                    <AgentSettings
-                        active={true}
-                        agent={activeThread.agentConfig}
-                    />
+                    <AgentSettings active={true} agent={thread.agentConfig} />
                 </div>
-                {userId && currentThread !== null && (
+                {userId && activeThread !== undefined && (
                     <Button
                         variant="outlineAccent"
                         className="mx-2"

@@ -43,7 +43,7 @@ function upsertMessageState(
 ): ChatState {
     const activeIdx = threadId
         ? prevState.threads.findIndex((thread) => thread.id === threadId)
-        : prevState.currentThread;
+        : prevState.currentThreadIdx;
 
     if (activeIdx === null) return prevState;
     const active = prevState.threads[activeIdx];
@@ -75,10 +75,10 @@ export function upsertTitleState(
     prevState: ChatState,
     title: string,
 ): ChatState {
-    if (prevState.currentThread === null) return prevState;
+    if (prevState.currentThreadIdx === null) return prevState;
     const threads = prevState.threads;
     const activeThread = {
-        ...threads[prevState.currentThread],
+        ...threads[prevState.currentThreadIdx],
         lastModified: new Date(),
         title,
     };
@@ -113,7 +113,7 @@ function createNewThread(
         input: '',
     };
 
-    const currentThread = prevState.currentThread;
+    const currentThread = prevState.currentThreadIdx;
     const newThread: ChatThread =
         currentThread === null
             ? { ...prevState.defaultThread }
@@ -136,7 +136,7 @@ function createNewThread(
     return {
         ...newState,
         threads,
-        currentThread: newIndex !== -1 ? newIndex : null,
+        currentThreadIdx: newIndex !== -1 ? newIndex : null,
         ...(currentThread === null && {
             defaultThread: resetDefaultThread(),
         }),
@@ -144,9 +144,9 @@ function createNewThread(
 }
 
 const getActiveThread = (state: ChatState): ChatThread =>
-    state.currentThread === null
+    state.currentThreadIdx === null
         ? state.defaultThread
-        : state.threads[state.currentThread];
+        : state.threads[state.currentThreadIdx];
 
 export function createSubmitHandler(
     plausible: PlausibleHook,
@@ -272,7 +272,7 @@ export function createThreadHandler(
         state.abortController?.abort();
         setState((prevState) => ({
             ...prevState,
-            currentThread: null,
+            currentThreadIdx: null,
             defaultThread: resetDefaultThread(),
             input: '',
             botTyping: false,
@@ -331,9 +331,9 @@ export function updateThreadConfigHandler(setState: ChatDispatch) {
                     : prevState.streamResponse;
 
             const threads = [...prevState.threads];
-            if (prevState.currentThread) {
-                threads[prevState.currentThread] = {
-                    ...threads[prevState.currentThread!],
+            if (prevState.currentThreadIdx) {
+                threads[prevState.currentThreadIdx] = {
+                    ...threads[prevState.currentThreadIdx!],
                     agentConfig,
                 };
                 return {
@@ -457,7 +457,7 @@ export function removeThreadHandler(setState: ChatDispatch) {
             return {
                 ...prevState,
                 threads,
-                currentThread: threads.length - 1,
+                currentThreadIdx: threads.length - 1,
                 saved: false,
             };
         });
@@ -474,7 +474,7 @@ export function removeAllThreadsHandler(
             return {
                 ...prevState,
                 threads: [getDefaultThread(activeThread.agentConfig)],
-                currentThread: null,
+                currentThreadIdx: null,
                 input: '',
                 saved: true,
                 editId: null,

@@ -12,9 +12,7 @@ import useMessages from '@/lib/ChatManagerHook';
 import { Button } from '../ui/button';
 
 export default function Header() {
-    const { currentThread, threads } = useChat();
-    const activeThread =
-        currentThread !== null ? threads[currentThread] : undefined;
+    const { activeThread } = useChat();
     const {
         sideBarOpen,
         setSideBarOpen,

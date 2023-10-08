@@ -35,7 +35,7 @@ const initialState: ChatState = {
     threads: [],
     saved: true,
     editId: null,
-    currentThread: null,
+    currentThreadIdx: null,
     defaultThread: resetDefaultThread(),
     botTyping: false,
     openAiApiKey: '',

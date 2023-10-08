@@ -1,6 +1,12 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, {
+    createContext,
+    useContext,
+    useEffect,
+    useMemo,
+    useState,
+} from 'react';
 import { useRouter } from 'next/navigation';
 import { usePlausible } from 'next-plausible';
 import { useSession } from 'next-auth/react';
@@ -62,7 +68,7 @@ export function ChatProvider({
 
     const defaultCharacter = characterList.find((c) => c.name === 'Chat');
 
-    const initialThread = getInitialActiveThread(
+    const currentThreadIdx = getInitialActiveThread(
         defaultCharacter || characterList[0],
         threadId,
         threadList,
@@ -78,15 +84,16 @@ export function ChatProvider({
     const [state, setState] = useState<ChatState>({
         ...initialState,
         characterList,
-        currentThread: initialThread,
+        currentThreadIdx,
         defaultThread,
         threads: threadList.sort(sortThreadlist),
     });
 
-    const activeThread =
-        state.currentThread !== null
-            ? state.threads[state.currentThread]
-            : undefined;
+    const activeThread = useMemo(() => {
+        if (state.currentThreadIdx !== null) {
+            return state.threads[state.currentThreadIdx];
+        }
+    }, [state.currentThreadIdx, state.threads]);
 
     const createThread = createThreadHandler(state, setState, router);
     const setOpenAiApiKey = setOpenAiApiKeyHandler(setState);
@@ -119,9 +126,9 @@ export function ChatProvider({
 
     // Save thread when it is updated
     useEffect(() => {
-        if (!state.saved && state.currentThread !== null) {
+        if (!state.saved && state.currentThreadIdx !== null) {
             try {
-                const thread = state.threads[state.currentThread];
+                const thread = state.threads[state.currentThreadIdx];
                 if (userId) upsertThread(thread);
                 if (window !== undefined) {
                     setLocalThreadList(state.threads);
@@ -131,7 +138,7 @@ export function ChatProvider({
                 console.error(err);
             }
         }
-    }, [state.saved, state.currentThread, userId, state.threads]);
+    }, [state.saved, state.currentThreadIdx, userId, state.threads]);
 
     // Update active thread when threadId changes
     useEffect(() => {
@@ -148,13 +155,14 @@ export function ChatProvider({
                 : {
                       ...prevState,
                       input: '',
-                      currentThread: foundThreadIndex,
+                      currentThreadIdx: foundThreadIndex,
                   };
         });
     }, [threadId, state.threads]);
 
     const value: ChatState = {
         ...state,
+        activeThread,
         abortRequest,
         createThread,
         setOpenAiApiKey,

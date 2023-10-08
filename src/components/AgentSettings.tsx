@@ -34,18 +34,16 @@ export default function AgentSettings({
     active?: boolean;
 }) {
     const {
+        activeThread,
         updateThreadConfig,
         setSystemMessage,
         saveCharacter,
-        threads,
-        currentThread,
         defaultThread,
         streamResponse,
         setStreamResponse,
     } = useChat();
 
-    const activeThread =
-        currentThread !== null ? threads[currentThread] : defaultThread;
+    const thread = activeThread || defaultThread;
     const isNew = agent === undefined;
     const [config, setConfig] = useState(
         agent
@@ -55,7 +53,7 @@ export default function AgentSettings({
                   name: 'New Character',
               },
     );
-    useEffect(() => setConfig(activeThread.agentConfig), [activeThread]);
+    useEffect(() => setConfig(thread.agentConfig), [thread]);
 
     const onFieldChange = (
         field: keyof AgentConfig,
@@ -86,7 +84,7 @@ export default function AgentSettings({
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (activeThread) {
+        if (thread) {
             setSystemMessage(config.systemMessage);
             updateThreadConfig(config);
         }

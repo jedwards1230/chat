@@ -5,10 +5,8 @@ import useMessages from '@/lib/ChatManagerHook';
 import { Button } from './ui/button';
 
 export default function QuickActions() {
-    const { currentThread, threads, botTyping, createThread, abortRequest } =
-        useChat();
-    const activeThread =
-        currentThread !== null ? threads[currentThread] : undefined;
+    const { activeThread, botTyping, createThread, abortRequest } = useChat();
+
     const messages = useMessages(
         activeThread?.currentNode,
         activeThread?.mapping,
