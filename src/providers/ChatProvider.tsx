@@ -18,7 +18,6 @@ import {
     createSubmitHandler,
     createThreadHandler,
     editMessageHandler,
-    getInitialActiveThread,
     removeMessageHandler,
     removeThreadHandler,
     removeAllThreadsHandler,
@@ -29,34 +28,29 @@ import {
     updateThreadConfigHandler,
     saveCharacterHandler,
     setOpenAiApiKeyHandler,
-    upsertTitleState,
     addMessageHandler,
 } from './ChatProviderUtils';
-import { useUI } from './UIProvider';
-import initialState from './initialChat';
-import Dialogs from '@/components/Dialogs';
-import { upsertThread } from '@/utils/server/supabase';
-import { mergeThreads, mergeCharacters, sortThreadlist } from '@/utils';
+import {
+    getCharacterListByUserId,
+    getThreadListByUserId,
+    upsertThread,
+} from '@/utils/server/supabase';
 import {
     getLocalCharacterList,
     getLocalOpenAiKey,
     getLocalThreadList,
     setLocalThreadList,
 } from '@/utils/client/localstorage';
+import { useUI } from './UIProvider';
+import initialState from './initialChat';
+import Dialogs from '@/components/Dialogs';
+import { mergeThreads, mergeCharacters } from '@/utils';
 
 const ChatContext = createContext<ChatState>(initialState);
 
 export const useChat = () => useContext(ChatContext);
 
-export function ChatProvider({
-    children,
-    threadList,
-    characterList,
-}: {
-    children: React.ReactNode;
-    threadList: ChatThread[];
-    characterList: AgentConfig[];
-}) {
+export function ChatProvider({ children }: { children: React.ReactNode }) {
     const search = useSearchParams();
     const threadId = search.get('c');
     const plausible = usePlausible();
@@ -66,28 +60,7 @@ export function ChatProvider({
 
     const { setAppSettingsOpen } = useUI();
 
-    const defaultCharacter = characterList.find((c) => c.name === 'Chat');
-
-    const currentThreadIdx = getInitialActiveThread(
-        defaultCharacter || characterList[0],
-        threadId,
-        threadList,
-    );
-
-    const defaultThread = defaultCharacter
-        ? {
-              ...initialState.defaultThread,
-              agentConfig: defaultCharacter,
-          }
-        : initialState.defaultThread;
-
-    const [state, setState] = useState<ChatState>({
-        ...initialState,
-        characterList,
-        currentThreadIdx,
-        defaultThread,
-        threads: threadList.sort(sortThreadlist),
-    });
+    const [state, setState] = useState<ChatState>(initialState);
 
     const activeThread = useMemo(() => {
         if (state.currentThreadIdx !== null) {
@@ -99,30 +72,51 @@ export function ChatProvider({
     const setOpenAiApiKey = setOpenAiApiKeyHandler(setState);
     const abortRequest = abortRequestHandler(state, setState);
 
-    // Load local data
+    // Load data
     useEffect(() => {
         // Load OpenAI API key from local storage
         const key = getLocalOpenAiKey();
         if (key) setOpenAiApiKey(key);
 
-        // Load threads from local storage if not connected to db
-        const localCharacters = getLocalCharacterList();
-        const localThreads = getLocalThreadList();
+        // Define an async function to fetch and merge data
+        const fetchDataAndMerge = async () => {
+            // Load threads and characters from local storage
+            const localCharacters = getLocalCharacterList();
+            const localThreads = getLocalThreadList();
 
-        const threads = mergeThreads(state.threads, localThreads);
-        const characterList = mergeCharacters(
-            state.characterList,
-            localCharacters,
-        );
+            let serverCharacters: AgentConfig[] = [];
+            let serverThreads: ChatThread[] = [];
 
-        setState((prevState) => ({
-            ...prevState,
-            saved: false,
-            threads,
-            characterList,
-        }));
+            if (userId) {
+                // Fetch server data
+                [serverThreads, serverCharacters] = await Promise.all([
+                    getThreadListByUserId(userId),
+                    getCharacterListByUserId(userId),
+                ]);
+            }
+
+            const mergedThreads = mergeThreads(
+                mergeThreads(state.threads, localThreads),
+                serverThreads,
+            );
+            const mergedCharacters = mergeCharacters(
+                mergeCharacters(state.characterList, localCharacters),
+                serverCharacters,
+            );
+
+            setState((prevState) => ({
+                ...prevState,
+                saved: false,
+                threads: mergedThreads,
+                characterList: mergedCharacters,
+            }));
+        };
+
+        // Call the async function
+        fetchDataAndMerge();
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [userId]);
 
     // Save thread when it is updated
     useEffect(() => {

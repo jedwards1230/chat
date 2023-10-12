@@ -28,9 +28,7 @@ export default function ChatHistoryEntry({
         removeThread(entry.id);
         deleteThreadById(entry.id);
         deleteLocalThreadById(entry.id);
-        if (active) {
-            createThread();
-        }
+        if (active) createThread();
     };
 
     const setActive = (e: any) => {
