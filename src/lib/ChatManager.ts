@@ -81,20 +81,29 @@ export default class ChatManager {
 
     static deleteMessage(id: string, mapping: MessageMapping): MessageMapping {
         const newMapping: MessageMapping = { ...mapping };
-
+    
         const childMessage = newMapping[id];
         if (!childMessage) {
             return newMapping;
         }
         const parent = childMessage.parent;
         if (parent) {
+            // Remove the node from its parent's children
             newMapping[parent].children = newMapping[parent].children.filter(
                 (childId) => childId !== id,
             );
+            // Assign the node's children to its parent
+            childMessage.children.forEach((childId) => {
+                if(newMapping[childId]){
+                    newMapping[childId].parent = parent;
+                    newMapping[parent].children.push(childId);
+                }
+            });
         }
         delete newMapping[id];
         return newMapping;
     }
+    
 
     static getOrderedMessages(
         current_node: string | null,
