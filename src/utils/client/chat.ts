@@ -5,7 +5,6 @@ import { v4 as uuidv4 } from 'uuid';
 import OpenAI from 'openai';
 
 import { readStream, callTool, parseStreamData } from '../client';
-import { getChatStream, getTitleStream } from '../server/chat';
 import ChatManager from '@/lib/ChatManager';
 
 const MAX_LOOPS = 10;

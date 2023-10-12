@@ -1,0 +1,174 @@
+import ChatManager from './ChatManager';
+
+describe('ChatManager', () => {
+    let initialMapping: MessageMapping;
+    let initialMessage: Message;
+
+    beforeEach(() => {
+        initialMessage = {
+            id: '1',
+            content: 'Hello',
+            role: 'user',
+        };
+        initialMapping = {
+            '1': {
+                id: '1',
+                message: initialMessage,
+                parent: null,
+                children: [],
+            },
+        };
+    });
+
+    test('createMessage', () => {
+        const newMessage: Message = {
+            id: '2',
+            content: 'Hi',
+            role: 'assistant',
+        };
+        const { newMapping, newCurrentNode } = ChatManager.createMessage(
+            newMessage,
+            initialMapping,
+            '1',
+        );
+        expect(newMapping['2']).toEqual({
+            id: '2',
+            message: newMessage,
+            parent: '1',
+            children: [],
+        });
+        expect(newMapping['1'].children).toContain('2');
+        expect(newCurrentNode).toBe('2');
+    });
+
+    test('readMessage', () => {
+        const message = ChatManager.readMessage('1', initialMapping);
+        expect(message).toEqual(initialMessage);
+    });
+
+    test('updateMessage', () => {
+        const updatedMessage: Message = {
+            ...initialMessage,
+            content: 'Updated content',
+        };
+        const newMapping = ChatManager.updateMessage(
+            updatedMessage,
+            initialMapping,
+        );
+        expect(newMapping['1'].message).toEqual(updatedMessage);
+    });
+
+    test('deleteMessage', () => {
+        const newMapping = ChatManager.deleteMessage('1', initialMapping);
+        expect(newMapping['1']).toBeUndefined();
+    });
+
+    test('upsertMessage', () => {
+        const newMessage: Message = {
+            id: '2',
+            content: 'Hi',
+            role: 'assistant',
+        };
+        let { newMapping } = ChatManager.upsertMessage(
+            newMessage,
+            initialMapping,
+            '1',
+        );
+        expect(newMapping['2']).toEqual({
+            id: '2',
+            message: newMessage,
+            parent: '1',
+            children: [],
+        });
+        expect(newMapping['1'].children).toContain('2');
+
+        const updatedMessage: Message = {
+            ...newMessage,
+            content: 'Updated content',
+        };
+        ({ newMapping } = ChatManager.upsertMessage(
+            updatedMessage,
+            newMapping,
+            '1',
+        ));
+        expect(newMapping['2'].message).toEqual(updatedMessage);
+    });
+
+    test('getOrderedMessages', () => {
+        const newMessage: Message = {
+            id: '2',
+            content: 'Hi',
+            role: 'assistant',
+        };
+        let { newMapping } = ChatManager.createMessage(
+            newMessage,
+            initialMapping,
+            '1',
+        );
+        const orderedMessages = ChatManager.getOrderedMessages('2', newMapping);
+        expect(orderedMessages).toEqual([initialMessage, newMessage]);
+    });
+
+    test('prepareMessageHistory', () => {
+        const newMessage: Message = {
+            id: '2',
+            content: 'Hi',
+            role: 'assistant',
+            name: 'Bot',
+        };
+        let { newMapping } = ChatManager.createMessage(
+            newMessage,
+            initialMapping,
+            '1',
+        );
+        const history = ChatManager.prepareMessageHistory('2', newMapping);
+        expect(history).toEqual([
+            {
+                ...initialMessage,
+                name: undefined,
+            },
+            {
+                ...newMessage,
+                name: 'Bot',
+            },
+        ]);
+    });
+
+    test('editMessageAndFork', () => {
+        const alternateMessage: Message = {
+            id: '3',
+            content: 'Alternate content',
+            role: 'assistant',
+        };
+        let newMapping = ChatManager.editMessageAndFork(
+            '1',
+            alternateMessage,
+            initialMapping,
+        );
+        expect(newMapping['1'].children).toContain('3');
+        expect(newMapping['3']).toEqual({
+            id: '3',
+            message: alternateMessage,
+            parent: '1',
+            children: [],
+        });
+    });
+
+    test('getSystemMessage', () => {
+        const systemMessage: Message = {
+            id: '0',
+            content: 'System message',
+            role: 'system',
+        };
+        let { newCurrentNode, newMapping } = ChatManager.createMessage(
+            systemMessage,
+            initialMapping,
+            null,
+        );
+        const retrievedSystemMessage = ChatManager.getSystemMessage(
+            newCurrentNode,
+            newMapping,
+        );
+        expect(retrievedSystemMessage).toEqual(systemMessage);
+    });
+});

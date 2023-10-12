@@ -8,13 +8,15 @@ export default class ChatManager {
 
         const updateCurrentNode = (current_node: string) => {
             const node = mapping[current_node];
-
+            if (node.children.includes(id)) {
+                throw new Error(
+                    `ID ${id} already exists in children of current_node`,
+                );
+            }
             return {
                 [current_node]: {
                     ...node,
-                    children: node.children.includes(id)
-                        ? node.children
-                        : [...node.children, id],
+                    children: [...node.children, id],
                 },
             };
         };
@@ -66,11 +68,8 @@ export default class ChatManager {
         mapping: MessageMapping,
     ): MessageMapping {
         if (!mapping[message.id]) {
-            throw new Error(
-                `Message with ID ${message.id} does not exist in mapping ${mapping}`,
-            );
+            return mapping;
         }
-
         return {
             ...mapping,
             [message.id]: {
@@ -87,15 +86,13 @@ export default class ChatManager {
         if (!childMessage) {
             return newMapping;
         }
-
         const parent = childMessage.parent;
         if (parent) {
             newMapping[parent].children = newMapping[parent].children.filter(
                 (childId) => childId !== id,
             );
         }
-
-        delete mapping[id];
+        delete newMapping[id];
         return newMapping;
     }
 

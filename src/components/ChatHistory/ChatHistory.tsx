@@ -79,7 +79,7 @@ function ChatHistory({
             {/* Footer Buttons */}
             <div className="flex w-full justify-end gap-x-2 pb-3 pl-2 text-sm md:pb-1 md:pl-0">
                 <AccountDropdown user={user}>
-                    <div className="grid w-full grid-cols-6 items-center gap-1">
+                    <div className="grid w-full grid-cols-7 items-center gap-1">
                         {user ? (
                             <>
                                 {user.image && (
@@ -88,15 +88,15 @@ function ChatHistory({
                                         alt="Profile Picture"
                                         width={32}
                                         height={32}
-                                        className="col-span-1"
+                                        className="col-span-1 rounded-sm"
                                     />
                                 )}
-                                <div className="col-span-4 truncate text-ellipsis">
+                                <div className="col-span-5 truncate text-ellipsis">
                                     {user.email}
                                 </div>
                             </>
                         ) : (
-                            <div className="col-span-5 text-left">Menu</div>
+                            <div className="col-span-6 text-left">Menu</div>
                         )}
                         <div className="col-span-1 flex justify-center">
                             <Ellipsis />

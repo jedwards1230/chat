@@ -7,16 +7,7 @@ const LLAMA_2_SECRET = process.env.LLAMA_2_SECRET;
 const MODEL: Model = 'llama-2-7b-chat-int8';
 
 export async function getLlama2Chat(
-    messages: { role: string; content: string | null }[] = [
-        {
-            role: 'system',
-            content: 'You are a helpful assistant.',
-        },
-        {
-            role: 'user',
-            content: 'Tell me a joke',
-        },
-    ],
+    messages: { role: string; content: string | null }[],
 ): Promise<Message> {
     const url = new URL(
         `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/ai/run/@cf/meta/${MODEL}`,
