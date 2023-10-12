@@ -29,7 +29,14 @@ function ChatInput() {
     const [activeId, setActiveId] = useState<string>(thread.id);
     const inputRef = useRef<HTMLTextAreaElement>(null);
 
-    const tokenCount = useMemo(() => getTokenCount(input), [input]);
+    const [tokenCount, setTokenCount] = useState(0);
+
+    useEffect(() => {
+        (async () => {
+            const count = await getTokenCount(input);
+            setTokenCount(count);
+        })();
+    }, [input]);
 
     const rows = calculateRows(input);
 

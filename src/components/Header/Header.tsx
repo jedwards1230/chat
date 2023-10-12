@@ -1,7 +1,7 @@
 'use client';
 
 import clsx from 'clsx';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { useChat } from '@/providers/ChatProvider';
 import { Bars, Information } from '../Icons';
@@ -25,15 +25,20 @@ export default function Header() {
         activeThread?.mapping,
     );
 
-    const tokenCount = useMemo(() => {
-        if (messages.length > 1) {
-            return messages.reduce(
-                (acc, msg) =>
-                    msg.content ? acc + getTokenCount(msg.content) : acc,
-                0,
-            );
-        }
-        return 0;
+    const [tokenCount, setTokenCount] = useState(0);
+
+    useEffect(() => {
+        (async () => {
+            let total = 0;
+            if (messages.length > 1) {
+                for (const msg of messages) {
+                    if (msg.content) {
+                        total += await getTokenCount(msg.content);
+                    }
+                }
+            }
+            setTokenCount(total);
+        })();
     }, [messages]);
 
     const handleSidebarToggle = () => setSideBarOpen(!sideBarOpen);
