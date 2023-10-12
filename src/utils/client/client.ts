@@ -185,11 +185,23 @@ export async function validateOpenAIKey(apiKey: string) {
         throw new Error('Invalid OpenAI key');
     }
 
-    const openai = new OpenAI({
-        dangerouslyAllowBrowser: true,
-        apiKey,
+    const res = await fetch('https://api.openai.com/v1/models', {
+        headers: {
+            Authorization: `Bearer ${apiKey}`,
+        },
     });
-    const modelListData = await openai.models.list();
 
-    return modelListData && modelListData.data && modelListData.data.length > 0;
+    if (!res.ok) {
+        throw new Error(
+            `Got ${res.status} error from OpenAI API: ${res.statusText}`,
+        );
+    }
+
+    const json = await res.json();
+
+    if (!json || !json.data || json.data.length === 0) {
+        throw new Error('No models found');
+    }
+
+    return true;
 }

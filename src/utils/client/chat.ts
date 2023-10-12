@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import OpenAI from 'openai';
 
 import { readStream, callTool, parseStreamData } from '../client';
-import { fetchChat, getTitleStream } from '../server/chat';
+import { getChatStream, getTitleStream } from '../server/chat';
 import ChatManager from '@/lib/ChatManager';
 
 const MAX_LOOPS = 10;
@@ -70,7 +70,7 @@ export async function getTitle(
     const l = messages.length;
     if (l < 2 || l > 10) return;
 
-    const stream = await requestTitleStream(messages, userId, openAiApiKey);
+    const stream = await fetchTitle(messages, openAiApiKey);
 
     // Callback function to handle each chunk of the response stream
     const streamCallback = (
@@ -154,12 +154,11 @@ export async function getChat({
 
         for (let i = 0; i < 5; i++) {
             try {
-                const stream = await requestChatWithClientOrServer(
+                const stream = await fetchChat(
                     activeThread,
                     controller.signal,
                     msgHistory,
                     true,
-                    userId,
                     apiKey,
                 );
 
@@ -176,12 +175,11 @@ export async function getChat({
             }
         }
     } else {
-        const res = await requestChatWithClientOrServer(
+        const res = await fetchChat(
             activeThread,
             controller.signal,
             msgHistory,
             false,
-            userId,
             apiKey,
         );
 
@@ -215,85 +213,61 @@ export async function getChat({
     }));
 }
 
-async function requestTitleStream(
-    msgHistory: Message[],
-    userId?: string | null,
-    apiKey?: string,
-) {
+async function fetchTitle(msgHistory: Message[], apiKey?: string) {
     // Prepare the chat history
     const history = msgHistory.map((msg) => msg.role + ': ' + msg.content);
     const historyStr = history.join('\n');
 
-    if (userId && !apiKey) {
-        // user server-side key
-        const res = await fetch('/api/get_title', {
-            method: 'POST',
-            body: JSON.stringify({
-                history: historyStr,
-            }),
-        });
-        if (!res.body) {
-            throw new Error('No response body from /api/get_title');
-        }
+    const res = await fetch('/api/get_title', {
+        method: 'POST',
+        body: JSON.stringify({
+            history: historyStr,
+            apiKey,
+        }),
+    });
 
-        return res.body;
-    } else if (apiKey) {
-        // use client-side key
-        return await getTitleStream(historyStr, apiKey);
+    if (!res.body) {
+        throw new Error('No response body from /api/get_title');
     }
 
-    throw new Error('No API key or user ID');
+    return res.body;
 }
 
-async function requestChatWithClientOrServer(
+async function fetchChat(
     activeThread: ChatThread,
     signal: AbortSignal,
     msgHistory: Message[],
     stream: boolean = true,
-    userId?: string | null,
     apiKey?: string,
 ) {
-    if (userId && !apiKey) {
-        // use server-side key
-        const response = await fetch('/api/chat', {
-            method: 'POST',
-            signal,
-            body: JSON.stringify({
-                activeThread,
-                msgHistory,
-                stream,
-            }),
-        });
-
-        if (stream) {
-            if (!response.body) {
-                throw new Error('No response body from /api/chat');
-            }
-
-            return response.body;
-        } else {
-            if (!response.ok) {
-                throw new Error(
-                    `Got ${response.status} error from /api/chat: ${response.statusText}`,
-                );
-            }
-
-            const json: Message = await response.json();
-
-            return json;
-        }
-    } else if (apiKey) {
-        // use client-side key
-        return await fetchChat({
+    const response = await fetch('/api/chat', {
+        method: 'POST',
+        signal,
+        body: JSON.stringify({
             activeThread,
             msgHistory,
-            signal,
-            key: apiKey,
             stream,
-        });
-    }
+            apiKey,
+        }),
+    });
 
-    throw new Error('No API key or user ID');
+    if (stream) {
+        if (!response.body) {
+            throw new Error('No response body from /api/chat');
+        }
+
+        return response.body;
+    } else {
+        if (!response.ok) {
+            throw new Error(
+                `Got ${response.status} error from /api/chat: ${response.statusText}`,
+            );
+        }
+
+        const json: Message = await response.json();
+
+        return json;
+    }
 }
 
 type ToolDataParams = {

@@ -2,12 +2,13 @@ import { getTitleStream } from '@/utils/server/chat';
 
 export const runtime = 'edge';
 
+type ReqType = {
+    history: string;
+    apiKey?: string;
+};
+
 export async function POST(request: Request) {
-    const {
-        history,
-    }: {
-        history: string;
-    } = await request.json();
+    const { history, apiKey }: ReqType = await request.json();
 
     if (!history) {
         return new Response('No history', {
@@ -15,7 +16,7 @@ export async function POST(request: Request) {
         });
     }
 
-    const stream = await getTitleStream(history);
+    const stream = await getTitleStream(history, apiKey);
 
     return new Response(stream, {
         headers: {

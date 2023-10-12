@@ -1,15 +1,17 @@
-import { fetchChat } from '@/utils/server/chat';
+import { getChatStream } from '@/utils/server/chat';
 
 export const runtime = 'edge';
 
+type ReqType = {
+    msgHistory: Message[];
+    activeThread: ChatThread;
+    stream: boolean;
+    key?: string;
+};
+
 export async function POST(request: Request) {
-    const { msgHistory, activeThread, stream, key } =
-        (await request.json()) as {
-            msgHistory: Message[];
-            activeThread: ChatThread;
-            stream: boolean;
-            key?: string;
-        };
+    const { msgHistory, activeThread, stream, key }: ReqType =
+        await request.json();
 
     if (!msgHistory) {
         return new Response('No message history', {
@@ -17,7 +19,7 @@ export async function POST(request: Request) {
         });
     }
 
-    const res = await fetchChat({ activeThread, msgHistory, stream, key });
+    const res = await getChatStream({ activeThread, msgHistory, stream, key });
 
     if (typeof res === 'string') {
         return new Response(res, {

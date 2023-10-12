@@ -89,7 +89,7 @@ export async function getTitleStream(history: string, key?: string) {
     }
 }
 
-type FetchChatParams = {
+type GetChatStreamParams = {
     activeThread: ChatThread;
     msgHistory: Message[];
     signal?: AbortSignal;
@@ -97,13 +97,13 @@ type FetchChatParams = {
     stream?: boolean;
 };
 
-export async function fetchChat({
+export async function getChatStream({
     activeThread,
     msgHistory = [],
     signal,
     key,
     stream = true,
-}: FetchChatParams): Promise<ReadableStream<any> | Message> {
+}: GetChatStreamParams): Promise<ReadableStream<any> | Message> {
     const tools = activeThread.agentConfig.toolsEnabled
         ? activeThread.agentConfig.tools
         : [];
