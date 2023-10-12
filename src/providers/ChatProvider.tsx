@@ -7,7 +7,7 @@ import React, {
     useMemo,
     useState,
 } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { usePlausible } from 'next-plausible';
 import { useSession } from 'next-auth/react';
 
@@ -52,13 +52,13 @@ export function ChatProvider({
     children,
     threadList,
     characterList,
-    threadId,
 }: {
     children: React.ReactNode;
     threadList: ChatThread[];
     characterList: AgentConfig[];
-    threadId?: string;
 }) {
+    const search = useSearchParams();
+    const threadId = search.get('c');
     const plausible = usePlausible();
     const { data: session } = useSession();
     const userId = session?.user?.email;

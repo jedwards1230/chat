@@ -4,8 +4,6 @@ import PlausibleProvider from 'next-plausible';
 import './globals.css';
 import Providers from '@/providers';
 
-export const runtime = 'edge';
-
 const APP_NAME = 'Chat';
 const APP_DEFAULT_TITLE = 'Chat';
 const APP_TITLE_TEMPLATE = 'Chat | %s';

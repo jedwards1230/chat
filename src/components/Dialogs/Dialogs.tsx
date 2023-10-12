@@ -4,7 +4,7 @@ import AppSettingsDialog from './AppSettings/AppSettingsDialog';
 import ShareChat from './ShareChat';
 import { useUI } from '@/providers/UIProvider';
 
-export default function Dialogs({ threadId }: { threadId?: string }) {
+export default function Dialogs({ threadId }: { threadId: string | null }) {
     const { shareModalOpen } = useUI();
 
     return (
