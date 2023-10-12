@@ -16,7 +16,7 @@ export function SubmitButton({
             {tokenCount > 0 && (
                 <div className="text-sm" title="Token Count">
                     <span>{tokenCount}</span>
-                    {maxTokens > 0 && <span>/ {maxTokens}</span>}
+                    {maxTokens > 0 && <span> / {maxTokens}</span>}
                 </div>
             )}
             <Button
