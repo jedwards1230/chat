@@ -21,7 +21,10 @@ export default function ModelSelector() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="outlineAccent">
+                <Button
+                    variant="outlineAccent"
+                    className="hover:text-foreground"
+                >
                     Model: {activeModel.name}
                 </Button>
             </DropdownMenuTrigger>
