@@ -1,18 +1,16 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, memo, ChangeEvent } from 'react';
+import { useEffect, useRef, useState, memo } from 'react';
 
 import { useChat } from '@/providers/ChatProvider';
 import QuickActions from '../QuickActions';
 import { isMobile } from '@/utils/client/device';
 import { calculateRows } from '@/utils';
 import { getTokenCount } from '@/utils/tokenizer';
-import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
-import { Input } from '../ui/input';
-import { createMessage } from '@/utils/client/chat';
 import { EditButtons, SubmitButton } from './Buttons';
 import CommandOverlay from './CommandOverlay';
+import FileUpload from './FileUpload';
 
 function ChatInput() {
     const {
@@ -20,7 +18,6 @@ function ChatInput() {
         defaultThread,
         input,
         editId,
-        addMessage,
         changeInput,
         handleSubmit,
     } = useChat();
@@ -52,41 +49,6 @@ function ChatInput() {
         }
     };
 
-    const onFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
-        const files = e.target.files;
-        console.log(e.target.files);
-        if (files) {
-            for (const file of files) {
-                if (file.type.startsWith('text/') || file.type === '') {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        const contents = e.target?.result;
-                        if (contents) {
-                            const content =
-                                typeof contents === 'string'
-                                    ? contents
-                                    : contents.toString();
-
-                            const fileExtension =
-                                file.name.split('.').pop() || 'txt';
-
-                            const message = createMessage({
-                                role: 'user',
-                                name: file.name,
-                                content: `\`\`\`${fileExtension}\n// ${file.name}\n\n${content}\n\`\`\``,
-                            });
-
-                            addMessage(message, thread);
-                        }
-                    };
-                    reader.readAsText(file);
-                } else {
-                    console.log('Unsupported file type', file.type);
-                }
-            }
-        }
-    };
-
     useEffect(() => {
         if (thread.id !== activeId) {
             setActiveId(thread.id);
@@ -109,23 +71,7 @@ function ChatInput() {
                         />
                     )}
                     <div className="flex gap-1 sm:gap-2">
-                        <Button
-                            className="text-xl font-bold"
-                            variant="outline"
-                            size="icon"
-                            onClick={() =>
-                                document.getElementById('fileInput')?.click()
-                            }
-                        >
-                            +
-                        </Button>
-                        <Input
-                            id="fileInput"
-                            className="hidden"
-                            type="file"
-                            multiple
-                            onChange={onFileUpload}
-                        />
+                        <FileUpload thread={thread} />
                         <Textarea
                             variant="blue"
                             ref={inputRef}
