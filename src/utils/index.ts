@@ -1,4 +1,4 @@
-import { ChatCompletionMessageParam } from 'openai/resources/chat';
+import { type ChatCompletionMessageParam } from 'openai/resources/chat';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { upsertCharacter, upsertThread } from './server/supabase';

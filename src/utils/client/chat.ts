@@ -2,7 +2,7 @@
 
 import { Dispatch, SetStateAction } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import OpenAI from 'openai';
+import type OpenAI from 'openai';
 
 import { readStream, callTool, parseStreamData } from '../client';
 import ChatManager from '@/lib/ChatManager';

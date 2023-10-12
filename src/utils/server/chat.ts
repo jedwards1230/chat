@@ -167,7 +167,7 @@ export async function getChatStream({
 
 async function fetchLlama2Chat(msgHistory: Message[]) {
     const messages = prepareMessages(msgHistory);
-    return await getLlama2Chat(messages);
+    return getLlama2Chat(messages);
 }
 
 async function fetchOpenAiChat(
@@ -181,9 +181,8 @@ async function fetchOpenAiChat(
     const messages = prepareMessages(msgHistory);
     const model = activeThread.agentConfig.model;
     const temperature = model.params?.temperature;
-
+    
     const openai = getOpenAiClient(key);
-
     const completion = await openai.chat.completions.create(
         {
             model: model.name,
@@ -195,19 +194,9 @@ async function fetchOpenAiChat(
         { signal },
     );
 
-    if (completion instanceof Stream) {
-        const stream = toReadableStream(completion);
-
-        if (!stream) {
-            throw new Error('No response body from /api/chat');
-        }
-
-        return stream;
-    }
-
-    return {
+    return (completion instanceof Stream) ? toReadableStream(completion) : {
         id: uuidv4(),
         content: completion.choices[0].message.content,
         role: completion.choices[0].message.role,
-    };
+    }
 }

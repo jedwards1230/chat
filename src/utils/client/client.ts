@@ -1,6 +1,6 @@
 'use client';
 
-import OpenAI from 'openai';
+import type OpenAI from 'openai';
 
 export async function readStream(
     stream: ReadableStream,
