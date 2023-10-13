@@ -60,6 +60,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
     const { setAppSettingsOpen } = useUI();
 
+    const [mounted, setMounted] = useState(false);
     const [state, setState] = useState<ChatState>(initialState);
 
     const activeThread = useMemo(() => {
@@ -74,6 +75,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
     // Load data
     useEffect(() => {
+        if (mounted) return;
         // Load OpenAI API key from local storage
         const key = getLocalOpenAiKey();
         if (key) setOpenAiApiKey(key);
@@ -108,6 +110,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
                 threads: mergedThreads,
                 characterList: mergedCharacters,
             }));
+            setMounted(true);
         };
 
         fetchDataAndMerge();
