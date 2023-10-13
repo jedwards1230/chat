@@ -20,19 +20,36 @@ export async function getThreadListByUserId(
         db.getChatThreads(userId),
     ]);
 
+    const threadIds = threads.map((thread) => thread.id);
+    const allMessages = await db.getMessagesForThreads(threadIds);
+
+    const messageIds = allMessages.map((message) => message.id);
+    const allRelations = await db.getMessageRelationsForMessages(messageIds);
+
+    const groupBy = (array: any[], key: string) =>
+        array.reduce((result, currentValue) => {
+            (result[currentValue[key]] = result[currentValue[key]] || []).push(
+                currentValue,
+            );
+            return result;
+        }, {});
+
+    const messagesByThreadId = groupBy(allMessages, 'threadId');
+    const relationsByMessageId = groupBy(allRelations, 'messageId');
+
     const threadList: ChatThread[] = [];
     for (const thread of threads) {
         if (!thread.agentConfigId)
             throw new Error(`Thread ${thread.id} has no agent config ID`);
 
-        const messages = await db.getMessages(thread.id);
+        const messages = messagesByThreadId[thread.id] || [];
 
         let currentNode: string | null = null;
         const mapping: MessageMapping = {};
         for (const message of messages) {
             if (message.active) currentNode = message.id;
 
-            const relations = await db.getMessageRelations(message.id);
+            const relations = relationsByMessageId[message.id] || [];
             for (const { parentMessageId, childMessageId } of relations) {
                 const name =
                     (message.role !== 'user'

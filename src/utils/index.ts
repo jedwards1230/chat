@@ -1,7 +1,6 @@
 import { type ChatCompletionMessageParam } from 'openai/resources/chat';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { upsertCharacter, upsertThread } from './server/supabase';
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -64,7 +63,6 @@ export function mergeThreads(
             existingThread.lastModified < thread.lastModified
         ) {
             threadMap.set(thread.id, thread);
-            upsertThread(thread);
         }
     });
 
@@ -91,7 +89,6 @@ export function mergeCharacters(
             existingCharacter.lastModified < character.lastModified
         ) {
             characterMap.set(character.name, character);
-            upsertCharacter(character);
         }
     });
 

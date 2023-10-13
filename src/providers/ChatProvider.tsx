@@ -78,7 +78,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         const key = getLocalOpenAiKey();
         if (key) setOpenAiApiKey(key);
 
-        // Define an async function to fetch and merge data
         const fetchDataAndMerge = async () => {
             // Load threads and characters from local storage
             const localCharacters = getLocalCharacterList();
@@ -106,13 +105,11 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
             setState((prevState) => ({
                 ...prevState,
-                saved: false,
                 threads: mergedThreads,
                 characterList: mergedCharacters,
             }));
         };
 
-        // Call the async function
         fetchDataAndMerge();
 
         // eslint-disable-next-line react-hooks/exhaustive-deps

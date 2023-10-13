@@ -53,11 +53,31 @@ export const db = {
         if (error) throw new Error(error.message);
         return messageRelationships;
     },
+    async getMessageRelationsForMessages(
+        messageIds: string[],
+    ): Promise<Tables<'MessageRelationships'>[]> {
+        const { data: messageRelationships, error } = await supabase
+            .from('MessageRelationships')
+            .select('*')
+            .in('childMessageId', messageIds);
+        if (error) throw new Error(error.message);
+        return messageRelationships;
+    },
     async getMessages(threadId: string): Promise<Tables<'Messages'>[]> {
         const { data: messages, error } = await supabase
             .from('Messages')
             .select('*')
             .eq('threadId', threadId);
+        if (error) throw new Error(error.message);
+        return messages;
+    },
+    async getMessagesForThreads(
+        threadIds: string[],
+    ): Promise<Tables<'Messages'>[]> {
+        const { data: messages, error } = await supabase
+            .from('Messages')
+            .select('*')
+            .in('threadId', threadIds);
         if (error) throw new Error(error.message);
         return messages;
     },
