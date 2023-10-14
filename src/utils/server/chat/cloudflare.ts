@@ -1,5 +1,6 @@
 'use server';
 
+import { prepareMessages } from '@/utils';
 import { v4 as uuidv4 } from 'uuid';
 
 const ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID;
@@ -44,4 +45,9 @@ export async function getLlama2Chat(
         role: 'assistant',
         id: uuidv4(),
     };
+}
+
+export async function fetchLlama2Chat(msgHistory: Message[]) {
+    const messages = prepareMessages(msgHistory);
+    return getLlama2Chat(messages);
 }

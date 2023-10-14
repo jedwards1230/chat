@@ -2,7 +2,7 @@
 
 import clsx from 'clsx';
 import { useCallback, useState } from 'react';
-import { PanInfo, motion } from 'framer-motion';
+import { type PanInfo, motion } from 'framer-motion';
 
 import { useChat } from '@/providers/ChatProvider';
 import { useUI } from '@/providers/UIProvider';

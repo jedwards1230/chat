@@ -1,4 +1,4 @@
-import { getChatStream } from '@/utils/server/chat';
+import { getChatStream } from '@/utils/server/chat/stream';
 
 export const runtime = 'edge';
 
@@ -14,26 +14,18 @@ export async function POST(request: Request) {
         await request.json();
 
     if (!msgHistory) {
-        return new Response('No message history', {
-            status: 400,
-        });
+        return new Response('No message history', { status: 400 });
     }
 
     const res = await getChatStream({ activeThread, msgHistory, stream, key });
 
     if (typeof res === 'string') {
-        return new Response(res, {
-            status: 500,
-        });
+        return new Response(res, { status: 500 });
     }
 
     if (res instanceof ReadableStream) {
-        return new Response(res, {
-            status: 200,
-        });
+        return new Response(res, { status: 200 });
     }
 
-    return new Response(JSON.stringify(res), {
-        status: 200,
-    });
+    return new Response(JSON.stringify(res), { status: 200 });
 }

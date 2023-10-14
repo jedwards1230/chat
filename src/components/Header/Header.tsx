@@ -1,7 +1,7 @@
 'use client';
 
 import clsx from 'clsx';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useChat } from '@/providers/ChatProvider';
 import { Bars, Information } from '../Icons';

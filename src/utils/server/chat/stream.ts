@@ -1,54 +1,14 @@
-import OpenAI from 'openai';
-import { Stream } from 'openai/streaming';
-import { ChatCompletionCreateParams } from 'openai/resources/chat';
+'use server';
+
 import { v4 as uuidv4 } from 'uuid';
 
 import { Calculator, Search, WebBrowser, WikipediaQueryRun } from '@/tools';
-import { prepareMessages } from '..';
-import { getLlama2Chat } from '@/lib/cloudflare';
+import { fetchLlama2Chat } from '@/utils/server/chat/cloudflare';
+import { fetchOpenAiChat, getOpenAiClient, toReadableStream } from './openai';
 
 const SERVER_KEY = process.env.OPENAI_API_KEY;
 
-export function getOpenAiClient(key?: string) {
-    return new OpenAI({
-        apiKey: SERVER_KEY || key,
-        dangerouslyAllowBrowser: !!key,
-    });
-}
-
-function toReadableStream(
-    stream: Stream<OpenAI.Chat.Completions.ChatCompletionChunk>,
-): ReadableStream {
-    let iter: AsyncIterator<OpenAI.Chat.Completions.ChatCompletionChunk>;
-    const encoder = new TextEncoder();
-
-    return new ReadableStream({
-        async start() {
-            iter = stream[Symbol.asyncIterator]();
-        },
-        async pull(ctrl) {
-            try {
-                const { value, done } = await iter.next();
-                if (done) return ctrl.close();
-
-                const str =
-                    typeof value === 'string'
-                        ? value
-                        : // Add a newline after JSON to make it easier to parse newline-separated JSON on the frontend.
-                          JSON.stringify(value) + '\n';
-                const bytes = encoder.encode(str);
-
-                ctrl.enqueue(bytes);
-            } catch (err) {
-                ctrl.error(err);
-            }
-        },
-        async cancel() {
-            await iter.return?.();
-        },
-    });
-}
-
+// TODO: generalize this to work with any model
 export async function getTitleStream(history: string, key?: string) {
     try {
         const openai = getOpenAiClient(key);
@@ -127,10 +87,12 @@ export async function getChatStream({
         }
     };
 
-    let functions: ChatCompletionCreateParams.Function[] | undefined;
+    let functions: ChatFunction[] | undefined;
     if (tools && tools.length > 0) {
         functions = tools.map((tool) => formatTool(tool));
     }
+
+    console.log({ stream });
 
     try {
         switch (activeThread.agentConfig.model.name) {
@@ -162,41 +124,5 @@ export async function getChatStream({
                   role: 'assistant',
                   content: JSON.stringify(err),
               };
-    }
-}
-
-async function fetchLlama2Chat(msgHistory: Message[]) {
-    const messages = prepareMessages(msgHistory);
-    return getLlama2Chat(messages);
-}
-
-async function fetchOpenAiChat(
-    activeThread: ChatThread,
-    msgHistory: Message[],
-    stream: boolean,
-    functions?: ChatCompletionCreateParams.Function[],
-    signal?: AbortSignal,
-    key?: string,
-): Promise<ReadableStream<any> | Message> {
-    const messages = prepareMessages(msgHistory);
-    const model = activeThread.agentConfig.model;
-    const temperature = model.params?.temperature;
-    
-    const openai = getOpenAiClient(key);
-    const completion = await openai.chat.completions.create(
-        {
-            model: model.name,
-            messages,
-            temperature,
-            functions,
-            stream,
-        },
-        { signal },
-    );
-
-    return (completion instanceof Stream) ? toReadableStream(completion) : {
-        id: uuidv4(),
-        content: completion.choices[0].message.content,
-        role: completion.choices[0].message.role,
     }
 }
