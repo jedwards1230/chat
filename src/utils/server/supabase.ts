@@ -60,26 +60,33 @@ export async function getThreadListByUserId(
                     ? new Date(message.createdAt)
                     : new Date();
 
-                mapping[message.id] = {
-                    id: message.id,
-                    message: {
+                if (mapping[message.id]) {
+                    mapping[message.id].children.push(childMessageId);
+                    mapping[message.id].children = [
+                        ...new Set(mapping[message.id].children),
+                    ]; // Remove duplicates
+                } else {
+                    mapping[message.id] = {
                         id: message.id,
-                        content: message.content,
-                        role: message.role,
-                        name,
-                        createdAt,
-                        ...(message.functionCallName &&
-                            message.functionCallArguments && {
-                                function_call: {
-                                    name: message.functionCallName,
-                                    arguments:
-                                        message.functionCallArguments as string,
-                                },
-                            }),
-                    },
-                    parent: parentMessageId,
-                    children: [childMessageId],
-                };
+                        message: {
+                            id: message.id,
+                            content: message.content,
+                            role: message.role,
+                            name,
+                            createdAt,
+                            ...(message.functionCallName &&
+                                message.functionCallArguments && {
+                                    function_call: {
+                                        name: message.functionCallName,
+                                        arguments:
+                                            message.functionCallArguments as string,
+                                    },
+                                }),
+                        },
+                        parent: parentMessageId,
+                        children: [childMessageId],
+                    };
+                }
             }
         }
 

@@ -615,7 +615,7 @@ export function changeBranchHandler(setState: ChatDispatch) {
             return {
                 ...prevState,
                 input: '',
-                //editId: null,
+                editId: null,
                 saved: false,
                 threads: prevState.threads.map((thread) =>
                     thread.id === activeThread.id
