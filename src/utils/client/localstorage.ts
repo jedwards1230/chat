@@ -24,6 +24,7 @@ export function getLocalThreadList() {
                     key,
                     {
                         ...value,
+                        children: [...new Set(value.children)],
                         message: value.message
                             ? {
                                   ...value.message,
