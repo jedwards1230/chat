@@ -185,26 +185,42 @@ export function createSubmitHandler(
 
     const getNewMapping = (
         activeThread: ChatThread,
-        msg: Message,
         editId?: string | null,
-    ): MessagesState => {
+    ): { newMessage: Message; newMap: MessagesState } => {
         if (editId) {
-            const newMapping = ChatManager.editMessageAndFork(
-                editId,
-                msg,
-                activeThread.mapping,
-            );
-            return {
-                mapping: newMapping,
-                currentNode: activeThread.currentNode,
-            };
-        }
+            const editMessage = activeThread.mapping[editId].message;
+            if (editMessage) {
+                const newMessage = {
+                    ...editMessage,
+                    content: state.input,
+                };
+                const newMap = ChatManager.editMessageAndFork(
+                    editId,
+                    newMessage,
+                    activeThread.mapping,
+                );
 
-        return ChatManager.createMessage(
-            msg,
+                return {
+                    newMessage: editMessage,
+                    newMap,
+                };
+            }
+        }
+        const userMsg = createMessage({
+            role: 'user',
+            content: state.input,
+        });
+
+        const newMap = ChatManager.createMessage(
+            userMsg,
             activeThread.mapping,
             activeThread.currentNode,
         );
+
+        return {
+            newMessage: userMsg,
+            newMap,
+        };
     };
 
     return async (e: FormEvent) => {
@@ -214,25 +230,21 @@ export function createSubmitHandler(
             return openKeyDialog('Credentials');
         }
 
-        // create user message
-        const userMsg = createMessage({
-            role: 'user',
-            content: state.input,
-            id: state.editId || undefined,
-        });
-
         const activeThread = getActiveThread(state);
         const controller = new AbortController();
 
         // create new mapping and ordered list of messages
-        const newMap = getNewMapping(activeThread, userMsg, state.editId);
+        const { newMessage, newMap } = getNewMapping(
+            activeThread,
+            state.editId,
+        );
         const msgHistory = ChatManager.prepareMessageHistory(
             newMap.currentNode,
             newMap.mapping,
         );
 
         upsertThread(newMap, controller);
-        upsertMessage(userMsg);
+        upsertMessage(newMessage);
 
         router.replace('/?c=' + activeThread.id);
         plausible('Submitted Message', {
@@ -586,5 +598,34 @@ export function addMessageHandler(
         setState((prevState) => createNewThread(prevState, newMap));
         setState((prevState) => upsertMessageState(prevState, message));
         router.replace('/?c=' + activeThread.id);
+    };
+}
+
+export function changeBranchHandler(setState: ChatDispatch) {
+    return (id: string) => {
+        setState((prevState) => {
+            const activeThread = getActiveThread(prevState);
+            const newNode = ChatManager.findEndmostNode(
+                id,
+                activeThread.mapping,
+            );
+            if (!newNode) {
+                throw new Error('Node not found');
+            }
+            return {
+                ...prevState,
+                input: '',
+                //editId: null,
+                saved: false,
+                threads: prevState.threads.map((thread) =>
+                    thread.id === activeThread.id
+                        ? {
+                              ...thread,
+                              currentNode: newNode,
+                          }
+                        : thread,
+                ),
+            };
+        });
     };
 }

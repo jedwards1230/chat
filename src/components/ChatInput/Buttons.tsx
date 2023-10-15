@@ -1,5 +1,6 @@
 import { useChat } from '@/providers/ChatProvider';
 import { Button } from '../ui/button';
+import clsx from 'clsx';
 
 export function SubmitButton({
     tokenCount,
@@ -14,9 +15,20 @@ export function SubmitButton({
     return (
         <div className="flex flex-col justify-end gap-1 p-1">
             {tokenCount > 0 && (
-                <div className="text-sm" title="Token Count">
-                    <span>{tokenCount}</span>
-                    {maxTokens > 0 && <span> / {maxTokens}</span>}
+                <div
+                    className={clsx(
+                        'text-center text-sm',
+                        maxTokens > 0 &&
+                            tokenCount > maxTokens &&
+                            'text-red-500',
+                    )}
+                    title={
+                        tokenCount +
+                        ' tokens' +
+                        (maxTokens > 0 ? ' / ' + maxTokens + ' max tokens' : '')
+                    }
+                >
+                    {tokenCount}
                 </div>
             )}
             <Button

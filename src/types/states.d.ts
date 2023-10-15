@@ -30,6 +30,7 @@ type ChatState = {
     createThread: () => void;
     /** Toggle plugin for active thread */
     toggleplugin: (plugin: Tool) => void;
+    changeBranch: (id: string) => void;
     saveCharacter: (character: AgentConfig) => Promise<void>;
     updateThreadConfig: (config: Partial<AgentConfig>) => void;
     setSystemMessage: (message: string) => void;

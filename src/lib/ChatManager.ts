@@ -1,3 +1,5 @@
+import { v4 as uuid } from 'uuid';
+
 export default class ChatManager {
     static createMessage(
         message: Message,
@@ -31,14 +33,6 @@ export default class ChatManager {
                 children: [],
             },
         };
-
-        if (current_node) {
-            const parentNode = newMapping[current_node];
-            newMapping[current_node] = {
-                ...parentNode,
-                children: [...parentNode.children, id],
-            };
-        }
 
         return { mapping: newMapping, currentNode: id };
     }
@@ -77,6 +71,14 @@ export default class ChatManager {
                 message,
             },
         };
+    }
+
+    static findEndmostNode(id: string, mapping: MessageMapping): string {
+        let currentNode = id;
+        while (mapping[currentNode].children.length > 0) {
+            currentNode = mapping[currentNode].children[0];
+        }
+        return currentNode;
     }
 
     static deleteMessage(
@@ -157,26 +159,34 @@ export default class ChatManager {
         id: string,
         alternateMessage: Message,
         mapping: MessageMapping,
-    ): MessageMapping {
+    ): MessagesState {
         const newMapping: MessageMapping = { ...mapping };
 
-        const childMessage = newMapping[id];
-        if (!childMessage) {
+        const originalMessage = newMapping[id];
+        if (!originalMessage) {
             throw new Error(`Message with ID ${id} does not exist`);
         }
 
-        childMessage.message = alternateMessage;
+        // Check if the alternateMessage id does not already exist in the mapping
+        if (newMapping[alternateMessage.id]) {
+            alternateMessage.id = uuid();
+        }
 
         newMapping[alternateMessage.id] = {
             id: alternateMessage.id,
             message: alternateMessage,
-            parent: id,
+            parent: originalMessage.parent, // same parent as original message
             children: [],
         };
 
-        childMessage.children.push(alternateMessage.id);
+        // Add the new message to the parent's list of children
+        if (originalMessage.parent) {
+            newMapping[originalMessage.parent].children.push(
+                alternateMessage.id,
+            );
+        }
 
-        return newMapping;
+        return { mapping: newMapping, currentNode: alternateMessage.id };
     }
 
     static getSystemMessage(

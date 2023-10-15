@@ -29,6 +29,7 @@ import {
     saveCharacterHandler,
     setOpenAiApiKeyHandler,
     addMessageHandler,
+    changeBranchHandler,
 } from './ChatProviderUtils';
 import {
     getCharacterListByUserId,
@@ -163,6 +164,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         addMessage: addMessageHandler(setState, router),
         cancelEdit: cancelEditHandler(setState),
         changeInput: changeInputHandler(setState),
+        changeBranch: changeBranchHandler(setState),
         removeThread: removeThreadHandler(setState),
         saveCharacter: saveCharacterHandler(setState, userId),
         removeMessage: removeMessageHandler(setState),

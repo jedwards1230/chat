@@ -10,7 +10,6 @@ export default function FileUpload({ thread }: { thread: ChatThread }) {
 
     const onFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
-        console.log(e.target.files);
         if (files) {
             for (const file of files) {
                 const reader = new FileReader();
