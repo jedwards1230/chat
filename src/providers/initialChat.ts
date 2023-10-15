@@ -49,6 +49,7 @@ const initialState: ChatState = {
     editMessage: () => {},
     abortRequest: () => {},
     createThread: () => {},
+    changeBranch: () => {},
     removeThread: () => {},
     toggleplugin: () => {},
     removeMessage: () => {},
