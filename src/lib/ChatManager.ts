@@ -79,31 +79,42 @@ export default class ChatManager {
         };
     }
 
-    static deleteMessage(id: string, mapping: MessageMapping): MessageMapping {
-        const newMapping: MessageMapping = { ...mapping };
-    
-        const childMessage = newMapping[id];
-        if (!childMessage) {
-            return newMapping;
+    static deleteMessage(
+        id: string,
+        mapping: MessageMapping,
+        currentNode: string | null,
+    ): { updatedMapping: MessageMapping; newCurrentNode: string | null } {
+        const updatedMapping: MessageMapping = { ...mapping };
+
+        const messageToDelete = updatedMapping[id];
+        if (!messageToDelete) {
+            return { updatedMapping, newCurrentNode: currentNode };
         }
-        const parent = childMessage.parent;
+        const parent = messageToDelete.parent;
         if (parent) {
             // Remove the node from its parent's children
-            newMapping[parent].children = newMapping[parent].children.filter(
-                (childId) => childId !== id,
-            );
+            updatedMapping[parent].children = updatedMapping[
+                parent
+            ].children.filter((childId) => childId !== id);
             // Assign the node's children to its parent
-            childMessage.children.forEach((childId) => {
-                if(newMapping[childId]){
-                    newMapping[childId].parent = parent;
-                    newMapping[parent].children.push(childId);
+            messageToDelete.children.forEach((childId) => {
+                if (updatedMapping[childId]) {
+                    updatedMapping[childId].parent = parent;
+                    updatedMapping[parent].children.push(childId);
                 }
             });
         }
-        delete newMapping[id];
-        return newMapping;
+        delete updatedMapping[id];
+
+        // Update current node
+        let newCurrentNode = currentNode;
+        if (currentNode === id) {
+            // If the deleted message is the current node
+            newCurrentNode = parent; // Set the parent as the new current node
+        }
+
+        return { updatedMapping, newCurrentNode };
     }
-    
 
     static getOrderedMessages(
         current_node: string | null,

@@ -92,8 +92,6 @@ export async function getChatStream({
         functions = tools.map((tool) => formatTool(tool));
     }
 
-    console.log({ stream });
-
     try {
         switch (activeThread.agentConfig.model.name) {
             case 'gpt-3.5-turbo':

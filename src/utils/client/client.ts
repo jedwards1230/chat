@@ -157,6 +157,9 @@ export function parseStreamData(
             accumulatedResponse = c.error.message;
             continue;
         }
+        if (!c.choices) {
+            console.error('No choices in stream data', c);
+        }
         const data = c.choices[0];
         if (data) {
             if (data.finish_reason === 'function_call') {

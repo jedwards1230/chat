@@ -70,6 +70,10 @@ export async function fetchOpenAiChat(
         { signal },
     );
 
+    if (!(completion instanceof Stream) && !completion.choices) {
+        console.error('No choices in stream data', completion);
+    }
+
     return completion instanceof Stream
         ? toReadableStream(completion)
         : {

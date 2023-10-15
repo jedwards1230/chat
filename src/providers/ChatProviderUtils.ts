@@ -432,10 +432,13 @@ export function removeMessageHandler(setState: ChatDispatch) {
     return (id: string) => {
         setState((prevState) => {
             const activeThread = getActiveThread(prevState);
-            activeThread.mapping = ChatManager.deleteMessage(
+            const newMapping = ChatManager.deleteMessage(
                 id,
                 activeThread.mapping,
+                activeThread.currentNode,
             );
+            activeThread.mapping = newMapping.updatedMapping;
+            activeThread.currentNode = newMapping.newCurrentNode;
             return {
                 ...prevState,
                 saved: false,
