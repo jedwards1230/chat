@@ -56,7 +56,6 @@ export default function FileUpload({ thread }: { thread: ChatThread }) {
                 id="fileInput"
                 className="hidden"
                 type="file"
-                multiple
                 onChange={onFileUpload}
             />
         </>

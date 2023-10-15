@@ -48,11 +48,12 @@ function upsertMessageState(
     if (activeIdx === null) return prevState;
     const active = prevState.threads[activeIdx];
 
-    const { newMapping, newCurrentNode } = ChatManager.upsertMessage(
-        newMessage,
-        active.mapping,
-        active.currentNode,
-    );
+    const { mapping: newMapping, currentNode: newCurrentNode } =
+        ChatManager.upsertMessage(
+            newMessage,
+            active.mapping,
+            active.currentNode,
+        );
 
     const newThread: ChatThread = {
         ...active,
@@ -103,7 +104,7 @@ export function upsertTitleState(
  * */
 function createNewThread(
     prevState: ChatState,
-    newMap: NewMapping,
+    newMap: MessagesState,
     controller?: AbortController,
 ): ChatState {
     const newState = {
@@ -119,8 +120,8 @@ function createNewThread(
             ? { ...prevState.defaultThread }
             : {
                   ...prevState.threads[currentThread],
-                  mapping: newMap.newMapping,
-                  currentNode: newMap.newCurrentNode,
+                  mapping: newMap.mapping,
+                  currentNode: newMap.currentNode,
                   lastModified: new Date(),
               };
 
@@ -169,7 +170,7 @@ export function createSubmitHandler(
         }
     };
 
-    const upsertThread = (newMap: NewMapping, controller: AbortController) =>
+    const upsertThread = (newMap: MessagesState, controller: AbortController) =>
         setState((prevState) => createNewThread(prevState, newMap, controller));
 
     const upsertMessage = (newMessage: Message, threadId?: string) =>
@@ -186,7 +187,7 @@ export function createSubmitHandler(
         activeThread: ChatThread,
         msg: Message,
         editId?: string | null,
-    ): NewMapping => {
+    ): MessagesState => {
         if (editId) {
             const newMapping = ChatManager.editMessageAndFork(
                 editId,
@@ -194,8 +195,8 @@ export function createSubmitHandler(
                 activeThread.mapping,
             );
             return {
-                newMapping,
-                newCurrentNode: activeThread.currentNode,
+                mapping: newMapping,
+                currentNode: activeThread.currentNode,
             };
         }
 
@@ -226,8 +227,8 @@ export function createSubmitHandler(
         // create new mapping and ordered list of messages
         const newMap = getNewMapping(activeThread, userMsg, state.editId);
         const msgHistory = ChatManager.prepareMessageHistory(
-            newMap.newCurrentNode,
-            newMap.newMapping,
+            newMap.currentNode,
+            newMap.mapping,
         );
 
         upsertThread(newMap, controller);
@@ -377,7 +378,7 @@ export function setSystemMessageHandler(setState: ChatDispatch) {
                     activeThread.mapping,
                 );
             } else {
-                const { newMapping, newCurrentNode } =
+                const { mapping: newMapping, currentNode: newCurrentNode } =
                     ChatManager.createMessage(
                         {
                             ...createMessage({ role: 'system' }),

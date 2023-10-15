@@ -17,6 +17,7 @@ type ModelParams = {
     presencePenalty?: number;
 };
 
+/** Basic details for calling the API */
 interface ModelInfo {
     name: Model;
     api: ApiProvider;
@@ -33,16 +34,26 @@ interface LlamaModelInfo extends ModelInfo {
     api: 'llama';
 }
 
+/** The model used to generate responses */
 type ModelApi = OpenAiModelInfo | LlamaModelInfo;
 
-type Role = 'system' | 'user' | 'assistant' | 'function';
-
+/**
+ * User configured settings for the agent.
+ */
 interface AgentConfig {
     id: string;
+    /** Not injected into chat. Simply for the user to organize Agents. */
     name: string;
+    /** List of functions for which the Agent has access. */
     tools: Tool[];
+    /**
+     * Toggles sending list of tools to the API.
+     * Will prevent sending tools even if there are tools in the list.
+     * */
     toolsEnabled: boolean;
+    /** The model used to generate responses */
     model: ModelApi;
+    /** System message to steer the Agent. */
     systemMessage: string;
 }
 

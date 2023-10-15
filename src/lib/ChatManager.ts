@@ -3,7 +3,7 @@ export default class ChatManager {
         message: Message,
         mapping: MessageMapping,
         current_node: string | null,
-    ): NewMapping {
+    ): MessagesState {
         const id = message.id;
 
         const updateCurrentNode = (current_node: string) => {
@@ -40,18 +40,18 @@ export default class ChatManager {
             };
         }
 
-        return { newMapping, newCurrentNode: id };
+        return { mapping: newMapping, currentNode: id };
     }
 
     static upsertMessage(
         message: Message,
         mapping: MessageMapping,
         current_node: string | null,
-    ): NewMapping {
+    ): MessagesState {
         if (mapping[message.id]) {
             return {
-                newMapping: ChatManager.updateMessage(message, mapping),
-                newCurrentNode: current_node,
+                mapping: ChatManager.updateMessage(message, mapping),
+                currentNode: current_node,
             };
         } else {
             return ChatManager.createMessage(message, mapping, current_node);

@@ -26,11 +26,8 @@ describe('ChatManager', () => {
             content: 'Hi',
             role: 'assistant',
         };
-        const { newMapping, newCurrentNode } = ChatManager.createMessage(
-            newMessage,
-            initialMapping,
-            '1',
-        );
+        const { mapping: newMapping, currentNode: newCurrentNode } =
+            ChatManager.createMessage(newMessage, initialMapping, '1');
         expect(newMapping['2']).toEqual({
             id: '2',
             message: newMessage,
@@ -69,7 +66,7 @@ describe('ChatManager', () => {
             content: 'Hi',
             role: 'assistant',
         };
-        let { newMapping } = ChatManager.upsertMessage(
+        let { mapping: newMapping } = ChatManager.upsertMessage(
             newMessage,
             initialMapping,
             '1',
@@ -86,7 +83,7 @@ describe('ChatManager', () => {
             ...newMessage,
             content: 'Updated content',
         };
-        ({ newMapping } = ChatManager.upsertMessage(
+        ({ mapping: newMapping } = ChatManager.upsertMessage(
             updatedMessage,
             newMapping,
             '1',
@@ -100,7 +97,7 @@ describe('ChatManager', () => {
             content: 'Hi',
             role: 'assistant',
         };
-        let { newMapping } = ChatManager.createMessage(
+        let { mapping: newMapping } = ChatManager.createMessage(
             newMessage,
             initialMapping,
             '1',
@@ -116,7 +113,7 @@ describe('ChatManager', () => {
             role: 'assistant',
             name: 'Bot',
         };
-        let { newMapping } = ChatManager.createMessage(
+        let { mapping: newMapping } = ChatManager.createMessage(
             newMessage,
             initialMapping,
             '1',
@@ -160,11 +157,8 @@ describe('ChatManager', () => {
             content: 'System message',
             role: 'system',
         };
-        let { newCurrentNode, newMapping } = ChatManager.createMessage(
-            systemMessage,
-            initialMapping,
-            null,
-        );
+        let { currentNode: newCurrentNode, mapping: newMapping } =
+            ChatManager.createMessage(systemMessage, initialMapping, null);
         const retrievedSystemMessage = ChatManager.getSystemMessage(
             newCurrentNode,
             newMapping,
