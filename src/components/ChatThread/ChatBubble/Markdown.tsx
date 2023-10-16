@@ -36,7 +36,9 @@ function Markdown({
             h6: ({ node, ...props }) => (
                 <h6 {...props} className="text-xs font-bold" />
             ),
-            p: ({ node, ...props }) => <div {...props} className="text-base" />,
+            p: ({ node, ...props }) => (
+                <span {...props} className="text-base" />
+            ),
             blockquote: ({ node, ...props }) => (
                 <blockquote
                     {...props}
