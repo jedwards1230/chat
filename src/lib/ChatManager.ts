@@ -1,6 +1,15 @@
 import { v4 as uuid } from 'uuid';
 
+/**
+ * The ChatManager class provides methods to manage a chat conversation represented as a graph.
+ * The graph's nodes are messages, with the first message being the super parent and the most recent messages
+ * being the end of the branches. The class provides methods to create, read, update, and delete messages,
+ * as well as methods to manage the chat conversation as a whole.
+ */
 export default class ChatManager {
+    /**
+     * Creates a new message in the graph.
+     */
     static createMessage(
         message: Message,
         mapping: MessageMapping,
@@ -37,6 +46,9 @@ export default class ChatManager {
         return { mapping: newMapping, currentNode: id };
     }
 
+    /**
+     * Updates an existing message or creates a new one if it doesn't exist.
+     */
     static upsertMessage(
         message: Message,
         mapping: MessageMapping,
@@ -44,19 +56,25 @@ export default class ChatManager {
     ): MessagesState {
         if (mapping[message.id]) {
             return {
-                mapping: ChatManager.updateMessage(message, mapping),
+                mapping: this.updateMessage(message, mapping),
                 currentNode: current_node,
             };
         } else {
-            return ChatManager.createMessage(message, mapping, current_node);
+            return this.createMessage(message, mapping, current_node);
         }
     }
 
+    /**
+     * Reads a message from the graph.
+     */
     static readMessage(id: string, mapping: MessageMapping): Message | null {
         const childMessage = mapping[id];
         return childMessage ? childMessage.message : null;
     }
 
+    /**
+     * Updates an existing message in the graph.
+     */
     static updateMessage(
         message: Message,
         mapping: MessageMapping,
@@ -73,6 +91,9 @@ export default class ChatManager {
         };
     }
 
+    /**
+     * Finds the endmost node in a branch of the graph.
+     */
     static findEndmostNode(id: string, mapping: MessageMapping): string {
         let currentNode = id;
         while (mapping[currentNode].children.length > 0) {
@@ -81,6 +102,9 @@ export default class ChatManager {
         return currentNode;
     }
 
+    /**
+     * Deletes a message from the graph.
+     */
     static deleteMessage(
         id: string,
         mapping: MessageMapping,
@@ -118,6 +142,9 @@ export default class ChatManager {
         return { updatedMapping, newCurrentNode };
     }
 
+    /**
+     * Returns the ordered list of messages from a branch of the graph.
+     */
     static getOrderedMessages(
         current_node: string | null,
         mapping: MessageMapping,
@@ -139,14 +166,14 @@ export default class ChatManager {
         return orderedMessages;
     }
 
+    /**
+     * Prepares the history of messages for display.
+     */
     static prepareMessageHistory(
         current_node: string | null,
         mapping: MessageMapping,
     ): Message[] {
-        const orderedMessages = ChatManager.getOrderedMessages(
-            current_node,
-            mapping,
-        );
+        const orderedMessages = this.getOrderedMessages(current_node, mapping);
         return orderedMessages.map((message) => {
             return {
                 ...message,
@@ -155,6 +182,9 @@ export default class ChatManager {
         });
     }
 
+    /**
+     * Edits a message and forks the conversation at the message's point in the graph.
+     */
     static editMessageAndFork(
         id: string,
         alternateMessage: Message,
@@ -189,6 +219,9 @@ export default class ChatManager {
         return { mapping: newMapping, currentNode: alternateMessage.id };
     }
 
+    /**
+     * Returns the system message from the graph.
+     */
     static getSystemMessage(
         current_node: string | null,
         mapping: MessageMapping,
@@ -208,5 +241,47 @@ export default class ChatManager {
         }
 
         return null;
+    }
+
+    /**
+     * Regenerates the conversation from the most recent user message or from a provided message id, removing any assistant messages
+     * between that user message and the end of the branch.
+     */
+    static regenerate(
+        currentNode: string | null,
+        mapping: MessageMapping,
+        messageId?: string,
+    ): MessagesState {
+        // If no currentNode, return the initial state
+        if (!currentNode) {
+            return { mapping, currentNode };
+        }
+
+        // If messageId is provided, set it as the current node
+        if (messageId) {
+            currentNode = messageId;
+        }
+
+        let endmostNode = this.findEndmostNode(currentNode, mapping);
+        let node = mapping[endmostNode];
+
+        while (node && node.message?.role !== 'user') {
+            const { updatedMapping, newCurrentNode } = this.deleteMessage(
+                endmostNode,
+                mapping,
+                currentNode,
+            );
+            mapping = updatedMapping;
+            currentNode = newCurrentNode;
+
+            if (currentNode) {
+                endmostNode = this.findEndmostNode(currentNode, mapping);
+                node = mapping[endmostNode];
+            } else {
+                break;
+            }
+        }
+
+        return { mapping, currentNode };
     }
 }

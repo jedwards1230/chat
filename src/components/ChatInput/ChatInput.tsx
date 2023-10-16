@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, memo } from 'react';
 
 import { useChat } from '@/providers/ChatProvider';
-import QuickActions from '../QuickActions';
+import QuickActions from './QuickActions';
 import { isMobile } from '@/utils/client/device';
 import { calculateRows } from '@/utils';
 import { getTokenCount } from '@/utils/tokenizer';

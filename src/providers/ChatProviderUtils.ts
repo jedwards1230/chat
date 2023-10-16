@@ -98,11 +98,11 @@ export function upsertTitleState(
 }
 
 /**
- * Create new thread
+ * upsert thread
  * - If isNew, create new thread with default config
  * - If not isNew, add to current thread
  * */
-function createNewThread(
+function upsertThreadState(
     prevState: ChatState,
     newMap: MessagesState,
     controller?: AbortController,
@@ -171,16 +171,14 @@ export function createSubmitHandler(
     };
 
     const upsertThread = (newMap: MessagesState, controller: AbortController) =>
-        setState((prevState) => createNewThread(prevState, newMap, controller));
+        setState((p) => upsertThreadState(p, newMap, controller));
 
     const upsertMessage = (newMessage: Message, threadId?: string) =>
-        setState((prevState) =>
-            upsertMessageState(prevState, newMessage, threadId),
-        );
+        setState((p) => upsertMessageState(p, newMessage, threadId));
 
     const upsertTitle = (title: string) => {
         document.title = 'Chat | ' + title;
-        setState((prevState) => upsertTitleState(prevState, title));
+        setState((p) => upsertTitleState(p, title));
     };
 
     const getNewMapping = (
@@ -273,6 +271,55 @@ export function createSubmitHandler(
         getRes.then(() =>
             getTitle(activeThread, upsertTitle, userId, state.openAiApiKey),
         );
+    };
+}
+
+// take the current message history and submit a chat request
+// basically the same as createSubmitHandler but without the form event, router, plausible
+export function regenerateChatHandler(
+    setState: ChatDispatch,
+    state: ChatState,
+    userId?: string | null,
+) {
+    const upsertMessage = (newMessage: Message, threadId?: string) =>
+        setState((prevState) =>
+            upsertMessageState(prevState, newMessage, threadId),
+        );
+
+    return (messageId?: string) => {
+        if (!state.openAiApiKey && !userId) {
+            return;
+        }
+
+        const activeThread = getActiveThread(state);
+        const controller = new AbortController();
+        const newMap = ChatManager.regenerate(
+            activeThread.currentNode,
+            activeThread.mapping,
+            messageId,
+        );
+
+        setState((prevState) =>
+            upsertThreadState(prevState, newMap, controller),
+        );
+
+        const msgHistory = ChatManager.prepareMessageHistory(
+            newMap.currentNode,
+            newMap.mapping,
+        );
+
+        const opts = {
+            activeThread,
+            msgHistory,
+            upsertMessage,
+            controller,
+            state,
+            setState,
+            loops: 0,
+            userId,
+        };
+
+        getChat(opts);
     };
 }
 
@@ -596,7 +643,7 @@ export function addMessageHandler(
             activeThread.currentNode,
         );
 
-        setState((prevState) => createNewThread(prevState, newMap));
+        setState((prevState) => upsertThreadState(prevState, newMap));
         setState((prevState) => upsertMessageState(prevState, message));
         router.replace('/?c=' + activeThread.id);
     };

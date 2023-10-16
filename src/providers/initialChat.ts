@@ -53,6 +53,7 @@ const initialState: ChatState = {
     removeThread: () => {},
     toggleplugin: () => {},
     removeMessage: () => {},
+    regenerateChat: () => {},
     setOpenAiApiKey: () => {},
     removeAllThreads: () => {},
     setSystemMessage: () => {},

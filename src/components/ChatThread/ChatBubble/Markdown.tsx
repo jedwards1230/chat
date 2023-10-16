@@ -126,7 +126,7 @@ function Markdown({
 
     return (
         <ReactMarkdown
-            className={clsx('space-y-4', className)}
+            className={clsx('flex flex-col gap-y-4', className)}
             remarkPlugins={[remarkGfm]}
             components={components}
         >

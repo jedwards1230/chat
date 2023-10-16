@@ -37,6 +37,8 @@ type ChatState = {
     editMessage: (messageId: string) => void;
     /** Add a message to the thread without triggering a response */
     addMessage: (message: ChatMessage, activeThread: ChatThread) => void;
+    /** Regenerate the current chat */
+    regenerateChat: (messageId?: string) => void;
     removeMessage: (messageId: string) => void;
     removeThread: (threadId: string) => void;
     removeAllThreads: () => void;

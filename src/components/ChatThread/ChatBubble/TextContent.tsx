@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import Markdown from './Markdown';
 import { parseInput } from '@/tools/utils';
+import { useChat } from '@/providers/ChatProvider';
 
 export default function TextContent({
     message,
@@ -57,13 +58,17 @@ function FunctionDetails({
     input?: any;
     content: string | null;
 }) {
+    const { botTyping } = useChat();
     const [open, setOpen] = useState(false);
     const mdContent = `\`\`\`md\n${content}\n\`\`\``;
     const parsedInput = parseInput(input, message.name as Tool);
 
     return (
         <>
-            <PreviewButton loading={!content} onClick={() => setOpen(!open)}>
+            <PreviewButton
+                loading={!content && botTyping}
+                onClick={() => setOpen(!open)}
+            >
                 <div className="inline-block align-middle">{message.name}:</div>{' '}
                 <div title={parsedInput} className="inline-block align-middle">
                     <Markdown content={parsedInput} />

@@ -16,7 +16,7 @@ const buttonVariants = cva(
                 primaryBlue:
                     'bg-blue-primary text-background dark:text-foreground hover:bg-blue-primary/80',
                 primaryGreen:
-                    'bg-green-primary text-background hover:bg-green-primary/80',
+                    'bg-green-primary text-background dark:text-foreground hover:bg-green-primary/80',
                 outline:
                     'border border-input bg-background hover:bg-accent hover:dark:bg-background/80 hover:text-accent-foreground',
                 outlineAccent:
@@ -30,7 +30,7 @@ const buttonVariants = cva(
                     'hover:bg-background/40 dark:hover:bg-background/80',
                 link: 'text-primary underline-offset-4 hover:underline',
                 functionPreview:
-                    'bg-primary text-primary-foreground border-2 border-blue-primary border-pulse opacity-100',
+                    'bg-primary text-primary-foreground border-2 cursor-default border-blue-primary border-pulse opacity-100',
             },
             size: {
                 default: 'h-10 px-4 py-2',

@@ -30,6 +30,7 @@ import {
     setOpenAiApiKeyHandler,
     addMessageHandler,
     changeBranchHandler,
+    regenerateChatHandler,
 } from './ChatProviderUtils';
 import {
     getCharacterListByUserId,
@@ -174,6 +175,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         setStreamResponse: setStreamResponseHandler(setState),
         setPluginsEnabled: setPluginsEnabledHandler(setState),
         updateThreadConfig: updateThreadConfigHandler(setState),
+        regenerateChat: regenerateChatHandler(setState, state),
         removeAllThreads: removeAllThreadsHandler(setState, router),
         handleSubmit: createSubmitHandler(
             plausible,
