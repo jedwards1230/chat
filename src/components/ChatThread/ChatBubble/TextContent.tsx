@@ -113,7 +113,7 @@ function PreviewButton({
         <Button
             variant={loading ? 'functionPreview' : 'default'}
             onClick={onClick}
-            className="gap-2 text-ellipsis transition-all"
+            className="gap-2 text-ellipsis rounded-xl transition-all"
         >
             {children}
         </Button>

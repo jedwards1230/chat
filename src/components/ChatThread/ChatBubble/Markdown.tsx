@@ -3,7 +3,7 @@
 import clsx from 'clsx';
 import remarkGfm from 'remark-gfm';
 import { useMemo, memo } from 'react';
-import ReactMarkdown, { Components } from 'react-markdown';
+import ReactMarkdown, { type Components } from 'react-markdown';
 
 import CodeBlock from '../CodeBlock';
 
