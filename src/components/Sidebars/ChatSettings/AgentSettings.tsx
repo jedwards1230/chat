@@ -1,8 +1,5 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-
-import { defaultAgentConfig } from '@/providers/characters';
 import { modelList, modelMap } from '@/providers/models';
 import { useChat } from '@/providers/ChatProvider';
 import { availableTools } from '@/tools/config';
@@ -18,40 +15,27 @@ import {
     SelectValue,
 } from '../../ui/select';
 
-export default function AgentSettings({ agent }: { agent?: AgentConfig }) {
+export default function AgentSettings({ config }: { config: AgentConfig }) {
     const {
-        activeThread,
         updateThreadConfig,
         setSystemMessage,
-        defaultThread,
         streamResponse,
         setStreamResponse,
     } = useChat();
 
-    const thread = activeThread || defaultThread;
-    const isNew = agent === undefined;
-    const [config, setConfig] = useState(
-        agent
-            ? agent
-            : {
-                  ...defaultAgentConfig,
-                  name: 'New Character',
-              },
-    );
-    useEffect(() => setConfig(thread.agentConfig), [thread]);
-
     const onFieldChange = (
         field: keyof AgentConfig,
-        value: string | number | boolean,
+        value: string | number | boolean | Tool[],
     ) => {
         const update = { ...config, [field]: value };
-        setConfig(update);
 
+        // get model info by name
         if (field === 'model') {
             const model = modelMap[value as Model];
             if (model) update.model = model;
         }
 
+        // update chat provider
         if (field === 'systemMessage') {
             setSystemMessage(value as string);
         } else {
@@ -64,18 +48,18 @@ export default function AgentSettings({ agent }: { agent?: AgentConfig }) {
             ? config.tools.filter((t) => t !== tool)
             : [...config.tools, tool];
 
-        setConfig({ ...config, tools: newTools });
+        onFieldChange('tools', newTools);
     };
 
     const params = config.model.params;
 
     const modelInfo = [
-        { Temperature: params?.temperature },
-        { 'Top P': params?.topP },
-        { N: params?.N },
-        { 'Max Tokens': params?.maxTokens },
-        { 'Frequency Penalty': params?.frequencyPenalty },
-        { 'Presence Penalty': params?.presencePenalty },
+        { Temperature: params.temperature },
+        { 'Top P': params.topP },
+        { N: params.N },
+        { 'Max Tokens': params.maxTokens },
+        { 'Frequency Penalty': params.frequencyPenalty },
+        { 'Presence Penalty': params.presencePenalty },
     ];
 
     const functionsAllowed = config.model.api !== 'llama';

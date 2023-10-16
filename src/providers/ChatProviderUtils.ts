@@ -343,7 +343,7 @@ export function updateThreadConfigHandler(setState: ChatDispatch) {
                     ? false
                     : prevState.streamResponse;
 
-            if (prevState.currentThreadIdx) {
+            if (prevState.currentThreadIdx !== null) {
                 const newThread: ChatThread = {
                     ...prevState.threads[prevState.currentThreadIdx],
                     agentConfig,

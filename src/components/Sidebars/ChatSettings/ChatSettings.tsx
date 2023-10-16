@@ -40,7 +40,7 @@ function ChatSettings() {
         >
             <div className="flex h-full w-full flex-col pb-3 md:pb-1">
                 <div className="flex-1 px-2">
-                    <AgentSettings agent={thread.agentConfig} />
+                    <AgentSettings config={thread.agentConfig} />
                 </div>
                 {userId && activeThread !== undefined && (
                     <Button
