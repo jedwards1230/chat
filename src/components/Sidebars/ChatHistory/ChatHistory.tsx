@@ -7,11 +7,11 @@ import Image from 'next/image';
 import { useUI } from '@/providers/UIProvider';
 import ChatHistoryEntry from './ChatHistoryEntry';
 import { isMobile } from '@/utils/client/device';
-import { Sidebar } from '../Sidebar';
+import { Sidebar } from '../../Sidebar';
 import { AccountDropdown } from './Buttons';
-import { Button } from '../ui/button';
+import { Button } from '../../ui/button';
 import { useSession } from 'next-auth/react';
-import { Ellipsis } from '../Icons';
+import { Ellipsis } from '../../Icons';
 import { sortThreadlist } from '@/utils';
 import { useChat } from '@/providers/ChatProvider';
 

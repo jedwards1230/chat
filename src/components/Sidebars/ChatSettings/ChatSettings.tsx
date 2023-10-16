@@ -1,17 +1,16 @@
 'use client';
 
 import { memo } from 'react';
-
 import { useSession } from 'next-auth/react';
 
 import { useChat } from '@/providers/ChatProvider';
-import { Share } from '../Icons';
+import { Share } from '../../Icons';
 import { isMobile } from '@/utils/client/device';
 import { useUI } from '@/providers/UIProvider';
-import AgentSettings from '../AgentSettings';
+import AgentSettings from './AgentSettings';
 import { shareThread } from '@/utils/server/supabase';
-import { Sidebar } from '../Sidebar';
-import { Button } from '../ui/button';
+import { Sidebar } from '../../Sidebar';
+import { Button } from '../../ui/button';
 
 function ChatSettings() {
     const { data: session } = useSession();
@@ -41,7 +40,7 @@ function ChatSettings() {
         >
             <div className="flex h-full w-full flex-col pb-3 md:pb-1">
                 <div className="flex-1 px-2">
-                    <AgentSettings active={true} agent={thread.agentConfig} />
+                    <AgentSettings agent={thread.agentConfig} />
                 </div>
                 {userId && activeThread !== undefined && (
                     <Button

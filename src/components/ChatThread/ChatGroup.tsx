@@ -16,7 +16,7 @@ export default function ChatGroup({
             className={clsx(
                 'group relative w-full px-1 pb-6 pt-4 transition-colors sm:px-2',
                 role !== 'user'
-                    ? 'bg-neutral-200/60 dark:bg-neutral-800/70'
+                    ? 'bg-neutral-200/60 dark:bg-accent'
                     : 'border-y dark:border-neutral-700',
             )}
         >

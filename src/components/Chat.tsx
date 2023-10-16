@@ -11,8 +11,8 @@ import { isMobile } from '@/utils/client/device';
 import Header from './Header';
 import ChatInput from './ChatInput/ChatInput';
 import ChatThread from './ChatThread';
-import ChatHistory from './ChatHistory';
-import ChatSettings from './ChatSettings';
+import ChatHistory from './Sidebars/ChatHistory';
+import ChatSettings from './Sidebars/ChatSettings';
 
 export default function Chat() {
     const { activeThread, botTyping, threads } = useChat();

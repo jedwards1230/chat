@@ -1,38 +1,25 @@
 'use client';
 
-import clsx from 'clsx';
 import { useEffect, useState } from 'react';
 
 import { defaultAgentConfig } from '@/providers/characters';
 import { modelList, modelMap } from '@/providers/models';
 import { useChat } from '@/providers/ChatProvider';
-import { Textarea } from './ui/textarea';
-import { Checkbox } from './ui/checkbox';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
+import { availableTools } from '@/tools/config';
+import { Textarea } from '../../ui/textarea';
+import { Checkbox } from '../../ui/checkbox';
+import { Button } from '../../ui/button';
+import { Input } from '../../ui/input';
+import { Label } from '../../ui/label';
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from './ui/select';
+} from '../../ui/select';
 
-const availableTools: Tool[] = [
-    'calculator',
-    'search',
-    'web-browser',
-    'wikipedia-api',
-];
-
-export default function AgentSettings({
-    agent,
-    active = false,
-}: {
-    agent?: AgentConfig;
-    active?: boolean;
-}) {
+export default function CharacterSettings({ agent }: { agent?: AgentConfig }) {
     const {
         activeThread,
         updateThreadConfig,
@@ -67,11 +54,6 @@ export default function AgentSettings({
         }
 
         setConfig(update);
-
-        if (!isNew && active) {
-            saveCharacter(update);
-            updateThreadConfig(update);
-        }
     };
 
     const togglePlugin = (tool: Tool) => {
@@ -154,23 +136,9 @@ export default function AgentSettings({
                 )}
                 {functionsAllowed && (
                     <div className="flex w-full flex-col gap-2">
-                        <label
-                            className={clsx(
-                                'flex flex-col rounded px-1 transition-colors dark:hover:bg-neutral-600',
-                                active
-                                    ? 'hover:bg-neutral-500'
-                                    : 'hover:bg-neutral-300',
-                            )}
-                        >
+                        <label className="flex flex-col rounded px-1 transition-colors hover:bg-neutral-300 dark:hover:bg-neutral-600">
                             <div className="flex items-center justify-between gap-4 dark:border-neutral-600">
-                                <div
-                                    className={clsx(
-                                        'font-semibold transition-colors dark:text-neutral-100',
-                                        active
-                                            ? 'text-neutral-100'
-                                            : 'text-neutral-950',
-                                    )}
-                                >
+                                <div className="font-semibold text-neutral-950 transition-colors dark:text-neutral-100">
                                     Plugins
                                 </div>
                                 <Checkbox
@@ -182,14 +150,7 @@ export default function AgentSettings({
                                 />
                             </div>
                             {config.toolsEnabled && (
-                                <div
-                                    className={clsx(
-                                        'text-xs transition-colors dark:text-neutral-400',
-                                        active
-                                            ? 'text-neutral-400'
-                                            : 'text-neutral-600',
-                                    )}
-                                >
+                                <div className="text-xs text-neutral-600 transition-colors dark:text-neutral-400">
                                     {config.tools.length} enabled
                                 </div>
                             )}
@@ -202,12 +163,7 @@ export default function AgentSettings({
                                     return (
                                         <label
                                             key={plugin}
-                                            className={clsx(
-                                                'flex w-full cursor-pointer items-center justify-between rounded p-1 text-sm dark:hover:bg-neutral-600',
-                                                active
-                                                    ? 'hover:bg-neutral-500'
-                                                    : 'hover:bg-neutral-300',
-                                            )}
+                                            className="flex w-full cursor-pointer items-center justify-between rounded p-1 text-sm hover:bg-neutral-300 dark:hover:bg-neutral-600"
                                         >
                                             <span className="capitalize">
                                                 {plugin}
@@ -226,14 +182,7 @@ export default function AgentSettings({
                     </div>
                 )}
                 <details className="w-full">
-                    <summary
-                        className={clsx(
-                            'cursor-pointer dark:hover:bg-neutral-700',
-                            active
-                                ? 'hover:bg-neutral-500'
-                                : 'hover:bg-neutral-300',
-                        )}
-                    >
+                    <summary className="cursor-pointer hover:bg-neutral-300 dark:hover:bg-neutral-700">
                         Advanced
                     </summary>
                     {modelInfo.map((info) => {
@@ -241,12 +190,7 @@ export default function AgentSettings({
                         return (
                             <div
                                 key={k}
-                                className={clsx(
-                                    'flex w-full justify-between text-sm dark:text-neutral-400',
-                                    active
-                                        ? 'text-neutral-400'
-                                        : 'text-neutral-600',
-                                )}
+                                className="flex w-full justify-between text-sm text-neutral-600 dark:text-neutral-400"
                             >
                                 <div>{k}:</div>
                                 <div>{v}</div>

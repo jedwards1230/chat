@@ -1,12 +1,11 @@
 'use client';
 
-import clsx from 'clsx';
 import { useState, memo } from 'react';
 
 import { useChat } from '@/providers/ChatProvider';
-import AgentSettings from '../AgentSettings';
-import { Dialog, DialogContent, DialogTrigger } from '../ui/dialog';
-import { Button } from '../ui/button';
+import { Dialog, DialogContent, DialogTrigger } from '../../ui/dialog';
+import { Button } from '../../ui/button';
+import CharacterSettings from './CharacterSettings';
 
 function CharacterSelector({ children }: { children: React.ReactNode }) {
     const { activeThread, defaultThread, characterList } = useChat();
@@ -65,9 +64,8 @@ function CharacterSelector({ children }: { children: React.ReactNode }) {
                     </div>
 
                     <div className="col-span-6">
-                        <AgentSettings
+                        <CharacterSettings
                             key={activeCard.id}
-                            active={true}
                             agent={characterList.find(
                                 (agent) => agent.id === activeCard.id,
                             )}

@@ -343,20 +343,21 @@ export function updateThreadConfigHandler(setState: ChatDispatch) {
                     ? false
                     : prevState.streamResponse;
 
-            const threads = [...prevState.threads];
             if (prevState.currentThreadIdx) {
-                threads[prevState.currentThreadIdx] = {
-                    ...threads[prevState.currentThreadIdx!],
+                const newThread: ChatThread = {
+                    ...prevState.threads[prevState.currentThreadIdx],
                     agentConfig,
                 };
                 return {
                     ...prevState,
-                    threads,
+                    threads: prevState.threads.map((thread) =>
+                        thread.id === newThread.id ? newThread : thread,
+                    ),
                     lastModified: new Date(),
                     streamResponse,
                 };
             } else {
-                const defaultThread = {
+                const defaultThread: ChatThread = {
                     ...prevState.defaultThread,
                     agentConfig,
                 };
