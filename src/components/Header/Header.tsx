@@ -51,7 +51,7 @@ export default function Header() {
             className={clsx(
                 'grid h-16 w-full shrink-0 grid-cols-12 border-b p-2',
                 messages.length > 1
-                    ? 'border-neutral-300 shadow dark:border-neutral-500'
+                    ? 'border-border shadow'
                     : 'border-transparent bg-transparent',
             )}
         >

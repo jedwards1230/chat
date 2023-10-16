@@ -605,6 +605,7 @@ export function addMessageHandler(
 export function changeBranchHandler(setState: ChatDispatch) {
     return (id: string) => {
         setState((prevState) => {
+            prevState.abortRequest();
             const activeThread = getActiveThread(prevState);
             const newNode = ChatManager.findEndmostNode(
                 id,
