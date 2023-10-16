@@ -76,31 +76,28 @@ export function upsertTitleState(
     prevState: ChatState,
     title: string,
 ): ChatState {
-    if (prevState.currentThreadIdx === null) return prevState;
-    const threads = prevState.threads;
-    const activeThread = {
-        ...threads[prevState.currentThreadIdx],
-        lastModified: new Date(),
-        title,
-    };
+    const newThread =
+        prevState.currentThreadIdx !== null
+            ? {
+                  ...prevState.threads[prevState.currentThreadIdx],
+                  lastModified: new Date(),
+                  title,
+              }
+            : {
+                  ...prevState.defaultThread,
+                  lastModified: new Date(),
+                  title,
+              };
 
-    const foundThreadIndex = threads.findIndex(
-        (thread) => thread.id === activeThread.id,
+    const threads = prevState.threads.map((thread) =>
+        thread.id === newThread.id ? newThread : thread,
     );
-
-    threads[foundThreadIndex] = {
-        ...threads[foundThreadIndex],
-        lastModified: new Date(),
-        title,
-    };
 
     return { ...prevState, threads };
 }
 
 /**
- * upsert thread
- * - If isNew, create new thread with default config
- * - If not isNew, add to current thread
+ * Ensure ChatThread is ready for messages
  * */
 function upsertThreadState(
     prevState: ChatState,

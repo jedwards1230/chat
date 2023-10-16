@@ -1,19 +1,92 @@
-import OpenAI from 'openai';
+'use server';
+
+import type OpenAI from 'openai';
 import { Stream } from 'openai/streaming';
 import { type ChatCompletionCreateParams } from 'openai/resources/chat';
 import { v4 as uuidv4 } from 'uuid';
+
 import { prepareMessages } from '@/utils';
+import { openai } from '@/lib/openai';
 
-const SERVER_KEY = process.env.OPENAI_API_KEY;
+export async function fetchOpenAiChat(
+    activeThread: ChatThread,
+    msgHistory: Message[],
+    stream: boolean,
+    functions?: ChatCompletionCreateParams.Function[],
+    signal?: AbortSignal,
+    key?: string,
+): Promise<ReadableStream<any> | Message> {
+    const messages = prepareMessages(msgHistory);
+    const model = activeThread.agentConfig.model;
+    const temperature = model.params?.temperature;
 
-export function getOpenAiClient(key?: string) {
-    return new OpenAI({
-        apiKey: SERVER_KEY || key,
-        dangerouslyAllowBrowser: !!key,
-    });
+    if (key) openai.apiKey = key;
+    const completion = await openai.chat.completions.create(
+        {
+            model: model.name,
+            messages,
+            temperature,
+            functions,
+            stream,
+        },
+        { signal },
+    );
+
+    if (!(completion instanceof Stream) && !completion.choices) {
+        console.error('No choices in stream data', completion);
+    }
+
+    return completion instanceof Stream
+        ? toReadableStream(completion)
+        : {
+              id: uuidv4(),
+              content: completion.choices[0].message.content,
+              role: completion.choices[0].message.role,
+          };
 }
 
-export function toReadableStream(
+// TODO: generalize this to work with any model
+export async function getTitleStream(history: string, key?: string) {
+    try {
+        if (key) openai.apiKey = key;
+        const completion = await openai.chat.completions.create({
+            model: 'gpt-3.5-turbo-16k',
+            messages: [
+                {
+                    role: 'system',
+                    content:
+                        'Generate a brief title based on provided conversation. ' +
+                        'Provide only the string for the title. No quotes or labels are necessary.' +
+                        'No matter how complex the conversation, make the title extremely brief. ' +
+                        'Max length is 20 characters. ',
+                },
+                {
+                    role: 'user',
+                    content: `### BEGIN HISTORY ###\n${history}\n### END HISTORY ###\n`,
+                },
+            ],
+            temperature: 0.1,
+            stream: true,
+        });
+
+        const stream = toReadableStream(completion);
+
+        if (!stream) {
+            throw new Error('No response body from /api/chat');
+        }
+
+        return stream;
+    } catch (err) {
+        console.error(err);
+        return new ReadableStream({
+            start(controller) {
+                controller.error(JSON.stringify(err));
+            },
+        });
+    }
+}
+
+function toReadableStream(
     stream: Stream<OpenAI.Chat.Completions.ChatCompletionChunk>,
 ): ReadableStream {
     let iter: AsyncIterator<OpenAI.Chat.Completions.ChatCompletionChunk>;
@@ -44,41 +117,4 @@ export function toReadableStream(
             await iter.return?.();
         },
     });
-}
-
-export async function fetchOpenAiChat(
-    activeThread: ChatThread,
-    msgHistory: Message[],
-    stream: boolean,
-    functions?: ChatCompletionCreateParams.Function[],
-    signal?: AbortSignal,
-    key?: string,
-): Promise<ReadableStream<any> | Message> {
-    const messages = prepareMessages(msgHistory);
-    const model = activeThread.agentConfig.model;
-    const temperature = model.params?.temperature;
-
-    const openai = getOpenAiClient(key);
-    const completion = await openai.chat.completions.create(
-        {
-            model: model.name,
-            messages,
-            temperature,
-            functions,
-            stream,
-        },
-        { signal },
-    );
-
-    if (!(completion instanceof Stream) && !completion.choices) {
-        console.error('No choices in stream data', completion);
-    }
-
-    return completion instanceof Stream
-        ? toReadableStream(completion)
-        : {
-              id: uuidv4(),
-              content: completion.choices[0].message.content,
-              role: completion.choices[0].message.role,
-          };
 }

@@ -66,8 +66,6 @@ export async function getTitle(
         activeThread.currentNode,
         activeThread.mapping,
     );
-    const l = messages.length;
-    if (l < 2 || l > 10) return;
 
     const stream = await fetchTitle(messages, openAiApiKey);
 
@@ -219,13 +217,17 @@ export async function getChat({
 
 async function fetchTitle(msgHistory: Message[], apiKey?: string) {
     // Prepare the chat history
-    const history = msgHistory.map((msg) => msg.role + ': ' + msg.content);
-    const historyStr = history.join('\n');
+    const history = JSON.stringify(
+        msgHistory.map((m) => ({
+            role: m.role,
+            content: m.content,
+        })),
+    );
 
     const res = await fetch('/api/get_title', {
         method: 'POST',
         body: JSON.stringify({
-            history: historyStr,
+            history,
             apiKey,
         }),
     });

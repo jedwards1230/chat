@@ -1,4 +1,4 @@
-import { getTitleStream } from '@/utils/server/chat/stream';
+import { getTitleStream } from '@/utils/server/chat/openai';
 
 export const runtime = 'edge';
 

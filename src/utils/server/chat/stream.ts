@@ -4,50 +4,9 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { Calculator, Search, WebBrowser, WikipediaQueryRun } from '@/tools';
 import { fetchLlama2Chat } from '@/utils/server/chat/cloudflare';
-import { fetchOpenAiChat, getOpenAiClient, toReadableStream } from './openai';
+import { fetchOpenAiChat } from './openai';
 
 const SERVER_KEY = process.env.OPENAI_API_KEY;
-
-// TODO: generalize this to work with any model
-export async function getTitleStream(history: string, key?: string) {
-    try {
-        const openai = getOpenAiClient(key);
-        const completion = await openai.chat.completions.create({
-            model: 'gpt-3.5-turbo-16k',
-            messages: [
-                {
-                    role: 'system',
-                    content:
-                        'Generate a brief title based on provided chat messages. ' +
-                        'Provide only the string for the title. No quotes or labels are necessary.' +
-                        'There should only be one subject in the title. ' +
-                        'Max length is 20 characters. ',
-                },
-                {
-                    role: 'user',
-                    content: history,
-                },
-            ],
-            temperature: 0.1,
-            stream: true,
-        });
-
-        const stream = toReadableStream(completion);
-
-        if (!stream) {
-            throw new Error('No response body from /api/chat');
-        }
-
-        return stream;
-    } catch (err) {
-        console.error(err);
-        return new ReadableStream({
-            start(controller) {
-                controller.error(JSON.stringify(err));
-            },
-        });
-    }
-}
 
 type GetChatStreamParams = {
     activeThread: ChatThread;
