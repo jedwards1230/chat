@@ -91,10 +91,10 @@ function Markdown({
             ),
             hr: ({ node, ...props }) => <hr {...props} className="my-2" />,
             ol: ({ node, ...props }) => (
-                <ol {...props} className="list-inside list-decimal" />
+                <ol {...props} className="list-inside list-decimal pl-4" />
             ),
             ul: ({ node, ...props }) => (
-                <ul {...props} className="list-inside list-disc" />
+                <ul {...props} className="list-inside list-disc pl-4" />
             ),
             a: ({ node, ...props }) => (
                 <a {...props} className="text-blue-500 hover:underline" />
