@@ -244,10 +244,10 @@ export default class ChatManager {
     }
 
     /**
-     * Regenerates the conversation from the most recent user message or from a provided message id, removing any assistant messages
-     * between that user message and the end of the branch.
+     * Regenerates the conversation from the most recent user message or from a provided message id, and forks the conversation
+     * from that user message. Maintains all the history of the old branch, and just gives a new mapping and current node to the new branch.
      */
-    static regenerate(
+    static regenerateAndFork(
         currentNode: string | null,
         mapping: MessageMapping,
         messageId?: string,
@@ -266,20 +266,25 @@ export default class ChatManager {
         let node = mapping[endmostNode];
 
         while (node && node.message?.role !== 'user') {
-            const { updatedMapping, newCurrentNode } = this.deleteMessage(
-                endmostNode,
-                mapping,
-                currentNode,
-            );
-            mapping = updatedMapping;
-            currentNode = newCurrentNode;
-
-            if (currentNode) {
-                endmostNode = this.findEndmostNode(currentNode, mapping);
-                node = mapping[endmostNode];
+            endmostNode = this.findEndmostNode(currentNode, mapping);
+            node = mapping[endmostNode];
+            if (node) {
+                currentNode = endmostNode;
             } else {
                 break;
             }
+        }
+
+        if (currentNode) {
+            const messageToRegenerate = {
+                ...mapping[currentNode].message,
+                id: uuid(),
+            } as Message;
+            return this.editMessageAndFork(
+                currentNode,
+                messageToRegenerate,
+                mapping,
+            );
         }
 
         return { mapping, currentNode };

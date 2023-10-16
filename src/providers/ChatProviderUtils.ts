@@ -293,7 +293,7 @@ export function regenerateChatHandler(
 
         const activeThread = getActiveThread(state);
         const controller = new AbortController();
-        const newMap = ChatManager.regenerate(
+        const newMap = ChatManager.regenerateAndFork(
             activeThread.currentNode,
             activeThread.mapping,
             messageId,
@@ -666,6 +666,7 @@ export function changeBranchHandler(setState: ChatDispatch) {
                 input: '',
                 editId: null,
                 saved: false,
+                botTyping: false,
                 threads: prevState.threads.map((thread) =>
                     thread.id === activeThread.id
                         ? {
