@@ -30,6 +30,8 @@ const buttonVariants = cva(
                     'hover:bg-background/40 dark:hover:bg-background/80',
                 link: 'text-primary underline-offset-4 hover:underline',
                 functionPreview:
+                    'dark:bg-primary border-2 border-border text-foreground dark:text-primary-foreground hover:dark:bg-primary/70 hover:bg-primary/20',
+                functionPreviewLoading:
                     'bg-primary text-primary-foreground border-2 cursor-default border-blue-primary border-pulse opacity-100',
             },
             size: {

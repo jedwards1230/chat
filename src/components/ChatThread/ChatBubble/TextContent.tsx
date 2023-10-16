@@ -111,7 +111,7 @@ function PreviewButton({
 }) {
     return (
         <Button
-            variant={loading ? 'functionPreview' : 'default'}
+            variant={loading ? 'functionPreviewLoading' : 'functionPreview'}
             onClick={onClick}
             className="gap-2 text-ellipsis rounded-xl transition-all"
         >

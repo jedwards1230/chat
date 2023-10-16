@@ -19,7 +19,7 @@ export default function ProfilePicture({ role }: { role: Role }) {
                 )}
                 title={
                     role === 'user'
-                        ? 'You'
+                        ? 'User'
                         : role === 'assistant'
                         ? 'Assistant'
                         : 'Function'
