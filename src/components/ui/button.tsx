@@ -29,6 +29,8 @@ const buttonVariants = cva(
                 ghostAccent:
                     'hover:bg-background/40 dark:hover:bg-background/80',
                 link: 'text-primary underline-offset-4 hover:underline',
+                functionPreview:
+                    'bg-primary text-primary-foreground border-2 border-blue-primary border-pulse opacity-100',
             },
             size: {
                 default: 'h-10 px-4 py-2',

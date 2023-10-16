@@ -1,4 +1,5 @@
 import { Calculator, Search, WebBrowser, WikipediaQueryRun } from '@/tools/';
+import { parseInput } from '@/tools/utils';
 import { NextResponse } from 'next/server';
 
 export const runtime = 'edge';
@@ -21,22 +22,29 @@ export async function POST(request: Request) {
         });
     }
 
-    const cleanInput = input.slice(1, input.length - 1);
+    let parsed = '';
+    try {
+        parsed = JSON.parse(input);
+    } catch {
+        parsed = input;
+    }
+
+    const parsedInput = parseInput(parsed, tool);
 
     try {
         let result = '';
         switch (tool) {
             case 'calculator':
-                result = new Calculator().call(cleanInput);
+                result = new Calculator().call(parsedInput);
                 break;
             case 'search':
-                result = await new Search().call(cleanInput);
+                result = await new Search().call(parsedInput);
                 break;
             case 'web-browser':
-                result = await new WebBrowser({}).call(cleanInput);
+                result = await new WebBrowser({}).call(parsedInput);
                 break;
             case 'wikipedia-api':
-                result = await new WikipediaQueryRun().call(cleanInput);
+                result = await new WikipediaQueryRun().call(parsedInput);
                 break;
             default:
                 return new Response(`Invalid tool: ${tool}`, {

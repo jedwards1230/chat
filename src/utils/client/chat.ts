@@ -170,7 +170,12 @@ export async function getChat({
                     `Non-streamable response: ${JSON.stringify(stream)}`,
                 );
             } catch (e: any) {
-                console.error(e);
+                if (e.name === 'AbortError') {
+                    break;
+                } else {
+                    // Handle other errors
+                    console.error(e);
+                }
             }
         }
     } else {
@@ -295,21 +300,23 @@ export async function getToolData({
     const tool = toolInput.name;
 
     const assistantMsg = createFunctionCallMsg(toolInput);
+    const functionMsg: Message = {
+        id: uuidv4(),
+        content: '',
+        role: 'function',
+        name: tool,
+    };
 
     msgHistory.push(assistantMsg);
     upsertMessage(assistantMsg);
+    upsertMessage(functionMsg);
 
     const res = await callTool(toolInput);
     if (!res) {
         throw new Error('Tool failure');
     }
 
-    const functionMsg: Message = {
-        id: uuidv4(),
-        content: res,
-        role: 'function',
-        name: tool,
-    };
+    functionMsg.content = res;
 
     msgHistory.push(functionMsg);
     upsertMessage(functionMsg);

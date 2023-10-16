@@ -63,7 +63,7 @@ export class WebBrowser implements CustomTool {
         // get first substring from input
         let url = '';
         try {
-            url = JSON.parse(input.split(' ')[0]);
+            url = input;
         } catch {
             url = input.split(' ')[0];
         }

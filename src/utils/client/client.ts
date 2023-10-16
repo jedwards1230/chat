@@ -114,7 +114,7 @@ export async function callTool(toolInput: ToolInput) {
         method: 'POST',
         body: JSON.stringify({
             tool: toolInput.name,
-            input: JSON.stringify(toolInput.args),
+            input: toolInput.args,
         }),
     });
 

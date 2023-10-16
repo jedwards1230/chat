@@ -1,8 +1,10 @@
 'use client';
 
+import { useState } from 'react';
+
 import { Button } from '@/components/ui/button';
 import Markdown from './Markdown';
-import { useState } from 'react';
+import { parseInput } from '@/tools/utils';
 
 export default function TextContent({
     message,
@@ -52,21 +54,22 @@ function FunctionDetails({
     content,
 }: {
     message: Message;
-    input?: string;
+    input?: any;
     content: string | null;
 }) {
     const [open, setOpen] = useState(false);
     const mdContent = `\`\`\`md\n${content}\n\`\`\``;
+    const parsedInput = parseInput(input, message.name as Tool);
 
     return (
         <>
-            <PreviewButton onClick={() => setOpen(!open)}>
+            <PreviewButton loading={!content} onClick={() => setOpen(!open)}>
                 <div className="inline-block align-middle">{message.name}:</div>{' '}
-                <div title={input} className="inline-block align-middle">
-                    <Markdown content={input} />
+                <div title={parsedInput} className="inline-block align-middle">
+                    <Markdown content={parsedInput} />
                 </div>
             </PreviewButton>
-            {open && <DetailsContent content={mdContent} />}
+            {open && content && <DetailsContent content={mdContent} />}
         </>
     );
 }
@@ -95,12 +98,18 @@ function DetailsContent({ content }: { content: string }) {
 function PreviewButton({
     children,
     onClick,
+    loading = false,
 }: {
     children: React.ReactNode;
     onClick: () => void;
+    loading?: boolean;
 }) {
     return (
-        <Button onClick={onClick} className="gap-2 text-ellipsis">
+        <Button
+            variant={loading ? 'functionPreview' : 'default'}
+            onClick={onClick}
+            className="gap-2 text-ellipsis transition-all"
+        >
             {children}
         </Button>
     );

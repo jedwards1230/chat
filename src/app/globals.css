@@ -2,6 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes pulse-border {
+    0% {
+        border-color: hsl(var(--border));
+    }
+    50% {
+        border-color: hsl(var(--blue-primary));
+    }
+    100% {
+        border-color: hsl(var(--border));
+    }
+}
+
+.border-pulse {
+    animation: pulse-border 2s linear infinite;
+}
+.disabled:border-pulse {
+    animation: none;
+}
+
 @layer base {
     :root {
         --background: 0 0% 100%;
