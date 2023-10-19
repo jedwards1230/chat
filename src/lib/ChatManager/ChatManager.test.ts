@@ -1,4 +1,4 @@
-import ChatManager from './ChatManager';
+import ChatManager from '.';
 
 describe('ChatManager', () => {
     let initialMapping: MessageMapping;
@@ -56,7 +56,11 @@ describe('ChatManager', () => {
     });
 
     test('deleteMessage', () => {
-        const newMapping = ChatManager.deleteMessage('1', initialMapping);
+        const { updatedMapping: newMapping } = ChatManager.deleteMessage(
+            '1',
+            initialMapping,
+            '1',
+        );
         expect(newMapping['1']).toBeUndefined();
     });
 
@@ -137,7 +141,7 @@ describe('ChatManager', () => {
             content: 'Alternate content',
             role: 'assistant',
         };
-        let newMapping = ChatManager.editMessageAndFork(
+        let { mapping: newMapping } = ChatManager.editMessageAndFork(
             '1',
             alternateMessage,
             initialMapping,
@@ -164,5 +168,23 @@ describe('ChatManager', () => {
             newMapping,
         );
         expect(retrievedSystemMessage).toEqual(systemMessage);
+    });
+
+    test('regenerateAndFork', () => {
+        const newMessage: Message = {
+            id: '2',
+            content: 'Hi',
+            role: 'assistant',
+        };
+        let { mapping: newMapping, currentNode: newCurrentNode } =
+            ChatManager.createMessage(newMessage, initialMapping, '1');
+        const regeneratedState = ChatManager.regenerateAndFork(
+            newCurrentNode,
+            newMapping,
+        );
+        expect(regeneratedState.currentNode).not.toBe(newCurrentNode);
+        expect(
+            regeneratedState.mapping[regeneratedState.currentNode!].message,
+        ).toEqual(newMessage);
     });
 });

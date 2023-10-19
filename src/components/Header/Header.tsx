@@ -8,7 +8,7 @@ import { Bars, Information } from '../Icons';
 import ModelSelector from './ModelSelector';
 import { useUI } from '@/providers/UIProvider';
 import { getTokenCount } from '@/utils/tokenizer';
-import useMessages from '@/lib/ChatManagerHook';
+import { useMessages } from '@/lib/ChatManager';
 import { Button } from '../ui/button';
 
 export default function Header() {

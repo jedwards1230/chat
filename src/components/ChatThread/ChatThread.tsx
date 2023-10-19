@@ -4,7 +4,7 @@ import { useRef, useEffect, useMemo } from 'react';
 import clsx from 'clsx';
 
 import ChatPlaceholder from '../ChatPlaceholder';
-import useMessages from '@/lib/ChatManagerHook';
+import { useMessages } from '@/lib/ChatManager';
 import ChatGroup from './ChatGroup';
 
 export default function ChatThread({

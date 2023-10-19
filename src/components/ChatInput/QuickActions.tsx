@@ -1,7 +1,7 @@
 'use client';
 
 import { useChat } from '@/providers/ChatProvider';
-import useMessages from '@/lib/ChatManagerHook';
+import { useMessages } from '@/lib/ChatManager';
 import { Button } from '../ui/button';
 
 export default function QuickActions() {

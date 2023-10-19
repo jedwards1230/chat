@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import ChatManager from './ChatManager';
+import ChatManager from '.';
 
 const useMessages = (
     currentNode: string | null | undefined = null,

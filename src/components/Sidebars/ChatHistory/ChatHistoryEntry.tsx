@@ -9,7 +9,7 @@ import { isMobile } from '@/utils/client/device';
 import { useUI } from '@/providers/UIProvider';
 import { deleteThreadById } from '@/utils/server/supabase';
 import { deleteLocalThreadById } from '@/utils/client/localstorage';
-import useMessages from '@/lib/ChatManagerHook';
+import { useMessages } from '@/lib/ChatManager';
 
 export default function ChatHistoryEntry({
     entry,
