@@ -12,7 +12,6 @@ module.exports = withBundleAnalyzer(
     withPWA(
         withPlausibleProxy()({
             experimental: {
-                serverActions: true,
                 logging: {
                     level: 'verbose',
                     fullUrl: true,
