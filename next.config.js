@@ -11,11 +11,9 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 module.exports = withBundleAnalyzer(
     withPWA(
         withPlausibleProxy()({
-            experimental: {
-                logging: {
-                    level: 'verbose',
-                    fullUrl: true,
-                },
+            logging: {
+                level: 'verbose',
+                fullUrl: true,
             },
             images: {
                 remotePatterns: [
