@@ -5,7 +5,7 @@ import remarkGfm from 'remark-gfm';
 import { useMemo, memo } from 'react';
 import ReactMarkdown, { type Components } from 'react-markdown';
 
-import CodeBlock from '../CodeBlock';
+import CodeBlock from './CodeBlock';
 
 function Markdown({
     content = '',

@@ -128,6 +128,15 @@ export async function getChat({
         botTyping: true,
     }));
 
+    upsertMessage(
+        {
+            id: assistantId,
+            content: '',
+            role: 'assistant',
+        },
+        activeThread.id,
+    );
+
     if (state.streamResponse) {
         // Callback function to handle each chunk of the response stream
         const streamCallback = (

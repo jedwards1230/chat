@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 
-import { SharedBubble } from '@/components/ChatThread/ChatBubble';
+import { SharedBubble } from '@/components/ChatBubble';
 import { getSharedThreadById } from '@/utils/server/supabase';
 import ChatManager from '@/lib/ChatManager';
 

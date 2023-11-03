@@ -14,9 +14,20 @@ export default function ChatBubble({
     input?: string;
     config?: AgentConfig;
 }) {
+    return (
+        <div className="flex flex-col">
+            <BranchSwitcher message={message} />
+            <TextContent message={message} input={input} config={config} />
+            <ChatBubbleFunctionList message={message} />
+        </div>
+    );
+}
+
+function BranchSwitcher({ message }: { message: Message }) {
     const { activeThread, changeBranch } = useChat();
     const mapping = activeThread!.mapping;
-    // Fetch parent of the message
+
+    // Store parent of the message
     const parent = mapping[message.id]?.parent;
 
     // Determine if the message has siblings
@@ -50,31 +61,26 @@ export default function ChatBubble({
         [parent, currentIndex, siblingNodes, changeBranch],
     );
 
+    if (!hasSiblings) return null;
     return (
-        <div className="flex flex-col">
-            {hasSiblings && (
-                <div className="flex shrink-0 items-center text-sm">
-                    <button
-                        disabled={currentIndex === 0}
-                        onClick={() => handleSwitchBranch(-1)}
-                        className="transition-all disabled:opacity-20"
-                    >
-                        <ChevronLeft />
-                    </button>
-                    <span>
-                        {currentIndex + 1} / {siblingNodes.length}
-                    </span>
-                    <button
-                        disabled={siblingNodes[currentIndex + 1] === undefined}
-                        onClick={() => handleSwitchBranch(1)}
-                        className="transition-all disabled:opacity-20"
-                    >
-                        <ChevronRight />
-                    </button>
-                </div>
-            )}
-            <TextContent message={message} input={input} config={config} />
-            <ChatBubbleFunctionList message={message} />
+        <div className="flex shrink-0 items-center text-sm">
+            <button
+                disabled={currentIndex === 0}
+                onClick={() => handleSwitchBranch(-1)}
+                className="transition-all disabled:opacity-20"
+            >
+                <ChevronLeft />
+            </button>
+            <span>
+                {currentIndex + 1} / {siblingNodes.length}
+            </span>
+            <button
+                disabled={siblingNodes[currentIndex + 1] === undefined}
+                onClick={() => handleSwitchBranch(1)}
+                className="transition-all disabled:opacity-20"
+            >
+                <ChevronRight />
+            </button>
         </div>
     );
 }

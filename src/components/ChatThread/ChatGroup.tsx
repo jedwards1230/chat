@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 
-import { ChatBubble } from './ChatBubble';
-import ProfilePicture from './ChatBubble/ProfilePicture';
+import { ChatBubble } from '../ChatBubble';
+import ProfilePicture from '../ChatBubble/ProfilePicture';
 
 export default function ChatGroup({
     groupedMessages,

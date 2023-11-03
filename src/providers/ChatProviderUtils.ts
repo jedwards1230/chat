@@ -240,12 +240,11 @@ export function createSubmitHandler(
             userId,
         };
 
-        const getRes = toolInput
-            ? getToolData({ ...opts, toolInput })
-            : getChat(opts);
-        getRes.then(() =>
-            getTitle(activeThread, upsertTitle, userId, state.openAiApiKey),
-        );
+        toolInput
+            ? await getToolData({ ...opts, toolInput })
+            : await getChat(opts);
+
+        getTitle(activeThread, upsertTitle, userId, state.openAiApiKey);
     };
 }
 
