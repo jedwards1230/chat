@@ -88,7 +88,7 @@ export default function ChatThread({
             )}
         >
             <div className="flex h-full w-full flex-col">
-                {activeThread ? (
+                {activeThread?.currentNode ? (
                     groupedMessages.map((group, i) => (
                         <ChatGroup
                             key={i}

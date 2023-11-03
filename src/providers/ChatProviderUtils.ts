@@ -10,30 +10,8 @@ import { sortThreadlist } from '@/utils';
 import { createMessage, getTitle, getToolData } from '@/utils/client/chat';
 import { baseCommands } from '@/tools/commands';
 import ChatManager from '@/lib/ChatManager';
-import { defaultAgentConfig } from './characters';
 
 type ChatDispatch = Dispatch<SetStateAction<ChatState>>;
-
-/** Find initial thread */
-export function getInitialActiveThread(
-    savedConfig: AgentConfig,
-    activeId: string | null | undefined,
-    threadList: ChatThread[],
-): number | null {
-    for (let i = 0; i < threadList.length; i++) {
-        if (threadList[i].id === activeId) {
-            return i;
-        }
-    }
-
-    const initialThread: ChatThread = {
-        ...getDefaultThread(defaultAgentConfig),
-        ...(savedConfig && { agentConfig: savedConfig }),
-        lastModified: new Date(),
-    };
-
-    return null;
-}
 
 /** Upsert Message into ChatThread */
 function upsertMessageState(
@@ -581,6 +559,33 @@ export function abortRequestHandler(state: ChatState, setState: ChatDispatch) {
             botTyping: false,
             saved: false,
         }));
+    };
+}
+
+export function clearChatHandler(setState: ChatDispatch) {
+    return () => {
+        setState((prevState) => {
+            prevState.abortRequest();
+
+            const activeThread = getActiveThread(prevState);
+            const newMapping = ChatManager.clearChat(activeThread.mapping);
+
+            const newThread: ChatThread = {
+                ...activeThread,
+                mapping: newMapping.mapping,
+                currentNode: newMapping.currentNode,
+                lastModified: new Date(),
+                title: 'New Chat',
+            };
+
+            return {
+                ...prevState,
+                saved: false,
+                threads: prevState.threads.map((thread) =>
+                    thread.id === newThread.id ? newThread : thread,
+                ),
+            };
+        });
     };
 }
 

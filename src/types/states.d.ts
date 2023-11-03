@@ -28,6 +28,8 @@ type ChatState = {
     abortRequest: () => void;
     /** Abort request, set default thread, save */
     createThread: () => void;
+    /** Clear message history in current Chat Thread */
+    clearChat: () => void;
     /** Toggle plugin for active thread */
     toggleplugin: (plugin: Tool) => void;
     changeBranch: (id: string) => void;

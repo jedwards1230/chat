@@ -43,6 +43,7 @@ const initialState: ChatState = {
     characterList: defaultAgents,
     abortController: new AbortController(),
 
+    clearChat: () => {},
     addMessage: () => {},
     cancelEdit: () => {},
     changeInput: () => {},

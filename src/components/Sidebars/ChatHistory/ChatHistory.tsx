@@ -40,15 +40,6 @@ function ChatHistory({
         setMounted(true);
     }, [setSideBarOpen]);
 
-    const getMessageCount = (mapping: MessageMapping) => {
-        let count = 0;
-        for (const key in mapping) {
-            const r = mapping[key];
-            if (r) count++;
-        }
-        return count;
-    };
-
     return (
         <Sidebar
             pos="left"
@@ -66,15 +57,13 @@ function ChatHistory({
             </Button>
             {/* Chat History */}
             <div className="flex w-full flex-1 flex-col gap-1 overflow-y-scroll pt-2 sm:pt-0">
-                {threadList.map((thread, i) =>
-                    getMessageCount(thread.mapping) > 1 ? (
-                        <ChatHistoryEntry
-                            key={`${i}-${thread.id}`}
-                            entry={thread}
-                            active={thread.id === activeThread?.id}
-                        />
-                    ) : null,
-                )}
+                {threadList.map((thread, i) => (
+                    <ChatHistoryEntry
+                        key={`${i}-${thread.id}`}
+                        entry={thread}
+                        active={thread.id === activeThread?.id}
+                    />
+                ))}
             </div>
             {/* Footer Buttons */}
             <div className="flex w-full justify-end gap-x-2 pb-3 pl-2 text-sm md:pb-1 md:pl-0">

@@ -9,7 +9,6 @@ import { isMobile } from '@/utils/client/device';
 import { useUI } from '@/providers/UIProvider';
 import { deleteThreadById } from '@/utils/server/supabase';
 import { deleteLocalThreadById } from '@/utils/client/localstorage';
-import { useMessages } from '@/lib/ChatManager';
 
 export default function ChatHistoryEntry({
     entry,
@@ -20,7 +19,6 @@ export default function ChatHistoryEntry({
 }) {
     const { removeThread, createThread } = useChat();
     const { setSideBarOpen } = useUI();
-    const messages = useMessages(entry.currentNode, entry.mapping);
 
     // Function to remove a thread and update the local storage
     const remove = (e: any) => {
@@ -35,7 +33,7 @@ export default function ChatHistoryEntry({
         if (isMobile('md')) setSideBarOpen(false);
     };
 
-    if (messages.length <= 1) return null;
+    if (entry.currentNode === null) return null;
     return (
         <div className="relative">
             <Link

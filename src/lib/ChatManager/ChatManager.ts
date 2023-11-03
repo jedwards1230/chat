@@ -1,6 +1,14 @@
 import { v4 as uuid } from 'uuid';
 
 /**
+ * I was gonna make this a class that is stored in ChatThread,
+ * but then I have to serialize it and deserialize it every time
+ * I want to use a server action.
+ *
+ * TODO: This could easily be switched to a general utils file.
+ */
+
+/**
  * The ChatManager class provides methods to manage a chat conversation represented as a graph.
  * The graph's nodes are messages, with the first message being the super parent and the most recent messages
  * being the end of the branches. The class provides methods to create, read, update, and delete messages,
@@ -241,6 +249,28 @@ export default class ChatManager {
         }
 
         return null;
+    }
+
+    /**
+     * Clears the chat by deleting all messages except the system message.
+     */
+    static clearChat(mapping: MessageMapping): MessagesState {
+        const newMapping: MessageMapping = {};
+        let currentNode: string | null = null;
+
+        Object.keys(mapping).forEach((id) => {
+            const message = mapping[id].message;
+            if (message?.role === 'system') {
+                newMapping[id] = mapping[id];
+                currentNode = id;
+            }
+        });
+
+        if (currentNode && newMapping[currentNode]?.children.length > 0) {
+            newMapping[currentNode].children = [];
+        }
+
+        return { mapping: newMapping, currentNode };
     }
 
     /**
