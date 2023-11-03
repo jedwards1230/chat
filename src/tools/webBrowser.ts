@@ -106,9 +106,13 @@ export class WebBrowser implements CustomTool {
             context = results.map((res) => res.pageContent).join('\n');
         }
 
-        const instruction = `Text:${context}\n\nI need ${
-            doSummary ? 'a summary' : task
-        } from the above text, also provide up to 5 markdown links from within that would be of interest (always including URL and text). Links should be provided, if present, in markdown syntax as a list under the heading "Relevant Links:".`;
+        const summaryPrompt =
+            'I need a summary from the above text. This should cover many detailed points about the main subject of the page. The summary should be at least a good paragraph or two, which can include listed details, depending on the topic.';
+        const taskPrompt = `I need ${task} from the above text. Complete the task to the best of your ability based on information in the context. If the context seems irrelevant, let the user know there was an error.`;
+
+        const instruction = `${context}\n\n${
+            doSummary ? summaryPrompt : taskPrompt
+        }}\n\nAlso provide up to 5 markdown links from within that would be of interest (always including URL and text). Links should be provided, if present, in markdown syntax as a list under the heading "Relevant Links:".`;
 
         return this.model.predict(instruction);
     }
