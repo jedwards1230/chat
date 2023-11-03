@@ -12,35 +12,36 @@ interface Database {
             AgentConfigs: {
                 Row: {
                     id: string;
-                    model: Json | null;
-                    name: string | null;
-                    systemMessage: string | null;
-                    tools: string[] | null;
-                    toolsEnabled: boolean | null;
-                    userId: string | null;
+                    model: Json;
+                    name: string;
+                    systemMessage: string;
+                    tools: string[];
+                    toolsEnabled: boolean;
+                    userId: string;
                 };
                 Insert: {
                     id: string;
-                    model?: Json | null;
-                    name?: string | null;
-                    systemMessage?: string | null;
-                    tools?: string[] | null;
-                    toolsEnabled?: boolean | null;
-                    userId?: string | null;
+                    model: Json;
+                    name: string;
+                    systemMessage: string;
+                    tools: string[];
+                    toolsEnabled: boolean;
+                    userId: string;
                 };
                 Update: {
                     id?: string;
-                    model?: Json | null;
-                    name?: string | null;
-                    systemMessage?: string | null;
-                    tools?: string[] | null;
-                    toolsEnabled?: boolean | null;
-                    userId?: string | null;
+                    model?: Json;
+                    name?: string;
+                    systemMessage?: string;
+                    tools?: string[];
+                    toolsEnabled?: boolean;
+                    userId?: string;
                 };
                 Relationships: [
                     {
                         foreignKeyName: 'AgentConfigs_userId_fkey';
                         columns: ['userId'];
+                        isOneToOne: false;
                         referencedRelation: 'Users';
                         referencedColumns: ['userId'];
                     },
@@ -48,43 +49,66 @@ interface Database {
             };
             ChatThreads: {
                 Row: {
-                    agentConfigId: string | null;
+                    agentConfigId: string;
                     created: string;
                     id: string;
                     lastModified: string;
-                    title: string | null;
-                    userId: string | null;
+                    title: string;
+                    userId: string;
                 };
                 Insert: {
-                    agentConfigId?: string | null;
+                    agentConfigId: string;
                     created: string;
                     id: string;
                     lastModified: string;
-                    title?: string | null;
-                    userId?: string | null;
+                    title: string;
+                    userId: string;
                 };
                 Update: {
-                    agentConfigId?: string | null;
+                    agentConfigId?: string;
                     created?: string;
                     id?: string;
                     lastModified?: string;
-                    title?: string | null;
-                    userId?: string | null;
+                    title?: string;
+                    userId?: string;
                 };
                 Relationships: [
                     {
                         foreignKeyName: 'ChatThreads_agentConfigId_fkey';
                         columns: ['agentConfigId'];
+                        isOneToOne: false;
                         referencedRelation: 'AgentConfigs';
                         referencedColumns: ['id'];
                     },
                     {
                         foreignKeyName: 'ChatThreads_userId_fkey';
                         columns: ['userId'];
+                        isOneToOne: false;
                         referencedRelation: 'Users';
                         referencedColumns: ['userId'];
                     },
                 ];
+            };
+            documents: {
+                Row: {
+                    content: string | null;
+                    embedding: string | null;
+                    id: number;
+                    metadata: Json | null;
+                };
+                Insert: {
+                    content?: string | null;
+                    embedding?: string | null;
+                    id?: number;
+                    metadata?: Json | null;
+                };
+                Update: {
+                    content?: string | null;
+                    embedding?: string | null;
+                    id?: number;
+                    metadata?: Json | null;
+                };
+                Relationships: [];
             };
             MessageRelationships: {
                 Row: {
@@ -112,7 +136,7 @@ interface Database {
                     id: string;
                     name: string | null;
                     role: Database['public']['Enums']['Role'];
-                    threadId: string | null;
+                    threadId: string;
                 };
                 Insert: {
                     active?: boolean | null;
@@ -124,7 +148,7 @@ interface Database {
                     id: string;
                     name?: string | null;
                     role: Database['public']['Enums']['Role'];
-                    threadId?: string | null;
+                    threadId: string;
                 };
                 Update: {
                     active?: boolean | null;
@@ -136,12 +160,13 @@ interface Database {
                     id?: string;
                     name?: string | null;
                     role?: Database['public']['Enums']['Role'];
-                    threadId?: string | null;
+                    threadId?: string;
                 };
                 Relationships: [
                     {
                         foreignKeyName: 'Messages_threadId_fkey';
                         columns: ['threadId'];
+                        isOneToOne: false;
                         referencedRelation: 'ChatThreads';
                         referencedColumns: ['id'];
                     },
@@ -155,7 +180,7 @@ interface Database {
                     lastModified: string;
                     originalThreadId: string;
                     title: string;
-                    userId: string | null;
+                    userId: string;
                 };
                 Insert: {
                     agentConfig: Json;
@@ -164,7 +189,7 @@ interface Database {
                     lastModified: string;
                     originalThreadId: string;
                     title: string;
-                    userId?: string | null;
+                    userId: string;
                 };
                 Update: {
                     agentConfig?: Json;
@@ -173,12 +198,13 @@ interface Database {
                     lastModified?: string;
                     originalThreadId?: string;
                     title?: string;
-                    userId?: string | null;
+                    userId?: string;
                 };
                 Relationships: [
                     {
                         foreignKeyName: 'SharedChatThreads_userId_fkey';
                         columns: ['userId'];
+                        isOneToOne: false;
                         referencedRelation: 'Users';
                         referencedColumns: ['userId'];
                     },
@@ -216,6 +242,7 @@ interface Database {
                     {
                         foreignKeyName: 'SharedMessages_sharedThreadId_fkey';
                         columns: ['sharedThreadId'];
+                        isOneToOne: false;
                         referencedRelation: 'SharedChatThreads';
                         referencedColumns: ['id'];
                     },
@@ -238,10 +265,65 @@ interface Database {
             [_ in never]: never;
         };
         Functions: {
-            [_ in never]: never;
+            ivfflathandler: {
+                Args: {
+                    '': unknown;
+                };
+                Returns: unknown;
+            };
+            match_documents: {
+                Args: {
+                    query_embedding: string;
+                    match_count?: number;
+                    filter?: Json;
+                };
+                Returns: {
+                    id: number;
+                    content: string;
+                    metadata: Json;
+                    similarity: number;
+                }[];
+            };
+            vector_avg: {
+                Args: {
+                    '': number[];
+                };
+                Returns: string;
+            };
+            vector_dims: {
+                Args: {
+                    '': string;
+                };
+                Returns: number;
+            };
+            vector_norm: {
+                Args: {
+                    '': string;
+                };
+                Returns: number;
+            };
+            vector_out: {
+                Args: {
+                    '': string;
+                };
+                Returns: unknown;
+            };
+            vector_send: {
+                Args: {
+                    '': string;
+                };
+                Returns: string;
+            };
+            vector_typmod_in: {
+                Args: {
+                    '': unknown[];
+                };
+                Returns: number;
+            };
         };
         Enums: {
             Role: 'system' | 'user' | 'assistant' | 'function';
+            Tool: 'calculator' | 'search' | 'web-browser' | 'wikipedia-api';
         };
         CompositeTypes: {
             [_ in never]: never;

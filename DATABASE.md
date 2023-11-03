@@ -4,36 +4,36 @@ CREATE TYPE "Role" AS ENUM ('system', 'user', 'assistant', 'function');
 
 -- Users table
 CREATE TABLE "Users" (
-    "userId" VARCHAR(255) PRIMARY KEY
+    "userId" VARCHAR(255) PRIMARY KEY NOT NULL
 );
 
 -- AgentConfigs table
 CREATE TABLE "AgentConfigs" (
-    "id" UUID PRIMARY KEY,
-    "name" TEXT,
-    "tools" VARCHAR[],
-    "toolsEnabled" BOOLEAN,
-    "model" JSONB,
-    "systemMessage" TEXT,
-    "userId" VARCHAR(255),
+    "id" UUID PRIMARY KEY NOT NULL,
+    "name" TEXT NOT NULL,
+    "tools" VARCHAR[] NOT NULL,
+    "toolsEnabled" BOOLEAN NOT NULL,
+    "model" JSONB NOT NULL,
+    "systemMessage" TEXT NOT NULL,
+    "userId" VARCHAR(255) NOT NULL,
     FOREIGN KEY ("userId") REFERENCES "Users"("userId")
 );
 
 -- ChatThreads table
 CREATE TABLE "ChatThreads" (
-    "id" UUID PRIMARY KEY,
+    "id" UUID PRIMARY KEY NOT NULL,
     "created" TIMESTAMP NOT NULL,
     "lastModified" TIMESTAMP NOT NULL,
-    "title" TEXT,
-    "agentConfigId" UUID,
-    "userId" VARCHAR(255),
+    "title" TEXT NOT NULL,
+    "agentConfigId" UUID NOT NULL,
+    "userId" VARCHAR(255) NOT NULL,
     FOREIGN KEY ("agentConfigId") REFERENCES "AgentConfigs"("id"),
     FOREIGN KEY ("userId") REFERENCES "Users"("userId")
 );
 
 -- Messages table
 CREATE TABLE "Messages" (
-    "id" UUID PRIMARY KEY,
+    "id" UUID PRIMARY KEY NOT NULL,
     "content" TEXT,
     "role" "Role" NOT NULL,
     "name" TEXT,
@@ -41,15 +41,15 @@ CREATE TABLE "Messages" (
     "createdAt" TIMESTAMP,
     "functionCallName" TEXT,
     "functionCallArguments" JSONB,
-    "threadId" UUID,
+    "threadId" UUID NOT NULL,
     "active" BOOLEAN DEFAULT FALSE,
     FOREIGN KEY ("threadId") REFERENCES "ChatThreads"("id") ON DELETE CASCADE
 );
 
 -- MessageRelationships table
 CREATE TABLE "MessageRelationships" (
-    "parentMessageId" UUID,
-    "childMessageId" UUID,
+    "parentMessageId" UUID NOT NULL,
+    "childMessageId" UUID NOT NULL,
     PRIMARY KEY ("parentMessageId", "childMessageId"),
     FOREIGN KEY ("parentMessageId") REFERENCES "Messages"("id") ON DELETE CASCADE,
     FOREIGN KEY ("childMessageId") REFERENCES "Messages"("id") ON DELETE CASCADE
@@ -57,8 +57,8 @@ CREATE TABLE "MessageRelationships" (
 
 -- SharedChatThreads table
 CREATE TABLE "SharedChatThreads" (
-    "id" VARCHAR(255) PRIMARY KEY,
-    "userId" VARCHAR(255),
+    "id" VARCHAR(255) PRIMARY KEY NOT NULL,
+    "userId" VARCHAR(255) NOT NULL,
     "originalThreadId" UUID NOT NULL,
     "created" TIMESTAMP NOT NULL,
     "lastModified" TIMESTAMP NOT NULL,
@@ -70,7 +70,7 @@ CREATE TABLE "SharedChatThreads" (
 
 -- SharedMessages table
 CREATE TABLE "SharedMessages" (
-    "id" VARCHAR(255) PRIMARY KEY,
+    "id" VARCHAR(255) PRIMARY KEY NOT NULL,
     "sharedThreadId" VARCHAR(255) NOT NULL,
     "content" TEXT NOT NULL,
     "role" VARCHAR(50) NOT NULL,
