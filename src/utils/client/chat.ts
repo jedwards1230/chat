@@ -219,7 +219,10 @@ export async function getChat({
     setState((prevState) => ({
         ...prevState,
         botTyping: false,
-        saved: false,
+        saved: {
+            ...prevState.saved,
+            messages: false,
+        },
         isNew: false,
     }));
 }

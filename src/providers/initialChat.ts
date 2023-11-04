@@ -33,7 +33,11 @@ export function resetDefaultThread() {
 const initialState: ChatState = {
     input: '',
     threads: [],
-    saved: true,
+    saved: {
+        agentConfig: true,
+        thread: true,
+        messages: true,
+    },
     editId: null,
     currentThreadIdx: null,
     defaultThread: resetDefaultThread(),

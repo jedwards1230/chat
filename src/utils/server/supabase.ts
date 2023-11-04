@@ -115,24 +115,14 @@ export async function getThreadListByUserId(
 }
 
 export async function upsertThread(thread: ChatThread) {
-    const messages = ChatManager.getOrderedMessages(
-        thread.currentNode,
-        thread.mapping,
-    );
-    if (messages.length === 0) return;
-
     const userId = await getUserId();
     if (!userId) return;
 
     await db.upsertAgentConfigs([
         {
-            id: thread.agentConfig.id,
+            ...thread.agentConfig,
             userId,
-            name: thread.agentConfig.name,
-            tools: thread.agentConfig.tools,
-            toolsEnabled: thread.agentConfig.toolsEnabled,
             model: JSON.stringify(thread.agentConfig.model),
-            systemMessage: thread.agentConfig.systemMessage,
         },
     ]);
 
@@ -146,8 +136,18 @@ export async function upsertThread(thread: ChatThread) {
             agentConfigId: thread.agentConfig.id,
         },
     ]);
+}
 
-    // Upsert messages before upserting chat threads
+export async function upsertMessages(thread: ChatThread) {
+    const messages = ChatManager.getOrderedMessages(
+        thread.currentNode,
+        thread.mapping,
+    );
+    if (messages.length === 0) return;
+
+    const userId = await getUserId();
+    if (!userId) return;
+
     for (const message of messages) {
         await db.upsertMessages([
             {
@@ -276,14 +276,15 @@ export async function getCharacterListByUserId(
     return characterList;
 }
 
-export async function upsertCharacter(character: AgentConfig) {
+export async function upsertAgentConfig(agentConfig: AgentConfig) {
     const userId = await getUserId();
     if (!userId) return;
+
     await db.upsertAgentConfigs([
         {
-            ...character,
+            ...agentConfig,
             userId,
-            model: JSON.stringify(character.model),
+            model: JSON.stringify(agentConfig.model),
         },
     ]);
 }

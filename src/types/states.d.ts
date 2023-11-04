@@ -16,7 +16,11 @@ type ChatState = {
     /** Abort chat */
     abortController: AbortController;
     /** Setting this to false will trigger a save */
-    saved: boolean;
+    saved: {
+        agentConfig: boolean;
+        thread: boolean;
+        messages: boolean;
+    };
     /** Store character profiles */
     characterList: AgentConfig[];
     /** Store OpenAI API key */

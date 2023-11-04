@@ -32,22 +32,23 @@ import {
     addMessageHandler,
     changeBranchHandler,
     regenerateChatHandler,
+    upsertTitleState,
 } from './ChatProviderUtils';
 import {
     getCharacterListByUserId,
     getThreadListByUserId,
-    upsertThread,
 } from '@/utils/server/supabase';
 import {
     getLocalCharacterList,
     getLocalOpenAiKey,
     getLocalThreadList,
-    setLocalThreadList,
 } from '@/utils/client/localstorage';
 import { useUI } from './UIProvider';
 import initialState from './initialChat';
 import Dialogs from '@/components/Dialogs';
 import { mergeThreads, mergeCharacters } from '@/utils';
+import { useSave } from '@/lib/useSave';
+import { getTitle } from '@/utils/client';
 
 const ChatContext = createContext<ChatState>(initialState);
 
@@ -71,6 +72,12 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
             return state.threads[state.currentThreadIdx];
         }
     }, [state.currentThreadIdx, state.threads]);
+
+    const { saveAgentConfig, saveChatThread, saveMessages } = useSave(
+        userId,
+        state,
+        setState,
+    );
 
     const createThread = createThreadHandler(state, setState, router);
     const setOpenAiApiKey = setOpenAiApiKeyHandler(setState);
@@ -123,19 +130,40 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
     // Save thread when it is updated
     useEffect(() => {
-        if (!state.saved && state.currentThreadIdx !== null) {
-            try {
-                const thread = state.threads[state.currentThreadIdx];
-                if (userId) upsertThread(thread);
-                if (window !== undefined) {
-                    setLocalThreadList(state.threads);
-                }
-                setState((prevState) => ({ ...prevState, saved: true }));
-            } catch (err) {
-                console.error(err);
+        if (!activeThread) return;
+        const saveChat = async () => {
+            if (!state.saved.agentConfig)
+                await saveAgentConfig(activeThread.agentConfig);
+            if (!state.saved.thread) await saveChatThread(activeThread);
+            if (!state.saved.messages && !state.botTyping) {
+                await saveMessages(activeThread);
             }
-        }
-    }, [state.saved, state.currentThreadIdx, userId, state.threads]);
+        };
+        saveChat();
+    }, [
+        activeThread,
+        saveAgentConfig,
+        saveChatThread,
+        saveMessages,
+        state.botTyping,
+        state.currentThreadIdx,
+        state.saved.agentConfig,
+        state.saved.messages,
+        state.saved.thread,
+        state.threads,
+    ]);
+
+    useEffect(() => {
+        if (!activeThread) return;
+        if (state.botTyping) return;
+        const upsertTitle = (title: string) => {
+            document.title = 'Chat | ' + title;
+            setState((p) => upsertTitleState(p, title));
+        };
+
+        getTitle(activeThread, upsertTitle, userId, state.openAiApiKey);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [state.botTyping]);
 
     // Update active thread when threadId changes
     useEffect(() => {
@@ -169,7 +197,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         changeInput: changeInputHandler(setState),
         changeBranch: changeBranchHandler(setState),
         removeThread: removeThreadHandler(setState),
-        saveCharacter: saveCharacterHandler(setState, userId),
+        saveCharacter: saveCharacterHandler(setState),
         removeMessage: removeMessageHandler(setState),
         editMessage: editMessageHandler(setState),
         toggleplugin: togglePluginHandler(setState),

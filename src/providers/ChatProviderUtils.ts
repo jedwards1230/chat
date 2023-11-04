@@ -5,7 +5,7 @@ import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.share
 
 import { getDefaultThread, resetDefaultThread } from './initialChat';
 import { getChat } from '@/utils/client';
-import { deleteMessageById, upsertCharacter } from '@/utils/server/supabase';
+import { deleteMessageById } from '@/utils/server/supabase';
 import { sortThreadlist } from '@/utils';
 import { createMessage, getTitle, getToolData } from '@/utils/client/chat';
 import { baseCommands } from '@/tools/commands';
@@ -71,7 +71,14 @@ export function upsertTitleState(
         thread.id === newThread.id ? newThread : thread,
     );
 
-    return { ...prevState, threads };
+    return {
+        ...prevState,
+        threads,
+        saved: {
+            ...prevState.saved,
+            thread: false,
+        },
+    };
 }
 
 /**
@@ -82,13 +89,6 @@ function upsertThreadState(
     newMap: MessagesState,
     controller?: AbortController,
 ): ChatState {
-    const newState = {
-        ...prevState,
-        editId: prevState.editId ? null : prevState.editId,
-        abortController: controller ? controller : prevState.abortController,
-        input: '',
-    };
-
     const currentThread = prevState.currentThreadIdx;
     const newThread: ChatThread =
         currentThread === null
@@ -110,8 +110,16 @@ function upsertThreadState(
     const newIndex = threads.findIndex((thread) => thread.id === newThread.id);
 
     return {
-        ...newState,
+        ...prevState,
+        editId: prevState.editId ? null : prevState.editId,
+        abortController: controller ? controller : prevState.abortController,
+        input: '',
         threads,
+        saved: {
+            ...prevState.saved,
+            messages: false,
+            thread: false,
+        },
         currentThreadIdx: newIndex !== -1 ? newIndex : null,
         ...(currentThread === null && {
             defaultThread: resetDefaultThread(),
@@ -150,11 +158,6 @@ export function createSubmitHandler(
 
     const upsertMessage = (newMessage: Message, threadId?: string) =>
         setState((p) => upsertMessageState(p, newMessage, threadId));
-
-    const upsertTitle = (title: string) => {
-        document.title = 'Chat | ' + title;
-        setState((p) => upsertTitleState(p, title));
-    };
 
     const getNewMapping = (
         activeThread: ChatThread,
@@ -243,8 +246,6 @@ export function createSubmitHandler(
         toolInput
             ? await getToolData({ ...opts, toolInput })
             : await getChat(opts);
-
-        getTitle(activeThread, upsertTitle, userId, state.openAiApiKey);
     };
 }
 
@@ -457,7 +458,6 @@ export function editMessageHandler(setState: ChatDispatch) {
                 ...prevState,
                 editId: id,
                 input: msg.content || '',
-                saved: false,
             };
         });
     };
@@ -476,7 +476,10 @@ export function removeMessageHandler(setState: ChatDispatch) {
             activeThread.currentNode = newMapping.newCurrentNode;
             return {
                 ...prevState,
-                saved: false,
+                saved: {
+                    ...prevState.saved,
+                    messages: false,
+                },
                 threads: prevState.threads.map((thread) =>
                     thread.id === activeThread.id ? activeThread : thread,
                 ),
@@ -496,7 +499,6 @@ export function removeThreadHandler(setState: ChatDispatch) {
                 ...prevState,
                 threads,
                 currentThreadIdx: threads.length - 1,
-                saved: false,
             };
         });
 }
@@ -514,7 +516,6 @@ export function removeAllThreadsHandler(
                 threads: [getDefaultThread(activeThread.agentConfig)],
                 currentThreadIdx: null,
                 input: '',
-                saved: true,
                 editId: null,
             };
         });
@@ -556,7 +557,11 @@ export function abortRequestHandler(state: ChatState, setState: ChatDispatch) {
         setState((prevState) => ({
             ...prevState,
             botTyping: false,
-            saved: false,
+            saved: {
+                ...prevState.saved,
+                messages: false,
+                thread: false,
+            },
         }));
     };
 }
@@ -579,7 +584,10 @@ export function clearChatHandler(setState: ChatDispatch) {
 
             return {
                 ...prevState,
-                saved: false,
+                saved: {
+                    ...prevState.saved,
+                    messages: false,
+                },
                 threads: prevState.threads.map((thread) =>
                     thread.id === newThread.id ? newThread : thread,
                 ),
@@ -588,12 +596,8 @@ export function clearChatHandler(setState: ChatDispatch) {
     };
 }
 
-export function saveCharacterHandler(
-    setState: ChatDispatch,
-    userId?: string | null,
-) {
+export function saveCharacterHandler(setState: ChatDispatch) {
     return async (character: AgentConfig) => {
-        if (userId) upsertCharacter(character);
         setState((prevState) => {
             const characterList = prevState.characterList;
             const foundIndex = characterList.findIndex(
@@ -608,7 +612,10 @@ export function saveCharacterHandler(
 
             return {
                 ...prevState,
-                saved: false,
+                saved: {
+                    ...prevState.saved,
+                    character: false,
+                },
                 characterList,
             };
         });
@@ -666,7 +673,6 @@ export function changeBranchHandler(setState: ChatDispatch) {
                 ...prevState,
                 input: '',
                 editId: null,
-                saved: false,
                 botTyping: false,
                 threads: prevState.threads.map((thread) =>
                     thread.id === activeThread.id
