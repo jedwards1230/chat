@@ -26,10 +26,6 @@ export function getDefaultThread(config: AgentConfig): ChatThread {
     };
 }
 
-export function resetDefaultThread() {
-    return getDefaultThread(defaultAgents[0]);
-}
-
 const initialState: ChatState = {
     input: '',
     threads: [],
@@ -40,7 +36,7 @@ const initialState: ChatState = {
     },
     editId: null,
     currentThreadIdx: null,
-    defaultThread: resetDefaultThread(),
+    defaultThread: getDefaultThread(defaultAgents[0]),
     botTyping: false,
     openAiApiKey: '',
     streamResponse: true,

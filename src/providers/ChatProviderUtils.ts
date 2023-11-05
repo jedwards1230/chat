@@ -3,7 +3,7 @@
 import { Dispatch, SetStateAction, FormEvent } from 'react';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 
-import { getDefaultThread, resetDefaultThread } from './initialChat';
+import { getDefaultThread } from './initialChat';
 import { getChat } from '@/utils/client';
 import { deleteMessageById } from '@/utils/server/supabase';
 import { sortThreadlist } from '@/utils';
@@ -92,8 +92,10 @@ function upsertThreadState(
     const currentThread = prevState.currentThreadIdx;
     const newThread: ChatThread =
         currentThread === null
-            ? { ...prevState.defaultThread }
-            : {
+            ? // create new thread
+              { ...prevState.defaultThread }
+            : // update existing thread
+              {
                   ...prevState.threads[currentThread],
                   mapping: newMap.mapping,
                   currentNode: newMap.currentNode,
@@ -111,8 +113,8 @@ function upsertThreadState(
 
     return {
         ...prevState,
-        editId: prevState.editId ? null : prevState.editId,
-        abortController: controller ? controller : prevState.abortController,
+        editId: prevState.editId ? null : prevState.editId, // reset editId
+        abortController: controller ? controller : prevState.abortController, // reset abortController
         input: '',
         threads,
         saved: {
@@ -121,9 +123,6 @@ function upsertThreadState(
             thread: false,
         },
         currentThreadIdx: newIndex !== -1 ? newIndex : null,
-        ...(currentThread === null && {
-            defaultThread: resetDefaultThread(),
-        }),
     };
 }
 
@@ -308,7 +307,6 @@ export function createThreadHandler(
         setState((prevState) => ({
             ...prevState,
             currentThreadIdx: null,
-            defaultThread: resetDefaultThread(),
             input: '',
             botTyping: false,
             isNew: true,
