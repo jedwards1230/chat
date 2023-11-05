@@ -14,6 +14,8 @@ export default function ChatBubble({
     input?: string;
     config?: AgentConfig;
 }) {
+    if (message.role === 'assistant' && message.function_call) return null;
+    if (message.content === '') return null;
     return (
         <div className="flex flex-col">
             <BranchSwitcher message={message} />

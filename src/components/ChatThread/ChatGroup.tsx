@@ -11,6 +11,15 @@ export default function ChatGroup({
     config?: AgentConfig;
 }) {
     const { messages, role } = groupedMessages;
+
+    const getInput = (m: Message, i: number) => {
+        const lastMessage = messages[i - 1];
+        if (m.role === 'function' && lastMessage && lastMessage.function_call) {
+            const args = lastMessage.function_call.arguments;
+            return typeof args === 'string' ? args : args?.input;
+        }
+    };
+
     return (
         <div
             className={clsx(
@@ -22,33 +31,15 @@ export default function ChatGroup({
         >
             <div className="mx-auto flex w-full max-w-4xl gap-2 md:gap-4">
                 <ProfilePicture role={role} />
-
                 <div>
-                    {messages.map((m, i) => {
-                        if (m.role === 'assistant' && m.function_call) {
-                            return null;
-                        }
-                        const lastMessage = messages[i - 1];
-                        const input =
-                            m.role === 'function' &&
-                            lastMessage &&
-                            lastMessage.function_call &&
-                            lastMessage.function_call.arguments
-                                ? lastMessage.function_call.arguments
-                                : undefined;
-                        return (
-                            <ChatBubble
-                                key={m.id}
-                                message={m}
-                                config={config}
-                                input={
-                                    typeof input === 'string'
-                                        ? input
-                                        : input?.input
-                                }
-                            />
-                        );
-                    })}
+                    {messages.map((m, i) => (
+                        <ChatBubble
+                            key={m.id}
+                            message={m}
+                            config={config}
+                            input={getInput(m, i)}
+                        />
+                    ))}
                 </div>
             </div>
         </div>
