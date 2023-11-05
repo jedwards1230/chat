@@ -12,7 +12,6 @@ import { AccountDropdown } from './Buttons';
 import { Button } from '../../ui/button';
 import { useSession } from 'next-auth/react';
 import { Ellipsis } from '../../Icons';
-import { sortThreadlist } from '@/utils';
 import { useChat } from '@/providers/ChatProvider';
 
 function ChatHistory({
@@ -28,7 +27,8 @@ function ChatHistory({
     const [mounted, setMounted] = useState(false);
     const { sideBarOpen, setSideBarOpen } = useUI();
 
-    const threadList = threads.sort(sortThreadlist);
+    //const threadList = threads.sort(sortThreadlist);
+    const organizedThreads = organizeThreadsByDate(threads);
 
     const newThread = () => {
         if (isMobile()) setSideBarOpen(false);
@@ -57,12 +57,22 @@ function ChatHistory({
             </Button>
             {/* Chat History */}
             <div className="flex w-full flex-1 flex-col gap-1 overflow-y-scroll pt-2 sm:pt-0">
-                {threadList.map((thread, i) => (
-                    <ChatHistoryEntry
-                        key={`${i}-${thread.id}`}
-                        entry={thread}
-                        active={thread.id === activeThread?.id}
-                    />
+                {organizedThreads.map(({ thread, header }, i) => (
+                    <>
+                        {header && (
+                            <div
+                                key={`${i}-${header}`}
+                                className="w-full px-2 text-sm text-gray-400 "
+                            >
+                                {header}
+                            </div>
+                        )}
+                        <ChatHistoryEntry
+                            key={`${i}-${thread.id}`}
+                            entry={thread}
+                            active={thread.id === activeThread?.id}
+                        />
+                    </>
                 ))}
             </div>
             {/* Footer Buttons */}
@@ -98,3 +108,67 @@ function ChatHistory({
 }
 
 export default memo(ChatHistory);
+
+type SortedChatThread = { thread: ChatThread; header?: string };
+
+function organizeThreadsByDate(threadList: ChatThread[]): SortedChatThread[] {
+    const currentDate = new Date();
+    const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
+
+    return threadList
+        .sort((a, b) => b.lastModified.getTime() - a.lastModified.getTime()) // sorting threads by lastModified
+        .reduce((acc: SortedChatThread[], thread, i, arr) => {
+            const diffDays = Math.round(
+                (currentDate.getTime() - thread.lastModified.getTime()) /
+                    oneDay,
+            );
+
+            let header: string | undefined;
+
+            if (
+                i === 0 ||
+                (diffDays <= 7 &&
+                    (i === 0 ||
+                        Math.round(
+                            (currentDate.getTime() -
+                                arr[i - 1].lastModified.getTime()) /
+                                oneDay,
+                        ) > 7))
+            ) {
+                header = 'Last 7 days';
+            } else if (
+                diffDays <= 30 &&
+                (i === 0 ||
+                    Math.round(
+                        (currentDate.getTime() -
+                            arr[i - 1].lastModified.getTime()) /
+                            oneDay,
+                    ) > 30)
+            ) {
+                header = 'Last 30 days';
+            } else if (
+                diffDays <= 365 &&
+                (i === 0 ||
+                    Math.round(
+                        (currentDate.getTime() -
+                            arr[i - 1].lastModified.getTime()) /
+                            oneDay,
+                    ) > 365)
+            ) {
+                header = `${
+                    thread.lastModified.getMonth() + 1
+                }/${thread.lastModified.getFullYear()}`;
+            } else if (
+                diffDays > 365 &&
+                (i === 0 ||
+                    arr[i - 1].lastModified.getFullYear() <
+                        thread.lastModified.getFullYear())
+            ) {
+                header = `${thread.lastModified.getFullYear()}`;
+            }
+
+            acc.push({ thread, header });
+
+            return acc;
+        }, []);
+}
