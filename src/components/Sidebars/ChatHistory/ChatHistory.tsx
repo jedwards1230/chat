@@ -59,14 +59,14 @@ function ChatHistory({
             <div className="flex w-full flex-1 flex-col gap-1 overflow-y-scroll pt-2 sm:pt-0">
                 {organizedThreads.map(({ thread, header }, i) => (
                     <>
-                        {header && (
+                        {/* {header && (
                             <div
                                 key={`${i}-${header}`}
                                 className="w-full px-2 text-sm text-gray-400 "
                             >
                                 {header}
                             </div>
-                        )}
+                        )} */}
                         <ChatHistoryEntry
                             key={`${i}-${thread.id}`}
                             entry={thread}
