@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { useMemo } from 'react';
 
 import { ChatBubble } from '../ChatBubble';
 import ProfilePicture from '../ChatBubble/ProfilePicture';
@@ -20,6 +21,48 @@ export default function ChatGroup({
         }
     };
 
+    const subGroups = useMemo(() => {
+        const grouped: {
+            role: 'file' | 'text';
+            messages: Message[];
+        }[] = [];
+
+        // helper to add a message to the last group
+        const addToLastGroup = (message: Message, r: 'file' | 'text') => {
+            if (grouped.length === 0) {
+                grouped.push({ role: r, messages: [message] });
+            } else {
+                grouped[grouped.length - 1].messages.push(message);
+            }
+        };
+
+        const isFile = (message: Message) =>
+            message.role === 'user' && message.name !== undefined;
+
+        // check if the last message is from the same role
+        const eqPrevMsg = (role?: 'file' | 'text') =>
+            grouped[grouped.length - 1]?.role === role;
+
+        const upsert = (message: Message, r: 'file' | 'text' = 'text') => {
+            const role = r;
+            if (eqPrevMsg(role)) {
+                addToLastGroup(message, r);
+            } else {
+                grouped.push({ role: r, messages: [message] });
+            }
+        };
+
+        for (const message of messages) {
+            if (isFile(message)) {
+                upsert(message, 'file');
+            } else {
+                upsert(message);
+            }
+        }
+
+        return grouped;
+    }, [messages]);
+
     return (
         <div
             className={clsx(
@@ -32,14 +75,32 @@ export default function ChatGroup({
             <div className="mx-auto flex w-full max-w-4xl gap-2 md:gap-4">
                 <ProfilePicture role={role} />
                 <div>
-                    {messages.map((m, i) => (
-                        <ChatBubble
-                            key={m.id}
-                            message={m}
-                            config={config}
-                            input={getInput(m, i)}
-                        />
-                    ))}
+                    {subGroups.map(({ role, messages }, i) =>
+                        role === 'file' ? (
+                            <div
+                                key={`${i}-${role}`}
+                                className="flex flex-wrap"
+                            >
+                                {messages.map((m, j) => (
+                                    <ChatBubble
+                                        key={`${i}-${j}`}
+                                        message={m}
+                                        config={config}
+                                        input={getInput(m, j)}
+                                    />
+                                ))}
+                            </div>
+                        ) : (
+                            messages.map((m, j) => (
+                                <ChatBubble
+                                    key={`${i}-${j}`}
+                                    message={m}
+                                    config={config}
+                                    input={getInput(m, j)}
+                                />
+                            ))
+                        ),
+                    )}
                 </div>
             </div>
         </div>

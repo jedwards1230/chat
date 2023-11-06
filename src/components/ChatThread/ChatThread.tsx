@@ -54,20 +54,20 @@ export default function ChatThread({
             }
         };
 
+        // check if the last message is from the same role
+        const eqPrevMsg = (role: Role) =>
+            grouped[grouped.length - 1]?.role === role;
+
+        const upsert = (message: Message, r?: Role) => {
+            const role = r || message.role;
+            if (eqPrevMsg(role)) {
+                addToLastGroup(message);
+            } else {
+                grouped.push({ role: message.role, messages: [message] });
+            }
+        };
+
         for (const message of messages) {
-            // check if the last message is from the same role
-            const eqPrevMsg = (role: Role) =>
-                grouped[grouped.length - 1]?.role === role;
-
-            const upsert = (message: Message, r?: Role) => {
-                const role = r || message.role;
-                if (eqPrevMsg(role)) {
-                    addToLastGroup(message);
-                } else {
-                    grouped.push({ role: message.role, messages: [message] });
-                }
-            };
-
             if (message.role === 'function') {
                 upsert(message, 'assistant');
             } else {

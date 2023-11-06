@@ -6,6 +6,14 @@ import { Button } from '@/components/ui/button';
 import Markdown from './Markdown';
 import { parseInput } from '@/tools/utils';
 import { useChat } from '@/providers/ChatProvider';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '../ui/dialog';
 
 export default function TextContent({
     message,
@@ -23,23 +31,25 @@ export default function TextContent({
               }`
             : message.content;
 
+    const showFunctionDetails = message.role === 'function';
+    const showSystemMessage = message.role === 'system';
+    const showAssistantMessage = message.role === 'assistant' && content;
+    const showUserMessage = message.role === 'user' && content;
+
     return (
         <div className="relative overflow-hidden p-2">
-            {message.role === 'function' && (
+            {showFunctionDetails && (
                 <FunctionDetails
                     message={message}
                     input={input}
                     content={content}
                 />
             )}
-            {message.role === 'system' && (
+            {showSystemMessage && (
                 <SystemContent message={message} config={config} />
             )}
-            {message.role === 'assistant' && content && (
-                <Markdown content={content} />
-            )}
-            {message.role === 'user' &&
-                content &&
+            {showAssistantMessage && <Markdown content={content} />}
+            {showUserMessage &&
                 (message.name !== undefined ? (
                     <FileDetails message={message} />
                 ) : (
@@ -80,14 +90,23 @@ function FunctionDetails({
 }
 
 function FileDetails({ message }: { message: Message }) {
-    const [open, setOpen] = useState(false);
     return (
-        <>
-            <PreviewButton onClick={() => setOpen(!open)}>
-                <div className="inline-block align-middle">{message.name}</div>
-            </PreviewButton>
-            {open && <DetailsContent content={message.content || ''} />}
-        </>
+        <Dialog>
+            <DialogTrigger>
+                <PreviewButton>
+                    <div className="inline-block align-middle">
+                        {message.name}
+                    </div>
+                </PreviewButton>
+            </DialogTrigger>
+            <DialogContent className="max-h-[80vh] w-full max-w-3xl overflow-y-scroll">
+                <DialogHeader>
+                    <DialogTitle>{message.name}</DialogTitle>
+                    <DialogDescription>File Upload</DialogDescription>
+                </DialogHeader>
+                <DetailsContent content={message.content || ''} />
+            </DialogContent>
+        </Dialog>
     );
 }
 
@@ -106,7 +125,7 @@ function PreviewButton({
     loading = false,
 }: {
     children: React.ReactNode;
-    onClick: () => void;
+    onClick?: () => void;
     loading?: boolean;
 }) {
     return (
