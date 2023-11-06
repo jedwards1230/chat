@@ -595,7 +595,7 @@ export function clearChatHandler(setState: ChatDispatch) {
 }
 
 export function saveCharacterHandler(setState: ChatDispatch) {
-    return async (character: AgentConfig) => {
+    return (character: AgentConfig) => {
         setState((prevState) => {
             const characterList = prevState.characterList;
             const foundIndex = characterList.findIndex(

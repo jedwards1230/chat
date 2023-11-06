@@ -12,6 +12,7 @@
 /public/workbox-*
 
 /supabase
+/docs
 
 # testing
 /coverage

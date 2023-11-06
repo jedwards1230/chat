@@ -1,209 +1,346 @@
-'use client';
-
-import { useEffect, useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ChevronDown } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { v4 as uuid } from 'uuid';
+import * as z from 'zod';
 
 import { defaultAgentConfig } from '@/providers/characters';
 import { modelList, modelMap } from '@/providers/models';
+import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useChat } from '@/providers/ChatProvider';
 import { availableTools } from '@/tools/config';
-import { Textarea } from '../../ui/textarea';
-import { Checkbox } from '../../ui/checkbox';
-import { Button } from '../../ui/button';
-import { Input } from '../../ui/input';
-import { Label } from '../../ui/label';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+    DropdownMenu,
+    DropdownMenuTrigger,
+    DropdownMenuContent,
+    DropdownMenuItem,
+} from '@/components/ui/dropdown-menu';
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from '../../ui/select';
+} from '@/components/ui/select';
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from '@/components/ui/form';
 
-export default function CharacterSettings({ agent }: { agent?: AgentConfig }) {
+const formSchema = z.object({
+    id: z.string().optional(),
+    name: z
+        .string()
+        .min(2, {
+            message: 'Agent name must be at least 2 characters.',
+        })
+        .max(20, {
+            message: 'Agent name must be at most 20 characters.',
+        }),
+    systemMessage: z.string().optional(),
+    modelName: z.string(),
+    streamResponse: z.boolean(),
+    toolsEnabled: z.boolean(),
+    tools: z.array(z.string()),
+});
+
+export default function CharacterSettings({
+    agent,
+    setActive,
+}: {
+    agent?: AgentConfig;
+    setActive: (config: AgentConfig) => void;
+}) {
     const {
         activeThread,
         updateThreadConfig,
         setSystemMessage,
         saveCharacter,
+        characterList,
         defaultThread,
         streamResponse,
         setStreamResponse,
     } = useChat();
 
     const thread = activeThread || defaultThread;
-    const isNew = agent === undefined;
-    const [config, setConfig] = useState(
-        agent
-            ? agent
-            : {
-                  ...defaultAgentConfig,
-                  name: 'New Character',
-              },
-    );
-    useEffect(() => setConfig(thread.agentConfig), [thread]);
+    const initConfig = agent
+        ? agent
+        : {
+              ...defaultAgentConfig,
+              name: 'New Character',
+          };
 
-    const onFieldChange = (
-        field: keyof AgentConfig,
-        value: string | number | boolean,
+    const form = useForm<z.infer<typeof formSchema>>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            id: initConfig.id,
+            name: initConfig.name,
+            systemMessage: initConfig.systemMessage,
+            modelName: initConfig.model.name,
+            streamResponse,
+            toolsEnabled: initConfig.toolsEnabled,
+            tools: initConfig.tools,
+        },
+    });
+
+    const onSubmit = async (
+        values: z.infer<typeof formSchema>,
+        isNew: boolean = false,
     ) => {
-        const update = { ...config, [field]: value };
-
-        if (field === 'model') {
-            const model = modelMap[value as Model];
-            if (model) update.model = model;
+        if (isNew) {
+            if (characterList.find((c) => c.name === values.name)) {
+                form.setError('name', {
+                    type: 'manual',
+                    message: 'Character name must be unique.',
+                });
+                return;
+            }
+            values.id = uuid();
         }
+        const config: AgentConfig = {
+            ...values,
+            id: values.id || initConfig.id,
+            systemMessage: values.systemMessage || '',
+            model: modelMap[values.modelName as Model],
+            tools: values.tools as Tool[],
+        };
 
-        setConfig(update);
-    };
-
-    const togglePlugin = (tool: Tool) => {
-        const newTools = config.tools?.includes(tool)
-            ? config.tools.filter((t) => t !== tool)
-            : [...config.tools, tool];
-
-        setConfig({ ...config, tools: newTools });
-    };
-
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+        saveCharacter(config);
+        setActive(config);
         if (thread) {
+            setStreamResponse(values.streamResponse);
             setSystemMessage(config.systemMessage);
             updateThreadConfig(config);
         }
-        saveCharacter(config);
     };
 
-    const params = config.model.params;
+    const toggleTool = (tool: string) => {
+        const currentTools = form.getValues('tools');
+        if (currentTools.includes(tool)) {
+            // If the tool is currently selected, remove it from the array
+            form.setValue(
+                'tools',
+                currentTools.filter((t) => t !== tool),
+            );
+        } else {
+            // If the tool is not currently selected, add it to the array
+            form.setValue('tools', [...currentTools, tool]);
+        }
+    };
 
-    const modelInfo = [
-        { Temperature: params?.temperature },
-        { 'Top P': params?.topP },
-        { N: params?.N },
-        { 'Max Tokens': params?.maxTokens },
-        { 'Frequency Penalty': params?.frequencyPenalty },
-        { 'Presence Penalty': params?.presencePenalty },
-    ];
-
-    const functionsAllowed = config.model.api !== 'llama';
-    const streamingAllowed = config.model.api !== 'llama';
+    const modelName = form.watch('modelName') as Model;
+    const model = modelMap[modelName];
+    const functionsAllowed = model.api !== 'llama';
+    const streamingAllowed = model.api !== 'llama';
 
     return (
-        <form onSubmit={handleSubmit} className="w-full space-y-4">
-            <div className="flex flex-col gap-2">
-                <Input
-                    placeholder="Agent Name"
-                    required
-                    value={config.name}
-                    onChange={(e) => onFieldChange('name', e.target.value)}
-                />
-                <Textarea
-                    placeholder="Agent System Message"
-                    required
-                    value={config.systemMessage}
-                    onChange={(e) =>
-                        onFieldChange('systemMessage', e.target.value)
-                    }
-                />
-            </div>
-            <div className="flex flex-col gap-4 rounded-md">
-                <Select
-                    onValueChange={(v) => v && onFieldChange('model', v)}
-                    value={config.model.name}
-                >
-                    <SelectTrigger className="w-full">
-                        <SelectValue placeholder={config.model.name} />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {modelList.map((model) => (
-                            <SelectItem
-                                key={'select-' + model.name}
-                                value={model.name}
-                            >
-                                {model.name}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-                {streamingAllowed && (
-                    <div className="flex justify-between px-1">
-                        <Label htmlFor="stream-response">Stream Response</Label>
-                        <Checkbox
-                            id="stream-response"
-                            checked={streamResponse}
-                            onCheckedChange={setStreamResponse}
-                        />
-                    </div>
-                )}
-                {functionsAllowed && (
-                    <div className="flex w-full flex-col gap-2">
-                        <label className="flex flex-col rounded px-1 transition-colors hover:bg-neutral-300 dark:hover:bg-neutral-600">
-                            <div className="flex items-center justify-between gap-4 dark:border-neutral-600">
-                                <div className="font-semibold text-neutral-950 transition-colors dark:text-neutral-100">
-                                    Plugins
-                                </div>
-                                <Checkbox
-                                    title="Toggle plugins"
-                                    checked={config.toolsEnabled}
-                                    onCheckedChange={(e) =>
-                                        onFieldChange('toolsEnabled', e)
-                                    }
-                                />
-                            </div>
-                            {config.toolsEnabled && (
-                                <div className="text-xs text-neutral-600 transition-colors dark:text-neutral-400">
-                                    {config.tools.length} enabled
-                                </div>
-                            )}
-                        </label>
-                        {config.toolsEnabled && (
-                            <div>
-                                {availableTools.map((plugin) => {
-                                    const checked =
-                                        config.tools.includes(plugin);
-                                    return (
-                                        <label
-                                            key={plugin}
-                                            className="flex w-full cursor-pointer items-center justify-between rounded p-1 text-sm hover:bg-neutral-300 dark:hover:bg-neutral-600"
-                                        >
-                                            <span className="capitalize">
-                                                {plugin}
-                                            </span>
-                                            <Checkbox
-                                                checked={checked}
-                                                onCheckedChange={() =>
-                                                    togglePlugin(plugin)
-                                                }
-                                            />
-                                        </label>
-                                    );
-                                })}
-                            </div>
+        <Form {...form}>
+            <form
+                onSubmit={form.handleSubmit((v) => onSubmit(v))}
+                className="flex h-full flex-col justify-between"
+            >
+                <div className="h-full w-full space-y-4">
+                    <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Agent Name</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        placeholder="Agent Name"
+                                        required
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
                         )}
-                    </div>
-                )}
-                <details className="w-full">
-                    <summary className="cursor-pointer hover:bg-neutral-300 dark:hover:bg-neutral-700">
-                        Advanced
-                    </summary>
-                    {modelInfo.map((info) => {
-                        const [k, v] = Object.entries(info)[0];
-                        return (
-                            <div
-                                key={k}
-                                className="flex w-full justify-between text-sm text-neutral-600 dark:text-neutral-400"
-                            >
-                                <div>{k}:</div>
-                                <div>{v}</div>
-                            </div>
-                        );
-                    })}
-                </details>
-            </div>
-            <div className="flex w-full justify-end">
-                <Button variant="outlineAccent" type="submit">
-                    {!isNew ? 'Update' : 'Create'}
-                </Button>
-            </div>
-        </form>
+                    />
+                    <FormField
+                        control={form.control}
+                        name="systemMessage"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>System Message</FormLabel>
+                                <FormControl>
+                                    <Textarea
+                                        placeholder="Agent System Message"
+                                        required
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="modelName"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Model</FormLabel>
+                                <FormControl>
+                                    <Select
+                                        {...field}
+                                        onValueChange={field.onChange}
+                                    >
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue
+                                                placeholder={field.value}
+                                            />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {modelList.map((model) => (
+                                                <SelectItem
+                                                    key={'select-' + model.name}
+                                                    value={model.name}
+                                                >
+                                                    {model.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    {streamingAllowed && (
+                        <FormField
+                            control={form.control}
+                            name="streamResponse"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <FormLabel className="flex w-full items-center justify-between rounded p-1 hover:bg-secondary">
+                                            Stream Response
+                                            <Checkbox
+                                                id="stream-response"
+                                                checked={field.value}
+                                                onCheckedChange={field.onChange}
+                                            />
+                                        </FormLabel>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    )}
+                    {functionsAllowed && (
+                        <div className="w-full space-y-2">
+                            <FormField
+                                control={form.control}
+                                name="toolsEnabled"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormControl>
+                                            <FormLabel className="flex w-full items-center justify-between rounded p-1 hover:bg-secondary">
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <div className="font-semibold text-neutral-950 transition-colors dark:text-neutral-100">
+                                                        Plugins
+                                                    </div>
+                                                    {field.value && (
+                                                        <div className="text-xs text-neutral-600 transition-colors dark:text-neutral-400">
+                                                            {
+                                                                form.watch(
+                                                                    'tools',
+                                                                ).length
+                                                            }{' '}
+                                                            enabled
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <Checkbox
+                                                    checked={field.value}
+                                                    onCheckedChange={
+                                                        field.onChange
+                                                    }
+                                                />
+                                            </FormLabel>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            {form.watch('toolsEnabled') && (
+                                <FormItem className="pl-2">
+                                    {availableTools.map((tool) => (
+                                        <FormLabel
+                                            key={tool}
+                                            className="flex items-center justify-between rounded p-1 hover:bg-secondary"
+                                        >
+                                            {tool}
+                                            <Checkbox
+                                                id={tool}
+                                                checked={form
+                                                    .watch('tools')
+                                                    .includes(tool)}
+                                                onCheckedChange={() =>
+                                                    toggleTool(tool)
+                                                }
+                                            >
+                                                {tool}
+                                            </Checkbox>
+                                        </FormLabel>
+                                    ))}
+                                </FormItem>
+                            )}
+                        </div>
+                    )}
+                </div>
+                <FormMessage />
+                <div className="mt-auto flex w-full justify-end">
+                    <SaveButton
+                        onSubmit={onSubmit}
+                        formValues={form.getValues}
+                    />
+                </div>
+            </form>
+        </Form>
+    );
+}
+
+function SaveButton({
+    onSubmit,
+    formValues,
+}: {
+    onSubmit: Function;
+    formValues: () => z.infer<typeof formSchema>;
+}) {
+    return (
+        <div className="flex items-center">
+            <Button
+                variant="outlineAccent"
+                type="submit"
+                className="rounded-r-none border-r-0"
+            >
+                Save
+            </Button>
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button
+                        className="rounded-l-none border-l-0"
+                        variant="outlineAccent"
+                    >
+                        <ChevronDown size={16} />
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="">
+                    <DropdownMenuItem
+                        onClick={() => onSubmit(formValues(), true)}
+                    >
+                        Save As New
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+        </div>
     );
 }

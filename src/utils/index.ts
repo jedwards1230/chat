@@ -51,9 +51,7 @@ export function mergeThreads(
     const threadMap = new Map<string, ChatThread>();
 
     // Add the old threads to the map
-    oldThreads.forEach((thread) => {
-        threadMap.set(thread.id, thread);
-    });
+    oldThreads.forEach((thread) => threadMap.set(thread.id, thread));
 
     // Add the new threads to the map, replacing the old ones if the new one is more recent
     newThreads.forEach((thread) => {
@@ -67,30 +65,24 @@ export function mergeThreads(
     });
 
     // Convert the map values back to an array
-    return Array.from(threadMap.values()).sort(sortThreadlist);
+    return Array.from(threadMap.values());
 }
 
 export function mergeCharacters(
-    oldCharacters: any[],
-    newCharacters: any[],
+    oldCharacters: AgentConfig[],
+    newCharacters: AgentConfig[],
 ): AgentConfig[] {
     const characterMap = new Map<string, any>();
 
     // Add the old characters to the map
-    oldCharacters.forEach((character) => {
-        characterMap.set(character.name, character);
-    });
+    oldCharacters.forEach((character) =>
+        characterMap.set(character.name, character),
+    );
 
     // Add the new characters to the map, replacing the old ones if the new one is more recent
-    newCharacters.forEach((character) => {
-        const existingCharacter = characterMap.get(character.id);
-        if (
-            !existingCharacter ||
-            existingCharacter.lastModified < character.lastModified
-        ) {
-            characterMap.set(character.name, character);
-        }
-    });
+    newCharacters.forEach((character) =>
+        characterMap.set(character.name, character),
+    );
 
     // Convert the map values back to an array
     return Array.from(characterMap.values());

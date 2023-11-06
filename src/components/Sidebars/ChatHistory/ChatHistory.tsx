@@ -68,7 +68,7 @@ function ChatHistory({
                             </div>
                         )} */}
                         <ChatHistoryEntry
-                            key={`${i}-${thread.id}`}
+                            key={`${i}-${thread.id}-${thread.title}`}
                             entry={thread}
                             active={thread.id === activeThread?.id}
                         />

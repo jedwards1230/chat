@@ -13,6 +13,7 @@
     },
     "dependencies": {
         "@ducanh2912/next-pwa": "^9.7.2",
+        "@hookform/resolvers": "^3.3.2",
         "@opentelemetry/api": "^1.6.0",
         "@radix-ui/react-checkbox": "^1.0.4",
         "@radix-ui/react-dialog": "^1.0.5",
@@ -33,9 +34,10 @@
         "next-auth": "5.0.0-beta.2",
         "next-plausible": "^3.11.3",
         "next-themes": "^0.2.1",
-        "openai": "4.15.2",
+        "openai": "4.15.4",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
+        "react-hook-form": "^7.48.2",
         "react-markdown": "^9.0.0",
         "react-syntax-highlighter": "^15.5.0",
         "remark-gfm": "^4.0.0",
@@ -43,7 +45,8 @@
         "tailwind-merge": "^2.0.0",
         "tailwindcss-animate": "^1.0.7",
         "typescript": "5.2.2",
-        "uuid": "^9.0.1"
+        "uuid": "^9.0.1",
+        "zod": "^3.22.4"
     },
     "devDependencies": {
         "@next/bundle-analyzer": "^14.0.1",

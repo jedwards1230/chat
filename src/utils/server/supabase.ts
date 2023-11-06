@@ -282,7 +282,11 @@ export async function upsertAgentConfig(agentConfig: AgentConfig) {
 
     await db.upsertAgentConfigs([
         {
-            ...agentConfig,
+            id: agentConfig.id,
+            name: agentConfig.name,
+            tools: agentConfig.tools,
+            toolsEnabled: agentConfig.toolsEnabled,
+            systemMessage: agentConfig.systemMessage,
             userId,
             model: JSON.stringify(agentConfig.model),
         },

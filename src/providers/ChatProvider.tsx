@@ -34,19 +34,9 @@ import {
     regenerateChatHandler,
     upsertTitleState,
 } from './ChatProviderUtils';
-import {
-    getCharacterListByUserId,
-    getThreadListByUserId,
-} from '@/utils/server/supabase';
-import {
-    getLocalCharacterList,
-    getLocalOpenAiKey,
-    getLocalThreadList,
-} from '@/utils/client/localstorage';
 import { useUI } from './UIProvider';
 import initialState from './initialChat';
 import Dialogs from '@/components/Dialogs';
-import { mergeThreads, mergeCharacters } from '@/utils';
 import { useSave } from '@/lib/useSave';
 import { getTitle } from '@/utils/client';
 
@@ -64,76 +54,34 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
     const { setAppSettingsOpen } = useUI();
 
-    const [mounted, setMounted] = useState(false);
     const [state, setState] = useState<ChatState>(initialState);
 
-    const activeThread = useMemo(() => {
-        if (state.currentThreadIdx !== null) {
-            return state.threads[state.currentThreadIdx];
-        }
-    }, [state.currentThreadIdx, state.threads]);
-
-    const { saveAgentConfig, saveChatThread, saveMessages } = useSave(
-        userId,
-        state,
-        setState,
+    const activeThread = useMemo(
+        () =>
+            state.currentThreadIdx !== null
+                ? state.threads[state.currentThreadIdx]
+                : undefined,
+        [state.currentThreadIdx, state.threads],
     );
 
     const createThread = createThreadHandler(state, setState, router);
     const setOpenAiApiKey = setOpenAiApiKeyHandler(setState);
     const abortRequest = abortRequestHandler(state, setState);
 
-    // Load data
-    useEffect(() => {
-        if (mounted) return;
-        // Load OpenAI API key from local storage
-        const key = getLocalOpenAiKey();
-        if (key) setOpenAiApiKey(key);
-
-        const fetchDataAndMerge = async () => {
-            // Load threads and characters from local storage
-            const localCharacters = getLocalCharacterList();
-            const localThreads = getLocalThreadList();
-
-            let serverCharacters: AgentConfig[] = [];
-            let serverThreads: ChatThread[] = [];
-
-            if (userId) {
-                // Fetch server data
-                [serverThreads, serverCharacters] = await Promise.all([
-                    getThreadListByUserId(userId),
-                    getCharacterListByUserId(userId),
-                ]);
-            }
-
-            const mergedThreads = mergeThreads(
-                mergeThreads(state.threads, localThreads),
-                serverThreads,
-            );
-            const mergedCharacters = mergeCharacters(
-                mergeCharacters(state.characterList, localCharacters),
-                serverCharacters,
-            );
-
-            setState((prevState) => ({
-                ...prevState,
-                threads: mergedThreads,
-                characterList: mergedCharacters,
-            }));
-            setMounted(true);
-        };
-
-        fetchDataAndMerge();
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [userId]);
+    const { saveAgentConfig, saveChatThread, saveMessages } = useSave(
+        userId,
+        state,
+        setState,
+        setOpenAiApiKey,
+    );
 
     // Save thread when it is updated
     useEffect(() => {
         if (!activeThread) return;
         const saveChat = async () => {
-            if (!state.saved.agentConfig)
+            if (!state.saved.agentConfig) {
                 await saveAgentConfig(activeThread.agentConfig);
+            }
             if (!state.saved.thread) await saveChatThread(activeThread);
             if (!state.saved.messages && !state.botTyping) {
                 await saveMessages(activeThread);
@@ -153,6 +101,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         state.threads,
     ]);
 
+    // Update title when bot is finished typing
     useEffect(() => {
         if (!activeThread) return;
         if (state.botTyping) return;
