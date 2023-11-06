@@ -38,8 +38,8 @@ function CharacterSelector({ children }: { children: React.ReactNode }) {
                     </div>
                 </div>
                 <div className="grid h-full w-full grid-cols-3 gap-4 md:grid-cols-10">
-                    <div className="col-span-3 flex h-[70vh] w-full flex-col justify-between gap-2">
-                        <div className="flex w-full gap-2 overflow-y-scroll pr-2 sm:pr-4 md:flex-col">
+                    <div className="col-span-7 flex w-full flex-col justify-between gap-2 sm:col-span-3 md:h-[70vh]">
+                        <div className="flex w-full gap-2 overflow-y-scroll pb-3 pr-2 sm:pr-4 md:flex-col md:pb-0">
                             {characterList
                                 .sort((a, b) => a.name.localeCompare(b.name))
                                 .map((agent, i) => {

@@ -144,7 +144,7 @@ export default function CharacterSettings({
         <Form {...form}>
             <form
                 onSubmit={form.handleSubmit((v) => onSubmit(v))}
-                className="flex h-full flex-col justify-between"
+                className="flex h-full flex-col justify-between gap-2"
             >
                 <div className="h-full w-full space-y-4">
                     <FormField
