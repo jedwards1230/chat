@@ -3,6 +3,7 @@
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { Trash } from '../Icons';
 import Markdown from './Markdown';
 import { parseInput } from '@/tools/utils';
 import { useChat } from '@/providers/ChatProvider';
@@ -37,7 +38,7 @@ export default function TextContent({
     const showUserMessage = message.role === 'user' && content;
 
     return (
-        <div className="relative overflow-hidden p-2">
+        <div className="relative p-2 overflow-hidden">
             {showFunctionDetails && (
                 <FunctionDetails
                     message={message}
@@ -90,6 +91,7 @@ function FunctionDetails({
 }
 
 function FileDetails({ message }: { message: Message }) {
+    const { removeMessage } = useChat();
     return (
         <Dialog>
             <DialogTrigger asChild>
@@ -101,8 +103,15 @@ function FileDetails({ message }: { message: Message }) {
             </DialogTrigger>
             <DialogContent className="max-h-[80vh] w-full max-w-3xl overflow-y-scroll">
                 <DialogHeader>
-                    <DialogTitle>{message.name}</DialogTitle>
-                    <DialogDescription>File Upload</DialogDescription>
+                    <div className="flex gap-4">
+                        <div>
+                            <DialogTitle>{message.name}</DialogTitle>
+                            <DialogDescription>File Upload</DialogDescription>
+                        </div>
+                        <button onClick={() => removeMessage(message.id)}>
+                            <Trash />
+                        </button>
+                    </div>
                 </DialogHeader>
                 <DetailsContent content={message.content || ''} />
             </DialogContent>
@@ -132,7 +141,7 @@ function PreviewButton({
         <Button
             variant={loading ? 'functionPreviewLoading' : 'functionPreview'}
             onClick={onClick}
-            className="gap-2 text-ellipsis rounded-xl transition-all"
+            className="gap-2 transition-all text-ellipsis rounded-xl"
         >
             {children}
         </Button>
@@ -148,7 +157,7 @@ function SystemContent({
 }) {
     if (!config) return null;
     return (
-        <div className="flex w-full flex-col justify-start rounded text-sm text-neutral-400 dark:text-neutral-400">
+        <div className="flex flex-col justify-start w-full text-sm rounded text-neutral-400 dark:text-neutral-400">
             <div>Model: {config.model.name}</div>
             <div>System Message: {message.content}</div>
             {config.toolsEnabled && config.tools.length > 0 && (
