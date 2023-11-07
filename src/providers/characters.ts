@@ -6,7 +6,7 @@ export const defaultAgentConfig: AgentConfig = {
     name: 'Chat',
     tools: ['search', 'wikipedia-api'],
     toolsEnabled: true,
-    model: modelMap['gpt-4'],
+    model: modelMap['gpt-4-1106-preview'],
     systemMessage: 'You are a helpful assistant.',
 };
 
