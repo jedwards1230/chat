@@ -92,7 +92,7 @@ function FunctionDetails({
 function FileDetails({ message }: { message: Message }) {
     return (
         <Dialog>
-            <DialogTrigger>
+            <DialogTrigger asChild>
                 <PreviewButton>
                     <div className="inline-block align-middle">
                         {message.name}

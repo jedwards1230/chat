@@ -52,11 +52,8 @@ export async function getChatStream({
     }
 
     try {
-        switch (activeThread.agentConfig.model.name) {
-            case 'gpt-3.5-turbo':
-            case 'gpt-3.5-turbo-16k':
-            case 'gpt-4':
-            case 'gpt-4-0613':
+        switch (activeThread.agentConfig.model.api) {
+            case 'openai':
                 return await fetchOpenAiChat(
                     activeThread,
                     msgHistory,
@@ -65,7 +62,7 @@ export async function getChatStream({
                     signal,
                     key,
                 );
-            case 'llama-2-7b-chat-int8':
+            case 'llama':
                 return await fetchLlama2Chat(msgHistory);
         }
     } catch (err) {
