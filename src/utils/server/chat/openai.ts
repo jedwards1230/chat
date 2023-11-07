@@ -59,9 +59,9 @@ export async function getTitleStream(history: string, key?: string) {
                     role: 'system',
                     content:
                         'Generate a brief title based on provided conversation. ' +
-                        'Provide only the string for the title. No quotes or labels are necessary.' +
+                        'Provide only the alphanumeric characters for the title. No quotes or labels are necessary.' +
                         'No matter how complex the conversation, make the title extremely brief. ' +
-                        'Max length is 20 characters. ',
+                        'Max length is 15 characters. ',
                 },
                 {
                     role: 'user',
@@ -69,6 +69,7 @@ export async function getTitleStream(history: string, key?: string) {
                 },
             ],
             temperature: 0.1,
+            max_tokens: 15,
             stream: true,
         });
 

@@ -25,6 +25,10 @@ export default class ChatManager {
     ): MessagesState {
         const id = message.id;
 
+        if (mapping.hasOwnProperty(id)) {
+            throw new Error(`ID ${id} already exists in mapping`);
+        }
+
         const updateCurrentNode = (current_node: string) => {
             const node = mapping[current_node];
             if (node.children.includes(id)) {
@@ -135,6 +139,13 @@ export default class ChatManager {
                 if (updatedMapping[childId]) {
                     updatedMapping[childId].parent = parent;
                     updatedMapping[parent].children.push(childId);
+                }
+            });
+        } else {
+            // If the node is the super parent, remove the node's children
+            messageToDelete.children.forEach((childId) => {
+                if (updatedMapping[childId]) {
+                    updatedMapping[childId].parent = null;
                 }
             });
         }
@@ -306,15 +317,14 @@ export default class ChatManager {
         }
 
         if (currentNode) {
-            const messageToRegenerate = {
-                ...mapping[currentNode].message,
-                id: uuid(),
-            } as Message;
-            return this.editMessageAndFork(
-                currentNode,
-                messageToRegenerate,
-                mapping,
-            );
+            const msg = mapping[currentNode].message;
+            if (msg) {
+                return this.editMessageAndFork(
+                    currentNode,
+                    { ...msg, id: uuid() },
+                    mapping,
+                );
+            }
         }
 
         return { mapping, currentNode };
