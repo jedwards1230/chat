@@ -5,6 +5,7 @@ import ChatManager from '@/lib/ChatManager';
 import { db } from '@/lib/supabase.server';
 import { defaultAgents } from '@/providers/characters';
 import initialState from '@/providers/initialChat';
+import { groupBy } from '..';
 
 /* 
 Threads
@@ -26,69 +27,77 @@ export async function getThreadListByUserId(
     const messageIds = allMessages.map((message) => message.id);
     const allRelations = await db.getMessageRelationsForMessages(messageIds);
 
-    const groupBy = (array: any[], key: string) =>
-        array.reduce((result, currentValue) => {
-            (result[currentValue[key]] = result[currentValue[key]] || []).push(
-                currentValue,
-            );
-            return result;
-        }, {});
-
     const messagesByThreadId = groupBy(allMessages, 'threadId');
-    const relationsByMessageId = groupBy(allRelations, 'messageId');
 
     const threadList: ChatThread[] = [];
     for (const thread of threads) {
         if (!thread.agentConfigId)
             throw new Error(`Thread ${thread.id} has no agent config ID`);
 
-        const messages = messagesByThreadId[thread.id] || [];
+        const messages = messagesByThreadId[thread.id];
+        const relations = allRelations.filter((relation) =>
+            messages.some(
+                (message) =>
+                    message.id === relation.parentMessageId ||
+                    message.id === relation.childMessageId,
+            ),
+        );
 
-        let currentNode: string | null = null;
+        const currentNode: string | null =
+            messages.find((m) => m.active)?.id || null;
+
+        // Initialize the mapping with messages.
         const mapping: MessageMapping = {};
-        for (const message of messages) {
-            if (message.active) currentNode = message.id;
+        messages.forEach((message) => {
+            const name =
+                (message.role !== 'user' ? message.name : message.fileName) ||
+                undefined;
+            const createdAt = message.createdAt
+                ? new Date(message.createdAt)
+                : new Date();
 
-            const relations = relationsByMessageId[message.id] || [];
-            for (const { parentMessageId, childMessageId } of relations) {
-                const name =
-                    (message.role !== 'user'
-                        ? message.name
-                        : message.fileName) || undefined;
+            mapping[message.id] = {
+                id: message.id,
+                message: {
+                    id: message.id,
+                    content: message.content,
+                    role: message.role,
+                    name,
+                    createdAt,
+                    function_call:
+                        message.functionCallName &&
+                        message.functionCallArguments
+                            ? {
+                                  name: message.functionCallName,
+                                  arguments:
+                                      message.functionCallArguments as string,
+                              }
+                            : undefined,
+                },
+                parent: null, // Initial parent is null for every message
+                children: [], // Initialize children as an empty array
+            };
+        });
 
-                const createdAt = message.createdAt
-                    ? new Date(message.createdAt)
-                    : new Date();
-
-                if (mapping[message.id]) {
-                    mapping[message.id].children.push(childMessageId);
-                    mapping[message.id].children = [
-                        ...new Set(mapping[message.id].children),
-                    ]; // Remove duplicates
-                } else {
-                    mapping[message.id] = {
-                        id: message.id,
-                        message: {
-                            id: message.id,
-                            content: message.content,
-                            role: message.role,
-                            name,
-                            createdAt,
-                            ...(message.functionCallName &&
-                                message.functionCallArguments && {
-                                    function_call: {
-                                        name: message.functionCallName,
-                                        arguments:
-                                            message.functionCallArguments as string,
-                                    },
-                                }),
-                        },
-                        parent: parentMessageId,
-                        children: [childMessageId],
-                    };
-                }
+        // Establish the parent-child relationships.
+        relations.forEach((relation) => {
+            const { parentMessageId, childMessageId } = relation;
+            if (mapping[childMessageId] && mapping[parentMessageId]) {
+                mapping[childMessageId].parent = parentMessageId;
+                mapping[parentMessageId].children.push(childMessageId);
             }
-        }
+        });
+
+        // Check for the initial message and set its parent to null
+        messages.forEach((message) => {
+            if (
+                !relations.some(
+                    (relation) => relation.childMessageId === message.id,
+                )
+            ) {
+                mapping[message.id].parent = null;
+            }
+        });
 
         const base = agentConfigs[0];
         const agentConfig: AgentConfig = {

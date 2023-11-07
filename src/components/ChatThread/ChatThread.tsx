@@ -82,10 +82,7 @@ export default function ChatThread({
         <div
             style={style}
             ref={threadRef}
-            className={clsx(
-                'grow-1 relative flex h-full w-full max-w-full flex-col items-center justify-center',
-                hasMultipleMessages && 'overflow-y-scroll',
-            )}
+            className="grow-1 relative flex h-full w-full max-w-full flex-col items-center justify-center overflow-y-scroll"
         >
             <div className="flex h-full w-full flex-col">
                 {activeThread?.currentNode ? (

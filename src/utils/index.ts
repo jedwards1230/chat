@@ -57,3 +57,36 @@ export function mergeCharacters(
     // Convert the map values back to an array
     return Array.from(characterMap.values());
 }
+
+/**
+ * Groups the elements of an array based on the specified key.
+ * The function returns an object where each property is an array of elements
+ * that share the same value for the given key.
+ *
+ * @param array - The array to group.
+ * @param key - The key to group by, which must be a property of the elements in the array.
+ * @returns An object with properties corresponding to different values of the key.
+ * Each property is an array containing the elements that have that key's value.
+ *
+ * @example
+ * // Suppose we have an array of objects with a 'group' property
+ * const items = [{ group: 'a', value: 1 }, { group: 'b', value: 2 }, { group: 'a', value: 3 }];
+ * // Group items by the 'group' property
+ * const grouped = groupBy(items, 'group');
+ * // The 'grouped' object will be:
+ * // {
+ * //   a: [{ group: 'a', value: 1 }, { group: 'a', value: 3 }],
+ * //   b: [{ group: 'b', value: 2 }]
+ * // }
+ */
+export function groupBy<T, K extends keyof T>(
+    array: T[],
+    key: K,
+): Record<string, T[]> {
+    return array.reduce((result: any, currentValue: T) => {
+        (result[currentValue[key]] = result[currentValue[key]] || []).push(
+            currentValue,
+        );
+        return result;
+    }, {});
+}
