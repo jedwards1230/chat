@@ -2,10 +2,13 @@
 
 import type OpenAI from 'openai';
 import { Stream } from 'openai/streaming';
-import { type ChatCompletionCreateParams } from 'openai/resources/chat';
+
+import {
+    type ChatCompletionCreateParams,
+    type ChatCompletionMessageParam,
+} from 'openai/resources/chat';
 import { v4 as uuidv4 } from 'uuid';
 
-import { prepareMessages } from '@/utils';
 import { openai } from '@/lib/openai';
 
 export async function fetchOpenAiChat(
@@ -116,5 +119,24 @@ function toReadableStream(
         async cancel() {
             await iter.return?.();
         },
+    });
+}
+
+function prepareMessages(messages: Message[]): ChatCompletionMessageParam[] {
+    return messages.map((msg) => {
+        const functionCall = msg.function_call && {
+            ...msg.function_call,
+            arguments:
+                typeof msg.function_call.arguments === 'string'
+                    ? msg.function_call.arguments
+                    : msg.function_call?.arguments.input,
+        };
+
+        return {
+            role: msg.role,
+            content: msg.content,
+            name: msg.name || 'NAME_NOT_DEFINED',
+            ...(functionCall && { function_call: functionCall }),
+        };
     });
 }

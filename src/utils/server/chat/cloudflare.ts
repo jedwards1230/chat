@@ -1,6 +1,5 @@
 'use server';
 
-import { prepareMessages } from '@/utils';
 import { v4 as uuidv4 } from 'uuid';
 
 const ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID;
@@ -47,7 +46,19 @@ export async function getLlama2Chat(
     };
 }
 
+function prepareMessages(messages: Message[]) {
+    return messages.map((msg) => {
+        return {
+            role: msg.role,
+            content: msg.content || '',
+        };
+    });
+}
+
 export async function fetchLlama2Chat(msgHistory: Message[]) {
     const messages = prepareMessages(msgHistory);
+    if (typeof messages !== 'string' && messages !== null) {
+        throw new Error('Messages must be a string or null');
+    }
     return getLlama2Chat(messages);
 }

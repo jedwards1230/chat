@@ -1,4 +1,3 @@
-import { type ChatCompletionMessageParam } from 'openai/resources/chat';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -13,35 +12,6 @@ export function calculateRows(text: string, maxRows: number = 15) {
 
 export function sortThreadlist(a: ChatThread, b: ChatThread) {
     return b.lastModified.getTime() - a.lastModified.getTime();
-}
-
-export function prepareMessages(
-    messages: Message[],
-): ChatCompletionMessageParam[] {
-    return messages.map((msg) => {
-        if (msg.role === 'system') {
-            return {
-                role: msg.role,
-                content: msg.content,
-            };
-        }
-        const functionCall = msg.function_call && {
-            ...msg.function_call,
-            arguments:
-                typeof msg.function_call.arguments === 'string'
-                    ? msg.function_call.arguments
-                    : msg.function_call?.arguments.input,
-        };
-
-        return {
-            role: msg.role,
-            content: msg.content,
-            ...(msg.name && { name: msg.name }),
-            ...(functionCall && {
-                function_call: functionCall,
-            }),
-        };
-    });
 }
 
 export function mergeThreads(
