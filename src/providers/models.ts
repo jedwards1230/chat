@@ -57,7 +57,7 @@ const gpt35TurboBeta: OpenAiModelInfo = {
         temperature: 0.7,
         topP: 1,
         N: 1,
-        maxTokens: 4097,
+        maxTokens: 16385,
         frequencyPenalty: 0,
         presencePenalty: 0,
     },

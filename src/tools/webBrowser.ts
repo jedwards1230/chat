@@ -43,7 +43,7 @@ export class WebBrowser implements CustomTool {
     constructor({ headers, textSplitter, apiKey }: WebBrowserArgs) {
         const model = new ChatOpenAI({
             temperature: 0.3,
-            modelName: 'gpt-3.5-turbo-16k',
+            modelName: 'gpt-4-1106-preview',
             openAIApiKey: process.env.OPENAI_API_KEY || apiKey,
         });
         const embeddings = new OpenAIEmbeddings();

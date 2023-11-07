@@ -7,7 +7,7 @@ import { getDefaultThread } from './initialChat';
 import { getChat } from '@/utils/client';
 import { deleteMessageById } from '@/utils/server/supabase';
 import { sortThreadlist } from '@/utils';
-import { createMessage, getTitle, getToolData } from '@/utils/client/chat';
+import { createMessage, getToolData } from '@/utils/client/chat';
 import { baseCommands } from '@/tools/commands';
 import ChatManager from '@/lib/ChatManager';
 
