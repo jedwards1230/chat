@@ -122,8 +122,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
                 (t) => t.id === threadId,
             );
 
-            if (foundThreadIndex === -1) return prevState;
-
             return foundThreadIndex === -1
                 ? prevState
                 : {
